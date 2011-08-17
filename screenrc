@@ -1,0 +1,14 @@
+hardstatus alwayslastline
+hardstatus string '%{= kG}[ %{G}%H %{g}][%= %{=kw}%?%-Lw%?%{r}(%{W}%n*%f%t%?(%u)%?%{r})%{w}%?%+Lw%?%?%= %{g}][%{B}%Y-%m-%d %{W}%c %{g}]'
+defscrollback 5000
+shell bash
+startup_message off
+autodetach on
+
+default windows
+screen -t cl 0 
+screen -t app 1
+screen -t mysql 2 
+screen -t logger 3 
+screen -t access_log 4 
+screen -t error_log 5 
