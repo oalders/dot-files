@@ -3,6 +3,7 @@ call pathogen#runtime_append_all_bundles()
 
 " Bundle: git://github.com/altercation/vim-colors-solarized.git 
 " Bundle: https://github.com/vim-scripts/perl-support.vim.git
+" Bundle: https://github.com/scrooloose/nerdcommenter.git 
 
 colorscheme solarized
 set background=dark                                                                                                                                             
@@ -39,6 +40,15 @@ set expandtab
 " indents                                                                                                                                                        
 set smartindent                                                                                                                                                  
 set autoindent 
+
+" show matching brackets
+autocmd FileType perl set showmatch
+
+" show line numbers
+autocmd FileType perl set number
+
+let mapleader = ","
+
 
 command -range=% -nargs=* Tidy <line1>,<line2>!                                                                                                                  
   \perltidy -pbp <args> 
