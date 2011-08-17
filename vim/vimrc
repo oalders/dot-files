@@ -5,6 +5,7 @@ call pathogen#runtime_append_all_bundles()
 " Bundle: https://github.com/vim-scripts/perl-support.vim.git
 " Bundle: https://github.com/scrooloose/nerdcommenter.git
 " Bundle: https://github.com/bronson/vim-trailing-whitespace.git
+" Bundle: https://github.com/scrooloose/nerdtree.git
 
 colorscheme solarized
 set background=dark
