@@ -1,8 +1,14 @@
-:set background=dark                                                                                                                                             
-:syntax enable                                                                                                                                                   
-:set statusline=%F%m%r%h%w\ [FORMAT=%{&ff}]\ [TYPE=%Y]\ [ASCII=\%03.3b]\ [HEX=\%02.2B]\ [POS=%04l,%04v][%p%%]\ [LEN=%L]                                          
-:set laststatus=2                                                                                                                                                
-:set bs=2                                                                                                                                                        
+" Load plugins using Pathogen. Don't worry if this bit doesn't make sense.
+call pathogen#runtime_append_all_bundles()
+
+" Bundle: git://github.com/altercation/vim-colors-solarized.git 
+
+colorscheme solarized
+set background=dark                                                                                                                                             
+syntax enable                                                                                                                                                   
+set statusline=%F%m%r%h%w\ [FORMAT=%{&ff}]\ [TYPE=%Y]\ [ASCII=\%03.3b]\ [HEX=\%02.2B]\ [POS=%04l,%04v][%p%%]\ [LEN=%L]                                          
+set laststatus=2                                                                                                                                                
+set bs=2                                                                                                                                                        
 filetype plugin on                                                                                                                                               
                                                                                                                                                                  
 au BufReadPost *.pl   set keywordprg=perldoc\ -f                                                                                                                 
@@ -31,7 +37,7 @@ set expandtab
                                                                                                                                                                  
 " indents                                                                                                                                                        
 set smartindent                                                                                                                                                  
-set autoindent                                                                                                                                                   
-                                                                                                                                                                 
+set autoindent 
+
 command -range=% -nargs=* Tidy <line1>,<line2>!                                                                                                                  
   \perltidy -pbp <args> 
