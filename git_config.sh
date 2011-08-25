@@ -18,8 +18,5 @@ git config --global alias.s 'status'
 git config --global alias.changes 'diff --name-status -r'
 git config --global alias.diffstat 'diff --stat -r'
 
-# takes person's name or email address as sole arg
-git config --global alias.whois "!sh -c 'git log -i -1 --pretty=\"format:%an <%ae>\n\" --author=\"$1\"' -"
-
 # takes a commit name as sole arg
 git config --global alias.whatis "show -s --pretty='tformat:%h (%s, %ad)' --date=short"
