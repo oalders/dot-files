@@ -18,4 +18,7 @@ $SELF_PATH/inc/vim-update-bundles/vim-update-bundles
 sh git_config.sh
 
 # git extras
-curl https://raw.github.com/visionmedia/git-extras/master/bin/git-extras | INSTALL=y sh
+echo "installing git-extras"
+
+cd inc/git-extras
+make install PREFIX=~/local
