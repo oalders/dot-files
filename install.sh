@@ -21,4 +21,4 @@ sh git_config.sh
 echo "installing git-extras"
 
 cd inc/git-extras
-make install PREFIX=~/local
+make install PREFIX="~/local"
