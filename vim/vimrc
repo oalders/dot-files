@@ -2,7 +2,6 @@
 call pathogen#runtime_append_all_bundles()
 
 " Bundle: git://github.com/altercation/vim-colors-solarized.git
-" Bundle: https://github.com/vim-scripts/perl-support.vim.git
 " Bundle: https://github.com/scrooloose/nerdcommenter.git
 " Bundle: https://github.com/bronson/vim-trailing-whitespace.git
 " Bundle: https://github.com/scrooloose/nerdtree.git
@@ -19,9 +18,6 @@ filetype plugin on
 au BufReadPost *.pl   set keywordprg=perldoc\ -f
 
 :set paste
-
-nnoremap <silent> = !perltidy -q<Enter>
-vnoremap <silent> = :!perltidy -q<Enter>
 
 " Indent using tabs (while in visual mode)
 vnoremap < <gv
@@ -53,5 +49,8 @@ autocmd FileType perl set number
 let mapleader = ","
 
 
-command -range=% -nargs=* Tidy <line1>,<line2>!
-  \perltidy -pbp <args>
+"command -range=% -nargs=* Tidy <line1>,<line2>!
+"  \perltidy -pbp <args>
+
+nnoremap <silent> = :%!perltidy -q<Enter>
+vnoremap <silent> = :!perltidy -q<Enter>
