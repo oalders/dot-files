@@ -54,3 +54,6 @@ let mapleader = ","
 
 nnoremap <silent> = :%!perltidy -q<Enter>
 vnoremap <silent> = :!perltidy -q<Enter>
+
+" enables shift-tab for outdent
+exe 'set t_kB=' . nr2char(27) . '[Z'
