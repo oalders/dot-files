@@ -1,0 +1,3 @@
+local: ~/minicpan
+remote: http://cpan.metacpan.org/
+exact_mirror: 1
