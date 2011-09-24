@@ -11,6 +11,8 @@ ln -sf $SELF_PATH/perltidyrc ~/.perltidyrc
 ln -sf $SELF_PATH/screenrc ~/.screenrc
 ln -sf $SELF_PATH/vim/vimrc ~/.vimrc
 
+source $HOME/.bashrc
+
 git submodule init
 git submodule update
 
@@ -26,3 +28,4 @@ make install PREFIX="~/local"
 
 # for some reason a "~" folder gets created in the git-extras install
 git clean -df
+
