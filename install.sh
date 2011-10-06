@@ -11,7 +11,7 @@ ln -sf $SELF_PATH/perltidyrc ~/.perltidyrc
 ln -sf $SELF_PATH/screenrc ~/.screenrc
 ln -sf $SELF_PATH/vim/vimrc ~/.vimrc
 
-source $HOME/.bashrc
+. $HOME/.bashrc
 
 git submodule init
 git submodule update
