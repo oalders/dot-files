@@ -17,6 +17,7 @@ git config --global alias.co 'checkout'
 git config --global alias.s 'status'
 git config --global alias.changes 'diff --name-status -r'
 git config --global alias.diffstat 'diff --stat -r'
+git config --global alias.pt 'push --tags'
 
 # takes a commit name as sole arg
 git config --global alias.whatis "show -s --pretty='tformat:%h (%s, %ad)' --date=short"
