@@ -32,6 +32,12 @@ nmap <s-tab> ^i<bs><esc>
 " case insensitive search
 set ignorecase smartcase
 
+" highlight all matches
+set hlsearch
+
+" lookahead as search pattern is specified
+set incsearch
+
 " tabs
 set softtabstop=4
 set shiftwidth=4
@@ -64,3 +70,12 @@ exe 'set t_kB=' . nr2char(27) . '[Z'
 " reflow text
 nnoremap Q gqap
 vnoremap Q gq
+
+" highlight comments
+highlight Comment term=bold ctermfg=white
+
+"====[ Goto last location in non-empty files ]=======
+
+autocmd BufReadPost *  if line("'\"") > 1 && line("'\"") <= line("$")
+                   \|     exe "normal! g`\""
+                   \|  endif
