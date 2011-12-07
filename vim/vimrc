@@ -60,3 +60,7 @@ vnoremap <silent> = :!perltidy -q<Enter>
 
 " enables shift-tab for outdent
 exe 'set t_kB=' . nr2char(27) . '[Z'
+
+" reflow text
+nnoremap Q gqap
+vnoremap Q gq
