@@ -17,8 +17,6 @@ filetype plugin on
 
 au BufReadPost *.pl   set keywordprg=perldoc\ -f
 
-:set paste
-
 " Indent using tabs (while in visual mode)
 vnoremap < <gv
 vnoremap > >gv
