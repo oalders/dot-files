@@ -17,3 +17,17 @@ if [ -d "$HOME/local/bin" ] ; then
 fi
 
 PERL_CPANM_OPT="--local-lib=~/perl5"
+
+function gpull(){
+    STARTDIR=`pwd`;
+    git pull origin $1;
+    cd $(git rev-parse --show-toplevel);
+    git submodule init;
+    git submodule update;
+    cd $STARTDIR;
+}
+
+function gpush(){
+    gpull $1;
+    git push origin $1;
+}
