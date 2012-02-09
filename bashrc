@@ -7,6 +7,7 @@ alias l.='ls -ldF .[a-zA-Z0-9]* --color=tty' #only show dotfiles
 alias ps='ps auxw'
 alias du='du -h'
 alias df='df -h'
+alias xpasswd='perl -MCrypt::XkcdPassword -MModern::Perl -e "say Crypt::XkcdPassword->make_password"'
 
 if [ -f /home/`whoami`/perl5/perlbrew/etc/bashrc ]; then
    . /home/`whoami`/perl5/perlbrew/etc/bashrc
