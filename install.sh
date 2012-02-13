@@ -1,4 +1,4 @@
-#!/usr/bin/env sh
+#!/usr/bin/env bash
 
 SELF_PATH=$(cd -P -- "$(dirname -- "$0")" && pwd -P)
 
@@ -10,8 +10,6 @@ ln -sf $SELF_PATH/perlcriticrc ~/.perlcriticrc
 ln -sf $SELF_PATH/perltidyrc ~/.perltidyrc
 ln -sf $SELF_PATH/screenrc ~/.screenrc
 ln -sf $SELF_PATH/vim/vimrc ~/.vimrc
-
-. $HOME/.bashrc
 
 git submodule init
 git submodule update
@@ -32,3 +30,5 @@ git clean -df
 # silence warnings when perlbrew not installed
 mkdir -p $HOME/perl5/perlbrew/etc
 touch $HOME/perl5/perlbrew/etc/bashrc
+
+exec $SHELL
