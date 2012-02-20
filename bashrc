@@ -4,6 +4,7 @@ alias pine=alpine
 alias cpanx='cpanm --local-lib ~/perl5 --metacpan --mirror http://cpan.metacpan.org'
 alias cpanw='cpanm --local-lib ~/perl5 --mirror http://10.0.0.79/minicpan'
 alias l.='ls -ldF .[a-zA-Z0-9]* --color=tty' #only show dotfiles
+alias lsd='ls --group-directories-first'
 alias ps='ps auxw'
 alias du='du -h'
 alias df='df -h'
