@@ -94,3 +94,5 @@ function prompt_func() {
 }
 
 PROMPT_COMMAND=prompt_func
+
+source /etc/bash_completion.d/git
