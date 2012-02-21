@@ -31,5 +31,4 @@ git clean -df
 mkdir -p $HOME/perl5/perlbrew/etc
 touch $HOME/perl5/perlbrew/etc/bashrc
 
-cd ../..
-exec $SHELL
+#exec $SHELL
