@@ -8,8 +8,8 @@ alias lsd='ls --group-directories-first'
 alias ps='ps auxw'
 alias du='du -h'
 alias df='df -h'
-alias xpasswd='perl -MCrypt::XkcdPassword -MModern::Perl -e "say Crypt::XkcdPassword->make_password"'
-alias xkcdalt="perl -MWWW::xkcd -E 'say WWW::xkcd->new->fetch_metadata->{alt}'"
+alias xpasswd='perl -MCrypt::XkcdPassword -E "say Crypt::XkcdPassword->make_password"'
+alias xkcdalt='perl -MWWW::xkcd -E "say WWW::xkcd->new->fetch_metadata->{alt}"'
 
 if [ -f /home/`whoami`/perl5/perlbrew/etc/bashrc ]; then
    . /home/`whoami`/perl5/perlbrew/etc/bashrc
