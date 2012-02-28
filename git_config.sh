@@ -7,7 +7,7 @@ echo "git config"
 git config --global user.name "Olaf Alders"
 git config --global user.email "olaf@wundersolutions.com"
 
-git config --global color.ui true
+git config --global color.ui "auto"
 git config --global branch.master.remote origin
 git config --global branch.master.merge refs/heads/master
 git config --global push.default matching
