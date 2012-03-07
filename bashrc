@@ -8,6 +8,7 @@ alias lsd='ls --group-directories-first'
 alias ps='ps auxw'
 alias du='du -h'
 alias df='df -h'
+alias ssh-fingerprints='ls ~/.ssh/*.pub | xargs -L 1 ssh-keygen -l -f'
 alias xpasswd='perl -MCrypt::XkcdPassword -E "say Crypt::XkcdPassword->make_password"'
 alias xkcdalt='perl -MWWW::xkcd -E "say WWW::xkcd->new->fetch_metadata->{alt}"'
 
