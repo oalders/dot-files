@@ -76,15 +76,21 @@ function parse_git_branch {
 
 function prompt_func() {
     HOSTNAME=`hostname`
-    case $HOSTNAME in
-        "escher") SHELL_COLOR=$YELLOW ;;
-        "bach") SHELL_COLOR=$LIGHT_GREEN ;;
-        "dell") SHELL_COLOR=$RED ;;
-        "bacchus") SHELL_COLOR=$BLUE ;;
-    esac
 
+    # this kills performance in the Rackspace cloud
+    if [ "$HOSTNAME" = "bacchus" ]
+    then
+        git_branch="$(git branch 2> /dev/null)"
+        branch_pattern="* (.*)"
+        if [[ ${git_status} =~ ${branch_pattern} ]]; then
+            branch=${BASH_REMATCH[1]}
+            echo " (${branch})"
+            return
+        fi          
+    fi
+
+    SHELL_COLOR=$BLUE;
     previous_return_value=$?;
-    # prompt="${TITLEBAR}$BLUE[$RED\w$GREEN$(__git_ps1)$YELLOW$(git_dirty_flag)$BLUE]$COLOR_NONE "
     prompt="${TITLEBAR}${SHELL_COLOR}[${COLOR_NONE}\w${LIGHT_GRAY}$(parse_git_branch)${SHELL_COLOR}]${COLOR_NONE} "
     if test $previous_return_value -eq 0
     then
