@@ -49,7 +49,7 @@ COLOR_NONE="\[\e[0m\]"
 
 function parse_git_branch {
 
-  git rev-parse --git-dir &> /dev/null
+  #git rev-parse --git-dir &> /dev/null
   git_status="$(git status 2> /dev/null)"
   branch_pattern="^# On branch ([^${IFS}]*)"
   remote_pattern="# Your branch is (.*) of"
@@ -80,6 +80,7 @@ function prompt_func() {
     # this kills performance in the Rackspace cloud
     if [ "$HOSTNAME" = "bacchus" ]
     then
+        return
         git_branch="$(git branch 2> /dev/null)"
         branch_pattern="* (.*)"
         if [[ ${git_status} =~ ${branch_pattern} ]]; then
