@@ -14,8 +14,8 @@ alias ssh-fingerprints='ls ~/.ssh/*.pub | xargs -L 1 ssh-keygen -l -f'
 alias xpasswd='perl -MCrypt::XkcdPassword -E "say Crypt::XkcdPassword->make_password"'
 alias xkcdalt='perl -MWWW::xkcd -E "say WWW::xkcd->new->fetch_metadata->{alt}"'
 
-if [ -f /home/`whoami`/perl5/perlbrew/etc/bashrc ]; then
-   . /home/`whoami`/perl5/perlbrew/etc/bashrc
+if [ -f "$HOME/perl5/perlbrew/etc/bashrc" ]; then
+   . "$HOME/perl5/perlbrew/etc/bashrc"
 fi
 
 if [ -d "$HOME/local/bin" ] ; then
