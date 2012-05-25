@@ -69,6 +69,9 @@ let mapleader = ","
 nnoremap <silent> = :%!perltidy -q<Enter>
 vnoremap <silent> = :!perltidy -q<Enter>
 
+"remove all trailing whitespace
+:nnoremap <silent> - :let _s=@/<Bar>:%s/\s\+$//e<Bar>:let @/=_s<Bar>:nohl<CR>
+
 " enables shift-tab for outdent
 exe 'set t_kB=' . nr2char(27) . '[Z'
 
