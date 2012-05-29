@@ -23,10 +23,10 @@ sh git_config.sh
 echo "installing git-extras"
 
 cd inc/git-extras
-make install PREFIX="~/local"
+sudo make install PREFIX="~/local"
 
 # for some reason a "~" folder gets created in the git-extras install
-git clean -df
+sudo git clean -df
 
 # silence warnings when perlbrew not installed
 mkdir -p $HOME/perl5/perlbrew/etc
