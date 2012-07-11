@@ -1,19 +1,18 @@
 export EDITOR=vim
 
-alias ll='ls -alhG'
-alias linebreaks="perl -pi -e 's/\r/\n/g'"
-alias perldoc=cpandoc
-alias pine=alpine
 alias cpanx='cpanm --local-lib ~/perl5 --metacpan --mirror http://cpan.metacpan.org'
-alias cpanw='cpanm --local-lib ~/perl5 --mirror http://10.0.0.79/minicpan'
-alias l.='ls -ldF .[a-zA-Z0-9]* --color=tty' #only show dotfiles
-alias lsd='ls --group-directories-first'
-alias ps='ps auxw'
 alias du='du -h'
 alias df='df -h'
+alias l.='ls -ldF .[a-zA-Z0-9]* --color=tty' #only show dotfiles
+alias linebreaks="perl -pi -e 's/\r/\n/g'"
+alias ll='ls -alhG'
+alias lsd='ls --group-directories-first'
+alias perldoc=cpandoc
+alias pine=alpine
+alias ps='ps auxw'
 alias ssh-fingerprints='ls ~/.ssh/*.pub | xargs -L 1 ssh-keygen -l -f'
-alias xpasswd='perl -MCrypt::XkcdPassword -E "say Crypt::XkcdPassword->make_password"'
 alias xkcdalt='perl -MWWW::xkcd -E "say WWW::xkcd->new->fetch_metadata->{alt}"'
+alias xpasswd='perl -MCrypt::XkcdPassword -E "say Crypt::XkcdPassword->make_password"'
 
 if [ -f "$HOME/perl5/perlbrew/etc/bashrc" ]; then
    . "$HOME/perl5/perlbrew/etc/bashrc"
