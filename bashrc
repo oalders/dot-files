@@ -1,6 +1,7 @@
 export EDITOR=vim
 
 alias ll='ls -alhG'
+alias linebreaks="perl -pi -e 's/\r/\n/g'"
 alias perldoc=cpandoc
 alias pine=alpine
 alias cpanx='cpanm --local-lib ~/perl5 --metacpan --mirror http://cpan.metacpan.org'
