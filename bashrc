@@ -104,6 +104,10 @@ function prompt_func() {
     fi
 }
 
+function whosonport {
+    lsof -i :$1;
+}
+
 PROMPT_COMMAND=prompt_func
 
 if [ -f /etc/bash_completion.d/git ]; then
