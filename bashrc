@@ -44,7 +44,7 @@ function gsubs(){
 }
 
 function gpush(){
-    gpull --rebase origin $1;
+    grebase;
     git push origin $1;
 }
 
