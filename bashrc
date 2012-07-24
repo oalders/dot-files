@@ -26,8 +26,17 @@ fi
 PERL_CPANM_OPT="--local-lib=~/perl5"
 
 function gpull(){
-    STARTDIR=`pwd`;
     git pull origin $1;
+    gsubs;
+}
+
+function grebase(){
+    git pull --rebase origin $1;
+    gsubs;
+}
+
+function gsubs(){
+    STARTDIR=`pwd`;
     cd $(git rev-parse --show-toplevel);
     git submodule init;
     git submodule update;
@@ -90,7 +99,7 @@ function prompt_func() {
             branch=${BASH_REMATCH[1]}
             echo " (${branch})"
             return
-        fi          
+        fi
     fi
 
     SHELL_COLOR=$BLUE;
