@@ -115,7 +115,7 @@ function prompt_func() {
 }
 
 function whosonport {
-    lsof -i :$1;
+    sudo lsof -i :$1;
 }
 
 PROMPT_COMMAND=prompt_func
