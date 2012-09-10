@@ -124,3 +124,6 @@ if [ -f /etc/bash_completion.d/git ]; then
     source /etc/bash_completion.d/git
 fi
 
+if [ -d ~/perl5/bin ]; then
+    export PATH=~/perl5/bin:$PATH
+fi
