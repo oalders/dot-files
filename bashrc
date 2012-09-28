@@ -1,5 +1,12 @@
 export EDITOR=vim
 
+# don't put duplicate lines in the history. See bash(1) for more options
+export HISTCONTROL=ignoredups
+
+# for setting history length see HISTSIZE and HISTFILESIZE in bash(1)
+HISTSIZE=1000
+HISTFILESIZE=2000
+
 alias batterylife='pmset -g batt | grep Internal | awk "{print $2}" | sed "s/;//"'
 alias cpanx='cpanm --local-lib ~/perl5 --metacpan --mirror http://cpan.metacpan.org'
 alias du='du -h'
