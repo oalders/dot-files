@@ -4,7 +4,7 @@ runtime bundle/vim-pathogen/autoload/pathogen.vim
 " Bundle: tpope/vim-pathogen
 call pathogen#infect()
 
-" Bundle: git://github.com/altercation/vim-colors-solarized.git
+" Bundle: https://github.com/altercation/vim-colors-solarized.git
 " Bundle: https://github.com/scrooloose/nerdcommenter.git
 " Bundle: https://github.com/bronson/vim-trailing-whitespace.git
 " Bundle: https://github.com/scrooloose/nerdtree.git
@@ -12,6 +12,7 @@ call pathogen#infect()
 " Bundle: https://github.com/tpope/vim-fugitive.git
 " Bundle: https://github.com/henrik/vim-indexed-search.git
 " Bundle: https://github.com/Lokaltog/vim-powerline.git
+" Bundle: https://github.com/tpope/vim-surround.git
 
 syntax enable
 set background=dark
