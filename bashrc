@@ -145,3 +145,9 @@ fi
 if [ -d ~/perl5/bin ]; then
     export PATH=~/perl5/bin:$PATH
 fi
+
+if ! type "ack" > /dev/null  2>&1; then
+    if type 'ack-grep' > /dev/null 2>&1; then
+        alias ack='ack-grep'
+    fi
+fi
