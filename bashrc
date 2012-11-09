@@ -140,11 +140,11 @@ PROMPT_COMMAND=prompt_func
 
 if [ -f /etc/bash_completion.d/git ]; then
     source /etc/bash_completion.d/git
+elif [ -f `brew --prefix`/etc/bash_completion ]; then
+    . `brew --prefix`/etc/bash_completion
 fi
 
-if [ -f `brew --prefix`/etc/bash_completion ]; then
-    . `brew --prefix`/etc/bash_completion
-elif [ -d ~/perl5/bin ]; then
+if [ -d ~/perl5/bin ]; then
     export PATH=~/perl5/bin:$PATH
 fi
 
