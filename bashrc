@@ -11,6 +11,7 @@ alias batterylife='pmset -g batt | grep Internal | awk "{print $2}" | sed "s/;//
 alias cpanx='cpanm --local-lib ~/perl5 --metacpan --mirror http://cpan.metacpan.org'
 alias du='du -h'
 alias df='df -h'
+alias grep='grep --color=auto'
 alias l.='ls -ldF .[a-zA-Z0-9]* --color=tty' #only show dotfiles
 alias linebreaks="perl -pi -e 's/\r/\n/g'"
 alias ll='ls -alhG'
