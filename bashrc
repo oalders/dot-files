@@ -15,6 +15,7 @@ alias grep='grep --color=auto'
 alias l.='ls -ldF .[a-zA-Z0-9]* --color=tty' #only show dotfiles
 alias linebreaks="perl -pi -e 's/\r/\n/g'"
 alias ll='ls -alhG'
+alias ls='ls -G'
 alias lsd='ls --group-directories-first'
 alias penv='perl -MDDP -e "p(%ENV)"'
 alias perldoc=cpandoc
