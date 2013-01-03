@@ -10,6 +10,7 @@ git config --global user.email "olaf@wundersolutions.com"
 git config --global color.ui "auto"
 git config --global branch.master.remote origin
 git config --global branch.master.merge refs/heads/master
+git config --global branch.autosetuprebase always
 git config --global push.default matching
 
 git config --global alias.ba 'branch -a'
