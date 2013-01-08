@@ -73,6 +73,9 @@ vnoremap <silent> = :!perltidy -q<Enter>
 "remove all trailing whitespace
 :nnoremap <silent> - :let _s=@/<Bar>:%s/\s\+$//e<Bar>:let @/=_s<Bar>:nohl<CR>
 
+:set list!
+:set listchars=tab:\|-
+
 " enables shift-tab for outdent
 exe 'set t_kB=' . nr2char(27) . '[Z'
 
