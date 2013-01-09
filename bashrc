@@ -142,6 +142,10 @@ function check_compression {
       curl -I -H 'Accept-Encoding: gzip,deflate' $1 |grep "Content-Encoding"
 }
 
+function trace_process {
+    sudo lsof -p $1 && sudo strace -fp $1
+}
+
 PROMPT_COMMAND=prompt_func
 
 if [ -f /etc/bash_completion.d/git ]; then
