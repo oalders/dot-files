@@ -146,6 +146,10 @@ function trace_process {
     sudo lsof -p $1 && sudo strace -fp $1
 }
 
+function metacpan-pp {
+    curl -s  https://metacpan.org/author/OALDERS | perl -ne 'if (m!class="release".*/release/([^"]+)!) { $_ = $1; s/-/::/g; print $_,$/ }' | sort
+}
+
 PROMPT_COMMAND=prompt_func
 
 if [ -f /etc/bash_completion.d/git ]; then
