@@ -9,8 +9,8 @@ HISTFILESIZE=2000
 
 alias batterylife='pmset -g batt | grep Internal | awk "{print $2}" | sed "s/;//"'
 alias cpanx='cpanm --local-lib ~/perl5 --metacpan --mirror http://cpan.metacpan.org'
-alias du='du -h'
 alias df='df -h'
+alias du='du -h'
 alias grep='grep --color=auto'
 alias l.='ls -ldF .[a-zA-Z0-9]* --color=tty' #only show dotfiles
 alias linebreaks="perl -pi -e 's/\r/\n/g'"
@@ -27,15 +27,15 @@ alias xkcdalt='perl -MWWW::xkcd -E "say WWW::xkcd->new->fetch_metadata->{alt}"'
 alias xpasswd='perl -MCrypt::XkcdPassword -E "say Crypt::XkcdPassword->make_password"'
 
 # conversions
+alias d2b="perl -e 'printf qq|%b\n|, int( shift )'"
 alias d2h="perl -e 'printf qq|%X\n|, int( shift )'"
 alias d2o="perl -e 'printf qq|%o\n|, int( shift )'"
-alias d2b="perl -e 'printf qq|%b\n|, int( shift )'"
+alias h2b="perl -e 'printf qq|%b\n|, hex( shift )'"
 alias h2d="perl -e 'printf qq|%d\n|, hex( shift )'"
 alias h2o="perl -e 'printf qq|%o\n|, hex( shift )'"
-alias h2b="perl -e 'printf qq|%b\n|, hex( shift )'"
-alias o2h="perl -e 'printf qq|%X\n|, oct( shift )'"
-alias o2d="perl -e 'printf qq|%d\n|, oct( shift )'"
 alias o2b="perl -e 'printf qq|%b\n|, oct( shift )'"
+alias o2d="perl -e 'printf qq|%d\n|, oct( shift )'"
+alias o2h="perl -e 'printf qq|%X\n|, oct( shift )'"
 
 if [ -f "$HOME/perl5/perlbrew/etc/bashrc" ]; then
    . "$HOME/perl5/perlbrew/etc/bashrc"
