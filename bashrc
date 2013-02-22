@@ -152,6 +152,10 @@ function metacpan-pp {
     curl -s  https://metacpan.org/author/OALDERS | perl -ne 'if (m!class="release".*/release/([^"]+)!) { $_ = $1; s/-/::/g; print $_,$/ }' | sort
 }
 
+function git-recover-file {
+    git checkout $(git rev-list -n 1 HEAD -- "$1")^ -- "$1"
+}
+
 PROMPT_COMMAND=prompt_func
 
 if [ -f /etc/bash_completion.d/git ]; then
