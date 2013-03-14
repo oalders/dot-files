@@ -6,6 +6,7 @@ echo $SELF_PATH
 
 ln -sf $SELF_PATH/ackrc ~/.ackrc
 ln -sf $SELF_PATH/bashrc ~/.bashrc
+ln -sf $SELF_PATH/dzil ~/.dzil
 ln -sf $SELF_PATH/minicpanrc ~/.minicpanrc
 ln -sf $SELF_PATH/perlcriticrc ~/.perlcriticrc
 ln -sf $SELF_PATH/perltidyrc ~/.perltidyrc
