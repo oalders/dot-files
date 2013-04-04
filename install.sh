@@ -11,6 +11,7 @@ ln -sf $SELF_PATH/dzil ~/.dzil
 ln -sf $SELF_PATH/minicpanrc ~/.minicpanrc
 ln -sf $SELF_PATH/perlcriticrc ~/.perlcriticrc
 ln -sf $SELF_PATH/perltidyrc ~/.perltidyrc
+ln -sf $SELF_PATH/psqlrc ~/.psqlrc
 ln -sf $SELF_PATH/screenrc ~/.screenrc
 ln -sf $SELF_PATH/tmux.conf ~/.tmux.conf
 ln -sf $SELF_PATH/vim/vimrc ~/.vimrc
