@@ -51,6 +51,10 @@ set tabstop=4
 set smarttab
 set expandtab
 
+" 4 space tabs in html get annoying
+au BufRead,BufNewFile *.tmpl set filetype=html
+autocmd FileType html :setlocal sw=2 ts=2 sts=2
+
 " indents
 set smartindent
 set autoindent
