@@ -78,6 +78,9 @@ vnoremap <silent> = :!perltidy -q<Enter>
 "remove all trailing whitespace
 :nnoremap <silent> - :let _s=@/<Bar>:%s/\s\+$//e<Bar>:let @/=_s<Bar>:nohl<CR>
 
+"pretty print json
+map <leader>jt <Esc>:%!json_xs -f json -t json-pretty<CR>
+
 :set list!
 :set listchars=tab:\|-
 
