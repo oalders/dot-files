@@ -13,6 +13,7 @@ call pathogen#infect()
 " Bundle: https://github.com/henrik/vim-indexed-search.git
 " Bundle: https://github.com/Lokaltog/vim-powerline.git
 " Bundle: https://github.com/tpope/vim-surround.git
+" Bundle: https://github.com/vim-scripts/vim-json-bundle.git
 
 syntax enable
 set background=dark
