@@ -14,6 +14,7 @@ git config --global branch.autosetuprebase always
 git config --global push.default matching
 
 git config --global alias.ba 'branch -a'
+git config --global alias.delete-untracked-files 'clean -f -d'
 git config --global alias.co 'checkout'
 git config --global alias.s 'status'
 git config --global alias.changes 'diff --name-status -r'
