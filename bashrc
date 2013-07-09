@@ -157,6 +157,8 @@ function git-recover-file {
     git checkout $(git rev-list -n 1 HEAD -- "$1")^ -- "$1"
 }
 
+function md () { mkdir -p "$@" && cd "$@"; }
+
 PROMPT_COMMAND=prompt_func
 
 if [ -f /etc/bash_completion.d/git ]; then
