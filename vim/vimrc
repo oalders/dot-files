@@ -102,3 +102,7 @@ autocmd BufReadPost *  if line("'\"") > 1 && line("'\"") <= line("$")
                    \|  endif
 
 set stl=%f\ %m\ %r%{fugitive#statusline()}\ Line:%l/%L[%p%%]\ Col:%v\ Buf:#%n\ [%b][0x%B]
+
+" prevent left and right arrows from being disabled in insert mode when
+" editing SQL files
+let g:omni_sql_no_default_maps = 1
