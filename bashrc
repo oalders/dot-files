@@ -131,7 +131,7 @@ function prompt_func() {
     prompt="$HOSTNAME${TITLEBAR}${SHELL_COLOR}[${COLOR_NONE}\w${LIGHT_GRAY}$(parse_git_branch)${SHELL_COLOR}]${COLOR_NONE} "
     if test $previous_return_value -eq 0
     then
-        PS1="${prompt}$ "
+        PS1="${prompt}${YELLOW}⚡ ${COLOR_NONE}"
     else
         PS1="${prompt}${RED}${COLOR_NONE}$ "
     fi
