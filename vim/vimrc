@@ -107,6 +107,10 @@ set stl=%f\ %m\ %r%{fugitive#statusline()}\ Line:%l/%L[%p%%]\ Col:%v\ Buf:#%n\ [
 " editing SQL files
 let g:omni_sql_no_default_maps = 1
 
+" paste the same line multiple times without the content of the "yank" being replaced
+" http://stackoverflow.com/questions/7163947/vim-paste-multiple-times
+xnoremap p pgvy
+
 " https://github.com/jonswar/perl-code-tidyall/blob/master/etc/editors/tidyall.vim
 
 " Run tidyall on the current buffer. If an error occurs, show it and leave it
