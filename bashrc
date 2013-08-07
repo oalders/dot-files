@@ -142,15 +142,11 @@ function whosonport {
 }
 
 function check_compression {
-      curl -I -H 'Accept-Encoding: gzip,deflate' $1 |grep "Content-Encoding"
+      curl -I -H 'Accept-Encoding: gzip,deflate' $1 | grep "Content-Encoding"
 }
 
 function trace_process {
     sudo lsof -p $1 && sudo strace -fp $1
-}
-
-function metacpan-pp {
-    curl -s  https://metacpan.org/author/OALDERS | perl -ne 'if (m!class="release".*/release/([^"]+)!) { $_ = $1; s/-/::/g; print $_,$/ }' | sort
 }
 
 function git-recover-file {
