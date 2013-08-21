@@ -172,3 +172,4 @@ if ! type "ack" > /dev/null  2>&1; then
         alias ack='ack-grep'
     fi
 fi
+function gi() { curl http://gitignore.io/api/$@ ;}
