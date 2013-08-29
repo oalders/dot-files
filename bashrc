@@ -173,3 +173,8 @@ if ! type "ack" > /dev/null  2>&1; then
     fi
 fi
 function gi() { curl http://gitignore.io/api/$@ ;}
+
+function wwwman {
+  perl -we 'use URI::Escape;$cmd=shift;$args = uri_escape(join q[  ],@ARGV);
+           exec open => qq!http://explainshell.com/explain/$cmd?args=$args!' $@
+}
