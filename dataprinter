@@ -1,1 +1,4 @@
-{ end_separator => 1, hash_separator => ' => ', };
+{   end_separator  => 1,
+    hash_separator => ' => ',
+    filters        => { -external => [ 'DB', 'DateTime', 'JSON', 'URI' ], },
+};
