@@ -15,6 +15,7 @@ call pathogen#infect()
 " Bundle: https://github.com/tpope/vim-surround.git
 " Bundle: https://github.com/vim-scripts/vim-json-bundle.git
 " Bundle: https://github.com/bling/vim-airline.git
+" Bundle: https://github.com/907th/vim-auto-save.git
 
 syntax enable
 set background=dark
@@ -135,3 +136,5 @@ endfunction
 
 " Bind to ,t (or leader+t)
 map <leader>t :TidyAll<cr>
+
+let g:auto_save = 1  " enable AutoSave on Vim startup
