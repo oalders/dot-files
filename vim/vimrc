@@ -139,3 +139,5 @@ endfunction
 map <leader>t :TidyAll<cr>
 
 let g:auto_save = 1  " enable AutoSave on Vim startup
+
+let g:gitgutter_realtime = 0
