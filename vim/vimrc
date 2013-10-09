@@ -16,6 +16,7 @@ call pathogen#infect()
 " Bundle: https://github.com/vim-scripts/vim-json-bundle.git
 " Bundle: https://github.com/bling/vim-airline.git
 " Bundle: https://github.com/907th/vim-auto-save.git
+" Bundle: https://github.com/airblade/vim-gitgutter.git
 
 syntax enable
 set background=dark
