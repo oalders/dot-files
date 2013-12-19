@@ -183,7 +183,7 @@ function wwwman {
 function tmux() {
     local tmux=$(type -fp tmux)
     case "$1" in
-        update-environment|update-env|env-update)
+        update-environment|update-env|ue)
             local v
             while read v; do
                 if [[ $v == -* ]]; then
