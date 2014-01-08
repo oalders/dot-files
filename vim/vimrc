@@ -141,3 +141,6 @@ map <leader>t :TidyAll<cr>
 let g:auto_save = 1  " enable AutoSave on Vim startup
 
 let g:gitgutter_realtime = 0
+
+" http://stackoverflow.com/questions/1327978/sorting-words-not-lines-in-vim
+:vnoremap <F1> d:execute 'normal i' . join(sort(split(getreg('"'))), ' ')<CR>
