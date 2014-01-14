@@ -145,3 +145,6 @@ let g:gitgutter_realtime = 0
 
 " http://stackoverflow.com/questions/1327978/sorting-words-not-lines-in-vim
 :vnoremap <F1> d:execute 'normal a' . join(sort(split(getreg('"'))), ' ')<CR>
+
+map <F1> :TidyAll<CR>
+map <F2> :NERDTreeToggle<CR>
