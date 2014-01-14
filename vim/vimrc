@@ -119,6 +119,8 @@ xnoremap p pgvy
 " Run tidyall on the current buffer. If an error occurs, show it and leave it
 " in tidyall.ERR, and undo any changes.
 
+command! T :call TidyAll()
+
 command! TidyAll :call TidyAll()
 function! TidyAll()
     let cur_pos = getpos( '.' )
