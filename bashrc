@@ -206,3 +206,8 @@ function tmux() {
             ;;
     esac
 }
+
+fetch-pull-request () {
+    git fetch $1 refs/pull/$2/head:refs/remotes/pr/$2;
+    git co -b pr/$2 pr/$2;
+}
