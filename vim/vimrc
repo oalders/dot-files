@@ -75,8 +75,8 @@ let mapleader = ","
 "command -range=% -nargs=* Tidy <line1>,<line2>!
 "  \perltidy -pbp <args>
 
-nnoremap <silent> = :%!perltidy -q<Enter>
-vnoremap <silent> = :!perltidy -q<Enter>
+nnoremap <silent> = :%!plenv exec perltidy -q<Enter>
+vnoremap <silent> = :!plenv exec perltidy -q<Enter>
 
 "remove all trailing whitespace
 :nnoremap <silent> - :FixWhitespace<CR>
