@@ -42,9 +42,8 @@ alias o2b="perl -e 'printf qq|%b\n|, oct( shift )'"
 alias o2d="perl -e 'printf qq|%d\n|, oct( shift )'"
 alias o2h="perl -e 'printf qq|%X\n|, oct( shift )'"
 
-if [ -f "$HOME/perl5/perlbrew/etc/bashrc" ]; then
-   . "$HOME/perl5/perlbrew/etc/bashrc"
-fi
+if which plenv > /dev/null; then eval "$(plenv init -)"; fi
+if which rbenv > /dev/null; then eval "$(rbenv init -)"; fi
 
 if [ -d "$HOME/local/bin" ] ; then
     PATH="$HOME/local/bin:$PATH"
