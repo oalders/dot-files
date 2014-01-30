@@ -51,6 +51,9 @@ fi
 
 PERL_CPANM_OPT="--local-lib=~/perl5"
 
+# local::lib
+eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)
+
 function gpull(){
     git pull origin $1;
     gsubs;
