@@ -15,6 +15,7 @@ ln -sf $SELF_PATH/psqlrc ~/.psqlrc
 ln -sf $SELF_PATH/screenrc ~/.screenrc
 ln -sf $SELF_PATH/tmux.conf ~/.tmux.conf
 ln -sf $SELF_PATH/vim/vimrc ~/.vimrc
+ln -sf $SELF_PATH/vim/after ~/.vim/after
 
 git submodule init
 git submodule update
