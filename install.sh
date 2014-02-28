@@ -18,6 +18,10 @@ ln -sf $SELF_PATH/tmux.conf ~/.tmux.conf
 ln -sf $SELF_PATH/vim/vimrc ~/.vimrc
 ln -sf $SELF_PATH/vim/after ~/.vim/after
 
+# clean up recursive links
+rm vim/after/after
+rm dzil/dzil
+
 git submodule init
 git submodule update
 
