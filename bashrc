@@ -42,10 +42,6 @@ alias o2b="perl -e 'printf qq|%b\n|, oct( shift )'"
 alias o2d="perl -e 'printf qq|%d\n|, oct( shift )'"
 alias o2h="perl -e 'printf qq|%X\n|, oct( shift )'"
 
-if [ -d "$HOME/.plenv" ] ; then
-    echo 'export PATH="$HOME/.plenv/bin:$PATH"' >> ~/.bash_profile
-fi
-
 if which plenv > /dev/null; then eval "$(plenv init -)"; fi
 if which rbenv > /dev/null; then eval "$(rbenv init -)"; fi
 
