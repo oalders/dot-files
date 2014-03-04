@@ -22,4 +22,5 @@ if [ -d "$HOME/bin" ] ; then
 fi
 
 export PATH="$HOME/.plenv/bin:$PATH"
-eval "$(plenv init -)"
+
+if which plenv > /dev/null; then eval "$(plenv init -)"; fi

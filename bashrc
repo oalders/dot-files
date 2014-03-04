@@ -51,8 +51,7 @@ fi
 
 PERL_CPANM_OPT="--local-lib=~/perl5"
 
-# local::lib
-eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)
+[ $SHLVL -eq 1 ] && eval "$(perl -I$HOME/perl5/lib/perl5 -Mlocal::lib)"
 
 function gpull(){
     git pull origin $1;
@@ -166,10 +165,6 @@ if [ -f /etc/bash_completion.d/git ]; then
     source /etc/bash_completion.d/git
 elif [ -f `brew --prefix`/etc/bash_completion ]; then
     . `brew --prefix`/etc/bash_completion
-fi
-
-if [ -d ~/perl5/bin ]; then
-    export PATH=~/perl5/bin:$PATH
 fi
 
 if ! type "ack" > /dev/null  2>&1; then
