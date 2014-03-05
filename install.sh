@@ -42,11 +42,3 @@ sudo git clean -df
 # silence warnings when perlbrew not installed
 mkdir -p $HOME/perl5/perlbrew/etc
 touch $HOME/perl5/perlbrew/etc/bashrc
-
-if [ ! -d "$HOME/.plenv" ] ; then
-    cd
-    git clone git://github.com/tokuhirom/plenv.git ~/.plenv
-    git clone git://github.com/tokuhirom/Perl-Build.git ~/.plenv/plugins/perl-build/
-fi
-
-#exec $SHELL
