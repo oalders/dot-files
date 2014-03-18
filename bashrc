@@ -196,6 +196,8 @@ function tmux() {
     esac
 }
 
+# http://www.somethingorothersoft.com/2012/05/22/pulling-github-pull-requests-with-git/
+# fetch-pull-request origin 1234
 fetch-pull-request () {
     git fetch $1 refs/pull/$2/head:refs/remotes/pr/$2;
     git co -b pr/$2 pr/$2;
