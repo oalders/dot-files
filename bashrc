@@ -42,6 +42,9 @@ alias o2b="perl -e 'printf qq|%b\n|, oct( shift )'"
 alias o2d="perl -e 'printf qq|%d\n|, oct( shift )'"
 alias o2h="perl -e 'printf qq|%X\n|, oct( shift )'"
 
+if [ -d "$HOME/local/bin" ] ; then
+    PATH="$HOME/local/bin:$PATH"
+fi
 
 PERL_CPANM_OPT="--local-lib=~/perl5"
 
@@ -70,6 +73,32 @@ function gpush(){
     git push origin $1;
 }
 
+||||||| merged common ancestors
+function gpull(){
+    git pull origin $1;
+    gsubs;
+}
+
+function grebase(){
+    git pull --rebase origin $1;
+    gsubs;
+}
+
+function gsubs(){
+    STARTDIR=`pwd`;
+    cd $(git rev-parse --show-toplevel);
+    git submodule init;
+    git submodule update;
+    cd $STARTDIR;
+}
+
+function gpush(){
+    grebase;
+    git push origin $1;
+}
+
+=======
+>>>>>>> Removes perlbrew from bashrc.
 RED="\[\033[0;31m\]"
 YELLOW="\[\033[0;33m\]"
 GREEN="\[\033[0;32m\]"
