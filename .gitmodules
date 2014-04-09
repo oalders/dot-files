@@ -4,3 +4,6 @@
 [submodule "inc/git-extras"]
 	path = inc/git-extras
 	url = git://github.com/visionmedia/git-extras.git
+[submodule "inc/oh-my-git"]
+	path = inc/oh-my-git
+	url = https://github.com/arialdomartini/oh-my-git.git
