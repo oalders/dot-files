@@ -12,6 +12,7 @@ git config --global branch.master.merge refs/heads/master
 git config --global branch.autosetuprebase always
 git config --global merge.conflictstyle diff3
 git config --global push.default matching
+git config --global help.autocorrect 50
 
 git config --global alias.b  'branch'
 git config --global alias.ba 'branch -a'
