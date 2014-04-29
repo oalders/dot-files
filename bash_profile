@@ -19,3 +19,11 @@ if which rbenv > /dev/null; then eval "$(rbenv init -)"; fi
 if [ -d "$HOME/local/bin" ] ; then
     PATH="$HOME/local/bin:$PATH"
 fi
+
+if [ -d "$HOME/perl5/bin" ] ; then
+    PATH="$HOME/perl5/bin:$PATH"
+fi
+
+if [ -f $(brew --prefix)/etc/bash_completion ]; then
+    . $(brew --prefix)/etc/bash_completion
+fi
