@@ -70,7 +70,7 @@ function md () { mkdir -p "$@" && cd "$@"; }
 
 if [ -f /etc/bash_completion.d/git ]; then
     source /etc/bash_completion.d/git
-elif [ -f `brew --prefix`/etc/bash_completion ]; then
+elif [ hash brew 2>/dev/null && -f `brew --prefix`/etc/bash_completion ]; then
     . `brew --prefix`/etc/bash_completion
 fi
 
