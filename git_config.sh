@@ -27,7 +27,7 @@ git config --global alias.st 'status'
 git config --global branch.autosetuprebase always
 git config --global branch.master.merge refs/heads/master
 git config --global color.ui "auto"
-git config --global help.autocorrect 50
+git config --global help.autocorrect 10
 git config --global merge.conflictstyle diff3
 git config --global push.default simple
 
