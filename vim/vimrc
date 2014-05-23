@@ -84,6 +84,12 @@ vnoremap <silent> = :!perltidy -q<Enter>
 :nnoremap <silent> - :FixWhitespace<CR>
 :vnoremap <silent> - :FixWhitespace<CR>
 
+"dictionary sort
+:vnoremap <silent> so :!sort -d<CR>
+
+"dictionary sort unique
+:vnoremap <silent> su :!sort -d -u<CR>
+
 "pretty print json
 map <leader>jt <Esc>:%!json_xs -f json -t json-pretty<CR>
 
