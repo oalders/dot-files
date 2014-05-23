@@ -18,6 +18,7 @@ call pathogen#infect()
 " Bundle: https://github.com/tpope/vim-surround.git
 " Bundle: https://github.com/vim-scripts/vim-json-bundle.git
 " Bundle: https://github.com/wincent/Command-T.git
+" Bundle: https://github.com/qstrahl/vim-matchmaker.git
 
 syntax enable
 set background=dark
@@ -145,6 +146,8 @@ map <leader>t :TidyAll<cr>
 let g:auto_save = 1  " enable AutoSave on Vim startup
 
 let g:gitgutter_realtime = 0
+
+let g:matchmaker_enable_startup = 1
 
 " http://stackoverflow.com/questions/1327978/sorting-words-not-lines-in-vim
 :vnoremap <F1> d:execute 'normal a' . join(sort(split(getreg('"'))), ' ')<CR>
