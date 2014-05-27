@@ -42,12 +42,19 @@ alias o2b="perl -e 'printf qq|%b\n|, oct( shift )'"
 alias o2d="perl -e 'printf qq|%d\n|, oct( shift )'"
 alias o2h="perl -e 'printf qq|%X\n|, oct( shift )'"
 
-if [ -d "$HOME/local/bin" ] ; then
-    PATH="$HOME/local/bin:$PATH"
-fi
+# http://superuser.com/questions/39751/add-directory-to-path-if-its-not-already-there
+pathadd() {
+    if [ -d "$1" ] && [[ ":$PATH:" != *":$1:"* ]]; then
+        PATH="$1:$PATH"
+    fi
+}
+
+pathadd "/usr/local/sbin";
+pathadd "$HOME/local/bin";
 
 PERL_CPANM_OPT="--local-lib=~/perl5"
 
+# adds $HOME/perl5/bin to PATH
 [ $SHLVL -eq 1 ] && eval "$(perl -I$HOME/perl5/lib/perl5 -Mlocal::lib)"
 
 function whosonport {
