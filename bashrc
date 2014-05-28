@@ -124,3 +124,5 @@ fetch-pull-request () {
 }
 source ~/dot-files/inc/oh-my-git/prompt.sh
 
+# make sure NERDTree arrows work
+export LANG=en_US.UTF-8
