@@ -90,6 +90,11 @@ if ! type "ack" > /dev/null  2>&1; then
 fi
 function gi() { curl http://gitignore.io/api/$@ ;}
 
+# gh = git home
+# brings you to the top level of the git repo you are currently in
+# http://stackoverflow.com/questions/957928/is-there-a-way-to-get-the-git-root-directory-in-one-command
+function gh() { cd "$(git rev-parse --show-toplevel)"; }
+
 function wwwman {
   perl -we 'use URI::Escape;$cmd=shift;$args = uri_escape(join q[  ],@ARGV);
            exec open => qq!http://explainshell.com/explain/$cmd?args=$args!' $@
