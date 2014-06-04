@@ -19,6 +19,7 @@ git config --global alias.deleted 'log -1 --'
 git config --global alias.diffstat 'diff --stat -r'
 git config --global alias.dm 'diff -w -M master...HEAD'
 git config --global alias.dom 'diff -w -M origin/master...HEAD'
+git config --global alias.exec '!exec '
 git config --global alias.flog 'log --stat --abbrev-commit --relative-date --pretty=oneline'
 git config --global alias.from '!git fetch; git rebase origin/master'
 git config --global alias.plog "log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit --date=relative"
