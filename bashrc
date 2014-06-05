@@ -95,6 +95,8 @@ function gi() { curl http://gitignore.io/api/$@ ;}
 # http://stackoverflow.com/questions/957928/is-there-a-way-to-get-the-git-root-directory-in-one-command
 function gh() { cd "$(git rev-parse --show-toplevel)"; }
 
+function youtube-mp3 { youtube-download $1 && ffmpeg -i $1.mp4 $1.mp3; }
+
 function wwwman {
   perl -we 'use URI::Escape;$cmd=shift;$args = uri_escape(join q[  ],@ARGV);
            exec open => qq!http://explainshell.com/explain/$cmd?args=$args!' $@
