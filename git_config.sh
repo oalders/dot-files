@@ -26,6 +26,7 @@ git config --global alias.plog "log --graph --pretty=format:'%Cred%h%Creset -%C(
 git config --global alias.prom 'pull --rebase origin master'
 git config --global alias.pt 'push --tags'
 git config --global alias.st 'status'
+git config --global alias.view-stash 'stash show -p stash@{0}'
 git config --global branch.autosetuprebase always
 git config --global branch.master.merge refs/heads/master
 git config --global color.ui "auto"
