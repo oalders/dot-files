@@ -34,12 +34,12 @@ sh git_config.sh
 # git extras
 echo "installing git-extras"
 
+# silence warnings when perlbrew not installed
+mkdir -p $HOME/perl5/perlbrew/etc
+touch $HOME/perl5/perlbrew/etc/bashrc
+
 cd inc/git-extras
 sudo make install PREFIX="~/local"
 
 # for some reason a "~" folder gets created in the git-extras install
 sudo git clean -df
-
-# silence warnings when perlbrew not installed
-mkdir -p $HOME/perl5/perlbrew/etc
-touch $HOME/perl5/perlbrew/etc/bashrc
