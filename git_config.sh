@@ -4,8 +4,16 @@
 
 echo "git config"
 
-git config --global user.name "Olaf Alders"
 git config --global user.email "olaf@wundersolutions.com"
+git config --global user.name "Olaf Alders"
+
+git config --global branch.autosetuprebase always
+git config --global branch.master.merge refs/heads/master
+git config --global color.ui "auto"
+git config --global help.autocorrect 10
+git config --global merge.conflictstyle diff3
+git config --global push.default simple
+git config --global remote.origin.push HEAD
 
 git config --global alias.b  'branch'
 git config --global alias.ba 'branch -a'
@@ -27,14 +35,6 @@ git config --global alias.prom 'pull --rebase origin master'
 git config --global alias.pt 'push --tags'
 git config --global alias.st 'status'
 git config --global alias.view-stash 'stash show -p stash@{0}'
-git config --global branch.autosetuprebase always
-git config --global branch.master.merge refs/heads/master
-git config --global color.ui "auto"
-git config --global help.autocorrect 10
-git config --global merge.conflictstyle diff3
-git config --global push.default simple
 
 # takes a commit name as sole arg
 git config --global alias.whatis "show -s --pretty='tformat:%h (%s, %ad)' --date=short"
-
-
