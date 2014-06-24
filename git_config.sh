@@ -8,7 +8,6 @@ git config --global user.email "olaf@wundersolutions.com"
 git config --global user.name "Olaf Alders"
 
 git config --global branch.autosetuprebase always
-git config --global branch.master.merge refs/heads/master
 git config --global color.ui "auto"
 git config --global help.autocorrect 10
 git config --global merge.conflictstyle diff3
