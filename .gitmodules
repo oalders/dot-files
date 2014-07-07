@@ -7,3 +7,6 @@
 [submodule "inc/oh-my-git"]
 	path = inc/oh-my-git
 	url = https://github.com/arialdomartini/oh-my-git.git
+[submodule "inc/finna-be-octo-hipster"]
+	path = inc/finna-be-octo-hipster
+	url = git@github.com:jacaetevha/finna-be-octo-hipster.git

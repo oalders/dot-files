@@ -137,7 +137,4 @@ source ~/dot-files/inc/oh-my-git/prompt.sh
 # make sure NERDTree arrows work
 export LANG=en_US.UTF-8
 
-# set tab titles in iTerm2
-function title {
-    echo -ne "\033]0;"$*"\007"
-}
+source ~/dot-files/inc/finna-be-octo-hipster/iterm2_helpers.sh

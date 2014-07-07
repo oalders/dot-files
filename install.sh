@@ -31,12 +31,12 @@ $SELF_PATH/inc/vim-update-bundles/vim-update-bundles
 
 sh git_config.sh
 
-# git extras
-echo "installing git-extras"
-
 # silence warnings when perlbrew not installed
 mkdir -p $HOME/perl5/perlbrew/etc
 touch $HOME/perl5/perlbrew/etc/bashrc
+
+# git extras
+echo "installing git-extras"
 
 cd inc/git-extras
 sudo make install PREFIX="~/local"
