@@ -1,0 +1,6 @@
+[PerlTidy]
+select = {bin,lib,t}/**/*.{pl,pm,t,psgi}
+
+[SortLines::Naturally]
+select = .gitignore
+select = dzil/profiles/default/skel/MANIFEST.SKIP
