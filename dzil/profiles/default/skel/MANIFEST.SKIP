@@ -1,5 +1,6 @@
 .build
 .git
 .gitignore
-MANIFEST.SKIP
 local
+MANIFEST.SKIP
+.tidyallrc
