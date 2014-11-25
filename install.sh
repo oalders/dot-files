@@ -8,6 +8,8 @@ ln -sf $SELF_PATH/ackrc ~/.ackrc
 ln -sf $SELF_PATH/bashrc ~/.bashrc
 ln -sf $SELF_PATH/bash_profile ~/.bash_profile
 cp     $SELF_PATH/dataprinter ~/.dataprinter # Data::Printer doesn't like symlinks
+chmod 700 ~/.dataprinter
+
 ln -sf $SELF_PATH/dzil ~/.dzil
 ln -sf $SELF_PATH/minicpanrc ~/.minicpanrc
 ln -sf $SELF_PATH/perlcriticrc ~/.perlcriticrc
