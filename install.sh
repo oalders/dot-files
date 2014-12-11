@@ -4,6 +4,8 @@ SELF_PATH=$(cd -P -- "$(dirname -- "$0")" && pwd -P)
 
 echo $SELF_PATH
 
+mkdir -p ~/.re.pl
+
 ln -sf $SELF_PATH/ackrc ~/.ackrc
 ln -sf $SELF_PATH/bashrc ~/.bashrc
 ln -sf $SELF_PATH/bash_profile ~/.bash_profile
@@ -17,6 +19,7 @@ ln -sf $SELF_PATH/perltidyrc ~/.perltidyrc
 ln -sf $SELF_PATH/profile ~/.profile
 ln -sf $SELF_PATH/proverc ~/.proverc
 ln -sf $SELF_PATH/psqlrc ~/.psqlrc
+ln -sf $SELF_PATH/re.pl/repl.rc ~/.re.pl/repl.rc
 ln -sf $SELF_PATH/screenrc ~/.screenrc
 ln -sf $SELF_PATH/tmux.conf ~/.tmux.conf
 ln -sf $SELF_PATH/vim/vimrc ~/.vimrc

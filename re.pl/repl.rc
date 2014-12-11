@@ -1,0 +1,18 @@
+#!perl
+
+# swiped from https://gist.github.com/Cside/4065970
+
+my @plugins = (
+    'Colors',
+    'ReadLineHistory',    # history saved across sessions
+    'MultiLine::PPI',     # allow multiple lines
+
+    'Completion',
+    'CompletionDriver::Keywords',    # substr, while, etc
+    'CompletionDriver::LexEnv',      # current environment
+    'CompletionDriver::Globals',     # global variables
+    'CompletionDriver::INC',         # loading new modules
+    'CompletionDriver::Methods',     # class method completion
+);
+
+$_REPL->load_plugin( $_ ) for @plugins;
