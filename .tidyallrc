@@ -3,4 +3,5 @@ select = {bin,lib,t}/**/*.{pl,pm,t,psgi}
 
 [SortLines::Naturally]
 select = .gitignore
+select = cpan/*
 select = dzil/profiles/default/skel/MANIFEST.SKIP
