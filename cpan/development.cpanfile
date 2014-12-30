@@ -1,3 +1,4 @@
+requires 'App::GitGot';
 requires 'Carton';
 requires 'Code::TidyAll';
 requires 'Code::TidyAll::Plugin::SortLines::Naturally';
