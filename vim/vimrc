@@ -89,7 +89,7 @@ vnoremap <silent> = :!perltidy -q<Enter>
 :vnoremap <silent> so :!sort -d<CR>
 
 "dictionary sort unique
-:vnoremap <silent> su :!sort -d -u<CR>
+:vnoremap <silent> su :!sort -d <bar> uniq<CR>
 
 "pretty print json
 map <leader>jt <Esc>:%!json_xs -f json -t json-pretty<CR>
