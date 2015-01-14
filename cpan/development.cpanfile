@@ -10,3 +10,4 @@ requires 'Data::Printer::Filter::URI';
 requires 'Modern::Perl';
 requires 'Moose', '>= 2.1403';
 requires 'Perl::Critic';
+requires 'Test::Perl::Critic';
