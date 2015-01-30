@@ -10,6 +10,7 @@ call pathogen#infect()
 " Bundle: https://github.com/altercation/vim-colors-solarized.git
 " Bundle: https://github.com/bling/vim-airline.git
 " Bundle: https://github.com/bronson/vim-trailing-whitespace.git
+" Bundle: https://github.com/fatih/vim-go.git
 " Bundle: https://github.com/henrik/vim-indexed-search.git
 " Bundle: https://github.com/qstrahl/vim-matchmaker.git
 " Bundle: https://github.com/scrooloose/nerdcommenter.git
