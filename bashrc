@@ -138,3 +138,5 @@ source ~/dot-files/inc/oh-my-git/prompt.sh
 export LANG=en_US.UTF-8
 
 source ~/dot-files/inc/finna-be-octo-hipster/iterm2_helpers.sh
+
+export GOPATH=~/gocode
