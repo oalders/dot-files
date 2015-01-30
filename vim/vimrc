@@ -11,6 +11,7 @@ call pathogen#infect()
 " Bundle: https://github.com/bling/vim-airline.git
 " Bundle: https://github.com/bronson/vim-trailing-whitespace.git
 " Bundle: https://github.com/henrik/vim-indexed-search.git
+" Bundle: https://github.com/qstrahl/vim-matchmaker.git
 " Bundle: https://github.com/scrooloose/nerdcommenter.git
 " Bundle: https://github.com/scrooloose/nerdtree.git
 " Bundle: https://github.com/tpope/vim-abolish.git
@@ -19,7 +20,6 @@ call pathogen#infect()
 " Bundle: https://github.com/tpope/vim-surround.git
 " Bundle: https://github.com/vim-scripts/vim-json-bundle.git
 " Bundle: https://github.com/wincent/Command-T.git
-" Bundle: https://github.com/qstrahl/vim-matchmaker.git
 
 syntax enable
 set background=dark
