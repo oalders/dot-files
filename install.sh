@@ -44,7 +44,7 @@ touch $HOME/perl5/perlbrew/etc/bashrc
 echo "installing git-extras"
 
 cd inc/git-extras
-sudo make install PREFIX="~/local"
+make install PREFIX="~/local"
 
 # for some reason a "~" folder gets created in the git-extras install
 sudo git clean -df
