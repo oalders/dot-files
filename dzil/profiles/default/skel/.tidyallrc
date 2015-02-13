@@ -1,0 +1,11 @@
+[PerlTidy]
+argv = --profile=$ROOT/.perltidyrc
+select = {bin,examples,lib,t}/**/*.{pl,pm,t,psgi}
+
+[SortLines::Naturally]
+select = .gitignore
+select = MANIFEST.SKIP
+
+[UniqueLines]
+select = .gitignore
+select = MANIFEST.SKIP
