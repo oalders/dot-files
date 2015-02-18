@@ -6,6 +6,9 @@ set -o vi
 # don't put duplicate lines in the history. See bash(1) for more options
 export HISTCONTROL=ignoredups
 
+# http://askubuntu.com/questions/80371/bash-history-handling-with-multiple-terminals
+export PROMPT_COMMAND='history -a'
+
 # for setting history length see HISTSIZE and HISTFILESIZE in bash(1)
 HISTSIZE=1000
 HISTFILESIZE=2000
