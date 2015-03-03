@@ -31,6 +31,7 @@ alias perldoc=cpandoc
 alias pine=alpine
 alias pretty='python -mjson.tool'
 alias ps='ps auxw'
+alias source-perlbrew='source ~/perl5/perlbrew/etc/bashrc'
 alias ssh-fingerprints='ls ~/.ssh/*.pub | xargs -L 1 ssh-keygen -l -f'
 alias xkcdalt='perl -MWWW::xkcd -E "say WWW::xkcd->new->fetch_metadata->{alt}"'
 alias xpasswd='perl -MCrypt::XkcdPassword -E "say Crypt::XkcdPassword->make_password"'
