@@ -16,6 +16,7 @@ call pathogen#infect()
 " Bundle: https://github.com/rodjek/vim-puppet.git
 " Bundle: https://github.com/scrooloose/nerdcommenter.git
 " Bundle: https://github.com/scrooloose/nerdtree.git
+" Bundle: https://github.com/scrooloose/syntastic.git
 " Bundle: https://github.com/tpope/vim-abolish.git
 " Bundle: https://github.com/tpope/vim-commentary.git
 " Bundle: https://github.com/tpope/vim-fugitive.git
