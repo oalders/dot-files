@@ -163,6 +163,7 @@ let g:matchmaker_enable_startup = 1
 :vnoremap <F1> d:execute 'normal a' . join(sort(split(getreg('"'))), ' ')<CR>
 
 map <F2> :NERDTreeToggle<CR>
+map <F3> :SyntasticToggleMode<CR>
 
 set statusline+=%#warningmsg#
 set statusline+=%{SyntasticStatuslineFlag()}
@@ -170,12 +171,18 @@ set statusline+=%*
 
 let g:syntastic_always_populate_loc_list = 1
 let g:syntastic_auto_loc_list = 1
-let g:syntastic_check_on_open = 1
+let g:syntastic_check_on_open = 0
 let g:syntastic_check_on_wq = 0
+
+let g:syntastic_mode_map = { 'mode': 'active',
+                           \ 'active_filetypes': ['html', 'less', 'puppet'],
+                           \ 'passive_filetypes': ['perl'] }
 
 let g:syntastic_html_tidy_blocklevel_tags = [
   \ 'label',
   \ 'model_if',
+  \ 'model_loop',
+  \ 'model_unless',
   \ 'pkit_errorspan',
   \ ]
 
@@ -188,14 +195,16 @@ let g:syntastic_html_tidy_empty_tags = [
   \ 'model_var',
   \ 'model_else',
   \ 'pkit_component',
+  \ 'pkit_macro',
   \ ]
 
 let g:syntastic_html_tidy_ignore_errors = [
-  \ 'discarding unexpected <label>',
   \ 'discarding unexpected </label>',
-  \ 'discarding unexpected <loc>',
+  \ 'discarding unexpected <label>',
   \ 'discarding unexpected </loc>',
+  \ 'discarding unexpected <loc>',
+  \ '<img> escaping malformed URI reference',
+  \ 'inserting implicit <label>',
   \ 'missing </label> before <pkit_errorspan>',
   \ 'trimming empty <label>',
-  \ 'inserting implicit <label>',
   \ ]
