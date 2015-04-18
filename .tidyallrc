@@ -1,4 +1,5 @@
 [PerlTidy]
+-argv  = --profile=$ROOT/.perltidyrc
 select = {bin,lib,t}/**/*.{pl,pm,t,psgi}
 
 [SortLines::Naturally]

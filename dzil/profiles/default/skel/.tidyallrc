@@ -1,11 +1,13 @@
 [PerlTidy]
-argv = --profile=$ROOT/.perltidyrc
 select = {bin,examples,lib,t}/**/*.{pl,pm,t,psgi}
+select = app.psgi
+
+; [PerlCritic]
+; select = {bin,lib,t}/**/*.{pl,pm,t,psgi}
+; argv = --severity 5 --verbose 11 --exclude=ValuesAndExpressions::ProhibitAccessOfPrivateData
 
 [SortLines::Naturally]
 select = .gitignore
-select = MANIFEST.SKIP
 
-[UniqueLines]
-select = .gitignore
-select = MANIFEST.SKIP
+[JSON]
+select = t/**/*json

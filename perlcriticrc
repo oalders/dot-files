@@ -1,1 +1,3 @@
 exclude = Perl::Critic::Policy::Subroutines::RequireArgUnpacking
+exclude = Perl::Critic::Policy::ValuesAndExpressions::ProhibitAccessOfPrivateData
+verbose = 11
