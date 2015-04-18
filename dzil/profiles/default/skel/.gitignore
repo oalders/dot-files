@@ -1,3 +1,4 @@
-/{{$dist->name}}*
 .build
+/{{$dist->name}}*
+local
 .tidyall.d
