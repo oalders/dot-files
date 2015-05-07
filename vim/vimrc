@@ -157,6 +157,8 @@ let g:auto_save = 1  " enable AutoSave on Vim startup
 
 let g:gitgutter_realtime = 0
 
+let g:auto_save_no_updatetime = 1  " do not change the 'updatetime' option
+
 let g:matchmaker_enable_startup = 1
 
 " http://stackoverflow.com/questions/1327978/sorting-words-not-lines-in-vim
