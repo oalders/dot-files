@@ -54,6 +54,10 @@ pathadd() {
     fi
 }
 
+# python scripts via pip install --user
+pathadd "$HOME/Library/Python/2.7/bin";
+pathadd "$HOME/.local/bin";
+
 pathadd "/usr/local/sbin";
 pathadd "$HOME/local/bin";
 
