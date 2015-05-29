@@ -214,7 +214,7 @@ let g:syntastic_html_tidy_ignore_errors = [
 
 map ,mmi o__PACKAGE__->meta->make_immutable;<ESC>
 map ,ddp ouse DDP;<CR>p( );<ESC>
-map ,perl o#!/usr/bin/env perl;<CR><CR>use strict;<CR>use warnings;<CR>use feature qw( say );<CR><CR><ESC>
+map ,perl :set paste<CR>O#!/usr/bin/env perl;<CR><CR>use strict;<CR>use warnings;<CR>use feature qw( say );<CR><ESC>
 map ,moose Opackage Foo::Bar;<CR><CR>use Moose;<CR><CR>use MooseX::StrictConstructor;<CR><CR>__PACKAGE__->meta->make_immutable;<CR>1;<ESC>
 map ,ss omy $self = shift;<CR>
 
