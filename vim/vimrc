@@ -220,4 +220,4 @@ map ,ss omy $self = shift;<CR>
 
 " convert a file path to a Perl module name
 " ie Foo/Bar/Baz.pm => Foo::Bar::Baz
-map ,2mod :s/\//::/g<CR>:s/.pm$//<CR>
+map ,2mod :s/\//::/g<CR>gv:s/.pm$//<CR>
