@@ -38,6 +38,7 @@ git config --global alias.mylog 'log --author="Olaf Alders"'
 git config --global alias.plog "log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit --date=relative"
 git config --global alias.prom 'pull --rebase origin master'
 git config --global alias.pt 'push --tags'
+git config --global alias.rc "rebase --continue"
 git config --global alias.root "rev-parse --show-toplevel"
 git config --global alias.st 'status'
 git config --global alias.stu 'status --untracked-files=no'
