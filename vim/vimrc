@@ -220,7 +220,7 @@ map ,mmi o__PACKAGE__->meta->make_immutable;<ESC>
 map ,ddp ouse DDP;<CR>p( );<ESC>
 map ,perl :set paste<CR>O#!/usr/bin/env perl;<CR><CR>use strict;<CR>use warnings;<CR>use feature qw( say );<CR><ESC>
 map ,moose Opackage Foo::Bar;<CR><CR>use Moose;<CR><CR>use MooseX::StrictConstructor;<CR><CR>__PACKAGE__->meta->make_immutable;<CR>1;<ESC>
-map ,ss omy $self = shift;<CR>
+map ,ss :set paste<CR>i    my $self = shift;<CR>
 
 " convert a file path to a Perl module name
 " ie Foo/Bar/Baz.pm => Foo::Bar::Baz
