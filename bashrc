@@ -132,12 +132,8 @@ function tmux() {
         # https://gist.github.com/marczych/10524654
         ns)
            BRANCH=$(git rev-parse --abbrev-ref HEAD)
-           PULL=$(tmux capture-pane -p | grep -E "Successfully .*#[0-9]+" | tail -1 | sed 's/^.*#//')
-           SESSION_NAME="$BRANCH"
-
-           if [ "$PULL" != '' ] ; then
-              SESSION_NAME="$SESSION_NAME|$PULL"
-           fi
+           CURRENT_DIR=${PWD##*/};
+           SESSION_NAME="$CURRENT_DIR ⚡ $BRANCH"
 
            tmux rename-session "$SESSION_NAME"
             ;;
