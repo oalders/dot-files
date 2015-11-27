@@ -31,6 +31,7 @@ alias perldoc=cpandoc
 alias pine=alpine
 alias pretty='python -mjson.tool'
 alias ps='ps auxw'
+alias redo='sh ~/.fpp/.fpp.sh'
 alias source-perlbrew='source ~/perl5/perlbrew/etc/bashrc'
 alias ssh-fingerprints='ls ~/.ssh/*.pub | xargs -L 1 ssh-keygen -l -f'
 alias stp='git st | fpp'
