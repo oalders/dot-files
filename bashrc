@@ -144,6 +144,19 @@ function tmux() {
     esac
 }
 
+function fpp() {
+    local fpp=$(type -fp fpp)
+    $fpp "$@"
+    HISTORY_FILE="$HOME/.fpp/.fpp_history"
+    FPP_CACHE="$HOME/.fpp/.fpp.sh"
+    LAST_COMMAND=`tac $FPP_CACHE |egrep -m 1 . `
+    LAST_HISTORY_LINE=$(tac $HISTORY_FILE |egrep -m 1 .)
+
+    if [ "$LAST_COMMAND" != "$LAST_HISTORY_LINE" ] ; then
+        echo $LAST_COMMAND >> $HISTORY_FILE
+    fi
+}
+
 # http://www.somethingorothersoft.com/2012/05/22/pulling-github-pull-requests-with-git/
 # fetch-pull-request origin 1234
 fetch-pull-request () {
