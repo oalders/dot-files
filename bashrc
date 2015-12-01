@@ -154,10 +154,13 @@ function fpp() {
 
     case "$1" in
         --history)
-        cat $HISTORY_FILE
+        cat --number $HISTORY_FILE
         return 1
         ;;
         --redo)
+        if [ $2 ] ; then
+            LAST_HISTORY_LINE=$(tail -n+$2 $HISTORY_FILE |head -n1)
+        fi
         LAST_HISTORY_LINE=`echo "$LAST_HISTORY_LINE" | sed "s/'//g"`
         $LAST_HISTORY_LINE
         return 1
