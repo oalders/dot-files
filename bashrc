@@ -146,11 +146,25 @@ function tmux() {
 
 function fpp() {
     local fpp=$(type -fp fpp)
-    $fpp "$@"
+
     HISTORY_FILE="$HOME/.fpp/.fpp_history"
     FPP_CACHE="$HOME/.fpp/.fpp.sh"
-    LAST_COMMAND=`tac $FPP_CACHE |egrep -m 1 . `
+
     LAST_HISTORY_LINE=$(tac $HISTORY_FILE |egrep -m 1 .)
+
+    case "$1" in
+        --history)
+        cat $HISTORY_FILE
+        return 1
+        ;;
+        --redo)
+        LAST_HISTORY_LINE=`echo "$LAST_HISTORY_LINE" | sed "s/'//g"`
+        $LAST_HISTORY_LINE
+        return 1
+    esac
+
+    $fpp "$@"
+    LAST_COMMAND=`tac $FPP_CACHE |egrep -m 1 . `
 
     if [ "$LAST_COMMAND" != "$LAST_HISTORY_LINE" ] ; then
         echo $LAST_COMMAND >> $HISTORY_FILE
