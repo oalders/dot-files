@@ -150,8 +150,11 @@ function fpp() {
     HISTORY_FILE="$HOME/.fpp/.fpp_history"
     FPP_CACHE="$HOME/.fpp/.fpp.sh"
 
-    LAST_HISTORY_LINE=$(tac $HISTORY_FILE |egrep -m 1 .)
-
+    # fpp --history just displays entire history prefixed by line numbers
+    # fpp --redo will rexec the last entry in the history file
+    # fpp --redo -1 will rexec the last entry in the history file
+    # fpp --redo -2 will re-exec the second last line in the history file
+    # fpp --redo 11 will re-exec entry number 11 in the history file
     case "$1" in
         --history)
         cat --number $HISTORY_FILE
@@ -159,16 +162,25 @@ function fpp() {
         ;;
         --redo)
         if [ $2 ] ; then
-            LAST_HISTORY_LINE=$(tail -n+$2 $HISTORY_FILE |head -n1)
+            if [ $2 \> 0 ] ; then
+                LAST_HISTORY_LINE=$(head -n $2 $HISTORY_FILE |tail -n1)
+            else
+                LINE_NUMBER=$(( $2 * -1))
+                LAST_HISTORY_LINE=$(tail $HISTORY_FILE -n $LINE_NUMBER | head -n1)
+            fi
+        else
+            LAST_HISTORY_LINE=$(tail $HISTORY_FILE -n 1)
         fi
-        LAST_HISTORY_LINE=`echo "$LAST_HISTORY_LINE" | sed "s/'//g"`
-        $LAST_HISTORY_LINE
+
+        eval $LAST_HISTORY_LINE
         return 1
+        ;;
     esac
 
     $fpp "$@"
-    LAST_COMMAND=`tac $FPP_CACHE |egrep -m 1 . `
+    LAST_COMMAND=$(tail $FPP_CACHE -n 1)
 
+    # Don't keep adding the same command to the history file.
     if [ "$LAST_COMMAND" != "$LAST_HISTORY_LINE" ] ; then
         echo $LAST_COMMAND >> $HISTORY_FILE
     fi
