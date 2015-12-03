@@ -27,7 +27,6 @@ alias ls='ls -G'
 alias lsd='ls --group-directories-first'
 alias octal_perms='stat -c "%a %n"'
 alias penv='perl -MDDP -e "p(%ENV)"'
-alias perldoc=cpandoc
 alias pine=alpine
 alias pretty='python -mjson.tool'
 alias ps='ps auxw'
