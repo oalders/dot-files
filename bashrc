@@ -176,11 +176,14 @@ function fpp() {
         ;;
     esac
 
+    LAST_HISTORY_LINE=$(tail $HISTORY_FILE -n 1)
     $fpp "$@"
     LAST_COMMAND=$(tail $FPP_CACHE -n 1)
 
     # Don't keep adding the same command to the history file.
-    if [ "$LAST_COMMAND" != "$LAST_HISTORY_LINE" ] ; then
+    # Also, don't log a message about a no-op.
+
+    if [[ ("$LAST_COMMAND" != 'echo "nothing to do!" && exit 1') && ("$LAST_COMMAND" != "$LAST_HISTORY_LINE") ]] ; then
         echo $LAST_COMMAND >> $HISTORY_FILE
     fi
 }
