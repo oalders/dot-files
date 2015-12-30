@@ -5,6 +5,7 @@ SELF_PATH=$(cd -P -- "$(dirname -- "$0")" && pwd -P)
 echo $SELF_PATH
 
 mkdir -p ~/.re.pl
+mkdir -p ~/.vagrant.d
 
 ln -sf $SELF_PATH/ackrc ~/.ackrc
 ln -sf $SELF_PATH/bashrc ~/.bashrc
@@ -23,6 +24,7 @@ ln -sf $SELF_PATH/re.pl/repl.rc ~/.re.pl/repl.rc
 ln -sf $SELF_PATH/screenrc ~/.screenrc
 ln -sf $SELF_PATH/sqitch ~/.sqitch
 ln -sf $SELF_PATH/tmux.conf ~/.tmux.conf
+ln -sf $SELF_PATH/Vagrantfile ~/.vagrant.d/Vagrantfile
 ln -sf $SELF_PATH/vim/vimrc ~/.vimrc
 ln -sf $SELF_PATH/vim/after ~/.vim/after
 
