@@ -180,7 +180,7 @@ function fpp() {
 
     LAST_HISTORY_LINE=$(tail $HISTORY_FILE -n 1)
     $fpp "$@"
-    LAST_COMMAND=$(tail $FPP_CACHE -n 1)
+    LAST_COMMAND=$(tail $FPP_CACHE -n 2 | head -n 1)
 
     # Don't keep adding the same command to the history file.
     # Also, don't log a message about a no-op.
