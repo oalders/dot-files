@@ -164,13 +164,13 @@ function fpp() {
         --redo)
         if [ $2 ] ; then
             if [ $2 \> 0 ] ; then
-                LAST_HISTORY_LINE=$(head -n $2 $HISTORY_FILE |tail -n1)
+                LAST_HISTORY_LINE=$(head -n $2 $HISTORY_FILE |tail -n 1)
             else
                 LINE_NUMBER=$(( $2 * -1))
-                LAST_HISTORY_LINE=$(tail $HISTORY_FILE -n $LINE_NUMBER | head -n1)
+                LAST_HISTORY_LINE=$(tail -n $LINE_NUMBER $HISTORY_FILE | head -n 1)
             fi
         else
-            LAST_HISTORY_LINE=$(tail $HISTORY_FILE -n 1)
+            LAST_HISTORY_LINE=$(tail -n 1 $HISTORY_FILE )
         fi
 
         eval $LAST_HISTORY_LINE
@@ -178,9 +178,9 @@ function fpp() {
         ;;
     esac
 
-    LAST_HISTORY_LINE=$(tail $HISTORY_FILE -n 1)
+    LAST_HISTORY_LINE=$(tail -n 1 $HISTORY_FILE)
     $fpp "$@"
-    LAST_COMMAND=$(tail $FPP_CACHE -n 2 | head -n 1)
+    LAST_COMMAND=$(tail -n 2 $FPP_CACHE | head -n 1)
 
     # Don't keep adding the same command to the history file.
     # Also, don't log a message about a no-op.
