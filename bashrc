@@ -158,7 +158,7 @@ function fpp() {
     # fpp --redo 11 will re-exec entry number 11 in the history file
     case "$1" in
         --history)
-        cat --number $HISTORY_FILE
+        cat -n $HISTORY_FILE
         return 1
         ;;
         --redo)
