@@ -149,6 +149,8 @@ function fpp() {
     HISTORY_FILE="$HOME/.fpp/.fpp_history"
     FPP_CACHE="$HOME/.fpp/.fpp.sh"
 
+    touch $HISTORY_FILE
+
     # fpp --history just displays entire history prefixed by line numbers
     # fpp --redo will rexec the last entry in the history file
     # fpp --redo -1 will rexec the last entry in the history file
