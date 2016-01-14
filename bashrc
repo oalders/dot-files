@@ -33,7 +33,7 @@ alias ps='ps auxw'
 alias redo='sh ~/.fpp/.fpp.sh'
 alias source-perlbrew='source ~/perl5/perlbrew/etc/bashrc'
 alias ssh-fingerprints='ls ~/.ssh/*.pub | xargs -L 1 ssh-keygen -l -f'
-alias stp='git st | fpp'
+alias stp='git st | fpp --no-file-checks'
 alias xkcdalt='perl -MWWW::xkcd -E "say WWW::xkcd->new->fetch_metadata->{alt}"'
 alias xpasswd='perl -MCrypt::XkcdPassword -E "say Crypt::XkcdPassword->make_password"'
 
