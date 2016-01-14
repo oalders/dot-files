@@ -152,8 +152,8 @@ function fpp() {
     touch $HISTORY_FILE
 
     # fpp --history just displays entire history prefixed by line numbers
-    # fpp --redo will rexec the last entry in the history file
-    # fpp --redo -1 will rexec the last entry in the history file
+    # fpp --redo will re-exec the last entry in the history file
+    # fpp --redo -1 will also re-exec the last entry in the history file
     # fpp --redo -2 will re-exec the second last line in the history file
     # fpp --redo 11 will re-exec entry number 11 in the history file
     case "$1" in
