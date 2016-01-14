@@ -7,4 +7,5 @@ mkdir -p src
 cd src
 rm -rf PathPicker && git clone git@github.com:facebook/PathPicker.git
 cd PathPicker/
+rm -r ~/local/bin/fpp
 ln -s "$(pwd)/fpp" ~/local/bin/fpp
