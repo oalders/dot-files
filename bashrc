@@ -185,7 +185,7 @@ function fpp() {
     # Don't keep adding the same command to the history file.
     # Also, don't log a message about a no-op.
 
-    if [[ ("$LAST_COMMAND" != 'echo "nothing to do!" && exit 1') && ("$LAST_COMMAND" != "$LAST_HISTORY_LINE") ]] ; then
+    if [[ ("$LAST_COMMAND" != '') && ("$LAST_COMMAND" != "$LAST_HISTORY_LINE") ]] ; then
         echo $LAST_COMMAND >> $HISTORY_FILE
     fi
 }
