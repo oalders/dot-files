@@ -53,3 +53,5 @@ make install PREFIX="~/local"
 
 # for some reason a "~" folder gets created in the git-extras install
 sudo git clean -df
+
+sh install-fpp.sh
