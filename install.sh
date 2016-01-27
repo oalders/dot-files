@@ -56,4 +56,11 @@ sudo git clean -df
 
 sh install-fpp.sh
 
-git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
+LOCALCHECKOUT=~/.tmux/plugins/tpm
+if [ ! -d $LOCALCHECKOUT ] 
+then
+    git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
+else
+     cd $LOCALCHECKOUT
+    git pull origin master
+fi
