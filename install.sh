@@ -55,3 +55,5 @@ make install PREFIX="~/local"
 sudo git clean -df
 
 sh install-fpp.sh
+
+git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
