@@ -4,7 +4,8 @@ export EDITOR=vim
 set -o vi
 
 # don't put duplicate lines in the history. See bash(1) for more options
-export HISTCONTROL=ignoredups
+# http://www.linuxjournal.com/content/using-bash-history-more-efficiently-histcontrol
+export HISTCONTROL=ignoreboth
 
 # http://askubuntu.com/questions/80371/bash-history-handling-with-multiple-terminals
 export PROMPT_COMMAND='history -a'
