@@ -229,6 +229,3 @@ fi
 # clean up PATH
 # http://linuxg.net/oneliners-for-removing-the-duplicates-in-your-path/
 PATH=`echo -n $PATH | awk -v RS=: -v ORS=: '!arr[$0]++'`
-
-echo $platform
-echo $unamestr
