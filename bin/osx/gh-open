@@ -1,0 +1,23 @@
+#!/usr/bin/env perl
+
+# On OS X, open up the Github URL for the repository which you are currently
+# in.
+
+use strict;
+use warnings;
+
+my $output = `git remote -v`;
+
+my @lines = split m{\n}, $output;
+
+foreach my $line (@lines) {
+    my @parts = split m{\s+}, $lines[0];
+    next unless $parts[0] eq 'origin' && $parts[2] eq '(fetch)';
+
+    if ( $parts[1] =~ m{@(.*)\.git} ) {
+        my $url = $1;
+        $url =~ s{:}{/};
+        system `open https://$url`;
+        exit;
+    }
+}
