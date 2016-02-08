@@ -1,3 +1,12 @@
+# http://stackoverflow.com/questions/394230/detect-the-os-from-a-bash-script
+platform='unknown'
+unamestr=`uname`
+if [[ "$unamestr" == 'Linux' ]]; then
+   platform='linux'
+elif [[ "$unamestr" == 'Darwin' ]]; then
+   platform='osx'
+fi
+
 export EDITOR=vim
 
 # use vim mappings to move around the command line
