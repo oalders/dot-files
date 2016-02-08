@@ -221,3 +221,14 @@ export GOPATH=~/go
 if [ -d $GOPATH ] ; then
     export PATH="$GOPATH/bin:$PATH"
 fi
+
+if [[ $platform == 'osx' ]]; then
+    export PATH="~/dot-files/bin/osx:$PATH"
+fi
+
+# clean up PATH
+# http://linuxg.net/oneliners-for-removing-the-duplicates-in-your-path/
+PATH=`echo -n $PATH | awk -v RS=: -v ORS=: '!arr[$0]++'`
+
+echo $platform
+echo $unamestr
