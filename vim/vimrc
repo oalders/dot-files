@@ -4,13 +4,14 @@ runtime bundle/vim-pathogen/autoload/pathogen.vim
 " Bundle: tpope/vim-pathogen
 call pathogen#infect()
 
+" Bundle: https://github.com/Lokaltog/vim-powerline.git
 " Bundle: https://github.com/airblade/vim-gitgutter.git
 " Bundle: https://github.com/altercation/vim-colors-solarized.git
+" Bundle: https://github.com/bkad/CamelCaseMotion.git
 " Bundle: https://github.com/bling/vim-airline.git
 " Bundle: https://github.com/bronson/vim-trailing-whitespace.git
 " Bundle: https://github.com/fatih/vim-go.git
 " Bundle: https://github.com/henrik/vim-indexed-search.git
-" Bundle: https://github.com/Lokaltog/vim-powerline.git
 " Bundle: https://github.com/mbra/prettysql
 " Bundle: https://github.com/qstrahl/vim-matchmaker.git
 " Bundle: https://github.com/rodjek/vim-puppet.git
@@ -232,3 +233,12 @@ map ,ss :set paste<CR>i    my $self = shift;<CR>
 " convert a file path to a Perl module name
 " ie Foo/Bar/Baz.pm => Foo::Bar::Baz
 map ,2mod :s/\.pm//<CR>gv:s/\//::/g<CR>
+
+map <silent> w <Plug>CamelCaseMotion_w
+map <silent> b <Plug>CamelCaseMotion_b
+map <silent> e <Plug>CamelCaseMotion_e
+map <silent> ge <Plug>CamelCaseMotion_ge
+sunmap w
+sunmap b
+sunmap e
+sunmap ge
