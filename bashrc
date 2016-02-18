@@ -49,7 +49,7 @@ alias show-local-only-branches="git branch -r | awk '{print \$1}' | egrep -v -f 
 alias show-merged-branches='git branch --merged | grep -v "\*" | grep -v master'
 alias source-perlbrew='source ~/perl5/perlbrew/etc/bashrc'
 alias ssh-fingerprints='ls ~/.ssh/*.pub | xargs -L 1 ssh-keygen -l -f'
-alias stp='git st --short | fpp --no-file-checks'
+alias stp='git status | fpp --no-file-checks'
 alias xkcdalt='perl -MWWW::xkcd -E "say WWW::xkcd->new->fetch_metadata->{alt}"'
 alias xpasswd='perl -MCrypt::XkcdPassword -E "say Crypt::XkcdPassword->make_password"'
 
