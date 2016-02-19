@@ -4,14 +4,13 @@ use feature qw( say );
 
 use IO::Prompt::Tiny qw/prompt/;
 
-my @branches = grep { $_ ne '  master' && $_ !~ m{\A\*} } split q{\n},
-    `git branch`;
+my @branches = split q{\n}, `git branch | grep -v master | grep -v \\*`;
 
 foreach my $branch ( @branches ) {
-    my $answer = prompt( "Delete $branch Yes or no? (y/n)", "n" );
+    my $answer = prompt( "Delete $branch? (y/n)", "n" );
     if ( $answer eq 'y' ) {
-        my $success = `git branch -D $branch`;
-        say $success;
+        my $result = `git branch -D $branch`;
+        say $result;
     }
     else {
         say "Skipping $branch";
