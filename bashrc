@@ -224,6 +224,11 @@ if [ -d $GOPATH ] ; then
     export PATH="$GOPATH/bin:$PATH"
 fi
 
+LOCALPERLBIN=~/perl5/bin
+if [ -d $LOCALPERBIN ] ; then
+    export PATH="$LOCALPERLBIN:$PATH"
+fi
+
 if [[ $platform == 'osx' ]]; then
     export PATH="~/dot-files/bin/osx:$PATH"
 fi
