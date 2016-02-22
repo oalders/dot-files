@@ -48,12 +48,6 @@ touch $HOME/perl5/perlbrew/etc/bashrc
 # git extras
 echo "installing git-extras"
 
-cd inc/git-extras
-make install PREFIX="~/local"
-
-# for some reason a "~" folder gets created in the git-extras install
-sudo git clean -df
-
 sh install-fpp.sh
 
 LOCALCHECKOUT=~/.tmux/plugins/tpm
@@ -64,3 +58,9 @@ else
      cd $LOCALCHECKOUT
     git pull origin master
 fi
+
+cd inc/git-extras
+make install PREFIX="~/local"
+
+# for some reason a "~" folder gets created in the git-extras install
+sudo git clean -df
