@@ -6,18 +6,19 @@
 use strict;
 use warnings;
 
+use URI;
+
 my $output = `git remote -v`;
 
 my @lines = split m{\n}, $output;
 
-foreach my $line (@lines) {
+foreach my $line ( @lines ) {
     my @parts = split m{\s+}, $lines[0];
     next unless $parts[0] eq 'origin' && $parts[2] eq '(fetch)';
 
-    if ( $parts[1] =~ m{@(.*)\.git} ) {
-        my $url = $1;
-        $url =~ s{:}{/};
-        system `open https://$url`;
-        exit;
-    }
+    my $uri = URI->new( $parts[1] );
+    $uri->scheme( 'https' );
+
+    system `open $uri`;
+    exit;
 }
