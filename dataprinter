@@ -1,5 +1,7 @@
-{   end_separator  => 1,
-    hash_separator => ' => ',
+{
+    end_separator => 1,
     filters =>
         { -external => [ 'DBIx::Class', 'DB', 'DateTime', 'JSON', 'URI' ], },
+    hash_separator => ' => ',
+    scalar_quotes  => q{'},
 };
