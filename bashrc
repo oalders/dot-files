@@ -151,6 +151,10 @@ function tmux() {
            CURRENT_DIR=${PWD##*/};
            SESSION_NAME="$CURRENT_DIR ⚡ $BRANCH"
 
+           if [ -z "$BRANCH" ]; then
+               SESSION_NAME=$(pwd)
+           fi
+
            tmux rename-session "$SESSION_NAME"
             ;;
         *)
