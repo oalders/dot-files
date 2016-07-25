@@ -101,6 +101,8 @@ let mapleader = ","
 nnoremap <silent> = :%!perltidy -q<Enter>
 vnoremap <silent> = :!perltidy -q<Enter>
 
+vnoremap <silent> + :!sql-webformat<Enter>
+
 "remove all trailing whitespace
 :nnoremap <silent> - :FixWhitespace<CR>
 :vnoremap <silent> - :FixWhitespace<CR>
