@@ -16,7 +16,7 @@ my $output = `git remote -v`;
 my @lines = split m{\n}, $output;
 
 foreach my $line ( @lines ) {
-    my @parts = split m{\s+}, $lines[0];
+    my @parts = split m{\s+}, $line;
     next unless $parts[0] eq 'origin' && $parts[2] eq '(fetch)';
 
     my $resource = $parts[1];
