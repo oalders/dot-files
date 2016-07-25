@@ -45,9 +45,6 @@ go get github.com/github/hub
 mkdir -p $HOME/perl5/perlbrew/etc
 touch $HOME/perl5/perlbrew/etc/bashrc
 
-# git extras
-echo "installing git-extras"
-
 sh install-fpp.sh
 
 LOCALCHECKOUT=~/.tmux/plugins/tpm
@@ -58,6 +55,9 @@ else
      cd $LOCALCHECKOUT
     git pull origin master
 fi
+
+# git extras
+echo "installing git-extras"
 
 cd inc/git-extras
 make install PREFIX="~/local"
