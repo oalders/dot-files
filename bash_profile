@@ -17,3 +17,5 @@ if which rbenv > /dev/null; then eval "$(rbenv init -)"; fi
 if [ hash brew 2>/dev/null && -f $(brew --prefix)/etc/bash_completion ]; then
     . $(brew --prefix)/etc/bash_completion
 fi
+
+test -e "${HOME}/.iterm2_shell_integration.bash" && source "${HOME}/.iterm2_shell_integration.bash"
