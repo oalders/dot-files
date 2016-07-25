@@ -9,19 +9,16 @@ use feature qw( say );
 
 use Browser::Open qw( open_browser );
 use URI;
-use URI::git; # ensure it's installed
+use URI::git;    # ensure it's installed
 use URI::Heuristic qw(uf_uristr);
 
-my $output = `git remote -v`;
+my $remote = shift @ARGV || 'origin';
+my $output = `git remote get-url --all $remote`;
 
 my @lines = split m{\n}, $output;
-my $remote = shift @ARGV || 'origin';
 
-foreach my $line ( @lines ) {
-    my @parts = split m{\s+}, $line;
-    next unless $parts[0] eq $remote && $parts[2] eq '(fetch)';
-
-    my $resource = URI->new($parts[1]);
+foreach my $line (@lines) {
+    my $resource = URI->new($line);
 
     # remove 'git@' from git@github.com:username/repo.git
     $resource =~ s{\w*\@}{};
@@ -29,9 +26,9 @@ foreach my $line ( @lines ) {
     # remove : from git@github.com:username/repo.git
     $resource =~ s{(\w):(\w)}{$1/$2};
 
-    my $uri = URI->new( uf_uristr( $resource ) );
-    $uri->scheme( 'https' );
+    my $uri = URI->new( uf_uristr($resource) );
+    $uri->scheme('https');
 
-    open_browser( $uri );
+    open_browser($uri);
     exit;
 }
