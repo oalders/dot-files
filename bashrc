@@ -78,10 +78,11 @@ pathadd "$HOME/.local/bin";
 pathadd "/usr/local/sbin";
 pathadd "$HOME/local/bin";
 
-PERL_CPANM_OPT="--local-lib=~/perl5"
-
-# adds $HOME/perl5/bin to PATH
-[ $SHLVL -eq 1 ] && eval "$(perl -I$HOME/perl5/lib/perl5 -Mlocal::lib)"
+if [[ ! -d ~/.plenv ]]; then
+    PERL_CPANM_OPT="--local-lib=~/perl5"
+    # adds $HOME/perl5/bin to PATH
+    [ $SHLVL -eq 1 ] && eval "$(perl -I$HOME/perl5/lib/perl5 -Mlocal::lib)"
+fi
 
 function whosonport {
     sudo lsof -i :$1;

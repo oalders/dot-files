@@ -19,3 +19,7 @@ if [ hash brew 2>/dev/null && -f $(brew --prefix)/etc/bash_completion ]; then
 fi
 
 test -e "${HOME}/.iterm2_shell_integration.bash" && source "${HOME}/.iterm2_shell_integration.bash"
+if [[ -d ~/.plenv ]]; then
+    export PATH="$HOME/.plenv/bin:$PATH"
+    eval "$(plenv init -)"
+fi
