@@ -1,0 +1,9 @@
+requires 'Git::Helpers';
+requires 'GitHub::MergeVelocity';
+requires 'HTTP::BrowserDetect';
+requires 'LWP::ConsoleLogger';
+requires 'Module::Version::Loaded';
+requires 'Pithub';
+requires 'WWW::Mechanize::Cached';
+requires 'WebService::SQLFormat';
+requires 'fatfinger';
