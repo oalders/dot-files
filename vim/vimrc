@@ -61,23 +61,6 @@ set hlsearch
 " lookahead as search pattern is specified
 set incsearch
 
-" tabs
-set softtabstop=4
-set shiftwidth=4
-set tabstop=4
-set smarttab
-set expandtab
-
-" 4 space tabs in html get annoying
-au BufRead,BufNewFile *.tmpl set filetype=html
-autocmd FileType html :setlocal sw=2 ts=2 sts=2
-
-au BufRead,BufNewFile *.yml set filetype=yaml
-autocmd FileType yaml :setlocal sw=2 ts=2 sts=2
-
-" Treat Mojo templates (mostly) like HTML
-autocmd FileType html.epl setlocal sw=2 ts=2 sts=2
-
 " indents
 set smartindent
 set autoindent
@@ -248,3 +231,21 @@ sunmap w
 sunmap b
 sunmap e
 sunmap ge
+
+" tabs
+set softtabstop=4
+set shiftwidth=4
+set tabstop=4
+set smarttab
+" use spaces rather than tabs
+set expandtab
+
+" 4 space tabs in html get annoying
+au BufRead,BufNewFile *.tmpl set filetype=html
+autocmd FileType html :setlocal sw=2 ts=2 sts=2
+
+au BufRead,BufNewFile *.yml set filetype=yaml
+autocmd FileType yaml :setlocal sw=2 ts=2 sts=2
+
+" Treat Mojo templates (mostly) like HTML
+autocmd FileType html.epl setlocal sw=2 ts=2 sts=2
