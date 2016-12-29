@@ -48,7 +48,7 @@ touch $HOME/perl5/perlbrew/etc/bashrc
 sh install-fpp.sh
 
 LOCALCHECKOUT=~/.tmux/plugins/tpm
-if [ ! -d $LOCALCHECKOUT ] 
+if [ ! -d $LOCALCHECKOUT ]
 then
     git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
 else
