@@ -78,10 +78,16 @@ pathadd "$HOME/.local/bin";
 pathadd "/usr/local/sbin";
 pathadd "$HOME/local/bin";
 
+LOCALPERLBIN=~/perl5/bin
+
 if [[ ! -d ~/.plenv ]]; then
     PERL_CPANM_OPT="--local-lib=~/perl5"
     # adds $HOME/perl5/bin to PATH
     [ $SHLVL -eq 1 ] && eval "$(perl -I$HOME/perl5/lib/perl5 -Mlocal::lib)"
+
+    if [ -d $LOCALPERBIN ] ; then
+        export PATH="$LOCALPERLBIN:$PATH"
+    fi
 fi
 
 function whosonport {
@@ -229,10 +235,6 @@ if [ -d $GOPATH ] ; then
     export PATH="$GOPATH/bin:$PATH"
 fi
 
-LOCALPERLBIN=~/perl5/bin
-if [ -d $LOCALPERBIN ] ; then
-    export PATH="$LOCALPERLBIN:$PATH"
-fi
 
 if [[ $platform == 'osx' ]]; then
     export PATH="~/dot-files/bin/osx:$PATH"
