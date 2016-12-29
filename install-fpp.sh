@@ -7,8 +7,8 @@ set -eu -o pipefail
 bin_dir=~/local/bin
 src_dir=~/local/src
 
-mkdir -p $bin_dir 
-mkdir -p $src_dir 
+mkdir -p $bin_dir
+mkdir -p $src_dir
 
 pushd $src_dir
 
