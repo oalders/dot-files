@@ -45,3 +45,6 @@ git config --global alias.view-stash 'stash show -p stash@{0}'
 
 # takes a commit name as sole arg
 git config --global alias.whatis "show -s --pretty='tformat:%h (%s, %ad)' --date=short"
+
+# for Facebook Path Picker (fpp)
+git config --global grep.lineNumber true
