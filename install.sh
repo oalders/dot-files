@@ -38,7 +38,7 @@ git submodule update
 
 $SELF_PATH/inc/vim-update-bundles/vim-update-bundles
 
-sh git_config.sh
+sh git-config.sh
 
 go get github.com/github/hub
 
