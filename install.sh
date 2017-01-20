@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
+set -eu -o pipefail
 SELF_PATH=$(cd -P -- "$(dirname -- "$0")" && pwd -P)
 
 echo $SELF_PATH
@@ -52,8 +53,9 @@ if [ ! -d $LOCALCHECKOUT ]
 then
     git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
 else
-     cd $LOCALCHECKOUT
+    pushd $LOCALCHECKOUT
     git pull origin master
+    popd
 fi
 
 # git extras
