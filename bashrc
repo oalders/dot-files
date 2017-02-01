@@ -26,6 +26,7 @@ HISTFILESIZE=2000
 alias batterylife='pmset -g batt | grep Internal | awk "{print $2}" | sed "s/;//"'
 alias bytes_human='perl -MNumber::Bytes::Human -e "print Number::Bytes::Human::format_bytes shift"'
 alias c='perl -E "say (qq{\n}x65,q{-}x78); system('date');print qq{-}x78, qq{\n}"'
+alias cdr='cd `git root`'
 alias cpanx='cpanm --local-lib ~/perl5 --metacpan --mirror http://cpan.metacpan.org'
 alias delete-merged-branches='show-merged-branches | xargs -n 1 git branch -d'
 alias df='df -h'
