@@ -48,3 +48,19 @@ git config --global alias.whatis "show -s --pretty='tformat:%h (%s, %ad)' --date
 
 # for Facebook Path Picker (fpp)
 git config --global grep.lineNumber true
+
+if [ -d '/Applications/Meld.app' ]
+then
+    echo "Setting Meld as mergetool"
+    git config --global diff.tool 'meld'
+    git config --global difftool.prompt false
+    git config --global difftool.meld.trustExitCode true
+    git config --global difftool.meld.cmd 'open -W -a Meld --args "$LOCAL" "$PWD/$REMOTE"'
+    git config --global merge.tool 'meld'
+    git config --global mergetool.prompt false
+    git config --global mergetool.meld.trustExitCode true
+    git config --global mergetool.meld.cmd 'open -W -a Meld --args --auto-merge "$PWD/$LOCAL" "$PWD/$BASE" "$PWD/$REMOTE" --output="$PWD/$MERGED"'
+fi
+
+# Putting this earlier causes the script to exit
+git config --global --unset branch.master.merge
