@@ -179,6 +179,7 @@ function vi() {
     string=$1
     if [[ ! $string == *"::"* ]]; then
         $vi "$@"
+        return 1
     fi
 
     string=$(sed 's/::/\//g;' <<< $1)
