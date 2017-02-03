@@ -14,8 +14,8 @@ git config --global help.autocorrect 10
 git config --global merge.conflictstyle diff3
 git config --global push.default simple
 git config --global rerere.enabled 1
-git config --global --unset branch.master.merge
 
+git config --global branch.autosetuprebase always
 git config --global alias.b  'branch'
 git config --global alias.ba 'branch -a'
 git config --global alias.cam 'commit --amend'
