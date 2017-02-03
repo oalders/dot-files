@@ -1,6 +1,6 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
-# git config
+set -eu -o pipefail
 
 echo "git config"
 
