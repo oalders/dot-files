@@ -38,7 +38,7 @@ git submodule update
 
 $SELF_PATH/inc/vim-update-bundles/vim-update-bundles
 
-sh git-config.sh
+./git-config.sh
 
 go get github.com/github/hub
 
@@ -46,7 +46,7 @@ go get github.com/github/hub
 mkdir -p $HOME/perl5/perlbrew/etc
 touch $HOME/perl5/perlbrew/etc/bashrc
 
-sh install-fpp.sh
+./install-fpp.sh
 
 LOCALCHECKOUT=~/.tmux/plugins/tpm
 if [ ! -d $LOCALCHECKOUT ]
