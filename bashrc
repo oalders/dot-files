@@ -107,7 +107,9 @@ function git-recover-file {
     git checkout $(git rev-list -n 1 HEAD -- "$1")^ -- "$1"
 }
 
-function md () { mkdir -p "$@" && cd "$@"; }
+function md () {
+    pandoc $1 | lynx -stdin
+}
 
 if [ -f /etc/bash_completion.d/git ]; then
     source /etc/bash_completion.d/git
