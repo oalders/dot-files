@@ -31,6 +31,7 @@ alias cpanx='cpanm --local-lib ~/perl5 --metacpan --mirror http://cpan.metacpan.
 alias delete-merged-branches='show-merged-branches | xargs -n 1 git branch -d'
 alias df='df -h'
 alias du='du -h'
+alias gdf='git domo|fpp'
 alias grep='grep --color=auto'
 alias l='ls -lAtr'
 alias l.='ls -ldF .[a-zA-Z0-9]* --color=tty' #only show dotfiles
