@@ -178,9 +178,13 @@ let g:syntastic_auto_loc_list = 1
 let g:syntastic_check_on_open = 0
 let g:syntastic_check_on_wq = 0
 
+let g:syntastic_enable_perl_checker = 1
+let g:syntastic_perl_checkers = ['perl','podchecker','perlcritic']
+let g:syntastic_perl_perl_args = "-Ilib -It/lib -Idev/lib"
+
 let g:syntastic_mode_map = { 'mode': 'active',
-                           \ 'active_filetypes': ['html', 'less', 'puppet'],
-                           \ 'passive_filetypes': ['perl'] }
+                           \ 'active_filetypes': ['html', 'less', 'perl','puppet'],
+                           \ 'passive_filetypes': [] }
 
 let g:syntastic_html_tidy_blocklevel_tags = [
   \ 'label',
