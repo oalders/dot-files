@@ -29,6 +29,13 @@ ln -sf $SELF_PATH/Vagrantfile ~/.vagrant.d/Vagrantfile
 ln -sf $SELF_PATH/vim/vimrc ~/.vimrc
 ln -sf $SELF_PATH/vim/after ~/.vim/after
 
+if [ -f /usr/local/bin/mm-perl ]
+then
+    ln -sf $SELF_PATH/vim/maxmind_local_vimrc ~/.local_vimrc
+else
+    ln -sf $SELF_PATH/vim/vanilla_local_vimrc ~/.local_vimrc
+fi
+
 # clean up recursive links
 rm vim/after/after
 rm dzil/dzil
