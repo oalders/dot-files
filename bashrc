@@ -267,3 +267,8 @@ fi
 # clean up PATH
 # http://linuxg.net/oneliners-for-removing-the-duplicates-in-your-path/
 PATH=`echo -n $PATH | awk -v RS=: -v ORS=: '!arr[$0]++'`
+
+# https://unix.stackexchange.com/questions/19317/can-less-retain-colored-output
+fancydiff () {
+    git $1 --color=always $2 | diff-so-fancy | less -R
+}
