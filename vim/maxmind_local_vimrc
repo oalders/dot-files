@@ -1,1 +1,3 @@
-let g:syntastic_perl_perl_exec = '/usr/local/bin/mm-perl'
+" https://github.com/w0rp/ale/blob/master/doc/ale-perl.txt
+let g:ale_perl_perl_executable = '/usr/local/bin/mm-perl'
+let g:ale_perl_perl_options = '-X -c -Mwarnings -Ilib -It/lib -Idev/lib'
