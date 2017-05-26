@@ -4,7 +4,6 @@ runtime bundle/vim-pathogen/autoload/pathogen.vim
 " Bundle: tpope/vim-pathogen
 call pathogen#infect()
 
-" Bundle: https://github.com/Lokaltog/vim-powerline.git
 " Bundle: https://github.com/airblade/vim-gitgutter.git
 " Bundle: https://github.com/altercation/vim-colors-solarized.git
 " Bundle: https://github.com/bkad/CamelCaseMotion.git
@@ -14,6 +13,7 @@ call pathogen#infect()
 " Bundle: https://github.com/fatih/vim-go.git
 " Bundle: https://github.com/henrik/vim-indexed-search.git
 " Bundle: https://github.com/jreybert/vimagit
+" Bundle: https://github.com/Lokaltog/vim-powerline.git
 " Bundle: https://github.com/mbra/prettysql
 " Bundle: https://github.com/qstrahl/vim-matchmaker.git
 " Bundle: https://github.com/rodjek/vim-puppet.git
