@@ -1,1 +1,1 @@
-let g:ale_perl_perl_options = '-X -c -Mwarnings -Ilib -It/lib'
+let g:ale_perl_perl_options = '-c -Mwarnings -Ilib -It/lib'
