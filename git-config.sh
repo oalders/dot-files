@@ -66,5 +66,9 @@ then
     git config --global mergetool.meld.cmd 'open -W -a Meld --args --auto-merge "$PWD/$LOCAL" "$PWD/$BASE" "$PWD/$REMOTE" --output="$PWD/$MERGED"'
 fi
 
-# Putting this earlier causes the script to exit
+# a "git config --unset" on something that isn't set but is a valid key returns with no
+# message but an exit code of 5, which cause's bash's "set -e" to terminate both this
+# script and the calling install script
+set +e
 git config --global --unset branch.master.merge
+exit 0
