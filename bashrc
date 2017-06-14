@@ -161,6 +161,9 @@ function tmux() {
         ns)
            BRANCH=$(git rev-parse --abbrev-ref HEAD)
            CURRENT_DIR=${PWD##*/};
+
+           # A "." will produce a "bad session name" error
+           CURRENT_DIR=${CURRENT_DIR//./_}
            SESSION_NAME="$CURRENT_DIR ⚡ $BRANCH"
 
            if [ -z "$BRANCH" ]; then
