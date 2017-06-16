@@ -212,3 +212,7 @@ autocmd FileType html.epl setlocal sw=2 ts=2 sts=2
 hi Normal ctermbg=none
 
 source ~/.local_vimrc
+
+" prevent delay when switching from insert to normal mode
+" https://www.johnhawthorn.com/2012/09/vi-escape-delays/
+set timeoutlen=1000 ttimeoutlen=0
