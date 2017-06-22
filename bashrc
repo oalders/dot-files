@@ -159,18 +159,22 @@ function tmux() {
             ;;
         # https://gist.github.com/marczych/10524654
         ns)
-           BRANCH=$(git rev-parse --abbrev-ref HEAD)
-           CURRENT_DIR=${PWD##*/};
+            INSIDE_GIT_REPO="$(git rev-parse --is-inside-work-tree 2>/dev/null)"
 
-           # A "." will produce a "bad session name" error
-           CURRENT_DIR=${CURRENT_DIR//./_}
-           SESSION_NAME="$CURRENT_DIR ⚡ $BRANCH"
+            if [ $INSIDE_GIT_REPO ]; then
+                BRANCH=$(git rev-parse --abbrev-ref HEAD)
+                CURRENT_DIR=${PWD##*/}
 
-           if [ -z "$BRANCH" ]; then
+                SESSION_NAME="$CURRENT_DIR ⚡ $BRANCH"
+            else
                SESSION_NAME=$(pwd)
-           fi
+               STRIP="$HOME/"
+               SESSION_NAME=${SESSION_NAME/$STRIP}
+            fi
 
-           tmux rename-session "$SESSION_NAME"
+            # A "." will produce a "bad session name" error
+            SESSION_NAME=${SESSION_NAME//./_}
+            tmux rename-session "$SESSION_NAME"
             ;;
         *)
             $tmux "$@"
