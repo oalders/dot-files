@@ -84,6 +84,8 @@ let mapleader = ","
 nnoremap <silent> = :%!perltidy -q<Enter>
 vnoremap <silent> = :!perltidy -q<Enter>
 
+autocmd FileType python nnoremap <leader>y :0,$!yapf<Cr><C-o>
+
 vnoremap <silent> + :!sql-webformat<Enter>
 
 "remove all trailing whitespace
