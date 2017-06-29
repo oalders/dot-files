@@ -217,4 +217,4 @@ source ~/.local_vimrc
 
 " prevent delay when switching from insert to normal mode
 " https://www.johnhawthorn.com/2012/09/vi-escape-delays/
-set timeoutlen=1000 ttimeoutlen=0
+set timeoutlen=300 ttimeoutlen=0
