@@ -25,6 +25,8 @@ ln -sf $SELF_PATH/re.pl/repl.rc ~/.re.pl/repl.rc
 ln -sf $SELF_PATH/screenrc ~/.screenrc
 ln -sf $SELF_PATH/sqitch ~/.sqitch
 ln -sf $SELF_PATH/tmux.conf ~/.tmux.conf
+ln -sf $SELF_PATH/tmux/macos ~/.tmux-macos
+ln -sf $SELF_PATH/tmux/linux ~/.tmux-linux
 ln -sf $SELF_PATH/Vagrantfile ~/.vagrant.d/Vagrantfile
 ln -sf $SELF_PATH/vim/vimrc ~/.vimrc
 ln -sf $SELF_PATH/vim/after ~/.vim/after
