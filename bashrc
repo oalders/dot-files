@@ -173,7 +173,7 @@ function tmux() {
             fi
 
             # A "." will produce a "bad session name" error
-            SESSION_NAME=${SESSION_NAME//./_}
+            SESSION_NAME=${SESSION_NAME//./-}
             tmux rename-session "$SESSION_NAME"
             ;;
         *)
