@@ -1,6 +1,6 @@
-/{{$dist->name}}*
 .build
-local
-*.swo
-*.swp
-.tidyall.d
+/{{$dist->name}}*
+local/
+*.sw*
+tidyall.ERR
+.tidyall.d/
