@@ -102,7 +102,7 @@ vnoremap <silent> + :!sql-webformat<Enter>
 map <leader>jt <Esc>:%!json_xs -f json -t json-pretty<CR>
 
 :set list!
-:set listchars=tab:\|-
+:set listchars=tab:\|.
 
 " enables shift-tab for outdent
 exe 'set t_kB=' . nr2char(27) . '[Z'
