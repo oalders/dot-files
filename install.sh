@@ -51,7 +51,7 @@ $SELF_PATH/inc/vim-update-bundles/vim-update-bundles
 
 ./git-config.sh
 
-go get github.com/github/hub
+#go get github.com/github/hub
 
 # silence warnings when perlbrew not installed
 mkdir -p $HOME/perl5/perlbrew/etc
