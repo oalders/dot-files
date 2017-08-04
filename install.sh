@@ -66,9 +66,3 @@ else
     git pull origin master
     popd
 fi
-
-# git extras
-echo "installing git-extras"
-
-cd inc/git-extras
-make install PREFIX="$HOME/local"
