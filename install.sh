@@ -29,6 +29,8 @@ ln -sf $SELF_PATH/tmux/macos ~/.tmux-macos
 ln -sf $SELF_PATH/tmux/linux ~/.tmux-linux
 ln -sf $SELF_PATH/Vagrantfile ~/.vagrant.d/Vagrantfile
 ln -sf $SELF_PATH/vim/vimrc ~/.vimrc
+
+mkdir -p ~/.vim
 ln -sf $SELF_PATH/vim/after ~/.vim/after
 
 if [ -f /usr/local/bin/mm-perl ]
@@ -39,7 +41,7 @@ else
 fi
 
 # clean up recursive links
-rm vim/after/after
+rm -rf vim/after/after
 rm dzil/dzil
 
 git submodule init
