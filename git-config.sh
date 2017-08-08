@@ -43,9 +43,8 @@ git config --global alias.st 'status'
 git config --global alias.stu 'status --untracked-files=no'
 git config --global alias.view-stash 'stash show -p stash@{0}'
 
-# https://unix.stackexchange.com/questions/19317/can-less-retain-colored-output
-git config --global color.ui always
-git config --global core.pager 'less -r'
+git config --global color.ui auto
+git config --global core.pager 'less'
 
 # takes a commit name as sole arg
 git config --global alias.whatis "show -s --pretty='tformat:%h (%s, %ad)' --date=short"
