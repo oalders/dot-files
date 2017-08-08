@@ -40,10 +40,6 @@ else
     ln -sf $SELF_PATH/vim/vanilla_local_vimrc ~/.local_vimrc
 fi
 
-# clean up recursive links
-rm -rf vim/after/after
-rm dzil/dzil
-
 git submodule init
 git submodule update
 
