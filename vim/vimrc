@@ -224,3 +224,6 @@ source ~/.local_vimrc
 set timeoutlen=300 ttimeoutlen=0
 
 let g:go_fmt_command = "goimports"
+
+" show Perl::Critic rules which have been violated
+let g:ale_perl_perlcritic_showrules = 1
