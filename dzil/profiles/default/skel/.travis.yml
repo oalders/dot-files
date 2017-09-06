@@ -18,3 +18,7 @@ notifications:
     on_failure: always
 before_install:
   - eval $(curl https://travis-perl.github.io/init) --auto
+cache:
+  directories:
+    - local
+    - ~/perl5
