@@ -52,7 +52,7 @@ alias show-merged-branches='git branch --no-color --merged | grep -v "\*" | grep
 alias source-perlbrew='source ~/perl5/perlbrew/etc/bashrc'
 alias ssh-fingerprints='ls ~/.ssh/*.pub | xargs -L 1 ssh-keygen -l -f'
 alias stp='git status | fpp --no-file-checks'
-https://stackoverflow.com/a/19280187/406224
+# https://stackoverflow.com/a/19280187/406224
 alias takeover="tmux detach -a"
 alias tg='tidyall -g && git add -p'
 alias xkcdalt='perl -MWWW::xkcd -E "say WWW::xkcd->new->fetch_metadata->{alt}"'
