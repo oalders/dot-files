@@ -96,6 +96,11 @@ vnoremap <silent> + :!sql-webformat<Enter>
 "dictionary sort unique
 :vnoremap <silent> su :!sort -d <bar> uniq<CR>
 
+"ws shortcut to sort lists of words and move to one line. requires tidying
+"after the fact.
+" http://stackoverflow.com/questions/1327978/sorting-words-not-lines-in-vim
+:vnoremap <silent> ws :!perl -ne '$,=" ";print sort split /\s+/'<CR>
+
 "pretty print json
 map <leader>jt <Esc>:%!json_xs -f json -t json-pretty<CR>
 
@@ -162,9 +167,6 @@ let g:gitgutter_realtime = 0
 let g:auto_save_no_updatetime = 1  " do not change the 'updatetime' option
 
 let g:matchmaker_enable_startup = 1
-
-" http://stackoverflow.com/questions/1327978/sorting-words-not-lines-in-vim
-:vnoremap <F1> d:execute 'normal a' . join(sort(split(getreg('"'))), ' ')<CR>
 
 map <F2> :NERDTreeToggle<CR>
 
