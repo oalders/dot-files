@@ -224,3 +224,7 @@ let g:go_fmt_command = "goimports"
 
 " show Perl::Critic rules which have been violated
 let g:ale_perl_perlcritic_showrules = 1
+
+let g:ale_type_map = {
+\    'perlcritic': {'ES': 'WS', 'E': 'W'},
+\}
