@@ -79,10 +79,6 @@ autocmd FileType perl set number
 
 let mapleader = ","
 
-
-"command -range=% -nargs=* Tidy <line1>,<line2>!
-"  \perltidy -pbp <args>
-
 nnoremap <silent> = :%!perltidy -q<Enter>
 vnoremap <silent> = :!perltidy -q<Enter>
 
