@@ -9,6 +9,7 @@ git config --global user.name "Olaf Alders"
 
 git config --global branch.autosetuprebase always
 git config --global color.ui "auto"
+git config --global diff.algorithm histogram
 git config --global github.user oalders
 git config --global help.autocorrect 10
 git config --global merge.conflictstyle diff3
