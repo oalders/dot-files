@@ -20,8 +20,8 @@ export HISTCONTROL=ignoreboth
 export PROMPT_COMMAND='history -a'
 
 # for setting history length see HISTSIZE and HISTFILESIZE in bash(1)
-HISTSIZE=1000
-HISTFILESIZE=2000
+export HISTSIZE=1000
+export HISTFILESIZE=2000
 
 alias batterylife='pmset -g batt | grep Internal | awk "{print $2}" | sed "s/;//"'
 # https://superuser.com/a/975878/120685
