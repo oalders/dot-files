@@ -3,6 +3,17 @@
 set -eu -o pipefail
 SELF_PATH=$(cd -P -- "$(dirname -- "$0")" && pwd -P)
 
+LINK_FLAG=""
+
+# https://stackoverflow.com/a/17072017/406224
+if [ "$(uname)" == "Darwin" ]; then
+    echo "This is Darwin"
+    LINK_FLAG="-hF"
+elif [ "$(expr substr $(uname -s) 1 5)" == "Linux" ]; then
+    echo "This is Linux"
+    LINK_FLAG="-T"
+fi
+
 echo $SELF_PATH
 
 mkdir -p ~/.re.pl
@@ -14,7 +25,7 @@ ln -sf $SELF_PATH/bash_profile ~/.bash_profile
 cp     $SELF_PATH/dataprinter ~/.dataprinter # Data::Printer doesn't like symlinks
 chmod 700 ~/.dataprinter
 
-ln -sfT $SELF_PATH/dzil ~/.dzil
+ln -sf $LINK_FLAG $SELF_PATH/dzil ~/.dzil
 ln -sf $SELF_PATH/minicpanrc ~/.minicpanrc
 ln -sf $SELF_PATH/perlcriticrc ~/.perlcriticrc
 ln -sf $SELF_PATH/perltidyrc ~/.perltidyrc
@@ -23,7 +34,7 @@ ln -sf $SELF_PATH/proverc ~/.proverc
 ln -sf $SELF_PATH/psqlrc ~/.psqlrc
 ln -sf $SELF_PATH/re.pl/repl.rc ~/.re.pl/repl.rc
 ln -sf $SELF_PATH/screenrc ~/.screenrc
-ln -sfT $SELF_PATH/sqitch ~/.sqitch
+ln -sf $LINK_FLAG $SELF_PATH/sqitch ~/.sqitch
 ln -sf $SELF_PATH/tmux.conf ~/.tmux.conf
 ln -sf $SELF_PATH/tmux/macos ~/.tmux-macos
 ln -sf $SELF_PATH/tmux/linux ~/.tmux-linux
@@ -31,7 +42,7 @@ ln -sf $SELF_PATH/Vagrantfile ~/.vagrant.d/Vagrantfile
 ln -sf $SELF_PATH/vim/vimrc ~/.vimrc
 
 mkdir -p ~/.vim
-ln -sfT $SELF_PATH/vim/after ~/.vim/after
+ln -sf $LINK_FLAG $SELF_PATH/vim/after ~/.vim/after
 
 if [ -f /usr/local/bin/mm-perl ]
 then
