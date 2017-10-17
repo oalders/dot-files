@@ -6,6 +6,7 @@ call pathogen#infect()
 
 " Bundle: https://github.com/airblade/vim-gitgutter.git
 " Bundle: https://github.com/altercation/vim-colors-solarized.git
+" Bundle: https://github.com/AndrewRadev/splitjoin.vim
 " Bundle: https://github.com/avakhov/vim-yaml.git
 " Bundle: https://github.com/bkad/CamelCaseMotion.git
 " Bundle: https://github.com/SirVer/ultisnips.git
