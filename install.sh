@@ -14,7 +14,7 @@ ln -sf $SELF_PATH/bash_profile ~/.bash_profile
 cp     $SELF_PATH/dataprinter ~/.dataprinter # Data::Printer doesn't like symlinks
 chmod 700 ~/.dataprinter
 
-ln -sf $SELF_PATH/dzil ~/.dzil
+ln -sfT $SELF_PATH/dzil ~/.dzil
 ln -sf $SELF_PATH/minicpanrc ~/.minicpanrc
 ln -sf $SELF_PATH/perlcriticrc ~/.perlcriticrc
 ln -sf $SELF_PATH/perltidyrc ~/.perltidyrc
@@ -23,7 +23,7 @@ ln -sf $SELF_PATH/proverc ~/.proverc
 ln -sf $SELF_PATH/psqlrc ~/.psqlrc
 ln -sf $SELF_PATH/re.pl/repl.rc ~/.re.pl/repl.rc
 ln -sf $SELF_PATH/screenrc ~/.screenrc
-ln -sf $SELF_PATH/sqitch ~/.sqitch
+ln -sfT $SELF_PATH/sqitch ~/.sqitch
 ln -sf $SELF_PATH/tmux.conf ~/.tmux.conf
 ln -sf $SELF_PATH/tmux/macos ~/.tmux-macos
 ln -sf $SELF_PATH/tmux/linux ~/.tmux-linux
@@ -31,7 +31,7 @@ ln -sf $SELF_PATH/Vagrantfile ~/.vagrant.d/Vagrantfile
 ln -sf $SELF_PATH/vim/vimrc ~/.vimrc
 
 mkdir -p ~/.vim
-ln -sf $SELF_PATH/vim/after ~/.vim/after
+ln -sfT $SELF_PATH/vim/after ~/.vim/after
 
 if [ -f /usr/local/bin/mm-perl ]
 then
