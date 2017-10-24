@@ -22,7 +22,6 @@ call pathogen#infect()
 " Bundle: https://github.com/mbra/prettysql
 " Bundle: https://github.com/qstrahl/vim-matchmaker.git
 " Bundle: https://github.com/rodjek/vim-puppet.git
-" Bundle: https://github.com/scrooloose/nerdcommenter.git
 " Bundle: https://github.com/scrooloose/nerdtree.git
 " Bundle: https://github.com/sheerun/vim-polyglot.git
 " Bundle: https://github.com/SirVer/ultisnips.git
