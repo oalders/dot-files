@@ -287,3 +287,5 @@ PATH=`echo -n $PATH | awk -v RS=: -v ORS=: '!arr[$0]++'`
 fancydiff () {
     git $1 --color=always $2 | diff-so-fancy | less -R
 }
+
+[ -f ~/.fzf.bash ] && source ~/.fzf.bash
