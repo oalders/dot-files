@@ -46,7 +46,7 @@ ln -sf $LINK_FLAG $SELF_PATH/vim/after ~/.vim/after
 
 if [ -f /usr/local/bin/mm-perl ]
 then
-    ln -sf $SELF_PATH/vim/maxmind_local_vimrc ~/.local_vimrc
+    ln -sf ~/mm-dot-files/maxmind_local_vimrc ~/.local_vimrc
 else
     ln -sf $SELF_PATH/vim/vanilla_local_vimrc ~/.local_vimrc
 fi
