@@ -1,38 +1,39 @@
-" Load plugins using Pathogen. Don't worry if this bit doesn't make sense.
+call plug#begin('~/.vim/plugged')
 
-runtime bundle/vim-pathogen/autoload/pathogen.vim
-" Bundle: tpope/vim-pathogen
-call pathogen#infect()
+" On demand
+Plug 'scrooloose/nerdtree', { 'on':  'NERDTreeToggle' }
 
-" Bundle: https://github.com/airblade/vim-gitgutter.git
-" Bundle: https://github.com/altercation/vim-colors-solarized.git
-" Bundle: https://github.com/AndrewRadev/splitjoin.vim
-" Bundle: https://github.com/avakhov/vim-yaml.git
-" Bundle: https://github.com/bkad/CamelCaseMotion.git
-" Bundle: https://github.com/bling/vim-airline.git
-" Bundle: https://github.com/bronson/vim-trailing-whitespace.git
-" Bundle: https://github.com/c9s/perlomni.vim
-" Bundle: https://github.com/ctrlpvim/ctrlp.vim
-" Bundle: https://github.com/fatih/vim-go.git
-" Bundle: https://github.com/henrik/vim-indexed-search.git
-" Bundle: https://github.com/jreybert/vimagit
-" Bundle: https://github.com/junegunn/vader.vim
-" Bundle: https://github.com/Lokaltog/vim-powerline.git
-" Bundle: https://github.com/lukhio/vim-mapping-conflicts
-" Bundle: https://github.com/mbra/prettysql
-" Bundle: https://github.com/qstrahl/vim-matchmaker.git
-" Bundle: https://github.com/rodjek/vim-puppet.git
-" Bundle: https://github.com/scrooloose/nerdtree.git
-" Bundle: https://github.com/sheerun/vim-polyglot.git
-" Bundle: https://github.com/SirVer/ultisnips.git
-" Bundle: https://github.com/tpope/vim-abolish.git
-" Bundle: https://github.com/tpope/vim-commentary.git
-" Bundle: https://github.com/tpope/vim-fugitive.git
-" Bundle: https://github.com/tpope/vim-surround.git
-" Bundle: https://github.com/vim-scripts/vim-json-bundle.git
-" Bundle: https://github.com/w0rp/ale.git
-" Bundle: https://github.com/wincent/Command-T.git
-" Bundle: https://github.com/yko/mojo.vim.git
+Plug 'airblade/vim-gitgutter'
+Plug 'altercation/vim-colors-solarized'
+Plug 'AndrewRadev/splitjoin.vim'
+Plug 'avakhov/vim-yaml'
+Plug 'bkad/CamelCaseMotion'
+Plug 'bling/vim-airline'
+Plug 'bronson/vim-trailing-whitespace'
+Plug 'c9s/perlomni.vim'
+Plug 'ctrlpvim/ctrlp.vim'
+Plug 'fatih/vim-go'
+Plug 'henrik/vim-indexed-search'
+Plug 'jreybert/vimagit'
+Plug 'junegunn/vader.vim'
+Plug 'Lokaltog/vim-powerline'
+Plug 'lukhio/vim-mapping-conflicts'
+Plug 'mbra/prettysql'
+Plug 'qstrahl/vim-matchmaker'
+Plug 'rodjek/vim-puppet'
+Plug 'sheerun/vim-polyglot'
+Plug 'SirVer/ultisnips'
+Plug 'tpope/vim-abolish'
+Plug 'tpope/vim-commentary'
+Plug 'tpope/vim-fugitive'
+Plug 'tpope/vim-surround'
+Plug 'vim-scripts/vim-json-bundle'
+Plug 'w0rp/ale'
+Plug 'wincent/Command-T'
+Plug 'yko/mojo.vim'
+
+" Initialize plugin system
+call plug#end()
 
 syntax enable
 set background=dark

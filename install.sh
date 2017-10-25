@@ -54,8 +54,6 @@ fi
 git submodule init
 git submodule update
 
-$SELF_PATH/inc/vim-update-bundles/vim-update-bundles
-
 ./git-config.sh
 
 #go get github.com/github/hub
@@ -75,3 +73,10 @@ else
     git pull origin master
     popd
 fi
+
+# vim
+curl -fLo ~/.vim/autoload/plug.vim --create-dirs \
+    https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+
+rm -rf ~/.vim/Trashed-Bundles ~/.vim/bundle
+vim -c ':PlugInstall'
