@@ -32,6 +32,8 @@ Plug 'w0rp/ale'
 Plug 'wincent/Command-T'
 Plug 'yko/mojo.vim'
 
+source ~/.local_vimrc
+
 " Initialize plugin system
 call plug#end()
 
@@ -219,8 +221,6 @@ autocmd FileType html.epl setlocal sw=2 ts=2 sts=2
 
 " Don't override iTerm2's window transparency
 hi Normal ctermbg=none
-
-source ~/.local_vimrc
 
 " prevent delay when switching from insert to normal mode
 " https://www.johnhawthorn.com/2012/09/vi-escape-delays/
