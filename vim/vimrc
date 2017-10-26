@@ -15,6 +15,7 @@ Plug 'ctrlpvim/ctrlp.vim'
 Plug 'fatih/vim-go'
 Plug 'henrik/vim-indexed-search'
 Plug 'jreybert/vimagit'
+Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
 Plug 'junegunn/vader.vim'
 Plug 'Lokaltog/vim-powerline'
 Plug 'lukhio/vim-mapping-conflicts'
