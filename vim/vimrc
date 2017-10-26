@@ -240,6 +240,7 @@ let g:go_fmt_fail_silently = 1 " Ale handles this already
 
 autocmd FileType go nmap <leader>t  <Plug>(go-test)
 autocmd FileType go nmap <leader>b  <Plug>(go-build)
+autocmd FileType go set number
 
 " show Perl::Critic rules which have been violated
 let g:ale_perl_perlcritic_showrules = 1
