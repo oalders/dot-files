@@ -226,7 +226,7 @@ hi Normal ctermbg=none
 
 " prevent delay when switching from insert to normal mode
 " https://www.johnhawthorn.com/2012/09/vi-escape-delays/
-set timeoutlen=300 ttimeoutlen=0
+set timeoutlen=300 ttimeoutlen=300
 
 let g:go_auto_sameids = 1
 let g:go_auto_type_info = 0
