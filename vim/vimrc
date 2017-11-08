@@ -18,7 +18,6 @@ Plug 'jreybert/vimagit'
 Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
 Plug 'junegunn/fzf.vim'
 Plug 'junegunn/vader.vim'
-Plug 'Lokaltog/vim-powerline'
 Plug 'lukhio/vim-mapping-conflicts'
 Plug 'mbra/prettysql'
 Plug 'oalders/ale',  { 'branch': 'perl-warnings' }
@@ -43,7 +42,6 @@ syntax enable
 set background=dark
 colorscheme solarized
 
-set statusline=%F%m%r%h%w\ [FORMAT=%{&ff}]\ [TYPE=%Y]\ [ASCII=\%03.3b]\ [HEX=\%02.2B]\ [POS=%04l,%04v][%p%%]\ [LEN=%L]
 set laststatus=2
 set bs=2
 filetype on
@@ -131,8 +129,6 @@ autocmd BufReadPost *  if line("'\"") > 1 && line("'\"") <= line("$")
                    \|     exe "normal! g`\""
                    \|  endif
 
-set stl=%f\ %m\ %r%{fugitive#statusline()}\ Line:%l/%L[%p%%]\ Col:%v\ Buf:#%n\ [%b][0x%B]
-
 " prevent left and right arrows from being disabled in insert mode when
 " editing SQL files
 let g:omni_sql_no_default_maps = 1
@@ -177,9 +173,6 @@ let g:auto_save_no_updatetime = 1  " do not change the 'updatetime' option
 let g:matchmaker_enable_startup = 1
 
 map <F2> :NERDTreeToggle<CR>
-
-set statusline+=%#warningmsg#
-set statusline+=%*
 
 map ,mmi o__PACKAGE__->meta->make_immutable;<ESC>
 map ,ddp ouse DDP;<CR>p( );<ESC>
