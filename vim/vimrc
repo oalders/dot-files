@@ -18,7 +18,7 @@ Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
 Plug 'junegunn/fzf.vim'
 Plug 'junegunn/vader.vim'
 Plug 'lukhio/vim-mapping-conflicts'
-Plug 'mbra/prettysql'
+Plug 'mbra/prettysql' " ,fs to format visually selected SQL
 Plug 'oalders/ale',  { 'branch': 'perl-warnings' }
 Plug 'qstrahl/vim-matchmaker'
 Plug 'rodjek/vim-puppet'
