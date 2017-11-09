@@ -45,18 +45,6 @@ set backspace=2
 filetype on
 filetype plugin indent on
 
-autocmd BufReadPost *.pl   set keywordprg=perldoc\ -f
-
-" Indent using tabs (while in visual mode)
-vnoremap < <gv
-vnoremap > >gv
-" make tab in v mode ident code
-vmap <tab> >gv
-vmap <s-tab> <gv
-" make tab in normal mode ident code
-nmap <tab> I<tab><esc>
-nmap <s-tab> ^i<bs><esc>
-
 " case insensitive search
 set ignorecase smartcase
 
@@ -73,20 +61,7 @@ set autoindent
 :autocmd CursorHold * checktime
 set autoread
 
-" show matching brackets
-autocmd FileType perl set showmatch
-
-" show line numbers
-autocmd FileType perl set number
-
 let mapleader = ","
-
-nnoremap <silent> = :%!perltidy -q<Enter>
-vnoremap <silent> = :!perltidy -q<Enter>
-
-autocmd FileType python nnoremap <leader>y :0,$!yapf<Cr><C-o>
-
-vnoremap <silent> + :!sql-webformat<Enter>
 
 "remove all trailing whitespace
 :nnoremap <silent> - :FixWhitespace<CR>
@@ -102,12 +77,6 @@ vnoremap <silent> + :!sql-webformat<Enter>
 "after the fact.
 " http://stackoverflow.com/questions/1327978/sorting-words-not-lines-in-vim
 :vnoremap <silent> ws :!perl -ne '$,=" ";print sort split /\s+/'<CR>
-
-"pretty print json
-map <leader>jt <Esc>:%!json_xs -f json -t json-pretty<CR>
-
-:set list!
-:set listchars=tab:\|.
 
 " enables shift-tab for outdent
 exe 'set t_kB=' . nr2char(27) . '[Z'
@@ -125,13 +94,47 @@ autocmd BufReadPost *  if line("'\"") > 1 && line("'\"") <= line("$")
                    \|     exe "normal! g`\""
                    \|  endif
 
-" prevent left and right arrows from being disabled in insert mode when
-" editing SQL files
-let g:omni_sql_no_default_maps = 1
-
 " paste the same line multiple times without the content of the "yank" being replaced
 " http://stackoverflow.com/questions/7163947/vim-paste-multiple-times
 xnoremap p pgvy
+
+let g:auto_save = 1  " enable AutoSave on Vim startup
+
+let g:gitgutter_realtime = 0
+
+let g:auto_save_no_updatetime = 1  " do not change the 'updatetime' option
+
+let g:matchmaker_enable_startup = 1
+
+" Don't override iTerm2's window transparency
+highlight Normal ctermbg=none
+
+" prevent delay when switching from insert to normal mode
+" https://www.johnhawthorn.com/2012/09/vi-escape-delays/
+set timeoutlen=300 ttimeoutlen=300
+
+" ########### tabs ###########
+
+set softtabstop=4
+set shiftwidth=4
+set tabstop=4
+set smarttab
+" use spaces rather than tabs
+set expandtab
+
+" Indent using tabs (while in visual mode)
+vnoremap < <gv
+vnoremap > >gv
+" make tab in v mode ident code
+vmap <tab> >gv
+vmap <s-tab> <gv
+" make tab in normal mode ident code
+nmap <tab> I<tab><esc>
+nmap <s-tab> ^i<bs><esc>
+
+:set list!
+:set listchars=tab:\|.
+" ########### TidyAll ###########
 
 " https://github.com/jonswar/perl-code-tidyall/blob/master/etc/editors/tidyall.vim
 
@@ -154,31 +157,11 @@ function! TidyAll()
     call setpos( '.', cur_pos )
 endfunction
 
-" Uncomment to set leader to ,
-" let mapleader = ','
-
 " Bind to ,t (or leader+t)
 map <leader>t :TidyAll<cr>
 
-let g:auto_save = 1  " enable AutoSave on Vim startup
-
-let g:gitgutter_realtime = 0
-
-let g:auto_save_no_updatetime = 1  " do not change the 'updatetime' option
-
-let g:matchmaker_enable_startup = 1
-
+" ########### NERDTree ###########
 map <F2> :NERDTreeToggle<CR>
-
-map ,mmi o__PACKAGE__->meta->make_immutable;<ESC>
-map ,ddp ouse DDP;<CR>p( );<ESC>
-map ,perl :set paste<CR>O#!/usr/bin/env perl;<CR><CR>use strict;<CR>use warnings;<CR>use feature qw( say );<CR><ESC>
-map ,moose Opackage Foo::Bar;<CR><CR>use Moose;<CR><CR>use MooseX::StrictConstructor;<CR><CR>__PACKAGE__->meta->make_immutable;<CR>1;<ESC>
-map ,ss :set paste<CR>i    my $self = shift;<CR>
-
-" convert a file path to a Perl module name
-" ie Foo/Bar/Baz.pm => Foo::Bar::Baz
-map ,2mod :s/\.pm//<CR>gv:s/\//::/g<CR>
 
 map <silent> w <Plug>CamelCaseMotion_w
 map <silent> b <Plug>CamelCaseMotion_b
@@ -189,33 +172,10 @@ sunmap b
 sunmap e
 sunmap ge
 
-" tabs
-set softtabstop=4
-set shiftwidth=4
-set tabstop=4
-set smarttab
-" use spaces rather than tabs
-set expandtab
-
-" 4 space tabs in html get annoying
-autocmd BufRead,BufNewFile *.tmpl set filetype=html
-autocmd FileType html :setlocal sw=2 ts=2 sts=2
-
-autocmd BufRead,BufNewFile *.yml set filetype=yaml
-autocmd FileType yaml :setlocal sw=2 ts=2 sts=2
-
-" Don't show tabs for Go files
+" ########### Golang ###########
+" Hide tabs and show numbers for Go files
 autocmd FileType go setlocal nolist
-
-" Treat Mojo templates (mostly) like HTML
-autocmd FileType html.epl setlocal sw=2 ts=2 sts=2
-
-" Don't override iTerm2's window transparency
-highlight Normal ctermbg=none
-
-" prevent delay when switching from insert to normal mode
-" https://www.johnhawthorn.com/2012/09/vi-escape-delays/
-set timeoutlen=300 ttimeoutlen=300
+autocmd FileType go set number
 
 let g:go_auto_sameids = 1
 let g:go_auto_type_info = 0
@@ -231,7 +191,17 @@ let g:go_fmt_fail_silently = 1 " Ale handles this already
 
 autocmd FileType go nmap <leader>t  <Plug>(go-test)
 autocmd FileType go nmap <leader>b  <Plug>(go-build)
-autocmd FileType go set number
+
+" ########### Perl ###########
+
+" show matching brackets
+autocmd FileType perl set showmatch
+
+" show line numbers
+autocmd FileType perl set number
+
+nnoremap <silent> = :%!perltidy -q<Enter>
+vnoremap <silent> = :!perltidy -q<Enter>
 
 " show Perl::Critic rules which have been violated
 let g:ale_perl_perlcritic_showrules = 1
@@ -240,8 +210,51 @@ let g:ale_type_map = {
 \    'perlcritic': {'ES': 'WS', 'E': 'W'},
 \}
 
+autocmd BufReadPost *.pl   set keywordprg=perldoc\ -f
+
+map ,mmi o__PACKAGE__->meta->make_immutable;<ESC>
+map ,ddp ouse DDP;<CR>p( );<ESC>
+map ,perl :set paste<CR>O#!/usr/bin/env perl;<CR><CR>use strict;<CR>use warnings;<CR>use feature qw( say );<CR><ESC>
+map ,moose Opackage Foo::Bar;<CR><CR>use Moose;<CR><CR>use MooseX::StrictConstructor;<CR><CR>__PACKAGE__->meta->make_immutable;<CR>1;<ESC>
+map ,ss :set paste<CR>i    my $self = shift;<CR>
+
+" convert a file path to a Perl module name
+" ie Foo/Bar/Baz.pm => Foo::Bar::Baz
+map ,2mod :s/\.pm//<CR>gv:s/\//::/g<CR>
+
+" Treat Mojo templates (mostly) like HTML
+autocmd FileType html.epl setlocal sw=2 ts=2 sts=2
+
+" ########### SplitJoin ###########
+
 let g:splitjoin_split_mapping = ''
 let g:splitjoin_join_mapping = ''
 
 nmap <Leader>j :SplitjoinJoin<cr>
 nmap <Leader>s :SplitjoinSplit<cr>
+
+" ########### JSON ###########
+
+"pretty print json
+map <leader>jt <Esc>:%!json_xs -f json -t json-pretty<CR>
+
+" ########### Python ###########
+autocmd FileType python nnoremap <leader>y :0,$!yapf<Cr><C-o>
+
+" ########### SQL ###########
+vnoremap <silent> + :!sql-webformat<Enter>
+
+" prevent left and right arrows from being disabled in insert mode when
+" editing SQL files
+let g:omni_sql_no_default_maps = 1
+
+" ########### HTML ###########
+
+" 4 space tabs in html get annoying
+autocmd BufRead,BufNewFile *.tmpl set filetype=html
+autocmd FileType html :setlocal sw=2 ts=2 sts=2
+
+" ########### YAML ###########
+
+autocmd BufRead,BufNewFile *.yml set filetype=yaml
+autocmd FileType yaml :setlocal sw=2 ts=2 sts=2
