@@ -43,8 +43,7 @@ colorscheme solarized
 set laststatus=2
 set bs=2
 filetype on
-filetype indent on
-filetype plugin on
+filetype plugin indent on
 
 au BufReadPost *.pl   set keywordprg=perldoc\ -f
 
@@ -68,7 +67,6 @@ set hlsearch
 set incsearch
 
 " indents
-set smartindent
 set autoindent
 
 " reload files which have changed
