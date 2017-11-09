@@ -41,7 +41,7 @@ set background=dark
 colorscheme solarized
 
 set laststatus=2
-set bs=2
+set backspace=2
 filetype on
 filetype plugin indent on
 
