@@ -45,7 +45,7 @@ set backspace=2
 filetype on
 filetype plugin indent on
 
-au BufReadPost *.pl   set keywordprg=perldoc\ -f
+autocmd BufReadPost *.pl   set keywordprg=perldoc\ -f
 
 " Indent using tabs (while in visual mode)
 vnoremap < <gv
@@ -70,7 +70,7 @@ set incsearch
 set autoindent
 
 " reload files which have changed
-:au CursorHold * checktime
+:autocmd CursorHold * checktime
 set autoread
 
 " show matching brackets
@@ -198,10 +198,10 @@ set smarttab
 set expandtab
 
 " 4 space tabs in html get annoying
-au BufRead,BufNewFile *.tmpl set filetype=html
+autocmd BufRead,BufNewFile *.tmpl set filetype=html
 autocmd FileType html :setlocal sw=2 ts=2 sts=2
 
-au BufRead,BufNewFile *.yml set filetype=yaml
+autocmd BufRead,BufNewFile *.yml set filetype=yaml
 autocmd FileType yaml :setlocal sw=2 ts=2 sts=2
 
 " Don't show tabs for Go files
