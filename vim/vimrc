@@ -68,10 +68,10 @@ let mapleader = ","
 :vnoremap <silent> - :FixWhitespace<CR>
 
 "dictionary sort
-:vnoremap <silent> so :!sort -d<CR>
+:vnoremap <silent> so :!sort -d --ignore-case<CR>
 
 "dictionary sort unique
-:vnoremap <silent> su :!sort -d <bar> uniq<CR>
+:vnoremap <silent> su :!sort -d --ignore-case<bar> uniq<CR>
 
 "ws shortcut to sort lists of words and move to one line. requires tidying
 "after the fact.
