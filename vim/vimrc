@@ -224,6 +224,7 @@ map ,2mod :s/\.pm//<CR>gv:s/\//::/g<CR>
 
 " Treat Mojo templates (mostly) like HTML
 autocmd FileType html.epl setlocal sw=2 ts=2 sts=2
+autocmd FileType html.ep setlocal sw=2 ts=2 sts=2
 
 " ########### SplitJoin ###########
 
