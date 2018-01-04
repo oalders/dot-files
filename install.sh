@@ -1,6 +1,24 @@
 #!/usr/bin/env bash
 
 set -eu -o pipefail
+
+skip_vim_plugin_install=false
+
+# https://stackoverflow.com/questions/16483119/example-of-how-to-use-getopts-in-bash
+usage() { echo "Usage: $0 [-s] " 1>&2; exit 1; }
+
+while getopts ":s" o; do
+    case "${o}" in
+        s)
+            skip_vim_plugin_install=true
+            ;;
+        *)
+            usage
+            ;;
+    esac
+done
+shift $((OPTIND-1))
+
 SELF_PATH=$(cd -P -- "$(dirname -- "$0")" && pwd -P)
 
 LINK_FLAG=""
@@ -79,4 +97,10 @@ curl -fLo ~/.vim/autoload/plug.vim --create-dirs \
     https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
 
 rm -rf ~/.vim/Trashed-Bundles ~/.vim/bundle
-vim -c ':PlugInstall'
+
+if [ "$skip_vim_plugin_install" = true ]
+then
+    echo "Skip vim plug install.  Is this run via ansible?"
+else
+    vim -c ':PlugInstall'
+fi
