@@ -200,8 +200,24 @@ autocmd FileType perl set showmatch
 " show line numbers
 autocmd FileType perl set number
 
-nnoremap <silent> = :%!perltidy -q<Enter>
-vnoremap <silent> = :!perltidy -q<Enter>
+
+" https://stackoverflow.com/questions/2345519/how-can-i-script-vim-to-run-perltidy-on-a-buffer
+
+"define :Tidy command to run perltidy on visual selection || entire buffer"
+command -range=% -nargs=* PTidy <line1>,<line2>!perltidy
+
+"run :PTidy on entire buffer and return cursor to (approximate) original position"
+fun DoPerlTidy()
+    let l = line(".")
+    let c = col(".")
+    :PTidy
+    call cursor(l, c)
+endfun
+
+au Filetype perl vnoremap <silent> = :!perltidy -q<Enter>
+
+"shortcut for normal mode to run on entire buffer then return to current line"
+au Filetype perl nnoremap = :call DoPerlTidy()<CR>
 
 " show Perl::Critic rules which have been violated
 let g:ale_perl_perlcritic_showrules = 1
