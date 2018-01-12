@@ -204,7 +204,7 @@ autocmd FileType perl set number
 " https://stackoverflow.com/questions/2345519/how-can-i-script-vim-to-run-perltidy-on-a-buffer
 
 "define :Tidy command to run perltidy on visual selection || entire buffer"
-command -range=% -nargs=* PTidy <line1>,<line2>!perltidy -q<Enter>
+command -range=% -nargs=* PTidy <line1>,<line2>!perltidy -q<CR>
 
 "run :PTidy on entire buffer and return cursor to (approximate) original position"
 fun DoPerlTidy()
@@ -214,7 +214,7 @@ fun DoPerlTidy()
     call cursor(l, c)
 endfun
 
-au Filetype perl vnoremap <silent> = :!perltidy -q<Enter>
+au Filetype perl vnoremap <silent> = :!perltidy -q<CR>
 
 "shortcut for normal mode to run on entire buffer then return to current line"
 au Filetype perl nnoremap = :call DoPerlTidy()<CR>
@@ -259,7 +259,7 @@ map <leader>jt <Esc>:%!json_xs -f json -t json-pretty<CR>
 autocmd FileType python nnoremap <leader>y :0,$!yapf<Cr><C-o>
 
 " ########### SQL ###########
-vnoremap <silent> + :!sql-webformat<Enter>
+vnoremap <silent> + :!sql-webformat<CR>
 
 " prevent left and right arrows from being disabled in insert mode when
 " editing SQL files
