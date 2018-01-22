@@ -253,7 +253,7 @@ nmap <Leader>s :SplitjoinSplit<cr>
 " ########### JSON ###########
 
 "pretty print json
-map <leader>jt <Esc>:%!json_xs -f json -t json-pretty<CR>
+map <leader>jt <Esc>:%!cpanel_json_xs -f json-relaxed -t json-pretty<CR>
 
 " ########### Python ###########
 autocmd FileType python nnoremap <leader>y :0,$!yapf<Cr><C-o>
