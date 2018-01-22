@@ -111,7 +111,7 @@ highlight Normal ctermbg=none
 
 " prevent delay when switching from insert to normal mode
 " https://www.johnhawthorn.com/2012/09/vi-escape-delays/
-set timeoutlen=300 ttimeoutlen=300
+set timeoutlen=1000 ttimeoutlen=1000
 
 " ########### tabs ###########
 
