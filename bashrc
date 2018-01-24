@@ -44,6 +44,7 @@ alias files-open-by-process="sudo lsof | awk '$5 == "REG" {freq[$2]++ ; names[$2
 alias files-open-by-size="sudo lsof -s | awk '$5 == "REG"' | sort -n -r -k 7,7 | head -n 50"
 alias gdf='git domo|fpp'
 alias grep='grep --color=auto'
+alias hh='SwitchAudioSource -s "Built-in Output"'
 alias l='ls -lAtr'
 alias l.='ls -ldF .[a-zA-Z0-9]* --color=tty' #only show dotfiles
 alias linebreaks="perl -pi -e 's/\r/\n/g'"
