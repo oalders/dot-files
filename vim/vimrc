@@ -275,3 +275,15 @@ autocmd FileType html :setlocal sw=2 ts=2 sts=2
 
 autocmd BufRead,BufNewFile *.yml set filetype=yaml
 autocmd FileType yaml :setlocal sw=2 ts=2 sts=2
+
+highlight ColorColumn ctermbg=0
+
+" Set line markers to make indentation easier in Mojo templates
+" Enable via :call ShowLines()
+fun ShowLines()
+    :set colorcolumn=4,8,12,16,20,24,28
+endfun
+
+fun HideLines()
+    :set colorcolumn=
+endfun
