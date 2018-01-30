@@ -294,4 +294,11 @@ fancydiff () {
     git $1 --color=always $2 | diff-so-fancy | less -R
 }
 
+function ot () {
+    local vi=$(type -p vim)
+    string=$(perl -MOpen::This -E "print Open::This::to_vim('$1')")
+    $vi $string
+    return 1
+}
+
 [ -f ~/.fzf.bash ] && source ~/.fzf.bash
