@@ -172,6 +172,18 @@ sunmap b
 sunmap e
 sunmap ge
 
+" ########### Airline ###########
+" Show open buffers at top.  Disabled by default, but leave this here so I
+" don't forget about the setting.
+let g:airline#extensions#tabline#enabled = 0
+
+" ########### Ale ###########
+" Show Ale warnings and messages in statusline
+let g:airline#extensions#ale#enabled = 1
+
+nmap <silent> <C-k> <Plug>(ale_previous_wrap)
+nmap <silent> <C-j> <Plug>(ale_next_wrap)
+
 " ########### Golang ###########
 " Hide tabs and show numbers for Go files
 autocmd FileType go setlocal nolist
