@@ -202,7 +202,7 @@ let g:go_highlight_types = 1
 let g:go_fmt_fail_silently = 1 " Ale handles this already
 
 " gometalinter is off by default
-let g:ale_linters = {'go': ['gofmt', 'golint', 'go vet', 'gometalinter'] }
+let g:ale_linters = {'go': ['gofmt', 'golint', 'go vet', 'gometalinter'], 'perl': ['perl','perlcritic'] }
 
 autocmd FileType go nmap <leader>t  <Plug>(go-test)
 autocmd FileType go nmap <leader>b  <Plug>(go-build)
