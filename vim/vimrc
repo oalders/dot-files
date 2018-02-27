@@ -61,7 +61,7 @@ set autoindent
 :autocmd CursorHold * checktime
 set autoread
 
-let mapleader = ","
+let g:mapleader = ","
 
 "remove all trailing whitespace
 :nnoremap <silent> - :FixWhitespace<CR>
@@ -145,9 +145,9 @@ command! T :call TidyAll()
 
 command! TidyAll :call TidyAll()
 function! TidyAll()
-    let cur_pos = getpos( '.' )
-    let cmdline = ':1,$!tidyall --mode editor --pipe %:p 2> tidyall.ERR'
-    execute( cmdline )
+    let g:cur_pos = getpos( '.' )
+    let l:cmdline = ':1,$!tidyall --mode editor --pipe %:p 2> tidyall.ERR'
+    execute( l:cmdline )
     if v:shell_error
         echo "\nContents of tidyall.ERR:\n\n" . system( 'cat tidyall.ERR' )
         silent undo
@@ -223,10 +223,10 @@ command -range=% -nargs=* PTidy <line1>,<line2>!perltidy -q
 
 "run :PTidy on entire buffer and return cursor to (approximate) original position"
 fun DoPerlTidy()
-    let l = line(".")
-    let c = col(".")
+    let l:line = line(".")
+    let l:column = col(".")
     :PTidy
-    call cursor(l, c)
+    call cursor(l:line, l:column)
 endfun
 
 au Filetype perl vnoremap <silent> = :!perltidy -q<CR>
