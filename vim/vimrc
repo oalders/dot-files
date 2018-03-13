@@ -285,7 +285,7 @@ let g:omni_sql_no_default_maps = 1
 
 " 4 space tabs in html get annoying
 autocmd BufRead,BufNewFile *.tmpl set filetype=html
-autocmd FileType html :setlocal sw=2 ts=2 sts=2
+autocmd FileType html :setlocal sw=2 ts=2 sts=2 expandtab
 
 " ########### YAML ###########
 
