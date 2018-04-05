@@ -297,7 +297,11 @@ highlight ColorColumn ctermbg=0
 " Set line markers to make indentation easier in Mojo templates
 " Enable via :call ShowLines()
 fun ShowLines()
-    :set colorcolumn=5,9,13,17,21,25,29
+    if &ft ==# "html"
+        :set colorcolumn=5,9,13,17,21,25,29
+    else
+        :set colorcolumn=78
+    endif
 endfun
 
 fun HideLines()
