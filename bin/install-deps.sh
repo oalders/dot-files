@@ -6,3 +6,5 @@ cpm install -g --cpanfile cpan/pause.cpanfile
 
 # Fails to install on OS X
 cpanm --notest Data::Printer::Filter::JSON
+
+plenv rehash
