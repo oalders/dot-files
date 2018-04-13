@@ -98,6 +98,8 @@ curl -fLo ~/.vim/autoload/plug.vim --create-dirs \
 
 rm -rf ~/.vim/Trashed-Bundles ~/.vim/bundle
 
+npm install --global fkill-cli
+
 if [ "$skip_vim_plugin_install" = true ]
 then
     echo "Skip vim plug install.  Is this run via ansible?"
