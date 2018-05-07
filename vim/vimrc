@@ -25,6 +25,7 @@ Plug 'qstrahl/vim-matchmaker'
 Plug 'rodjek/vim-puppet'
 Plug 'scrooloose/nerdcommenter'
 Plug 'sheerun/vim-polyglot'
+Plug 'skaji/syntax-check-perl'
 Plug 'SirVer/ultisnips'
 Plug 'tpope/vim-abolish'
 Plug 'tpope/vim-fugitive'
@@ -205,6 +206,10 @@ let g:go_fmt_fail_silently = 1 " Ale handles this already
 
 " gometalinter currently not enabled
 let g:ale_linters = {'go': ['gofmt', 'golint', 'go vet'], 'perl': ['perl','perlcritic'] }
+let g:ale_linters = {'go': ['gofmt', 'golint', 'go vet', 'gometalinter'], 'perl': ['syntax-check', 'perlcritic'] }
+
+" https://github.com/skaji/syntax-check-perl#integrate-with-vim-plug-and-ale
+let g:ale_perl_syntax_check_config = expand('~/dot-files/syntax-check-perl/config.pl')
 
 autocmd FileType go nmap <leader>t  <Plug>(go-test)
 autocmd FileType go nmap <leader>b  <Plug>(go-build)
