@@ -313,3 +313,6 @@ endfun
 fun HideLines()
     :set colorcolumn=
 endfun
+
+" Try to install missing Perl modules
+nnoremap <leader>l :!perl -Mlazy -c %:p
