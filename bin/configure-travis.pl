@@ -105,7 +105,7 @@ EOF
 
 {
     no autovivification;
-    if ( exists $config->{matrix}{include}{allow_failures}
+    if ( exists $config->{matrix}{allow_failures}
         && !exists $config->{matrix}{fast_finish} ) {
         say 'Enable fast finish?';
         my $enable = choose(
