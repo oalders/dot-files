@@ -62,7 +62,7 @@ EOF
 }
 
 my $perl_helpers
-    = $config->{language} eq 'perl' && any { $_ =~ m{travis-perl-helpers} }
+    = $config->{language} eq 'perl' && any { $_ =~ m{travis-perl} }
 @{ $config->{before_install} };
 
 {
