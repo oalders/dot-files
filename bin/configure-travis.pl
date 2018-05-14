@@ -144,3 +144,5 @@ EOF
 # maybe install App::cpm for faster installs
 
 DumpFile( $config_file, $config );
+
+exit(0);
