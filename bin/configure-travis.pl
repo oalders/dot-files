@@ -118,25 +118,28 @@ EOF
 
 {
     no autovivification;
-    if ( $perl_helpers ) {
+    if ($perl_helpers) {
         say 'Enable coverage reports?';
         my $enable = choose(
             [ 'true', 'false' ],
         );
         use autovivification;
-        #$config->{matrix}{fast_finish} = $enable;
-        if ( $enable eq 'true' ) {
+        if (
+            $enable eq 'true'
+            && none { exists $_->{env} && $_->{env} =~ m{COVERAGE=1} }
+            @{ $config->{matrix}->{include}->{perl} }
+        ) {
+
             # get highest Perl release version
-            for my $version ( reverse @perl_versions ) {
-                if ( any { $_ eq $version } @{$config->{perl}} ) {
+            for my $version (@perl_versions) {
+                if ( any { $_ eq $version } @{ $config->{perl} } ) {
                     $config->{matrix}->{include}->{perl}
+                        = [ { perl => $version, env => 'COVERAGE=1' } ];
                 }
             }
         }
     }
 }
-
-# enable test coverage
 
 # maybe install App::cpm for faster installs
 
