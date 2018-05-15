@@ -2,11 +2,14 @@ use strict;
 use warnings;
 use feature qw( say );
 
+use Data::Dumper;
 use Data::Printer;
 use List::MoreUtils qw( first_index );
 use List::Util qw ( any none uniq );
 use Term::Choose qw( choose );
 use YAML::Tiny qw( DumpFile LoadFile );
+
+$Data::Dumper::Sortkeys = 1;
 
 my $config_file = '.travis.yml';
 my $config      = LoadFile($config_file);
@@ -23,25 +26,6 @@ my @perl_versions = qw(
     5.24
     5.26
 );
-
-if ( $config->{perl} ) {
-    my %perls = map { $_ => 1 } @{ $config->{perl} };
-    for my $version (@perl_versions) {
-        $perls{$version} = 1;
-    }
-    $config->{perl} = [ sort keys %perls ];
-
-    for my $might_fail ( 'blead', 'dev' ) {
-        if ( exists $perls{$might_fail} ) {
-            my $allowed
-                = $config->{matrix}{include}{allow_failures} || [];
-            if ( none { $_ eq $might_fail } @{$allowed} ) {
-                push @{$allowed}, $might_fail;
-            }
-            $config->{matrix}{include}{allow_failures} = $allowed;
-        }
-    }
-}
 
 unless ( exists $config->{cache}->{directories} ) {
     $config->{cache}{directories} = ['~/perl5'];
@@ -83,7 +67,8 @@ EOF
     say $msg;
 
     my @choices
-        = sort { $a cmp $b } uniq( 'aspell', 'elasticsearch', @{$apt_pkgs} );
+        = sort { $a cmp $b }
+        uniq( 'aspell', 'aspell-en', 'elasticsearch', @{$apt_pkgs} );
     my @pre_selected;
     for my $choice (@choices) {
         push @pre_selected,
@@ -103,6 +88,71 @@ EOF
     }
 }
 
+# Maybe add a test coverage run to the matrix
+{
+    no autovivification;
+    if ($perl_helpers) {
+        my $coverage_version;
+        say 'Enable coverage reports?';
+        my $enable = choose(
+            [ 'true', 'false' ],
+        );
+        my @includes
+            = exists $config->{matrix}{include}{perl}
+            ? @{ $config->{matrix}{include}{perl} }
+            : ();
+
+        if ( $enable eq 'true' ) {
+
+            use autovivification;
+
+            # get highest Perl release version
+            for my $version ( reverse @perl_versions ) {
+                if ( any { $_ eq $version } @{ $config->{perl} } ) {
+                    $coverage_version
+                        = { perl => $version, env => 'COVERAGE=1' };
+                    unless (
+                        list_contains_hash(
+                            \@includes,
+                            $coverage_version
+                        )
+                    ) {
+
+                        push @includes,
+                            { perl => $version, env => 'COVERAGE=1' };
+                    }
+                    last;
+                }
+            }
+            $config->{matrix}{include}{perl} = \@includes;
+        }
+    }
+}
+
+if ( $config->{perl} ) {
+    my %perls = map { $_ => 1 } @{ $config->{perl} };
+    for my $version (@perl_versions) {
+        $perls{$version} = 1;
+    }
+    $config->{perl} = [ sort keys %perls ];
+    my @allowed
+        = exists $config->{matrix}{allow_failures}
+        ? @{ $config->{matrix}{allow_failures} }
+        : ();
+
+    for my $might_fail ( 'blead', 'dev' ) {
+        if ( exists $perls{$might_fail} ) {
+            if (
+                none { exists $_->{perl} && $_->{perl} eq $might_fail }
+                @allowed
+            ) {
+                push @allowed, { perl => $might_fail };
+            }
+        }
+    }
+    $config->{matrix}{allow_failures} = \@allowed if @allowed;
+}
+
 {
     no autovivification;
     if ( exists $config->{matrix}{allow_failures}
@@ -116,29 +166,10 @@ EOF
     }
 }
 
-{
-    no autovivification;
-    if ($perl_helpers) {
-        say 'Enable coverage reports?';
-        my $enable = choose(
-            [ 'true', 'false' ],
-        );
-        use autovivification;
-        if (
-            $enable eq 'true'
-            && none { exists $_->{env} && $_->{env} =~ m{COVERAGE=1} }
-            @{ $config->{matrix}->{include}->{perl} }
-        ) {
-
-            # get highest Perl release version
-            for my $version (@perl_versions) {
-                if ( any { $_ eq $version } @{ $config->{perl} } ) {
-                    $config->{matrix}->{include}->{perl}
-                        = [ { perl => $version, env => 'COVERAGE=1' } ];
-                }
-            }
-        }
-    }
+sub list_contains_hash {
+    my $list = shift;
+    my $hash = Dumper(shift);
+    return any { Dumper($_) eq $hash } @{$list};
 }
 
 # maybe install App::cpm for faster installs
