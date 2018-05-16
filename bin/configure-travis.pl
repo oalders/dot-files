@@ -6,6 +6,7 @@ use Data::Dumper;
 use Data::Printer;
 use List::MoreUtils qw( first_index );
 use List::Util qw ( any none uniq );
+use Ref::Util qw( is_plain_arrayref );
 use Term::Choose qw( choose );
 use YAML::Tiny qw( DumpFile LoadFile );
 
@@ -31,11 +32,16 @@ unless ( exists $config->{cache}->{directories} ) {
     $config->{cache}{directories} = ['~/perl5'];
 }
 
+my $is_perl = exists $config->{language} && $config->{language} eq 'perl';
+my $perl_helpers;
 if (
-       $config->{language} eq 'perl'
-    && exists $config->{before_install}
-    && none { $_ eq 'eval $(curl https://travis-perl.github.io/init) --auto' }
-    @{ $config->{before_install} }
+    $config->{language} eq 'perl' && ( !exists $config->{before_install} )
+    || (
+        none {
+            $_ eq 'eval $(curl https://travis-perl.github.io/init) --auto'
+        }
+        @{ $config->{before_install} }
+    )
 ) {
     say <<'EOF';
 Enable automatic Perl helpers by adding the following to "before_install":
@@ -45,9 +51,11 @@ Enable automatic Perl helpers by adding the following to "before_install":
 EOF
 }
 
-my $perl_helpers
-    = $config->{language} eq 'perl' && any { $_ =~ m{travis-perl} }
-@{ $config->{before_install} };
+if ( exists $config->{before_install}
+    && is_plain_arrayref( $config->{before_install} ) ) {
+    $perl_helpers
+        = any { $_ =~ m{travis-perl} } @{ $config->{before_install} };
+}
 
 {
     no autovivification;
@@ -163,6 +171,42 @@ if ( $config->{perl} ) {
         );
         use autovivification;
         $config->{matrix}{fast_finish} = $enable;
+    }
+}
+
+{
+    no autovivification;
+    my @install;
+    if ($is_perl) {
+        my $before
+            = exists $config->{before_install}
+            ? $config->{before_install}
+            : [];
+
+        my @choices = sort ( 'Perl::Tidy', 'App::cpm' );
+        my @pre_selected;
+        for my $choice (@choices) {
+            push @pre_selected,
+                grep { $_ > -1 } first_index { $_ =~ m{$choice} } @{$before};
+        }
+
+        say 'Install these Perl modules?';
+        @install = choose( \@choices, { mark => \@pre_selected } );
+
+        my @to_add;
+        if (@install) {
+            my @before = @{$before};
+            for my $module (@install) {
+                if ( none { $_ =~ m{$module} } @before ) {
+                    push @to_add, $module;
+                }
+            }
+
+            if (@to_add) {
+                push @before, ( 'cpanm ' . join ' ', @to_add );
+                $config->{before_install} = \@before;
+            }
+        }
     }
 }
 
