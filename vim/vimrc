@@ -23,6 +23,7 @@ Plug 'mbra/prettysql' " ,fs to format visually selected SQL
 Plug 'oalders/ale',  { 'branch': 'perl-warnings' }
 Plug 'qstrahl/vim-matchmaker'
 Plug 'rsrchboy/mojo.vim'
+Plug 'ryanpcmcquen/fix-vim-pasting'
 Plug 'rodjek/vim-puppet'
 Plug 'scrooloose/nerdcommenter'
 Plug 'sheerun/vim-polyglot'
