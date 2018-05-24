@@ -106,8 +106,8 @@ EOF
             [ 'true', 'false' ],
         );
         my @includes
-            = exists $config->{matrix}{include}{perl}
-            ? @{ $config->{matrix}{include}{perl} }
+            = exists $config->{matrix}{include}
+            ? @{ $config->{matrix}{include} }
             : ();
 
         if ( $enable eq 'true' ) {
@@ -132,7 +132,7 @@ EOF
                     last;
                 }
             }
-            $config->{matrix}{include}{perl} = \@includes;
+            $config->{matrix}{include} = \@includes;
         }
     }
 }
