@@ -47,6 +47,7 @@ git config --global alias.undo 'reset --soft HEAD^'
 git config --global alias.view-stash 'stash show -p stash@{0}'
 
 git config --global color.ui auto
+git config --global core.excludesfile ~/.gitignore_global
 git config --global core.pager 'less'
 
 # takes a commit name as sole arg

@@ -44,6 +44,7 @@ cp     $SELF_PATH/dataprinter ~/.dataprinter # Data::Printer doesn't like symlin
 chmod 700 ~/.dataprinter
 
 ln -sf $LINK_FLAG $SELF_PATH/dzil ~/.dzil
+ln -sf $SELF_PATH/gitignore_global ~/.gitignore_global
 ln -sf $SELF_PATH/minicpanrc ~/.minicpanrc
 ln -sf $SELF_PATH/perlcriticrc ~/.perlcriticrc
 ln -sf $SELF_PATH/perltidyrc ~/.perltidyrc
