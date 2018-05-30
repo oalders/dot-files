@@ -43,6 +43,7 @@ ln -sf $SELF_PATH/bash_profile ~/.bash_profile
 cp     $SELF_PATH/dataprinter ~/.dataprinter # Data::Printer doesn't like symlinks
 chmod 700 ~/.dataprinter
 
+ln -sf $SELF_PATH/digrc ~/.digrc
 ln -sf $LINK_FLAG $SELF_PATH/dzil ~/.dzil
 ln -sf $SELF_PATH/gitignore_global ~/.gitignore_global
 ln -sf $SELF_PATH/minicpanrc ~/.minicpanrc
