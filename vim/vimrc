@@ -151,7 +151,7 @@ command! T :call TidyAll()
 
 command! TidyAll :call TidyAll()
 function! TidyAll()
-    let g:cur_pos = getpos( '.' )
+    let l:cur_pos = getpos( '.' )
     let l:cmdline = ':1,$!tidyall --mode editor --pipe %:p 2> tidyall.ERR'
     execute( l:cmdline )
     if v:shell_error
