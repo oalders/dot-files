@@ -20,6 +20,7 @@ git config --global rerere.enabled 1
 git config --global branch.autosetuprebase always
 git config --global alias.b  'branch'
 git config --global alias.ba 'branch -a'
+git config --global alias.ca 'commit --amend'
 git config --global alias.can 'commit --amend --no-edit'
 git config --global alias.changes 'diff --name-status -r'
 git config --global alias.ci 'commit'
