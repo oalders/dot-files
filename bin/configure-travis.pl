@@ -183,9 +183,11 @@ if ( $config->{perl} ) {
             ? $config->{before_install}
             : [];
 
-        my @choices = sort ( 'Perl::Tidy',
-            'Code::TidyAll::Plugin::SortLines::Naturally',
+        my @choices = (
             'App::cpm',
+            'Code::TidyAll::Plugin::SortLines::Naturally',
+            'Code::TidyAll::Plugin::UniqueLines',
+            'Perl::Tidy',
         );
         my @pre_selected;
         for my $choice (@choices) {
