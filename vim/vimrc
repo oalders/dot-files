@@ -57,6 +57,9 @@ set ignorecase smartcase
 " highlight all matches
 set hlsearch
 
+hi Search ctermbg=LightYellow
+hi Search ctermfg=Red
+
 " lookahead as search pattern is specified
 set incsearch
 
