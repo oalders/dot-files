@@ -4,7 +4,7 @@ use feature qw( say );
 
 use Data::Dumper;
 use Data::Printer;
-use List::MoreUtils qw( first_index );
+use List::MoreUtils qw( first_index indexes );
 use List::Util qw ( any none uniq );
 use Ref::Util qw( is_plain_arrayref );
 use Term::Choose qw( choose );
@@ -185,13 +185,9 @@ if ( $config->{perl} ) {
             'Code::TidyAll::Plugin::UniqueLines',
             'Perl::Tidy',
         );
-        my @pre_selected;
-        for my $choice (@choices) {
-            push @pre_selected,
-                grep { $_ > -1 } first_index { $_ =~ m{$choice} } @{$before};
-        }
 
-        say 'Install these Perl modules?';
+        my $parts = join ' ', map { split ' ' } @$before;
+        my @pre_selected = indexes { $parts =~ m{$_} } @choices;
         @install = choose( \@choices, { mark => \@pre_selected } );
 
         my @to_add;
