@@ -102,9 +102,7 @@ EOF
     if ($perl_helpers) {
         my $coverage_version;
         say 'Enable coverage reports?';
-        my $enable = choose(
-            [ 'true', 'false' ],
-        );
+        my $enable = choose( [ 'true', 'false' ] );
         my @includes
             = exists $config->{matrix}{include}
             ? @{ $config->{matrix}{include} }
@@ -166,9 +164,7 @@ if ( $config->{perl} ) {
     if ( exists $config->{matrix}{allow_failures}
         && !exists $config->{matrix}{fast_finish} ) {
         say 'Enable fast finish?';
-        my $enable = choose(
-            [ 'true', 'false' ],
-        );
+        my $enable = choose( [ 'true', 'false' ] );
         use autovivification;
         $config->{matrix}{fast_finish} = $enable;
     }
