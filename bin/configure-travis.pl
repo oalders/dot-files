@@ -200,9 +200,26 @@ if ( $config->{perl} ) {
             }
 
             if (@to_add) {
-                push @before, ( 'AUTHOR_TESTING=0 cpanm ' . join ' ', @to_add );
+                push @before,
+                    ( 'AUTHOR_TESTING=0 cpanm ' . join ' ', @to_add );
                 $config->{before_install} = \@before;
             }
+        }
+    }
+}
+
+{
+    no autovivification;
+    my @install;
+    if ( $is_perl && $perl_helpers ) {
+        if (
+            ! exists $config->{script}
+            || (
+                exists $config->{script} && none { $_ =~ m{j} }
+                @{ $config->{script} }
+            )
+        ) {
+            $config->{script} = 'prove -lr -j$(test-jobs) t';
         }
     }
 }
