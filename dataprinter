@@ -3,5 +3,8 @@
     filters =>
         { -external => [ 'DBIx::Class', 'DB', 'DateTime', 'JSON', 'URI' ], },
     hash_separator => ' => ',
-    scalar_quotes  => q{'},
+
+    # set index => 0 when dumping a data structure you want to copy/paste into code
+    index         => 1,
+    scalar_quotes => q{'},
 };
