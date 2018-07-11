@@ -36,10 +36,12 @@ echo $SELF_PATH
 
 mkdir -p ~/.re.pl
 mkdir -p ~/.vagrant.d
+mkdir -p ~/.cpanreporter
 
 ln -sf $SELF_PATH/ackrc ~/.ackrc
 ln -sf $SELF_PATH/bashrc ~/.bashrc
 ln -sf $SELF_PATH/bash_profile ~/.bash_profile
+ln -sf $SELF_PATH/cpanreporter/config.ini ~/.cpanreporter/config.ini
 cp     $SELF_PATH/dataprinter ~/.dataprinter # Data::Printer doesn't like symlinks
 chmod 700 ~/.dataprinter
 
