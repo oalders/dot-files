@@ -43,6 +43,8 @@ source ~/.local_vimrc
 " Initialize plugin system
 call plug#end()
 
+let g:mapleader = ","
+
 syntax enable
 set background=dark
 colorscheme solarized
@@ -70,8 +72,6 @@ set autoindent
 " reload files which have changed
 :autocmd CursorHold * checktime
 set autoread
-
-let g:mapleader = ","
 
 "remove all trailing whitespace
 :nnoremap <silent> - :FixWhitespace<CR>
