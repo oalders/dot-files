@@ -37,6 +37,7 @@ git config --global alias.domo 'diff -w -M origin/master...HEAD --name-only'
 git config --global alias.exec '!exec '
 git config --global alias.flog 'log --stat --abbrev-commit --relative-date --pretty=oneline'
 git config --global alias.from '!git fetch -p; git rebase origin/master'
+git config --global alias.fromp '!git from; git pf'
 git config --global alias.mylog 'log --author="Olaf Alders"'
 git config --global alias.plog "log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit --date=relative"
 git config --global alias.prom 'pull --rebase origin master'
