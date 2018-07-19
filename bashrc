@@ -8,6 +8,16 @@ elif [[ "$unamestr" == 'Darwin' ]]; then
 fi
 
 export EDITOR=vim
+# http://superuser.com/questions/39751/add-directory-to-path-if-its-not-already-there
+pathadd() {
+    if [ -d "$1" ] && [[ ":$PATH:" != *":$1:"* ]]; then
+        PATH="$1:$PATH"
+    fi
+}
+
+include() {
+    [[ -f "$1" ]] && source "$1"
+}
 
 # use vim mappings to move around the command line
 set -o vi
@@ -80,13 +90,6 @@ alias h2o="perl -e 'printf qq|%o\n|, hex( shift )'"
 alias o2b="perl -e 'printf qq|%b\n|, oct( shift )'"
 alias o2d="perl -e 'printf qq|%d\n|, oct( shift )'"
 alias o2h="perl -e 'printf qq|%X\n|, oct( shift )'"
-
-# http://superuser.com/questions/39751/add-directory-to-path-if-its-not-already-there
-pathadd() {
-    if [ -d "$1" ] && [[ ":$PATH:" != *":$1:"* ]]; then
-        PATH="$1:$PATH"
-    fi
-}
 
 # python scripts via pip install --user
 pathadd "$HOME/Library/Python/2.7/bin";
@@ -301,3 +304,5 @@ export SSH_AUTH_SOCK=~/.ssh/ssh_auth_sock
 if test $SSH_AUTH_SOCK && test $TMUX && [ $SSH_AUTH_SOCK != $SOCK ]; then
     export SSH_AUTH_SOCK=$SOCK
 fi
+
+include ~/.local_bashrc
