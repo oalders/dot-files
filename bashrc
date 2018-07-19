@@ -295,3 +295,9 @@ fancydiff () {
 }
 
 [ -f ~/.fzf.bash ] && source ~/.fzf.bash
+
+SOCK=~/.ssh/ssh_auth_sock
+export SSH_AUTH_SOCK=~/.ssh/ssh_auth_sock
+if test $SSH_AUTH_SOCK && test $TMUX && [ $SSH_AUTH_SOCK != $SOCK ]; then
+    export SSH_AUTH_SOCK=$SOCK
+fi
