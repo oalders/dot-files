@@ -172,7 +172,7 @@ if ( $config->{perl} ) {
 
 {
     no autovivification;
-    my @install;
+    my @before_install;
     if ($is_perl) {
         my $before
             = exists $config->{before_install}
@@ -188,12 +188,12 @@ if ( $config->{perl} ) {
 
         my $parts = join ' ', map { split ' ' } @$before;
         my @pre_selected = indexes { $parts =~ m{$_} } @choices;
-        @install = choose( \@choices, { mark => \@pre_selected } );
+        @before_install = choose( \@choices, { mark => \@pre_selected } );
 
         my @to_add;
-        if (@install) {
+        if (@before_install) {
             my @before = @{$before};
-            for my $module (@install) {
+            for my $module (@before_install) {
                 if ( none { $_ =~ m{$module} } @before ) {
                     push @to_add, $module;
                 }
@@ -201,7 +201,7 @@ if ( $config->{perl} ) {
 
             if (@to_add) {
                 push @before,
-                    ( 'AUTHOR_TESTING=0 cpanm ' . join ' ', @to_add );
+                    ( 'AUTHOR_TESTING=0 cpm install --workers $(test-jobs) --global ' . join ' ', @to_add );
                 $config->{before_install} = \@before;
             }
         }
@@ -211,7 +211,26 @@ if ( $config->{perl} ) {
 {
     no autovivification;
     my @install;
+    if ($is_perl) {
+        my $install
+            = exists $config->{install}
+            ? $config->{install}
+            : [];
+
+        my $cpm = 'AUTHOR_TESTING=0 cpm install --cpanfile cpanfile --workers $(test-jobs) --global';
+
+        unless ( any { $_ =~ m{cpm install} } @{ $config->{install} } ) {
+            unshift @{ $config->{install} }, $cpm;
+        }
+    }
+}
+
+{
+    no autovivification;
     if ( $is_perl && $perl_helpers ) {
+        if ( exists $config->{script} && !ref($config->{script}) ) {
+            $config->{script} = [$config->{script}];
+        }
         if (
             ! exists $config->{script}
             || (
@@ -219,7 +238,7 @@ if ( $config->{perl} ) {
                 @{ $config->{script} }
             )
         ) {
-            $config->{script} = 'prove -lr -j$(test-jobs) t';
+            $config->{script} = ['prove -lr -j$(test-jobs) t'];
         }
     }
 }
