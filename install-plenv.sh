@@ -10,5 +10,5 @@ plenv rehash
 export PATH="$HOME/.plenv/bin:$PATH"
 eval "$(plenv init -)"
 
-cpanm App::cpm
+cpanm --notest App::cpm
 plenv rehash
