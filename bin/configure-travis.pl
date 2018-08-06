@@ -180,7 +180,6 @@ if ( $config->{perl} ) {
             : [];
 
         my @choices = (
-            'App::cpm',
             'Code::TidyAll::Plugin::SortLines::Naturally',
             'Code::TidyAll::Plugin::UniqueLines',
             'Perl::Tidy',
@@ -189,6 +188,10 @@ if ( $config->{perl} ) {
         my $parts = join ' ', map { split ' ' } @$before;
         my @pre_selected = indexes { $parts =~ m{$_} } @choices;
         @before_install = choose( \@choices, { mark => \@pre_selected } );
+
+        unless ( any { $_ =~ m{cpanm} } @{ $before} ) {
+            unshift @{ $before }, 'cpanm --notest App::cpm';
+        }
 
         my @to_add;
         if (@before_install) {
@@ -201,7 +204,9 @@ if ( $config->{perl} ) {
 
             if (@to_add) {
                 push @before,
-                    ( 'AUTHOR_TESTING=0 cpm install --workers $(test-jobs) --global ' . join ' ', @to_add );
+                    (
+                    'AUTHOR_TESTING=0 cpm install --workers $(test-jobs) --global '
+                        . join ' ', @to_add );
                 $config->{before_install} = \@before;
             }
         }
@@ -217,10 +222,16 @@ if ( $config->{perl} ) {
             ? $config->{install}
             : [];
 
-        my $cpm = 'AUTHOR_TESTING=0 cpm install --cpanfile cpanfile --workers $(test-jobs) --global';
+        my $cover
+            = 'cpan-install --coverage   # installs coverage prereqs, if enabled';
+        my $cpm
+            = 'AUTHOR_TESTING=0 cpm install --cpanfile cpanfile --workers $(test-jobs) --global --with-recommends --with-suggests --with-configure --with-develop';
 
         unless ( any { $_ =~ m{cpm install} } @{ $config->{install} } ) {
             unshift @{ $config->{install} }, $cpm;
+        }
+        unless ( any { $_ =~ m{cover} } @{ $config->{install} } ) {
+            unshift @{ $config->{install} }, $cover;
         }
     }
 }
@@ -228,11 +239,11 @@ if ( $config->{perl} ) {
 {
     no autovivification;
     if ( $is_perl && $perl_helpers ) {
-        if ( exists $config->{script} && !ref($config->{script}) ) {
-            $config->{script} = [$config->{script}];
+        if ( exists $config->{script} && !ref( $config->{script} ) ) {
+            $config->{script} = [ $config->{script} ];
         }
         if (
-            ! exists $config->{script}
+            !exists $config->{script}
             || (
                 exists $config->{script} && none { $_ =~ m{j} }
                 @{ $config->{script} }
