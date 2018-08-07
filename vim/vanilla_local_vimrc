@@ -1,5 +1,4 @@
 let g:ale_perl_perl_options = '-c -Mwarnings -Ilib -It/lib'
-let g:ale_perl_syntax_check_options = '-Ilib -It/lib'
 
 let g:ale_perl_syntax_check_options = '-Mlazy -Ilib -It/lib'
 let g:ale_perl_syntax_check_executable = 'perl'
