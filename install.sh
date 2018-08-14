@@ -67,7 +67,13 @@ ln -sf $SELF_PATH/vim/vimrc ~/.vimrc
 mkdir -p ~/.vim
 ln -sf $LINK_FLAG $SELF_PATH/vim/after ~/.vim/after
 
-if [ -f /usr/local/bin/mm-perl ]
+IS_MM=false
+if [ -e /usr/local/bin/mm-perl ]
+then
+    IS_MM=true
+fi
+
+if [ $IS_MM  = true]
 then
     ln -sf ~/mm-dot-files/maxmind_local_vimrc ~/.local_vimrc
 else
@@ -108,5 +114,11 @@ then
     echo "Skip vim plug install.  Is this run via ansible?"
 else
     vim -c ':PlugInstall'
+
+  if [ $IS_MM = true ]
+  then
+    sudo npm install --global fkill-cli
+  else
     npm install --global fkill-cli
+  fi
 fi
