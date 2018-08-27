@@ -223,6 +223,11 @@ let g:ale_perl_syntax_check_config = expand('~/dot-files/syntax-check-perl/confi
 autocmd FileType go nmap <leader>t  <Plug>(go-test)
 autocmd FileType go nmap <leader>b  <Plug>(go-build)
 
+" ########### All file Types ###########
+"
+" Exec current file
+nnoremap <Leader>e <Esc>:!"%:p"<CR>
+
 " ########### Perl ###########
 "
 " Run prove on current file
