@@ -56,6 +56,7 @@ ln -sf $SELF_PATH/proverc ~/.proverc
 ln -sf $SELF_PATH/psqlrc ~/.psqlrc
 ln -sf $SELF_PATH/re.pl/repl.rc ~/.re.pl/repl.rc
 ln -sf $SELF_PATH/screenrc ~/.screenrc
+ln -sf $SELF_PATH/ssh/config ~/.ssh/config
 ln -sf $SELF_PATH/ssh/rc ~/.ssh/rc
 ln -sf $LINK_FLAG $SELF_PATH/sqitch ~/.sqitch
 ln -sf $SELF_PATH/tmux.conf ~/.tmux.conf

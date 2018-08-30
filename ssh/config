@@ -1,0 +1,3 @@
+VisualHostKey=yes
+
+Include ~/.ssh/config.d/*
