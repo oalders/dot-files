@@ -73,7 +73,7 @@ then
     IS_MM=true
 fi
 
-if [ $IS_MM  = true]
+if [ $IS_MM = true ]
 then
     ln -sf ~/mm-dot-files/maxmind_local_vimrc ~/.local_vimrc
 else
