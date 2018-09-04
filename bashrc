@@ -7,6 +7,8 @@ elif [[ "$unamestr" == 'Darwin' ]]; then
    platform='osx'
 fi
 
+export X_PLATFORM=$platform
+
 export EDITOR=vim
 # http://superuser.com/questions/39751/add-directory-to-path-if-its-not-already-there
 pathadd() {
