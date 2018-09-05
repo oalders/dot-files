@@ -44,6 +44,7 @@ git config --global alias.prom 'pull --rebase origin master'
 git config --global alias.pf 'push --force-with-lease'
 git config --global alias.pt 'push --tags'
 git config --global alias.rc "rebase --continue"
+git config --global alias.rgrep "grep --recurse-submodules"
 git config --global alias.root "rev-parse --show-toplevel"
 git config --global alias.st 'status'
 git config --global alias.stu 'status --untracked-files=no'
