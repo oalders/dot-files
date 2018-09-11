@@ -37,7 +37,7 @@ echo $SELF_PATH
 mkdir -p ~/.cpanreporter
 mkdir -p ~/.re.pl
 mkdir -p ~/.vagrant.d
-mkdir ~/.ssh/sockets
+mkdir -p ~/.ssh/sockets
 
 ln -sf $SELF_PATH/ackrc ~/.ackrc
 ln -sf $SELF_PATH/bashrc ~/.bashrc
