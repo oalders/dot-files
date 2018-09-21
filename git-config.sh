@@ -45,6 +45,13 @@ git config --global alias.pf 'push --force-with-lease'
 git config --global alias.pt 'push --tags'
 git config --global alias.rc "rebase --continue"
 git config --global alias.rgrep "grep --recurse-submodules"
+
+# Revert the changes introduced by a single file in a single commit
+# Invoke as "git revert-file-in-commit path/to/file commit"
+# which translates to:
+# git show dedca812826 -- path/to/file | git apply -R
+git config --global alias.revert-file-in-commit '!f() { git show $2 -- $1 | git apply -R;}; f'
+
 git config --global alias.root "rev-parse --show-toplevel"
 git config --global alias.st 'status'
 git config --global alias.stu 'status --untracked-files=no'
