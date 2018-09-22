@@ -5,6 +5,6 @@ Host *
 ControlMaster auto
 ControlPath  ~/.ssh/sockets/%r@%h-%p
 ControlPersist 600
-PreferredAuthentications=publickey
+PreferredAuthentications=publickey,password
 
 Include ~/.ssh/config.d/*
