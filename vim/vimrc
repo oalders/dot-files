@@ -267,7 +267,7 @@ let g:ale_type_map = {
 
 autocmd BufReadPost *.pl   set keywordprg=perldoc\ -f
 
-map ,mmi o__PACKAGE__->meta->make_immutable;<ESC>
+map ,mmi o__PACKAGE__->meta->make_immutable;<CR>1;<ESC>
 map ,ddp ouse DDP;<CR>p( );<ESC>
 map ,perl :set paste<CR>O#!/usr/bin/env perl;<CR><CR>use strict;<CR>use warnings;<CR>use feature qw( say );<CR><ESC>
 map ,moose Opackage Foo::Bar;<CR><CR>use Moose;<CR><CR>use MooseX::StrictConstructor;<CR><CR>__PACKAGE__->meta->make_immutable;<CR>1;<ESC>
