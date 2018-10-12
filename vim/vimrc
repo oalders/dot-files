@@ -339,5 +339,3 @@ vnoremap uu :s/\%V\-/_/g<cr>
 
 " Change underscores to hyphens
 vnoremap hh :s/\%V_/-/g<cr>
-
-set clipboard=unnamed
