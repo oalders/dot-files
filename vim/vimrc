@@ -331,6 +331,8 @@ fun HideLines()
     :set colorcolumn=
 endfun
 
+nnoremap <leader>xx :call setfperm(expand('%'),"rwxrw-rw-")<cr>
+
 " Try to install missing Perl modules
 nnoremap <leader>l :!perl -Mlazy -c %:p
 
