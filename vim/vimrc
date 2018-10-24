@@ -198,6 +198,19 @@ let g:airline#extensions#ale#enabled = 1
 nmap <silent> <C-k> <Plug>(ale_previous_wrap)
 nmap <silent> <C-j> <Plug>(ale_next_wrap)
 
+" gometalinter currently not enabled
+let g:ale_linters = {'go': ['gofmt', 'golint', 'go vet'], 'perl': ['syntax-check', 'perlcritic'] }
+
+let g:ale_type_map = {
+\    'perlcritic': {'ES': 'WS', 'E': 'W'},
+\}
+
+" https://github.com/skaji/syntax-check-perl#integrate-with-vim-plug-and-ale
+let g:ale_perl_syntax_check_config = expand('~/dot-files/syntax-check-perl/config.pl')
+
+" show Perl::Critic rules which have been violated
+let g:ale_perl_perlcritic_showrules = 1
+
 " ########### Golang ###########
 " Hide tabs and show numbers for Go files
 autocmd FileType go setlocal nolist
@@ -214,12 +227,6 @@ let g:go_highlight_methods = 1
 let g:go_highlight_operators = 1
 let g:go_highlight_types = 1
 let g:go_fmt_fail_silently = 1 " Ale handles this already
-
-" gometalinter currently not enabled
-let g:ale_linters = {'go': ['gofmt', 'golint', 'go vet'], 'perl': ['syntax-check', 'perlcritic'] }
-
-" https://github.com/skaji/syntax-check-perl#integrate-with-vim-plug-and-ale
-let g:ale_perl_syntax_check_config = expand('~/dot-files/syntax-check-perl/config.pl')
 
 autocmd FileType go nmap <leader>t  <Plug>(go-test)
 autocmd FileType go nmap <leader>b  <Plug>(go-build)
@@ -261,13 +268,6 @@ au Filetype perl vnoremap <silent> = :!perltidy -q<CR>
 
 "shortcut for normal mode to run on entire buffer then return to current line"
 au Filetype perl nnoremap = :call DoPerlTidy()<CR>
-
-" show Perl::Critic rules which have been violated
-let g:ale_perl_perlcritic_showrules = 1
-
-let g:ale_type_map = {
-\    'perlcritic': {'ES': 'WS', 'E': 'W'},
-\}
 
 autocmd BufReadPost *.pl   set keywordprg=perldoc\ -f
 
