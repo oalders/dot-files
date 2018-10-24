@@ -19,6 +19,7 @@ Plug 'henrik/vim-indexed-search'
 Plug 'jreybert/vimagit'
 Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
 Plug 'junegunn/fzf.vim'
+Plug 'junegunn/rainbow_parentheses.vim'
 Plug 'junegunn/vader.vim'
 Plug 'lukhio/vim-mapping-conflicts'
 Plug 'mbra/prettysql' " ,fs to format visually selected SQL
@@ -234,6 +235,9 @@ nnoremap <Leader>p <Esc>:!prove -It/lib -lv %<CR>
 
 " show matching brackets
 autocmd FileType perl set showmatch
+
+" show matching brackets
+autocmd FileType perl RainbowParentheses
 
 " show line numbers
 autocmd FileType perl set number
