@@ -335,7 +335,7 @@ nnoremap <leader>xx :call setfperm(expand('%'),"rwxrw-rw-")<cr>
 nnoremap <leader>l :!perl -Mlazy -c %:p
 
 " Change hyphens to underscores
-vnoremap uu :s/\%V\-/_/g<cr>
+vnoremap <silent> uu :s/\%V\-/_/g<cr>
 
 " Change underscores to hyphens
-vnoremap hh :s/\%V_/-/g<cr>
+vnoremap <silent> hh :s/\%V_/-/g<cr>
