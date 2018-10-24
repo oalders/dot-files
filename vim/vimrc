@@ -199,7 +199,15 @@ nmap <silent> <C-k> <Plug>(ale_previous_wrap)
 nmap <silent> <C-j> <Plug>(ale_next_wrap)
 
 " gometalinter currently not enabled
-let g:ale_linters = {'go': ['gofmt', 'golint', 'go vet'], 'perl': ['syntax-check', 'perlcritic'] }
+let g:ale_linters = {
+\   'go': ['gofmt', 'golint', 'go vet'],
+\   'perl': ['syntax-check', 'perlcritic'],
+\}
+
+let g:ale_fixers = {
+\   '*': ['remove_trailing_lines', 'trim_whitespace',],
+\   'sh': ['shfmt'],
+\}
 
 let g:ale_type_map = {
 \    'perlcritic': {'ES': 'WS', 'E': 'W'},
