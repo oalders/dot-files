@@ -5,19 +5,22 @@ set -eu -o pipefail
 skip_vim_plugin_install=false
 
 # https://stackoverflow.com/questions/16483119/example-of-how-to-use-getopts-in-bash
-usage() { echo "Usage: $0 [-s] " 1>&2; exit 1; }
+usage() {
+    echo "Usage: $0 [-s] " 1>&2
+    exit 1
+}
 
 while getopts ":s" o; do
     case "${o}" in
-        s)
-            skip_vim_plugin_install=true
-            ;;
-        *)
-            usage
-            ;;
+    s)
+        skip_vim_plugin_install=true
+        ;;
+    *)
+        usage
+        ;;
     esac
 done
-shift $((OPTIND-1))
+shift $((OPTIND - 1))
 
 SELF_PATH=$(cd -P -- "$(dirname -- "$0")" && pwd -P)
 
@@ -43,7 +46,7 @@ ln -sf $SELF_PATH/ackrc ~/.ackrc
 ln -sf $SELF_PATH/bashrc ~/.bashrc
 ln -sf $SELF_PATH/bash_profile ~/.bash_profile
 ln -sf $SELF_PATH/cpanreporter/config.ini ~/.cpanreporter/config.ini
-cp     $SELF_PATH/dataprinter ~/.dataprinter # Data::Printer doesn't like symlinks
+cp $SELF_PATH/dataprinter ~/.dataprinter # Data::Printer doesn't like symlinks
 chmod 700 ~/.dataprinter
 
 ln -sf $SELF_PATH/digrc ~/.digrc
@@ -69,13 +72,11 @@ mkdir -p ~/.vim
 ln -sf $LINK_FLAG $SELF_PATH/vim/after ~/.vim/after
 
 IS_MM=false
-if [ -e /usr/local/bin/mm-perl ]
-then
+if [ -e /usr/local/bin/mm-perl ]; then
     IS_MM=true
 fi
 
-if [ $IS_MM = true ]
-then
+if [ $IS_MM = true ]; then
     ln -sf ~/mm-dot-files/maxmind_local_vimrc ~/.local_vimrc
 else
     ln -sf $SELF_PATH/vim/vanilla_local_vimrc ~/.local_vimrc
@@ -96,8 +97,7 @@ touch $HOME/perl5/perlbrew/etc/bashrc
 ./install-fpp.sh
 
 LOCALCHECKOUT=~/.tmux/plugins/tpm
-if [ ! -d $LOCALCHECKOUT ]
-then
+if [ ! -d $LOCALCHECKOUT ]; then
     git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
 else
     pushd $LOCALCHECKOUT
@@ -111,16 +111,14 @@ curl -fLo ~/.vim/autoload/plug.vim --create-dirs \
 
 rm -rf ~/.vim/Trashed-Bundles ~/.vim/bundle
 
-if [ "$skip_vim_plugin_install" = true ]
-then
+if [ "$skip_vim_plugin_install" = true ]; then
     echo "Skip vim plug install.  Is this run via ansible?"
 else
     vim -c ':PlugInstall'
 
-  if [ $IS_MM = true ]
-  then
-    sudo npm install --global fkill-cli
-  else
-    npm install --global fkill-cli
-  fi
+    if [ $IS_MM = true ]; then
+        sudo npm install --global fkill-cli
+    else
+        npm install --global fkill-cli
+    fi
 fi
