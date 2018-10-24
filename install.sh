@@ -90,6 +90,11 @@ git submodule update
 
 #go get github.com/github/hub
 
+if [ -n "${GOPATH+set}" ]; then
+    echo "Installing shfmt"
+    go get -u mvdan.cc/sh/cmd/shfmt
+fi
+
 # silence warnings when perlbrew not installed
 mkdir -p $HOME/perl5/perlbrew/etc
 touch $HOME/perl5/perlbrew/etc/bashrc
