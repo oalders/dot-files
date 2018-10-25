@@ -71,6 +71,11 @@ ln -sf $SELF_PATH/vim/vimrc ~/.vimrc
 mkdir -p ~/.vim
 ln -sf $LINK_FLAG $SELF_PATH/vim/after ~/.vim/after
 
+git submodule init
+git submodule update
+
+./git-config.sh
+
 IS_MM=false
 if [ -e /usr/local/bin/mm-perl ]; then
     IS_MM=true
@@ -83,11 +88,6 @@ else
     ln -sf $SELF_PATH/vim/vanilla_local_vimrc ~/.local_vimrc
     ln -sf $SELF_PATH/ssh/config ~/.ssh/config
 fi
-
-git submodule init
-git submodule update
-
-./git-config.sh
 
 #go get github.com/github/hub
 
