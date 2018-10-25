@@ -7,7 +7,7 @@ echo "git config"
 git config --global user.email "olaf@wundersolutions.com"
 git config --global user.name "Olaf Alders"
 
-git config --global --add remote.origin.fetch "+refs/pull/*/head:refs/remotes/origin/pr/*"
+git config --global --replace remote.origin.fetch "+refs/pull/*/head:refs/remotes/origin/pr/*"
 git config --global branch.autosetuprebase always
 git config --global color.ui "auto"
 git config --global diff.algorithm histogram
