@@ -78,6 +78,7 @@ fi
 
 if [ $IS_MM = true ]; then
     ln -sf ~/mm-dot-files/maxmind_local_vimrc ~/.local_vimrc
+    git config --global --unset-all remote.origin.fetch
 else
     ln -sf $SELF_PATH/vim/vanilla_local_vimrc ~/.local_vimrc
     ln -sf $SELF_PATH/ssh/config ~/.ssh/config
