@@ -111,6 +111,15 @@ else
     popd
 fi
 
+NODE_MODULES='bash-language-server fkill-cli jsonlint prettier'
+
+if [ $IS_MM = true ]; then
+    sudo npm install --global $NODE_MODULES
+
+else
+    npm install --global $NODE_MODULES
+fi
+
 # vim
 curl -fLo ~/.vim/autoload/plug.vim --create-dirs \
     https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
@@ -121,10 +130,4 @@ if [ "$skip_vim_plugin_install" = true ]; then
     echo "Skip vim plug install.  Is this run via ansible?"
 else
     vim -c ':PlugInstall'
-
-    if [ $IS_MM = true ]; then
-        sudo npm install --global fkill-cli
-    else
-        npm install --global fkill-cli
-    fi
 fi
