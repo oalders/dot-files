@@ -111,7 +111,7 @@ else
     popd
 fi
 
-NODE_MODULES='bash-language-server fkill-cli jsonlint prettier'
+NODE_MODULES='bash-language-server eslint fkill-cli jsonlint prettier'
 
 if [ $IS_MM = true ]; then
     sudo npm install --global $NODE_MODULES
