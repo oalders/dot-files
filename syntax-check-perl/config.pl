@@ -4,7 +4,13 @@ use warnings;
 my $filename = $ENV{PERL_SYNTAX_CHECK_FILENAME} || "";
 
 # must return a hash that represents configuration for syntax_check
-my $config = {};
+my $config = {
+    compile => {
+        inc        => { libs => [ 'lib', 't/lib' ], replace_libs => 1, },
+        use_module => ['lazy'],
+    },
+};
+return $config;
 
 __END__
 =head1 CONFIGURATION EXAMPLE
