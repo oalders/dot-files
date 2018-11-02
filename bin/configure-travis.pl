@@ -192,8 +192,8 @@ if ( $config->{perl} ) {
         my @pre_selected = indexes { $parts =~ m{$_} } @choices;
         @before_install = choose( \@choices, { mark => \@pre_selected } );
 
-        unless ( any { $_ =~ m{cpanm} } @{ $before} ) {
-            unshift @{ $before }, 'cpanm --notest App::cpm';
+        unless ( any { $_ =~ m{cpanm} } @{$before} ) {
+            unshift @{$before}, 'cpanm --notest App::cpm';
         }
 
         my @to_add;
