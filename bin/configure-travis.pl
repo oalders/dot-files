@@ -26,6 +26,7 @@ my @perl_versions = qw(
     5.22
     5.24
     5.26
+    5.28
 );
 
 unless ( exists $config->{cache}->{directories} ) {
