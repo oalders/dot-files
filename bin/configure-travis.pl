@@ -157,6 +157,8 @@ if ( $config->{perl} ) {
             }
         }
     }
+    push @allowed, { env => 'COVERAGE=1' }
+        unless list_contains_hash( \@allowed, { env => 'COVERAGE=1' } );
     $config->{matrix}{allow_failures} = \@allowed if @allowed;
 }
 
