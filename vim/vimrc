@@ -24,14 +24,14 @@ Plug 'junegunn/vader.vim'
 Plug 'lukhio/vim-mapping-conflicts'
 Plug 'mannih/vim-perl-variable-highlighter'
 Plug 'mbra/prettysql' " ,fs to format visually selected SQL
-Plug 'oalders/syntax-check-perl',  { 'branch': 'executable-and-options' }
+"Plug 'oalders/syntax-check-perl',  { 'branch': 'executable-and-options' }
 Plug 'qstrahl/vim-matchmaker'
 Plug 'rodjek/vim-puppet'
 Plug 'rsrchboy/mojo.vim'
 Plug 'ryanpcmcquen/fix-vim-pasting'
 Plug 'scrooloose/nerdcommenter'
 Plug 'sheerun/vim-polyglot'
-"Plug 'skaji/syntax-check-perl'
+Plug 'skaji/syntax-check-perl'
 "Plug 'SirVer/ultisnips'
 Plug 'tpope/vim-abolish'
 Plug 'tpope/vim-fugitive'
