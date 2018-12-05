@@ -40,6 +40,7 @@ echo $SELF_PATH
 mkdir -p ~/.cpanreporter
 mkdir -p ~/.re.pl
 mkdir -p ~/.vagrant.d
+mkdir -p ~/.npm-packages
 mkdir -p ~/.ssh/sockets
 
 ln -sf $SELF_PATH/ackrc ~/.ackrc
@@ -53,6 +54,7 @@ ln -sf $SELF_PATH/digrc ~/.digrc
 ln -sf $LINK_FLAG $SELF_PATH/dzil ~/.dzil
 ln -sf $SELF_PATH/gitignore_global ~/.gitignore_global
 ln -sf $SELF_PATH/minicpanrc ~/.minicpanrc
+ln -sf $SELF_PATH/npmrc ~/.npmrc
 ln -sf $SELF_PATH/perlcriticrc ~/.perlcriticrc
 ln -sf $SELF_PATH/perltidyrc ~/.perltidyrc
 ln -sf $SELF_PATH/profile ~/.profile
@@ -113,12 +115,7 @@ fi
 
 NODE_MODULES='bash-language-server eslint fkill-cli jsonlint prettier'
 
-if [ $IS_MM = true ]; then
-    sudo npm install --global $NODE_MODULES
-
-else
-    npm install --global $NODE_MODULES || true
-fi
+npm install --global $NODE_MODULES
 
 # vim
 curl -fLo ~/.vim/autoload/plug.vim --create-dirs \
