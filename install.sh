@@ -117,7 +117,7 @@ if [ $IS_MM = true ]; then
     sudo npm install --global $NODE_MODULES
 
 else
-    npm install --global $NODE_MODULES
+    npm install --global $NODE_MODULES || true
 fi
 
 # vim
