@@ -91,7 +91,7 @@ fi
 
 #go get github.com/github/hub
 
-if [ -n "${GOPATH+set}" ]; then
+if [ -n "${GOPATH+set}" ] && [$(type "go" > /dev/null) ]; then
     echo "Installing shfmt"
     go get -u mvdan.cc/sh/cmd/shfmt
 fi
