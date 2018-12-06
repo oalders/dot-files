@@ -42,6 +42,8 @@ Plug 'w0rp/ale'
 "Plug 'yko/mojo.vim'
 Plug 'tpope/vim-sensible'
 
+source ~/.local_vimrc
+
 " Initialize plugin system
 call plug#end()
 
@@ -355,5 +357,3 @@ vnoremap <silent> uu :s/\%V\-/_/g<cr>
 
 " Change underscores to hyphens
 vnoremap <silent> hh :s/\%V_/-/g<cr>
-
-source ~/.local_vimrc
