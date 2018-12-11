@@ -2,12 +2,6 @@
 ###################
 # it's better to store source and build these, or use submodules
 # or subtrees
-*.com
-*.class
-*.dll
-*.exe
-*.o
-*.so
 *.pyc
 *.pyo
 
@@ -17,7 +11,6 @@
 # git has its own built in compression methods
 *.7z
 *.dmg
-#*.gz
 *.iso
 *.jar
 *.rar
