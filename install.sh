@@ -128,3 +128,6 @@ if [ "$skip_vim_plugin_install" = true ]; then
 else
     vim -c ':PlugInstall'
 fi
+
+cpanm install App::cpm
+cpm install -g Open::This
