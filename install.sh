@@ -131,3 +131,4 @@ fi
 
 cpanm install App::cpm
 cpm install -g Open::This
+cpm install -g --cpanfile cpan/development.cpanfile
