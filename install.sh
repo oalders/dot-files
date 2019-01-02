@@ -129,5 +129,5 @@ else
     vim -c ':PlugInstall'
 fi
 
-cpanm install App::cpm
+cpanm App::cpm
 cpm install -g --cpanfile cpan/development.cpanfile
