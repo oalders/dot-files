@@ -281,6 +281,7 @@ export LANG=en_US.UTF-8
 source ~/dot-files/inc/finna-be-octo-hipster/iterm2_helpers.sh
 
 export GOPATH=~/go
+export GO111MODULE=on
 if [ -d $GOPATH ] ; then
     export PATH="$GOPATH/bin:$PATH"
 fi
