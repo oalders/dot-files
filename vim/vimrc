@@ -204,6 +204,7 @@ let g:ale_linters = {
 \   'sh': ['language-server'],
 \   'go': ['gofmt', 'golint', 'go vet'],
 \   'perl': ['syntax-check', 'perlcritic'],
+\   'yaml': ['yamllint'],
 \}
 
 let g:ale_fixers = {
@@ -211,6 +212,7 @@ let g:ale_fixers = {
 \   'javascript': ['eslint'],
 \   'json': ['prettier'],
 \   'sh': ['shfmt'],
+\   'yaml': ['prettier'],
 \}
 
 let g:ale_type_map = {
