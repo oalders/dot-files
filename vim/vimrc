@@ -248,7 +248,13 @@ autocmd FileType go nmap <leader>b  <Plug>(go-build)
 " ########### All file Types ###########
 "
 " Exec current file
-nnoremap <Leader>e <Esc>:!"%:p"<CR>
+nnoremap <Leader>e <Esc>:call ExecFile()<CR>
+
+fun ExecFile()
+    ":call setfperm(expand("%"), "rwxr-xr-x")
+    :silent !chmod u+x %
+    :!"%:p"
+endfun
 
 " ########### Perl ###########
 "
