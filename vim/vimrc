@@ -211,6 +211,7 @@ let g:ale_fixers = {
 \   '*': ['remove_trailing_lines', 'trim_whitespace',],
 \   'javascript': ['eslint'],
 \   'json': ['prettier'],
+\   'perl': ['perltidy'],
 \   'sh': ['shfmt'],
 \   'yaml': ['prettier'],
 \}
