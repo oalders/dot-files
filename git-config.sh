@@ -19,7 +19,7 @@ git config --global rebase.autosquash true
 git config --global rerere.enabled 1
 
 git config --global branch.autosetuprebase always
-git config --global alias.b  'branch'
+git config --global alias.b 'branch'
 git config --global alias.ba 'branch -a'
 git config --global alias.ca 'commit --amend'
 git config --global alias.can 'commit --amend --no-edit'
@@ -69,8 +69,7 @@ git config --global alias.whatis "show -s --pretty='tformat:%h (%s, %ad)' --date
 # for Facebook Path Picker (fpp)
 git config --global grep.lineNumber true
 
-if [ -d '/Applications/Meld.app' ]
-then
+if [ -d '/Applications/Meld.app' ]; then
     echo "Setting Meld as mergetool"
     git config --global diff.tool 'meld'
     git config --global difftool.prompt false

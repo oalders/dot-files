@@ -1,10 +1,10 @@
 # http://stackoverflow.com/questions/394230/detect-the-os-from-a-bash-script
 platform='unknown'
-unamestr=`uname`
+unamestr=$(uname)
 if [[ "$unamestr" == 'Linux' ]]; then
-   platform='linux'
+    platform='linux'
 elif [[ "$unamestr" == 'Darwin' ]]; then
-   platform='osx'
+    platform='osx'
 fi
 
 export X_PLATFORM=$platform
@@ -94,11 +94,11 @@ alias o2d="perl -e 'printf qq|%d\n|, oct( shift )'"
 alias o2h="perl -e 'printf qq|%X\n|, oct( shift )'"
 
 # python scripts via pip install --user
-pathadd "$HOME/Library/Python/2.7/bin";
-pathadd "$HOME/.local/bin";
+pathadd "$HOME/Library/Python/2.7/bin"
+pathadd "$HOME/.local/bin"
 
-pathadd "/usr/local/sbin";
-pathadd "$HOME/local/bin";
+pathadd "/usr/local/sbin"
+pathadd "$HOME/local/bin"
 
 LOCALPERLBIN=~/perl5/bin
 
@@ -107,55 +107,55 @@ if [[ ! -d ~/.plenv && -d $LOCALPERLBIN ]]; then
     # adds $HOME/perl5/bin to PATH
     [ $SHLVL -eq 1 ] && eval "$(perl -I$HOME/perl5/lib/perl5 -Mlocal::lib)"
 
-    if [ -d $LOCALPERBIN ] ; then
+    if [ -d $LOCALPERBIN ]; then
         export PATH="$LOCALPERLBIN:$PATH"
     fi
 fi
 
-function whosonport {
-    sudo lsof -i :$1;
+function whosonport() {
+    sudo lsof -i :$1
 }
 
-function check_compression {
-      curl -I -H 'Accept-Encoding: gzip,deflate' $1 | grep "Content-Encoding"
+function check_compression() {
+    curl -I -H 'Accept-Encoding: gzip,deflate' $1 | grep "Content-Encoding"
 }
 
-function trace_process {
+function trace_process() {
     sudo lsof -p $1 && sudo strace -fp $1
 }
 
-function git-recover-file {
+function git-recover-file() {
     git checkout $(git rev-list -n 1 HEAD -- "$1")^ -- "$1"
 }
 
-function md () {
+function md() {
     pandoc $1 | lynx -stdin
 }
 
 if [ -f /etc/bash_completion.d/git ]; then
     source /etc/bash_completion.d/git
 elif [ -f /usr/local/bin/brew ]; then
-    if [ -f `brew --prefix`/etc/bash_completion ]; then
-        . `brew --prefix`/etc/bash_completion
+    if [ -f $(brew --prefix)/etc/bash_completion ]; then
+        . $(brew --prefix)/etc/bash_completion
     fi
 fi
 
-if ! type "ack" > /dev/null  2>&1; then
-    if type 'ack-grep' > /dev/null 2>&1; then
+if ! type "ack" >/dev/null 2>&1; then
+    if type 'ack-grep' >/dev/null 2>&1; then
         alias ack='ack-grep'
     fi
 fi
-function gi() { curl http://gitignore.io/api/$@ ;}
+function gi() { curl http://gitignore.io/api/$@; }
 
 # gh = git home
 # brings you to the top level of the git repo you are currently in
 # http://stackoverflow.com/questions/957928/is-there-a-way-to-get-the-git-root-directory-in-one-command
 function gh() { cd "$(git rev-parse --show-toplevel)"; }
 
-function youtube-mp3 { youtube-download $1 && ffmpeg -i $1.mp4 $1.mp3; }
+function youtube-mp3() { youtube-download $1 && ffmpeg -i $1.mp4 $1.mp3; }
 
-function wwwman {
-  perl -we 'use URI::Escape;$cmd=shift;$args = uri_escape(join q[  ],@ARGV);
+function wwwman() {
+    perl -we 'use URI::Escape;$cmd=shift;$args = uri_escape(join q[  ],@ARGV);
            exec open => qq!http://explainshell.com/explain/$cmd?args=$args!' $@
 }
 
@@ -163,41 +163,41 @@ function wwwman {
 function tmux() {
     local tmux=$(type -fp tmux)
     case "$1" in
-        update-environment|update-env|ue)
-            local v
-            while read v; do
-                if [[ $v == -* ]]; then
-                    unset ${v/#-/}
-                else
-                    # Add quotes around the argument
-                    v=${v/=/=\"}
-                    v=${v/%/\"}
-                    eval export $v
-                fi
-            done < <(tmux show-environment)
-            ;;
-        # https://gist.github.com/marczych/10524654
-        ns)
-            INSIDE_GIT_REPO="$(git rev-parse --is-inside-work-tree 2>/dev/null)"
-
-            if [ $INSIDE_GIT_REPO ]; then
-                BRANCH=$(git rev-parse --abbrev-ref HEAD)
-                CURRENT_DIR=${PWD##*/}
-
-                SESSION_NAME="$CURRENT_DIR ⚡ $BRANCH"
+    update-environment | update-env | ue)
+        local v
+        while read v; do
+            if [[ $v == -* ]]; then
+                unset ${v/#-/}
             else
-               SESSION_NAME=$(pwd)
-               STRIP="$HOME/"
-               SESSION_NAME=${SESSION_NAME/$STRIP}
+                # Add quotes around the argument
+                v=${v/=/=\"}
+                v=${v/%/\"}
+                eval export $v
             fi
+        done < <(tmux show-environment)
+        ;;
+    # https://gist.github.com/marczych/10524654
+    ns)
+        INSIDE_GIT_REPO="$(git rev-parse --is-inside-work-tree 2>/dev/null)"
 
-            # A "." will produce a "bad session name" error
-            SESSION_NAME=${SESSION_NAME//./-}
-            tmux rename-session "$SESSION_NAME"
-            ;;
-        *)
-            $tmux "$@"
-            ;;
+        if [ $INSIDE_GIT_REPO ]; then
+            BRANCH=$(git rev-parse --abbrev-ref HEAD)
+            CURRENT_DIR=${PWD##*/}
+
+            SESSION_NAME="$CURRENT_DIR ⚡ $BRANCH"
+        else
+            SESSION_NAME=$(pwd)
+            STRIP="$HOME/"
+            SESSION_NAME=${SESSION_NAME/$STRIP/}
+        fi
+
+        # A "." will produce a "bad session name" error
+        SESSION_NAME=${SESSION_NAME//./-}
+        tmux rename-session "$SESSION_NAME"
+        ;;
+    *)
+        $tmux "$@"
+        ;;
     esac
 }
 
@@ -212,7 +212,7 @@ function vi() {
         return 1
     fi
 
-    string=$(sed 's/::/\//g;' <<< $1)
+    string=$(sed 's/::/\//g;' <<<$1)
     string="lib/$string.pm"
     if [[ ! -e $string ]]; then
         string="t/$string"
@@ -234,20 +234,20 @@ function fpp() {
     # fpp --redo -2 will re-exec the second last line in the history file
     # fpp --redo 11 will re-exec entry number 11 in the history file
     case "$1" in
-        --history)
+    --history)
         cat -n $HISTORY_FILE
         return 1
         ;;
-        --redo)
-        if [ $2 ] ; then
-            if [ $2 \> 0 ] ; then
-                LAST_HISTORY_LINE=$(head -n $2 $HISTORY_FILE |tail -n 1)
+    --redo)
+        if [ $2 ]; then
+            if [ $2 \> 0 ]; then
+                LAST_HISTORY_LINE=$(head -n $2 $HISTORY_FILE | tail -n 1)
             else
-                LINE_NUMBER=$(( $2 * -1))
+                LINE_NUMBER=$(($2 * -1))
                 LAST_HISTORY_LINE=$(tail -n $LINE_NUMBER $HISTORY_FILE | head -n 1)
             fi
         else
-            LAST_HISTORY_LINE=$(tail -n 1 $HISTORY_FILE )
+            LAST_HISTORY_LINE=$(tail -n 1 $HISTORY_FILE)
         fi
 
         eval $LAST_HISTORY_LINE
@@ -262,16 +262,16 @@ function fpp() {
     # Don't keep adding the same command to the history file.
     # Also, don't log a message about a no-op.
 
-    if [[ ("$LAST_COMMAND" != '') && ("$LAST_COMMAND" != "$LAST_HISTORY_LINE") ]] ; then
-        echo $LAST_COMMAND >> $HISTORY_FILE
+    if [[ ("$LAST_COMMAND" != '') && ("$LAST_COMMAND" != "$LAST_HISTORY_LINE") ]]; then
+        echo $LAST_COMMAND >>$HISTORY_FILE
     fi
 }
 
 # http://www.somethingorothersoft.com/2012/05/22/pulling-github-pull-requests-with-git/
 # fetch-pull-request origin 1234
-fetch-pull-request () {
-    git fetch $1 refs/pull/$2/head:refs/remotes/pr/$2;
-    git co -b pr/$2 pr/$2;
+fetch-pull-request() {
+    git fetch $1 refs/pull/$2/head:refs/remotes/pr/$2
+    git co -b pr/$2 pr/$2
 }
 source ~/dot-files/inc/oh-my-git/prompt.sh
 
@@ -282,10 +282,9 @@ source ~/dot-files/inc/finna-be-octo-hipster/iterm2_helpers.sh
 
 export GOPATH=~/go
 export GO111MODULE=on
-if [ -d $GOPATH ] ; then
+if [ -d $GOPATH ]; then
     export PATH="$GOPATH/bin:$PATH"
 fi
-
 
 if [[ $platform == 'osx' ]]; then
     export PATH="~/dot-files/bin/osx:$PATH"
@@ -293,10 +292,10 @@ fi
 
 # clean up PATH
 # http://linuxg.net/oneliners-for-removing-the-duplicates-in-your-path/
-PATH=`echo -n $PATH | awk -v RS=: -v ORS=: '!arr[$0]++'`
+PATH=$(echo -n $PATH | awk -v RS=: -v ORS=: '!arr[$0]++')
 
 # https://unix.stackexchange.com/questions/19317/can-less-retain-colored-output
-fancydiff () {
+fancydiff() {
     git $1 --color=always $2 | diff-so-fancy | less -R
 }
 
@@ -315,11 +314,11 @@ export MANPATH="$NPM_PACKAGES/share/man:$(manpath)"
 
 # enable bash completion in interactive shells
 if ! shopt -oq posix; then
-  if [ -f /usr/share/bash-completion/bash_completion ]; then
-    . /usr/share/bash-completion/bash_completion
-  elif [ -f /etc/bash_completion ]; then
-    . /etc/bash_completion
-  fi
+    if [ -f /usr/share/bash-completion/bash_completion ]; then
+        . /usr/share/bash-completion/bash_completion
+    elif [ -f /etc/bash_completion ]; then
+        . /etc/bash_completion
+    fi
 fi
 
 # If this happens *before* bash completion setup then command line tab
