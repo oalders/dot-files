@@ -300,8 +300,6 @@ fancydiff () {
     git $1 --color=always $2 | diff-so-fancy | less -R
 }
 
-[ -f ~/.fzf.bash ] && source ~/.fzf.bash
-
 SOCK=~/.ssh/ssh_auth_sock
 if test $SSH_AUTH_SOCK && test $TMUX && [ $SSH_AUTH_SOCK != $SOCK ]; then
     export SSH_AUTH_SOCK=$SOCK
@@ -323,5 +321,9 @@ if ! shopt -oq posix; then
     . /etc/bash_completion
   fi
 fi
+
+# If this happens *before* bash completion setup then command line tab
+# completion via **<TAB> does not work.
+[ -f ~/.fzf.bash ] && source ~/.fzf.bash
 
 include ~/.local_bashrc
