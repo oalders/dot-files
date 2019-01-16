@@ -204,6 +204,7 @@ let g:ale_linters = {
 \   'sh': ['language-server'],
 \   'go': ['gofmt', 'golint', 'go vet'],
 \   'perl': ['syntax-check', 'perlcritic'],
+\   'vim': ['vint'],
 \   'yaml': ['yamllint'],
 \}
 

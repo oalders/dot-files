@@ -116,7 +116,7 @@ fi
 NODE_MODULES='bash-language-server eslint fkill-cli jsonlint prettier'
 
 npm install --global $NODE_MODULES || true
-pip install --user yamllint
+pip install --user vint yamllint
 
 # vim
 curl -fLo ~/.vim/autoload/plug.vim --create-dirs \
