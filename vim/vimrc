@@ -40,6 +40,15 @@ Plug 'tpope/vim-surround'
 Plug 'vim-scripts/vim-json-bundle'
 Plug 'w0rp/ale'
 "Plug 'yko/mojo.vim'
+
+if has('nvim')
+  Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
+else
+  Plug 'Shougo/deoplete.nvim'
+  Plug 'roxma/nvim-yarp'
+  Plug 'roxma/vim-hug-neovim-rpc'
+endif
+
 Plug 'tpope/vim-sensible'
 
 source ~/.local_vimrc
@@ -370,3 +379,6 @@ vnoremap <silent> hh :s/\%V_/-/g<cr>
 
 " maybe this should live in ~/.vim/ftdetect/bash_profile.vim
 au BufRead,BufNewFile bash_profile set filetype=sh
+
+let g:deoplete#enable_at_startup = 1
+let g:deoplete#auto_complete_start_length = 3
