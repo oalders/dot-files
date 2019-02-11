@@ -96,6 +96,9 @@ fi
 if [ -n "${GOPATH+set}" ] && [$(type "go" > /dev/null) ]; then
     echo "Installing shfmt"
     go get -u mvdan.cc/sh/cmd/shfmt
+
+    echo "Installing golangci-lint"
+    go get -u github.com/golangci/golangci-lint/cmd/golangci-lint
 fi
 
 # silence warnings when perlbrew not installed
