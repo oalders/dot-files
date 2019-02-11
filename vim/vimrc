@@ -366,6 +366,10 @@ fun HideLines()
     :set colorcolumn=
 endfun
 
+fun SudoWrite()
+    cmap w!! w !sudo tee % > /dev/null
+endfun
+
 nnoremap <leader>xx :call setfperm(expand('%'),"rwxrw-rw-")<cr>
 
 " Try to install missing Perl modules
