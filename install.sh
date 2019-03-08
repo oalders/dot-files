@@ -120,7 +120,11 @@ fi
 
 NODE_MODULES='bash-language-server eslint fkill-cli jsonlint prettier'
 
-npm install --global $NODE_MODULES || true
+if [ $IS_MM = false ]; then
+    npm install --global $NODE_MODULES || true
+else
+    npm install $NODE_MODULES || true
+fi
 pip install --user vint yamllint
 
 # vim
@@ -135,5 +139,7 @@ else
     vim -c ':PlugInstall'
 fi
 
-cpanm App::cpm
-cpm install -g --cpanfile cpan/development.cpanfile
+if [ $IS_MM = false ]; then
+    cpanm App::cpm
+    cpm install -g --cpanfile cpan/development.cpanfile
+fi
