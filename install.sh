@@ -43,6 +43,11 @@ mkdir -p ~/.vagrant.d
 mkdir -p ~/.npm-packages
 mkdir -p ~/.ssh/sockets
 
+IS_MM=false
+if [ -e /usr/local/bin/mm-perl ]; then
+    IS_MM=true
+fi
+
 ln -sf $SELF_PATH/ackrc ~/.ackrc
 ln -sf $SELF_PATH/bashrc ~/.bashrc
 ln -sf $SELF_PATH/bash_profile ~/.bash_profile
@@ -54,7 +59,9 @@ ln -sf $SELF_PATH/digrc ~/.digrc
 ln -sf $LINK_FLAG $SELF_PATH/dzil ~/.dzil
 ln -sf $SELF_PATH/gitignore_global ~/.gitignore_global
 ln -sf $SELF_PATH/minicpanrc ~/.minicpanrc
-ln -sf $SELF_PATH/npmrc ~/.npmrc
+if [ $IS_MM = false ]; then
+    ln -sf $SELF_PATH/npmrc ~/.npmrc
+fi
 ln -sf $SELF_PATH/perlcriticrc ~/.perlcriticrc
 ln -sf $SELF_PATH/perltidyrc ~/.perltidyrc
 ln -sf $SELF_PATH/profile ~/.profile
@@ -78,11 +85,6 @@ git submodule update
 
 ./git-config.sh
 
-IS_MM=false
-if [ -e /usr/local/bin/mm-perl ]; then
-    IS_MM=true
-fi
-
 if [ $IS_MM = true ]; then
     ln -sf ~/mm-dot-files/maxmind_local_vimrc ~/.local_vimrc
     git config --global --unset-all remote.origin.fetch
@@ -93,7 +95,7 @@ fi
 
 #go get github.com/github/hub
 
-if [ -n "${GOPATH+set}" ] && [$(type "go" > /dev/null) ]; then
+if [ -n "${GOPATH+set}" ] && [$(type "go" >/dev/null) ]; then
     echo "Installing shfmt"
     go get -u mvdan.cc/sh/cmd/shfmt
 
