@@ -125,7 +125,9 @@ if [ $IS_MM = false ]; then
 else
     npm install $NODE_MODULES || true
 fi
-pip install --user vint yamllint
+
+# pynvim is for vim-hug-neovim-rpc
+pip install --user vint yamllint pynvim
 
 # vim
 curl -fLo ~/.vim/autoload/plug.vim --create-dirs \
