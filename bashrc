@@ -45,6 +45,7 @@ alias bytes_human='perl -MNumber::Bytes::Human -e "print Number::Bytes::Human::f
 alias c='clear && tmux clear-history && perl -E "say (qq{\n}x65,q{-}x78); system('date');print qq{-}x78, qq{\n}"'
 alias cdr='cd `git root`'
 alias cpanx='cpanm --local-lib ~/perl5 --metacpan --mirror http://cpan.metacpan.org'
+alias d=docker
 alias delete-merged-branches='show-merged-branches | xargs -n 1 git branch -d'
 alias df='df -h'
 alias dangling-dockers='docker rmi -f $(docker images -f "dangling=true" -q)'
@@ -52,9 +53,11 @@ alias du='du -h'
 alias dzil-prove='dzil run --nobuild prove -lv t/my-test.t'
 alias dzil-prove-xs='dzil run prove -lv t/my-test.t'
 alias dzil-stale='dzil stale --all | xargs cpm install --global'
+alias fig=docker-compose
 # https://serverfault.com/questions/207100/how-can-i-find-phantom-storage-usage
 alias files-open-by-process="sudo lsof | awk '$5 == "REG" {freq[$2]++ ; names[$2] = $1 ;} END {for (pid in freq) print freq[pid], names[pid], pid ; }' | sort -n -r -k 1,1"
 alias files-open-by-size="sudo lsof -s | awk '$5 == "REG"' | sort -n -r -k 7,7 | head -n 50"
+alias g=git
 alias gdf='git domo|fpp'
 alias grep='grep --color=auto'
 alias hh='SwitchAudioSource -s "Built-in Output"'
