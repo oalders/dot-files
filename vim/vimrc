@@ -372,6 +372,16 @@ fun SudoWrite()
     cmap w!! w !sudo tee % > /dev/null
 endfun
 
+fun HideGutter()
+    :GitGutterDisable
+    :set nonumber
+endfun
+
+fun ShowGutter()
+    :GitGutterEnable
+    :set number
+endfun
+
 nnoremap <leader>xx :call setfperm(expand('%'),"rwxrw-rw-")<cr>
 
 " Try to install missing Perl modules
