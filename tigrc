@@ -5,3 +5,6 @@ bind status + !git commit --amend
 # https://github.com/jonas/tig/wiki/Bindings
 # Apply the selected stash
 bind stash a !?git stash apply %(stash)
+
+# Drop the selected stash item
+bind stash x !?git stash drop %(stash)
