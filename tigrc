@@ -1,0 +1,7 @@
+# http://jonas.nitro.dk/tig/tigrc.5.html
+# User-defined external command to amend the last commit
+bind status + !git commit --amend
+
+# https://github.com/jonas/tig/wiki/Bindings
+# Apply the selected stash
+bind stash a !?git stash apply %(stash)

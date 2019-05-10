@@ -71,6 +71,7 @@ ln -sf $SELF_PATH/re.pl/repl.rc ~/.re.pl/repl.rc
 ln -sf $SELF_PATH/screenrc ~/.screenrc
 ln -sf $SELF_PATH/ssh/rc ~/.ssh/rc
 ln -sf $LINK_FLAG $SELF_PATH/sqitch ~/.sqitch
+ln -sf $SELF_PATH/tigrc ~/.tigrc
 ln -sf $SELF_PATH/tmux.conf ~/.tmux.conf
 ln -sf $SELF_PATH/tmux/macos ~/.tmux-macos
 ln -sf $SELF_PATH/tmux/linux ~/.tmux-linux
