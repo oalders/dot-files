@@ -238,9 +238,10 @@ let g:ale_perl_syntax_check_config = expand('~/dot-files/syntax-check-perl/confi
 " show Perl::Critic rules which have been violated
 let g:ale_perl_perlcritic_showrules = 1
 
-" syntax highlighting for .perlcriticrc files
+" syntax highlighting for some Perl utility rc files
 autocmd BufEnter .perlcriticrc :setlocal filetype=dosini
-autocmd BufEnter .tidyallrc :setlocal filetype=dosini
+autocmd BufEnter .tidyallrc    :setlocal filetype=dosini
+autocmd BufEnter .yath.rc      :setlocal filetype=dosini
 
 " ########### Golang ###########
 " Hide tabs and show numbers for Go files
