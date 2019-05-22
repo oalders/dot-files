@@ -387,6 +387,11 @@ fun ShowGutter()
     :set number
 endfun
 
+" Remove last character from each line
+fun Truncate()
+    :%s/.$//
+endfun
+
 nnoremap <leader>xx :call setfperm(expand('%'),"rwxrw-rw-")<cr>
 
 " Try to install missing Perl modules
