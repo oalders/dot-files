@@ -242,6 +242,7 @@ let g:ale_perl_perlcritic_showrules = 1
 autocmd BufEnter .perlcriticrc :setlocal filetype=dosini
 autocmd BufEnter .tidyallrc    :setlocal filetype=dosini
 autocmd BufEnter .yath.rc      :setlocal filetype=dosini
+autocmd BufEnter .yath.user.rc      :setlocal filetype=dosini
 
 " ########### Golang ###########
 " Hide tabs and show numbers for Go files
