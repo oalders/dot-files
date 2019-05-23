@@ -4,6 +4,9 @@
 
 set -eu -o pipefail
 
+# Fix "ImportError: No module named builtins"
+pip install --user --quiet future
+
 bin_dir=~/local/bin
 src_dir=~/local/src
 
