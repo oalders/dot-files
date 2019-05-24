@@ -80,6 +80,7 @@ ln -sf $SELF_PATH/vim/vimrc ~/.vimrc
 
 mkdir -p ~/.vim
 ln -sf $LINK_FLAG $SELF_PATH/vim/after ~/.vim/after
+ln -sf $LINK_FLAG $SELF_PATH/vim/ftplugin ~/.vim/ftplugin
 
 git submodule init
 git submodule update
