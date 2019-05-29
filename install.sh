@@ -120,6 +120,8 @@ else
     popd
 fi
 
+npm install --save-dev acorn
+
 NODE_MODULES='bash-language-server eslint fkill-cli jsonlint prettier'
 
 if [ $IS_MM = false ]; then
