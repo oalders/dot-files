@@ -224,11 +224,12 @@ function vi() {
     $vi "$string"
 }
 
+export FPP_DIR="$HOME/.fpp"
 function fpp() {
     local fpp=$(type -fp fpp)
 
-    HISTORY_FILE="$HOME/.fpp/.fpp_history"
-    FPP_CACHE="$HOME/.fpp/.fpp.sh"
+    HISTORY_FILE="$FPP_DIR/.fpp_history"
+    FPP_CACHE="$FPP_DIR/.fpp.sh"
 
     touch $HISTORY_FILE
 
