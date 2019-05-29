@@ -130,6 +130,8 @@ else
     npm install $NODE_MODULES || true
 fi
 
+which pip || (which apt-get && sudo apt-get install -y python-pip)
+
 # pynvim is for vim-hug-neovim-rpc
 pip install --user vint yamllint pynvim
 
