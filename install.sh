@@ -122,7 +122,7 @@ else
     popd
 fi
 
-npm install --save-dev acorn
+npm install npm acorn
 
 NODE_MODULES='bash-language-server eslint fkill-cli jsonlint prettier'
 

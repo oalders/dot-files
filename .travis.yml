@@ -2,6 +2,8 @@
 addons:
   apt:
     packages:
+      - npm
+      - python3
       - tmux
       - vim
 dist: xenial
