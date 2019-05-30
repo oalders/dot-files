@@ -109,6 +109,8 @@ fi
 mkdir -p $HOME/perl5/perlbrew/etc
 touch $HOME/perl5/perlbrew/etc/bashrc
 
+which pip || (which apt-get && sudo apt-get install -y python-pip)
+
 ./install-fpp.sh
 
 LOCALCHECKOUT=~/.tmux/plugins/tpm
@@ -129,8 +131,6 @@ if [ $IS_MM = false ]; then
 else
     npm install $NODE_MODULES || true
 fi
-
-which pip || (which apt-get && sudo apt-get install -y python-pip)
 
 # pynvim is for vim-hug-neovim-rpc
 pip install --user vint yamllint pynvim
