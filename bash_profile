@@ -26,3 +26,9 @@ if [[ -d ~/.rbenv ]]; then
     eval "$(rbenv init -)"
 fi
 export GPG_TTY=$(tty)
+
+# The next line updates PATH for the Google Cloud SDK.
+if [ -f '/Users/olaf/Documents/maxmind/google-cloud-sdk/path.bash.inc' ]; then . '/Users/olaf/Documents/maxmind/google-cloud-sdk/path.bash.inc'; fi
+
+# The next line enables shell command completion for gcloud.
+if [ -f '/Users/olaf/Documents/maxmind/google-cloud-sdk/completion.bash.inc' ]; then . '/Users/olaf/Documents/maxmind/google-cloud-sdk/completion.bash.inc'; fi
