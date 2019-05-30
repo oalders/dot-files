@@ -2,26 +2,6 @@
 
 set -eu -o pipefail
 
-skip_vim_plugin_install=false
-
-# https://stackoverflow.com/questions/16483119/example-of-how-to-use-getopts-in-bash
-usage() {
-    echo "Usage: $0 [-s] " 1>&2
-    exit 1
-}
-
-while getopts ":s" o; do
-    case "${o}" in
-    s)
-        skip_vim_plugin_install=true
-        ;;
-    *)
-        usage
-        ;;
-    esac
-done
-shift $((OPTIND - 1))
-
 SELF_PATH=$(cd -P -- "$(dirname -- "$0")" && pwd -P)
 
 LINK_FLAG=""
@@ -76,11 +56,6 @@ ln -sf $SELF_PATH/tmux.conf ~/.tmux.conf
 ln -sf $SELF_PATH/tmux/macos ~/.tmux-macos
 ln -sf $SELF_PATH/tmux/linux ~/.tmux-linux
 ln -sf $SELF_PATH/Vagrantfile ~/.vagrant.d/Vagrantfile
-ln -sf $SELF_PATH/vim/vimrc ~/.vimrc
-
-mkdir -p ~/.vim
-ln -sf $LINK_FLAG $SELF_PATH/vim/after ~/.vim/after
-ln -sf $LINK_FLAG $SELF_PATH/vim/ftplugin ~/.vim/ftplugin
 
 git submodule init
 git submodule update
@@ -88,22 +63,12 @@ git submodule update
 ./git-config.sh
 
 if [ $IS_MM = true ]; then
-    ln -sf ~/mm-dot-files/maxmind_local_vimrc ~/.local_vimrc
     git config --global --unset-all remote.origin.fetch
 else
-    ln -sf $SELF_PATH/vim/vanilla_local_vimrc ~/.local_vimrc
     ln -sf $SELF_PATH/ssh/config ~/.ssh/config
 fi
 
 #go get github.com/github/hub
-
-if [ -n "${GOPATH+set}" ] && [$(type "go" >/dev/null) ]; then
-    echo "Installing shfmt"
-    go get -u mvdan.cc/sh/cmd/shfmt
-
-    echo "Installing golangci-lint"
-    go get -u github.com/golangci/golangci-lint/cmd/golangci-lint
-fi
 
 # silence warnings when perlbrew not installed
 mkdir -p $HOME/perl5/perlbrew/etc
@@ -139,17 +104,7 @@ fi
 # pynvim is for vim-hug-neovim-rpc
 pip install --user vint yamllint pynvim
 
-# vim
-curl -fLo ~/.vim/autoload/plug.vim --create-dirs \
-    https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
-
-rm -rf ~/.vim/Trashed-Bundles ~/.vim/bundle
-
-if [ "$skip_vim_plugin_install" = true ]; then
-    echo "Skip vim plug install.  Is this run via ansible?"
-else
-    vim -c ':PlugInstall'
-fi
+./configure-vim.sh
 
 if [ $IS_MM = false ]; then
     cpanm App::cpm
