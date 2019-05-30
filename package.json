@@ -1,0 +1,25 @@
+{
+  "name": "dot-files",
+  "version": "1.0.0",
+  "description": "https://github.com/Homebrew/homebrew-bundle",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/oalders/dot-files.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/oalders/dot-files/issues"
+  },
+  "homepage": "https://github.com/oalders/dot-files#readme",
+  "devDependencies": {
+    "acorn": "^6.1.1"
+  },
+  "dependencies": {
+    "npm": "^6.9.0"
+  }
+}
