@@ -110,7 +110,7 @@ mkdir -p $HOME/perl5/perlbrew/etc
 touch $HOME/perl5/perlbrew/etc/bashrc
 
 if [ $(which pip) ]; then
-    pip install --upgrade pip
+    pip install --user --upgrade pip
 else
     which apt-get && sudo apt-get install -y python-pip
 fi
