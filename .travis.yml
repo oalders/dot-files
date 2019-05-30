@@ -1,0 +1,12 @@
+---
+addons:
+  apt:
+    packages:
+      - tmux
+      - vim
+dist: xenial
+language: bash
+before_script:
+  - ln -sf $TRAVIS_BUILD_DIR ~/dot-files
+script:
+  - ./install.sh
