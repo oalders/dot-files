@@ -109,7 +109,11 @@ fi
 mkdir -p $HOME/perl5/perlbrew/etc
 touch $HOME/perl5/perlbrew/etc/bashrc
 
-which pip || (which apt-get && sudo apt-get install -y python-pip)
+if [ $(which pip) ]; then
+    pip install --upgrade pip
+else
+    which apt-get && sudo apt-get install -y python-pip
+fi
 
 ./install-fpp.sh
 
