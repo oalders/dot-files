@@ -74,10 +74,17 @@ fi
 mkdir -p $HOME/perl5/perlbrew/etc
 touch $HOME/perl5/perlbrew/etc/bashrc
 
+# pynvim is for vim-hug-neovim-rpc
+
 if [ $(which pip) ]; then
-    pip install --user --upgrade pip
+    if [ $TRAVIS = true ]; then
+        pip install vint yamllint pynvim
+    else
+        pip install --user --upgrade pip vint yamllint pynvim
+    fi
 else
     which apt-get && sudo apt-get install -y python-pip
+    pip install --user --upgrade pip vint yamllint pynvim
 fi
 
 ./install-fpp.sh
@@ -100,9 +107,6 @@ if [ $IS_MM = false ]; then
 else
     npm install $NODE_MODULES || true
 fi
-
-# pynvim is for vim-hug-neovim-rpc
-pip install --user vint yamllint pynvim
 
 ./configure-vim.sh
 

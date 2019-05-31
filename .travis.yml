@@ -11,7 +11,9 @@ addons:
       - tmux
       - vim
 dist: xenial
-language: bash
+language: python
+python:
+  - "3.7"
 before_script:
   - ln -sf $TRAVIS_BUILD_DIR ~/dot-files
 script:
