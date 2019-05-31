@@ -108,5 +108,11 @@ pip install --user vint yamllint pynvim
 
 if [ $IS_MM = false ]; then
     cpanm --notest App::cpm
+    if [ $(which plenv) ]; then
+        plenv rehash
+    fi
     cpm install -g --cpanfile cpan/development.cpanfile
+    if [ $(which plenv) ]; then
+        plenv rehash
+    fi
 fi
