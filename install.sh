@@ -116,3 +116,5 @@ if [ $IS_MM = false ]; then
         plenv rehash
     fi
 fi
+
+exit 0
