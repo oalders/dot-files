@@ -111,7 +111,7 @@ if [[ ! -d ~/.plenv && -d $LOCALPERLBIN ]]; then
     # adds $HOME/perl5/bin to PATH
     [ $SHLVL -eq 1 ] && eval "$(perl -I$HOME/perl5/lib/perl5 -Mlocal::lib)"
 
-    if [ -d $LOCALPERBIN ]; then
+    if [ -d $LOCALPERLBIN ]; then
         export PATH="$LOCALPERLBIN:$PATH"
     fi
 fi
