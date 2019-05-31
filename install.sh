@@ -98,6 +98,10 @@ else
     popd
 fi
 
+~/.tmux/plugins/tpm/bin/install_plugins
+~/.tmux/plugins/tpm/bin/update_plugins all
+~/.tmux/plugins/tpm/bin/clean_plugins
+
 npm install npm acorn
 
 NODE_MODULES='bash-language-server eslint fkill-cli jsonlint prettier'
