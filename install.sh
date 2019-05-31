@@ -107,6 +107,6 @@ pip install --user vint yamllint pynvim
 ./configure-vim.sh
 
 if [ $IS_MM = false ]; then
-    cpanm App::cpm
+    cpanm --notest App::cpm
     cpm install -g --cpanfile cpan/development.cpanfile
 fi
