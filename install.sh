@@ -102,14 +102,14 @@ fi
 ~/.tmux/plugins/tpm/bin/update_plugins all
 ~/.tmux/plugins/tpm/bin/clean_plugins
 
-npm install npm acorn
+yarn add acorn
 
 NODE_MODULES='bash-language-server eslint fkill-cli jsonlint prettier'
 
 if [ $IS_MM = false ]; then
-    npm install --global $NODE_MODULES || true
+    yarn global add $NODE_MODULES || true
 else
-    npm install $NODE_MODULES || true
+    yarn add $NODE_MODULES || true
 fi
 
 ./configure-vim.sh
