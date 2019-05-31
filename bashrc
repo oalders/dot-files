@@ -113,6 +113,7 @@ if [[ ! -d ~/.plenv && -d $LOCALPERLBIN ]]; then
 
     if [ -d $LOCALPERLBIN ]; then
         export PATH="$LOCALPERLBIN:$PATH"
+        pathadd $LOCALPERLBIN
     fi
 fi
 
