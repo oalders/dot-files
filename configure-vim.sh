@@ -33,7 +33,6 @@ else
     ln -sf $SELF_PATH/vim/vanilla_local_vimrc ~/.local_vimrc
 fi
 
-
 if [ -n "${GOPATH+set}" ] && [$(type "go" >/dev/null) ]; then
     echo "Installing shfmt"
     go get -u mvdan.cc/sh/cmd/shfmt
@@ -41,9 +40,6 @@ if [ -n "${GOPATH+set}" ] && [$(type "go" >/dev/null) ]; then
     echo "Installing golangci-lint"
     go get -u github.com/golangci/golangci-lint/cmd/golangci-lint
 fi
-
-# pynvim is for vim-hug-neovim-rpc
-pip install --user vint yamllint pynvim
 
 # vim
 curl -fLo ~/.vim/autoload/plug.vim --create-dirs \
