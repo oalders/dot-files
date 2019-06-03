@@ -2,6 +2,9 @@
 
 set -eu -o pipefail
 
+# Ignore unbound variables for now.  $TRAVIS is triggering an error.
+set +u
+
 # pynvim is for vim-hug-neovim-rpc
 # future: fix "ImportError: No module named builtins"
 # pynvim yamllint vint: ALE deps
