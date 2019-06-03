@@ -13,7 +13,7 @@ PIP_INSTALL="future pynvim yamllint vint"
 
 # make explicit cases for Travis, MacOS and Linux
 if [ $(which pip) ]; then
-    if [ $TRAVIS = true ]; then
+    if [[ $TRAVIS = true ]]; then
         pip install $PIP_INSTALL
     else
         pip install --user --quiet --upgrade pip $PIP_INSTALL
