@@ -16,7 +16,5 @@ matrix:
       language: generic
 before_script:
   - ln -sf $TRAVIS_BUILD_DIR ~/dot-files
-  - brew install homebrew/linuxbrew-core/eslint
-  - brew install homebrew/linuxbrew-core/prettier
 script:
   - ./install.sh
