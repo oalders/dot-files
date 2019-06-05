@@ -10,6 +10,7 @@ LINK_FLAG=""
 if [ "$(uname)" == "Darwin" ]; then
     echo "This is Darwin"
     LINK_FLAG="-hF"
+    brew bundle install --file=brew/macos-Brewfile
 elif [ "$(expr substr $(uname -s) 1 5)" == "Linux" ]; then
     echo "This is Linux"
     LINK_FLAG="-T"
@@ -94,9 +95,7 @@ fi
 ~/.tmux/plugins/tpm/bin/update_plugins all
 ~/.tmux/plugins/tpm/bin/clean_plugins
 
-yarn add acorn
-
-NODE_MODULES='bash-language-server eslint fkill-cli jsonlint prettier'
+NODE_MODULES='bash-language-server fkill-cli'
 
 if [ $IS_MM = false ]; then
     yarn global add $NODE_MODULES || true
