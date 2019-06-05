@@ -5,11 +5,13 @@ set -eu -o pipefail
 # Ignore unbound variables for now.  $TRAVIS is triggering an error.
 set +u
 
-# pynvim is for vim-hug-neovim-rpc
 # future: fix "ImportError: No module named builtins"
-# pynvim yamllint vint: ALE deps
+# pynvim: required by ALE
+# sqlparse: required by mbra/prettysql
+# vint: required by ALE
+# yamllint: required by ALE
 
-PIP_INSTALL="future pynvim yamllint vint"
+PIP_INSTALL="future pynvim sqlparse yamllint vint"
 
 # make explicit cases for Travis, MacOS and Linux
 if [ $(which pip) ]; then
