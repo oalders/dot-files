@@ -6,6 +6,10 @@ addons:
     packages:
       - tmux
       - vim
+cache:
+  directories:
+    - "~/perl5"
+    - "/usr/local"
 dist: xenial
 language: python
 matrix:
