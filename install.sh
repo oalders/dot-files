@@ -10,6 +10,7 @@ LINK_FLAG=""
 if [ "$(uname)" == "Darwin" ]; then
     echo "This is Darwin"
     LINK_FLAG="-hF"
+    brew config
     brew update
     brew bundle install --file=brew/macos-Brewfile
 elif [ "$(expr substr $(uname -s) 1 5)" == "Linux" ]; then
