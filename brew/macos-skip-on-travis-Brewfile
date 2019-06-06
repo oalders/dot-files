@@ -1,0 +1,4 @@
+brew "node"
+brew "python"
+brew "sqlite"
+brew "vim", args: ["with-override-system-vi", "without-perl"]

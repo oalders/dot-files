@@ -13,6 +13,13 @@ if [ "$(uname)" == "Darwin" ]; then
     brew config
     brew update
     brew bundle install --file=brew/macos-Brewfile
+
+    # These packages are installed because they are needed for the Linux tests.
+    # It's not clear how to have them not be installed for MacOS on Travis
+    if [[ $USER != 'travis' ]]; then
+        brew bundle install --file=brew/macos-skip-on-travis-Brewfile
+    fi
+
 elif [ "$(expr substr $(uname -s) 1 5)" == "Linux" ]; then
     echo "This is Linux"
     LINK_FLAG="-T"
