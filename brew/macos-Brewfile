@@ -15,21 +15,21 @@ brew "lynx"
 brew "mackup"
 brew "mongodb"
 brew "ncdu"
-brew "node"
+brew "node", args: ["force"]
 brew "pandoc"
 brew "perl-build"
 brew "pgcli"
 brew "plenv"
 brew "postgresql"
 brew "prettier"
-brew "python"
+brew "python", args: ["force"]
 brew "reattach-to-user-namespace"
 brew "sloccount"
 brew "sqlite"
 brew "tig"
-brew "tmux"
+brew "tmux", args: ["force"]
 brew "tree"
-brew "vim", args: ["with-override-system-vi", "without-perl"]
+brew "vim", args: ["force", "with-override-system-vi", "without-perl"]
 brew "watch"
 brew "wget"
 brew "yarn"
