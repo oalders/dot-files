@@ -99,7 +99,7 @@ alias o2d="perl -e 'printf qq|%d\n|, oct( shift )'"
 alias o2h="perl -e 'printf qq|%X\n|, oct( shift )'"
 
 # python scripts via pip install --user
-pathadd "$HOME/Library/Python/2.7/bin"
+pathadd "$HOME/Library/Python/3.7/bin"
 pathadd "$HOME/.local/bin"
 
 pathadd "/usr/local/sbin"
