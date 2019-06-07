@@ -73,6 +73,7 @@ alias pine=alpine
 alias pretty='python -mjson.tool'
 alias prune-local-branches='git remote prune origin && git branch -vv | grep -v origin'
 alias ps='ps auxw'
+alias python='python3'
 alias redo='fpp --redo'
 # http://stackoverflow.com/questions/13064613/how-to-prune-local-tracking-branches-that-do-not-exist-on-remote-anymore
 alias show-local-only-branches="git branch -r | awk '{print \$1}' | egrep -v -f /dev/fd/0 <(git branch -vv | grep origin) | awk '{print \$1}'"
