@@ -74,9 +74,15 @@ git submodule update
 
 if [ $IS_MM = true ]; then
     git config --global --unset-all remote.origin.fetch
-else
-    ln -sf $SELF_PATH/ssh/config ~/.ssh/config
 fi
+
+if [ $IS_DARWIN = true ]; then
+    ln -sf $SELF_PATH/ssh/config ~/.ssh/config
+else
+    rm -f ~/.ssh/config
+    ln -sf $SELF_PATH/ssh/no-include-config ~/.ssh/config
+fi
+
 
 #go get github.com/github/hub
 
