@@ -2,15 +2,12 @@
 
 set -eu -o pipefail
 
-SELF_PATH=$(cd -P -- "$(dirname -- "$0")" && pwd -P)
+source ~/dot-files/bash_functions.sh
 
-IS_DARWIN=false
 LINK_FLAG=""
 
 # https://stackoverflow.com/a/17072017/406224
-if [ "$(uname)" == "Darwin" ]; then
-    echo "This is Darwin"
-    IS_DARWIN=true
+if [ $IS_DARWIN = true ]; then
     LINK_FLAG="-hF"
     brew config
     brew update
@@ -23,7 +20,6 @@ if [ "$(uname)" == "Darwin" ]; then
     fi
 
 elif [ "$(expr substr $(uname -s) 1 5)" == "Linux" ]; then
-    echo "This is Linux"
     LINK_FLAG="-T"
 fi
 
@@ -34,11 +30,6 @@ mkdir -p ~/.re.pl
 mkdir -p ~/.vagrant.d
 mkdir -p ~/.npm-packages
 mkdir -p ~/.ssh/sockets
-
-IS_MM=false
-if [ -e /usr/local/bin/mm-perl ]; then
-    IS_MM=true
-fi
 
 ln -sf $SELF_PATH/ackrc ~/.ackrc
 ln -sf $SELF_PATH/bashrc ~/.bashrc

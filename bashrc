@@ -1,21 +1,6 @@
-# http://stackoverflow.com/questions/394230/detect-the-os-from-a-bash-script
-platform='unknown'
-unamestr=$(uname)
-if [[ "$unamestr" == 'Linux' ]]; then
-    platform='linux'
-elif [[ "$unamestr" == 'Darwin' ]]; then
-    platform='osx'
-fi
-
-export X_PLATFORM=$platform
-
 export EDITOR=vim
-# http://superuser.com/questions/39751/add-directory-to-path-if-its-not-already-there
-pathadd() {
-    if [ -d "$1" ] && [[ ":$PATH:" != *":$1:"* ]]; then
-        PATH="$1:$PATH"
-    fi
-}
+
+source ~/dot-files/bash_functions.sh
 
 include() {
     [[ -f "$1" ]] && source "$1"
@@ -293,7 +278,7 @@ if [ -d $GOPATH ]; then
     export PATH="$GOPATH/bin:$PATH"
 fi
 
-if [[ $platform == 'osx' ]]; then
+if [[ $IS_DARWIN ]]; then
     export PATH="~/dot-files/bin/osx:$PATH"
 fi
 
