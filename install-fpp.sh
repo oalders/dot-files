@@ -17,3 +17,8 @@ rm -rf PathPicker && git clone https://github.com/facebook/PathPicker.git
 pushd PathPicker/
 rm -rf $bin_dir/fpp
 ln -s "$(pwd)/fpp" $bin_dir/fpp
+
+# This will fail if "future" needs to be installed
+fpp --help
+
+exit 0
