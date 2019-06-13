@@ -6,7 +6,7 @@ set -eu -o pipefail
 set +u
 
 # future: fix "ImportError: No module named builtins"
-# pynvim: required by ALE
+# pynvim: required by deoplete
 # sqlparse: required by mbra/prettysql
 # vint: required by ALE
 # yamllint: required by ALE
