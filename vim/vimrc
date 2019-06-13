@@ -350,6 +350,10 @@ vnoremap <silent> hh :s/\%V_/-/g<cr>
 " maybe this should live in ~/.vim/ftdetect/bash_profile.vim
 au BufRead,BufNewFile bash_profile set filetype=sh
 
+" https://github.com/roxma/vim-hug-neovim-rpc/issues/28
+set pyxversion=3
+let g:python_host_prog = "/usr/bin/python2"
+let g:python3_host_prog = "/usr/bin/python3"
 let g:deoplete#enable_at_startup = 1
 let g:deoplete#auto_complete_start_length = 3
 
