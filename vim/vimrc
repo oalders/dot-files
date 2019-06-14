@@ -219,19 +219,9 @@ fun ExecFile()
 endfun
 
 " ########### Perl ###########
-"
-" Run prove on current file
-nnoremap <Leader>p <Esc>:!prove -It/lib -lv %<CR>
-
-" show matching brackets
-autocmd FileType perl set showmatch
 
 " show matching brackets
 autocmd FileType perl RainbowParentheses
-
-" show line numbers
-autocmd FileType perl set number
-
 
 " https://stackoverflow.com/questions/2345519/how-can-i-script-vim-to-run-perltidy-on-a-buffer
 
