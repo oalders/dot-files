@@ -2,8 +2,23 @@
 
 set -eu -o pipefail
 
-# Ignore unbound variables for now.  $TRAVIS is triggering an error.
-set +u
+function pip_install () {
+    PIP=$1
+    PIP_PKGS=$2
+    PIP_APT_PKG=$3
+
+    # make explicit cases for Travis, MacOS and Linux
+    if [ $(which $PIP) ]; then
+        if [[ $USER = "travis" ]]; then
+            $PIP install $PIP_PKGS
+        else
+            $PIP install --user --quiet --upgrade $PIP_PKGS
+        fi
+    else
+        which apt-get && sudo apt-get install -y python-pip
+        $PIP install --user --quiet --upgrade $PIP_PKGS
+    fi
+}
 
 # future: fix "ImportError: No module named builtins"
 # pynvim: required by deoplete
@@ -13,15 +28,9 @@ set +u
 
 PIP_INSTALL="future pynvim sqlparse yamllint vint"
 
-# make explicit cases for Travis, MacOS and Linux
-if [ $(which pip3) ]; then
-    if [[ $TRAVIS = true ]]; then
-        pip3 install $PIP_INSTALL
-    else
-        pip3 install --user --quiet --upgrade $PIP_INSTALL
-    fi
-else
-    which apt-get && sudo apt-get install -y python3-pip
-    pip3 install --user --quiet --upgrade $PIP_INSTALL
-fi
+# The prettysql plugin uses /usr/bin/env python, which finds the first python
+# in the path, which will not be python3, so we'll need to double up on
+# installing some libraries for now.
 
+pip_install 'pip3' $PIP_INSTALL 'python3-pip'
+pip_install "pip" "sqlparse" "python-pip"
