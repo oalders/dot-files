@@ -90,6 +90,9 @@ pathadd "$HOME/.local/bin"
 pathadd "/usr/local/sbin"
 pathadd "$HOME/local/bin"
 
+# node modules locally installing bin files
+pathadd "$HOME/dot-files/node_modules/.bin"
+
 LOCALPERLBIN=~/perl5/bin
 
 if [[ ! -d ~/.plenv && -d $LOCALPERLBIN ]]; then
