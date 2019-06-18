@@ -13,7 +13,7 @@ ln -sf $LINK_FLAG $SELF_PATH/vim/ftplugin ~/.vim/ftplugin
 if [ $IS_MM = true ]; then
     ln -sf ~/mm-dot-files/maxmind_local_vimrc ~/.local_vimrc
 else
-    ln -sf $SELF_PATH/vim/vanilla_local_vimrc ~/.local_vimrc
+    ln -sf $SELF_PATH/vim/vanilla_local_vim_plug_vimrc ~/.local_vim_plug_vimrc
 fi
 
 if [ -n "${GOPATH+set}" ] && [$(type "go" >/dev/null) ]; then

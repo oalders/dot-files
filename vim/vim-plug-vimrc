@@ -55,7 +55,7 @@ endif
 
 Plug 'tpope/vim-sensible'
 
-source ~/.local_vimrc
+source ~/.local_vim_plug_vimrc
 
 " Initialize plugin system
 call plug#end()
