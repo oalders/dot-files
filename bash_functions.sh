@@ -24,3 +24,7 @@ IS_MM=false
 if [ -e /usr/local/bin/mm-perl ]; then
     IS_MM=true
 fi
+
+export LINK_FLAG
+export IS_DARWIN
+export IS_MM

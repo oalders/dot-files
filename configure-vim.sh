@@ -6,13 +6,8 @@ source ~/dot-files/bash_functions.sh
 SELF_PATH=$(self_path)
 
 mkdir -p ~/.vim/rc/plug
-
-IS_MM=false
-if [ -e /usr/local/bin/mm-perl ]; then
-    IS_MM=true
-fi
-
 mkdir -p ~/.vim
+
 ln -sf $LINK_FLAG $SELF_PATH/vim/ftplugin ~/.vim/ftplugin
 
 if [ $IS_MM = true ]; then
