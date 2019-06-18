@@ -4,11 +4,8 @@ set -eu -o pipefail
 
 source ~/dot-files/bash_functions.sh
 
-LINK_FLAG=""
-
 # https://stackoverflow.com/a/17072017/406224
 if [ $IS_DARWIN = true ]; then
-    LINK_FLAG="-hF"
     brew config
     brew update
     brew bundle install --file=brew/macos-Brewfile
@@ -18,18 +15,15 @@ if [ $IS_DARWIN = true ]; then
     if [[ $USER != 'travis' ]]; then
         brew bundle install --file=brew/macos-skip-on-travis-Brewfile
     fi
-
-elif [ "$(expr substr $(uname -s) 1 5)" == "Linux" ]; then
-    LINK_FLAG="-T"
 fi
-
-echo $SELF_PATH
 
 mkdir -p ~/.cpanreporter
 mkdir -p ~/.re.pl
 mkdir -p ~/.vagrant.d
 mkdir -p ~/.npm-packages
 mkdir -p ~/.ssh/sockets
+
+SELF_PATH=$(self_path)
 
 ln -sf $SELF_PATH/ackrc ~/.ackrc
 ln -sf $SELF_PATH/bashrc ~/.bashrc
