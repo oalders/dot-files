@@ -1,2 +1,0 @@
-let g:ale_perl_syntax_check_executable = 'perl'
-let g:ale_perl_syntax_check_config = '~/dot-files/syntax-check-perl/config.pl'
