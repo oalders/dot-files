@@ -2,20 +2,8 @@
 
 set -eu -o pipefail
 
-SELF_PATH=$(cd -P -- "$(dirname -- "$0")" && pwd -P)
-
-LINK_FLAG=""
-
-# https://stackoverflow.com/a/17072017/406224
-if [ "$(uname)" == "Darwin" ]; then
-    echo "This is Darwin"
-    LINK_FLAG="-hF"
-elif [ "$(expr substr $(uname -s) 1 5)" == "Linux" ]; then
-    echo "This is Linux"
-    LINK_FLAG="-T"
-fi
-
-echo $SELF_PATH
+source ~/dot-files/bash_functions.sh
+SELF_PATH=$(self_path)
 
 mkdir -p ~/.vim/rc/plug
 

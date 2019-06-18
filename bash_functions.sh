@@ -1,4 +1,6 @@
-SELF_PATH=$(cd -P -- "$(dirname -- "$0")" && pwd -P)
+self_path() {
+    echo $(cd -P -- "$(dirname -- "$0")" && pwd -P)
+}
 
 # http://superuser.com/questions/39751/add-directory-to-path-if-its-not-already-there
 pathadd() {
