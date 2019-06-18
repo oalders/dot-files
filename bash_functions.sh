@@ -12,11 +12,9 @@ LINK_FLAG=""
 
 # https://stackoverflow.com/a/17072017/406224
 if [ "$(uname)" == "Darwin" ]; then
-    echo "This is Darwin"
     IS_DARWIN=true
     LINK_FLAG="-hF"
 elif [ "$(expr substr $(uname -s) 1 5)" == "Linux" ]; then
-    echo "This is Linux"
     LINK_FLAG="-T"
 fi
 
