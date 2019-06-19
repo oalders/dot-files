@@ -19,10 +19,11 @@ RainbowParentheses
 " https://stackoverflow.com/questions/2345519/how-can-i-script-vim-to-run-perltidy-on-a-buffer
 
 "define :Tidy command to run perltidy on visual selection || entire buffer"
-command -range=% -nargs=* PTidy <line1>,<line2>!perltidy -q
+command! -range=% -nargs=* PTidy <line1>,<line2>!perltidy -q
 
 "run :PTidy on entire buffer and return cursor to (approximate) original position"
-fun DoPerlTidy()
+" Not sure why I'm getting warnings that it already exists
+fun! DoPerlTidy()
     let l:line = line(".")
     let l:column = col(".")
     :PTidy
