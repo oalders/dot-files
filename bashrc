@@ -53,6 +53,7 @@ alias ll='ls -alhG'
 alias ls='ls -G'
 alias lsd='ls --group-directories-first'
 alias octal_perms='stat -c "%a %n"'
+alias path="tr : '\n' <<<$PATH"
 alias penv='perl -MDDP -e "p(%ENV)"'
 alias pine=alpine
 alias pretty='python -mjson.tool'
