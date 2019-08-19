@@ -94,6 +94,9 @@ pathadd "$HOME/local/bin"
 # node modules locally installing bin files
 pathadd "$HOME/dot-files/node_modules/.bin"
 
+# Homebrew installs some binaries here
+pathadd "/usr/local/sbin"
+
 LOCALPERLBIN=~/perl5/bin
 
 if [[ ! -d ~/.plenv && -d $LOCALPERLBIN ]]; then
