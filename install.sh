@@ -103,4 +103,8 @@ if [ $IS_MM = false ]; then
     fi
 fi
 
+if [ $IS_DARWIN = false ]; then
+    ./install-linux.sh
+fi
+
 exit 0
