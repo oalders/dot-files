@@ -13,7 +13,7 @@ mkdir -p ~/.fpp
 
 pushd $src_dir
 
-rm -rf PathPicker && git clone https://github.com/facebook/PathPicker.git
+rm -rf PathPicker && git clone --depth 1 https://github.com/facebook/PathPicker.git
 pushd PathPicker/
 rm -rf $bin_dir/fpp
 ln -s "$(pwd)/fpp" $bin_dir/fpp
