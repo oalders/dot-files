@@ -91,6 +91,10 @@ else
     yarn add $NODE_MODULES || true
 fi
 
+if [ $IS_DARWIN = true ]; then
+    yarn global add alfred-fkill || true
+fi
+
 if [ $IS_MM = false ]; then
     cpanm --local-lib=~/perl5 local::lib && eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)
     cpanm --notest App::cpm
