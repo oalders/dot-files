@@ -1,0 +1,19 @@
+[
+  { "name": "bug", "color": "ff0000", "description": "Bug" },
+  { "name": "duplicate", "color": "cccccc", "description": "Duplicate" },
+  { "name": "enhancement", "color": "84b6eb", "description": "Enhancement" },
+  {
+    "name": "good first issue",
+    "color": "f2791d",
+    "description": "Good first issue"
+  },
+  {
+    "name": "hacktoberfest",
+    "color": "f2791d",
+    "description": "Good first issue"
+  },
+  { "name": "help wanted", "color": "128A0C", "description": "Help Wanted" },
+  { "name": "invalid", "color": "e6e6e6", "description": "Invalid" },
+  { "name": "question", "color": "cc317c", "description": "Question" },
+  { "name": "wontfix", "color": "ffffff", "description": "Will not fix" }
+]
