@@ -1,3 +1,3 @@
 #!/bin/bash
 
-sudo apt-get install -y pandoc
+sudo apt-get install -y nodejs pandoc
