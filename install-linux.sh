@@ -1,3 +1,3 @@
 #!/bin/bash
 
-sudo apt-get install -y nodejs pandoc
+sudo apt-get install -y libnet-ssleay-perl nodejs pandoc
