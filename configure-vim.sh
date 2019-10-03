@@ -16,12 +16,14 @@ else
     ln -sf $SELF_PATH/vim/vanilla_local_vim_plug_vimrc ~/.local_vim_plug_vimrc
 fi
 
-if [ -n "${GOPATH+set}" ] && [$(type "go" >/dev/null) ]; then
+if [[ (-n "${GOPATH+set}" ) && ($(command -v go version)) ]]; then
     echo "Installing shfmt"
     go get -u mvdan.cc/sh/cmd/shfmt
 
     echo "Installing golangci-lint"
     go get -u github.com/golangci/golangci-lint/cmd/golangci-lint
+else
+    echo "Go not found. Not installing shfmt or golangci-lint"
 fi
 
 # vim
