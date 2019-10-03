@@ -21,7 +21,7 @@
   },
   "dependencies": {
     "bash-language-server": "^1.6.1",
-    "eslint": "^5.16.0",
+    "eslint": "^6.5.1",
     "fkill-cli": "^5.2.0",
     "jsonlint": "^1.6.3",
     "prettier": "^1.18.2"
