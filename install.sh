@@ -85,6 +85,12 @@ touch $HOME/perl5/perlbrew/etc/bashrc
 
 NODE_MODULES='bash-language-server fkill-cli'
 
+if [[ $(command -v yarnx -v) ]]; then
+    echo "yarn already installed"
+else
+    curl -o- -L https://yarnpkg.com/install.sh | bash
+fi
+
 if [ $IS_MM = false ]; then
     yarn global add $NODE_MODULES || true
 else
