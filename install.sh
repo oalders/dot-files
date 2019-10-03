@@ -85,9 +85,14 @@ touch $HOME/perl5/perlbrew/etc/bashrc
 
 NODE_MODULES='bash-language-server fkill-cli'
 
+if [ $IS_DARWIN = false ]; then
+    ./install-linux.sh
+fi
+
 if [[ $(command -v yarnx -v) ]]; then
     echo "yarn already installed"
 else
+    rm -rf $HOME/.yarn
     curl -o- -L https://yarnpkg.com/install.sh | bash
 fi
 
@@ -111,10 +116,6 @@ if [ $IS_MM = false ]; then
     if [ $(which plenv) ]; then
         plenv rehash
     fi
-fi
-
-if [ $IS_DARWIN = false ]; then
-    ./install-linux.sh
 fi
 
 exit 0
