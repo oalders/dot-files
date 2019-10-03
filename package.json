@@ -24,6 +24,6 @@
     "eslint": "^5.16.0",
     "fkill-cli": "^5.2.0",
     "jsonlint": "^1.6.3",
-    "prettier": "^1.17.1"
+    "prettier": "^1.18.2"
   }
 }
