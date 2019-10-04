@@ -2,6 +2,8 @@
 
 set -eu -o pipefail
 
+alias python='python3'
+
 function pip_install () {
     PIP=$1
     PIP_PKGS=$2
