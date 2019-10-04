@@ -17,7 +17,7 @@ function pip_install () {
             $PIP install --user --quiet --upgrade $PIP_PKGS
         fi
     else
-        which apt-get && sudo apt-get install -y python-pip
+        which apt-get && sudo apt-get install -y python-pip python3-pip
         $PIP install --user --quiet --upgrade $PIP_PKGS
     fi
 }
