@@ -17,6 +17,7 @@ if [ $IS_DARWIN = true ]; then
     # It's not clear how to have them not be installed for MacOS on Travis
     if [[ $USER != 'travis' ]]; then
         brew bundle install --file=brew/macos-skip-on-travis-Brewfile
+        brew install vim -- --with-override-system-vi --without-perl
 
         dockutil --remove 'App Store'
         dockutil --remove 'Contacts'
