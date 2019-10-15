@@ -6,6 +6,9 @@ source ~/dot-files/bash_functions.sh
 
 # https://stackoverflow.com/a/17072017/406224
 if [ $IS_DARWIN = true ]; then
+    if [ ! $(which brew) ]; then
+        /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+    fi
     brew config
     brew update
     brew bundle install --file=brew/macos-Brewfile
