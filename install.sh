@@ -18,6 +18,7 @@ if [ $IS_DARWIN = true ]; then
     if [[ $USER != 'travis' ]]; then
         brew bundle install --file=brew/macos-skip-on-travis-Brewfile
         brew install vim -- --with-override-system-vi --without-perl
+        brew cask install iterm2
 
         dockutil --remove 'App Store'
         dockutil --remove 'Contacts'
