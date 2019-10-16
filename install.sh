@@ -26,6 +26,12 @@ if [ $IS_DARWIN = true ]; then
         dockutil --remove 'Maps'
         dockutil --remove 'Siri'
         dockutil --remove 'System Preferences'
+
+        mas install 413857545  # Divvy
+        mas install 540404405  # Dropshelf (1.3.3)
+        mas install 405399194  # Kindle
+        mas install 445189367  # PopClip (2019.9.1)
+        mas install 1262957439 # Textual 7
     fi
 fi
 
