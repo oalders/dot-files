@@ -1,3 +1,4 @@
 brew "node"
+brew "mas"
 brew "python"
 brew "sqlite"
