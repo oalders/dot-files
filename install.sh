@@ -93,7 +93,7 @@ touch $HOME/perl5/perlbrew/etc/bashrc
 
 ./configure-vim.sh
 
-./install-fpp.sh
+./installer/fpp.sh
 
 ./configure-tmux.sh
 
