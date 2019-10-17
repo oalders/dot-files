@@ -25,8 +25,12 @@ if [ $IS_DARWIN = true ]; then
 
         dockutil --remove 'App Store'
         dockutil --remove 'Contacts'
+        dockutil --remove 'FaceTime'
+        dockutil --remove 'iTunes'
         dockutil --remove 'Launchpad'
         dockutil --remove 'Maps'
+        dockutil --remove 'News'
+        dockutil --remove 'Safari'
         dockutil --remove 'Siri'
         dockutil --remove 'System Preferences'
 
