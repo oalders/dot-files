@@ -23,6 +23,10 @@ if [ $IS_DARWIN = true ]; then
         brew bundle install --file=brew/local-only
         brew install vim -- --with-override-system-vi --without-perl
 
+        if [[ -e ~/local-dot-files/Brewfile ]]; then
+            brew bundle install --file=~/local-dot-files/Brewfile
+        fi
+
         ./macos/dock.sh
 
         # Enable tap to click -- may require logout/login
