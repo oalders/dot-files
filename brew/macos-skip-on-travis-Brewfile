@@ -1,5 +1,5 @@
-brew "node"
 brew "mas"
+brew "node"
 brew "python"
 brew "sqlite"
 cask "alfred"
