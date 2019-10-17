@@ -24,5 +24,5 @@ function pip_install () {
 # The prettysql plugin uses /usr/bin/env python, which finds the first python
 # in the path, which will not be python3, so we'll need to double up on
 # installing sqlparse for now.
-pip_install "pip" "pip-requirements.txt"
-pip_install "pip3" "pip3-requirements.txt"
+pip_install "pip" "pip/pip-requirements.txt"
+pip_install "pip3" "pip/pip3-requirements.txt"

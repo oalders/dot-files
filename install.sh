@@ -89,7 +89,7 @@ mkdir -p $HOME/perl5/perlbrew/etc
 touch $HOME/perl5/perlbrew/etc/bashrc
 
 # deps for vim and fpp
-./pip.sh
+./installer/pip.sh
 
 ./configure-vim.sh
 
