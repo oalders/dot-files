@@ -100,7 +100,7 @@ touch $HOME/perl5/perlbrew/etc/bashrc
 NODE_MODULES='bash-language-server fkill-cli'
 
 if [ $IS_DARWIN = false ]; then
-    ./install-linux.sh
+    ./installer/linux.sh
 fi
 
 if [[ $(command -v yarnx -v) ]]; then
