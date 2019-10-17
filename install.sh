@@ -29,6 +29,10 @@ if [ $IS_DARWIN = true ]; then
         dockutil --remove 'Maps'
         dockutil --remove 'Siri'
         dockutil --remove 'System Preferences'
+
+        # Enable tap to click -- may require logout/login
+        defaults -currentHost write -globalDomain com.apple.mouse.tapBehavior -int 1
+
     fi
 fi
 
