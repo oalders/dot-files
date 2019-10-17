@@ -6,6 +6,10 @@ source ~/dot-files/bash_functions.sh
 
 # https://stackoverflow.com/a/17072017/406224
 if [ $IS_DARWIN = true ]; then
+    # Install Net::SSLeay on MacOS
+    export CPPFLAGS="-I/usr/local/opt/openssl/include"
+    export LDFLAGS="-L/usr/local/opt/openssl/lib"
+
     if [ ! $(which brew) ]; then
         /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
     fi
