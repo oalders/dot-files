@@ -6,6 +6,11 @@ wait_for_input() {
 }
 
 cd /tmp
+
+wget https://github.com/deanishe/alfred-vpn-manager/releases/download/v3.2.0/VPN-Manager-3.2.alfredworkflow
+open VPN-Manager-3.2.alfredworkflow
+wait_for_input
+
 wget https://github.com/gharlan/alfred-github-workflow/releases/download/v1.6.2/github.alfredworkflow
 open github.alfredworkflow
 wait_for_input
@@ -24,5 +29,4 @@ wait_for_input
 
 wget https://github.com/fniephaus/alfred-travis-ci/releases/download/v2.1/Travis-CI-for-Alfred.alfredworkflow
 open Travis-CI-for-Alfred.alfredworkflow
-wait_for_input
 
