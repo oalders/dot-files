@@ -81,8 +81,7 @@ else
     ln -sf $SELF_PATH/ssh/no-include-config ~/.ssh/config
 fi
 
-
-#go get github.com/github/hub
+go get github.com/github/hub
 
 # silence warnings when perlbrew not installed
 mkdir -p $HOME/perl5/perlbrew/etc
