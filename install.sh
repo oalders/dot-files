@@ -23,16 +23,7 @@ if [ $IS_DARWIN = true ]; then
         brew bundle install --file=brew/local-only
         brew install vim -- --with-override-system-vi --without-perl
 
-        dockutil --remove 'App Store'
-        dockutil --remove 'Contacts'
-        dockutil --remove 'FaceTime'
-        dockutil --remove 'iTunes'
-        dockutil --remove 'Launchpad'
-        dockutil --remove 'Maps'
-        dockutil --remove 'News'
-        dockutil --remove 'Safari'
-        dockutil --remove 'Siri'
-        dockutil --remove 'System Preferences'
+        ./macos/dock.sh
 
         # Enable tap to click -- may require logout/login
         defaults -currentHost write -globalDomain com.apple.mouse.tapBehavior -int 1
