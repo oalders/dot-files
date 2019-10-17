@@ -3,6 +3,7 @@ brew "mas"
 brew "python"
 brew "sqlite"
 cask "alfred"
+cask "dash"
 cask "iterm2"
 cask "spotify"
 mas "Divvy", id: 413857545
