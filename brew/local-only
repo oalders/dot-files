@@ -3,12 +3,15 @@ brew "mas"
 brew "node"
 brew "python"
 brew "sqlite"
+brew "vagrant-completion"
 cask "alfred"
 cask "dash"
 cask "google-chrome"
 cask "iterm2"
 cask "spotify"
 cask "tunnelblick"
+cask "vagrant"
+cask "virtualbox"
 mas "Divvy", id: 413857545
 mas "Dropshelf", id: 540404405
 mas "Kindle", id: 405399194
