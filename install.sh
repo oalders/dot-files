@@ -15,12 +15,12 @@ if [ $IS_DARWIN = true ]; then
     fi
     brew config
     brew update
-    brew bundle install --file=brew/macos-Brewfile
+    brew bundle install --file=brew/defaults
 
     # These packages are installed because they are needed for the Linux tests.
     # It's not clear how to have them not be installed for MacOS on Travis
     if [[ $USER != 'travis' ]]; then
-        brew bundle install --file=brew/macos-skip-on-travis-Brewfile
+        brew bundle install --file=brew/local-only
         brew install vim -- --with-override-system-vi --without-perl
 
         dockutil --remove 'App Store'

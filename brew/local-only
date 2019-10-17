@@ -1,3 +1,4 @@
+# don't install these on Travis CI
 brew "mas"
 brew "node"
 brew "python"
