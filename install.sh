@@ -41,8 +41,6 @@ mkdir -p ~/.vagrant.d
 mkdir -p ~/.npm-packages
 mkdir -p ~/.ssh/sockets
 
-SELF_PATH=$(self_path)
-
 ln -sf $SELF_PATH/ackrc ~/.ackrc
 ln -sf $SELF_PATH/bashrc ~/.bashrc
 ln -sf $SELF_PATH/bash_profile ~/.bash_profile

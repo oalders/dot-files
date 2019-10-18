@@ -25,6 +25,9 @@ if [ -e /usr/local/bin/mm-perl ]; then
     IS_MM=true
 fi
 
+SELF_PATH=$(self_path)
+
 export LINK_FLAG
 export IS_DARWIN
 export IS_MM
+export SELF_PATH
