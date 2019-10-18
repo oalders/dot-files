@@ -85,7 +85,7 @@ touch $HOME/perl5/perlbrew/etc/bashrc
 # deps for vim and fpp
 ./installer/pip.sh
 
-./configure-vim.sh
+./configure/vim.sh
 
 ./installer/fpp.sh
 
