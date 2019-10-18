@@ -2,11 +2,11 @@
 
 set -eu -o pipefail
 
-SELF_PATH=$(cd -P -- "$(dirname -- "$0")" && pwd -P)
+source bash_functions.sh
 
-ln -sf $SELF_PATH/tmux.conf ~/.tmux.conf
-ln -sf $SELF_PATH/tmux/macos ~/.tmux-macos
-ln -sf $SELF_PATH/tmux/linux ~/.tmux-linux
+ln -sf $SELF_PATH/../tmux.conf ~/.tmux.conf
+ln -sf $SELF_PATH/../tmux/macos ~/.tmux-macos
+ln -sf $SELF_PATH/../tmux/linux ~/.tmux-linux
 
 LOCALCHECKOUT=~/.tmux/plugins/tpm
 if [ ! -d $LOCALCHECKOUT ]; then

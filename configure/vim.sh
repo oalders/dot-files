@@ -3,17 +3,16 @@
 set -eu -o pipefail
 
 source ~/dot-files/bash_functions.sh
-SELF_PATH=$(self_path)
 
 mkdir -p ~/.vim/rc/plug
 mkdir -p ~/.vim
 
-ln -sf $LINK_FLAG $SELF_PATH/vim/ftplugin ~/.vim/ftplugin
+ln -sf $LINK_FLAG $SELF_PATH/../vim/ftplugin ~/.vim/ftplugin
 
 if [ $IS_MM = true ]; then
     ln -sf ~/mm-dot-files/maxmind_local_vimrc ~/.local_vimrc
 else
-    ln -sf $SELF_PATH/vim/vanilla_local_vim_plug_vimrc ~/.local_vim_plug_vimrc
+    ln -sf $SELF_PATH/../vim/vanilla_local_vim_plug_vimrc ~/.local_vim_plug_vimrc
 fi
 
 if [[ (-n "${GOPATH+set}" ) && ($(command -v go version)) ]]; then
@@ -36,10 +35,10 @@ rm -rf ~/.vim/Trashed-Bundles ~/.vim/bundle
 rm -f ~/.vim/after
 
 rm -f ~/.vimrc
-ln -sf $SELF_PATH/vim/vim-plug-vimrc ~/.vimrc
+ln -sf $SELF_PATH/../vim/vim-plug-vimrc ~/.vimrc
 vim +'PlugInstall --sync' +qa
 rm ~/.vimrc
 
-ln -sf $SELF_PATH/vim/vimrc ~/.vimrc
-ln -sf $SELF_PATH/vim/vim-plug-vimrc ~/.vim/vim-plug-vimrc
-ln -sf $LINK_FLAG $SELF_PATH/vim/after ~/.vim/after
+ln -sf $SELF_PATH/../vim/vimrc ~/.vimrc
+ln -sf $SELF_PATH/../vim/vim-plug-vimrc ~/.vim/vim-plug-vimrc
+ln -sf $LINK_FLAG $SELF_PATH/../vim/after ~/.vim/after
