@@ -89,7 +89,7 @@ touch $HOME/perl5/perlbrew/etc/bashrc
 
 ./installer/fpp.sh
 
-./configure-tmux.sh
+./configure/tmux.sh
 
 NODE_MODULES='bash-language-server fkill-cli'
 
