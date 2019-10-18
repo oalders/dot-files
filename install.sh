@@ -68,7 +68,7 @@ ln -sf $SELF_PATH/Vagrantfile ~/.vagrant.d/Vagrantfile
 git submodule init
 git submodule update
 
-./git-config.sh
+./configure/git.sh
 
 if [ $IS_MM = true ]; then
     git config --global --unset-all remote.origin.fetch
