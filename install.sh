@@ -39,7 +39,6 @@ mkdir -p ~/.cpanreporter
 mkdir -p ~/.re.pl
 mkdir -p ~/.vagrant.d
 mkdir -p ~/.npm-packages
-mkdir -p ~/.ssh/sockets
 
 ln -sf $SELF_PATH/ackrc ~/.ackrc
 ln -sf $SELF_PATH/bashrc ~/.bashrc
@@ -62,7 +61,6 @@ ln -sf $SELF_PATH/proverc ~/.proverc
 ln -sf $SELF_PATH/psqlrc ~/.psqlrc
 ln -sf $SELF_PATH/re.pl/repl.rc ~/.re.pl/repl.rc
 ln -sf $SELF_PATH/screenrc ~/.screenrc
-ln -sf $SELF_PATH/ssh/rc ~/.ssh/rc
 ln -sf $LINK_FLAG $SELF_PATH/sqitch ~/.sqitch
 ln -sf $SELF_PATH/tigrc ~/.tigrc
 ln -sf $SELF_PATH/Vagrantfile ~/.vagrant.d/Vagrantfile
@@ -76,12 +74,7 @@ if [ $IS_MM = true ]; then
     git config --global --unset-all remote.origin.fetch
 fi
 
-if [ $IS_DARWIN = true ]; then
-    ln -sf $SELF_PATH/ssh/config ~/.ssh/config
-else
-    rm -f ~/.ssh/config
-    ln -sf $SELF_PATH/ssh/no-include-config ~/.ssh/config
-fi
+./configure/ssh.sh
 
 go get github.com/github/hub
 
