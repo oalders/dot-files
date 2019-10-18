@@ -10,22 +10,11 @@ if [ $IS_DARWIN = true ]; then
     export CPPFLAGS="-I/usr/local/opt/openssl/include"
     export LDFLAGS="-L/usr/local/opt/openssl/lib"
 
-    if [ ! $(which brew) ]; then
-        /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
-    fi
-    brew config
-    brew update
-    brew bundle install --file=brew/defaults
+    ./installer/homebrew.sh
 
     # These packages are installed because they are needed for the Linux tests.
     # It's not clear how to have them not be installed for MacOS on Travis
     if [[ $USER != 'travis' ]]; then
-        brew bundle install --file=brew/local-only
-        brew install vim -- --with-override-system-vi --without-perl
-
-        if [[ -e ~/local-dot-files/Brewfile ]]; then
-            brew bundle install --file=~/local-dot-files/Brewfile
-        fi
 
         ./macos/dock.sh
 
