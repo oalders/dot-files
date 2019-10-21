@@ -103,16 +103,5 @@ if [ $IS_DARWIN = true ]; then
     yarn global add alfred-fkill || true
 fi
 
-if [ $IS_MM = false ]; then
-    cpanm --local-lib=~/perl5 local::lib && eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)
-    cpanm --notest App::cpm
-    if [ $(which plenv) ]; then
-        plenv rehash
-    fi
-    cpm install -g --cpanfile cpan/development.cpanfile
-    if [ $(which plenv) ]; then
-        plenv rehash
-    fi
-fi
-
+./installer/cpan.sh
 exit 0
