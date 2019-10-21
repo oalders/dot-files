@@ -6,8 +6,10 @@ test -e ~/.plenv || git clone https://github.com/tokuhirom/plenv.git ~/.plenv
 source ~/.bash_profile
 test -e ~/.plenv/plugins/perl-build || git clone https://github.com/tokuhirom/Perl-Build.git ~/.plenv/plugins/perl-build/
 
-plenv install 5.26.2
-plenv global 5.26.2
+PERL_VERSION=5.30.0
+
+plenv install $PERL_VERSION
+plenv global $PERL_VERSION
 plenv install-cpanm
 plenv rehash
 
