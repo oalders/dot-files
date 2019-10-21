@@ -20,3 +20,5 @@ else
     rm -f ~/.ssh/config
     ln -sf $SELF_PATH/../ssh/no-include-config ~/.ssh/config
 fi
+
+exit 0

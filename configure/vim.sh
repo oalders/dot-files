@@ -42,3 +42,5 @@ rm ~/.vimrc
 ln -sf $SELF_PATH/../vim/vimrc ~/.vimrc
 ln -sf $SELF_PATH/../vim/vim-plug-vimrc ~/.vim/vim-plug-vimrc
 ln -sf $LINK_FLAG $SELF_PATH/../vim/after ~/.vim/after
+
+exit 0

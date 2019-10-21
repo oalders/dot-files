@@ -18,3 +18,5 @@ eval "$(plenv init -)"
 
 cpanm --notest App::cpm
 plenv rehash
+
+exit 0

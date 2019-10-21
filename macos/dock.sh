@@ -16,3 +16,5 @@ dockutil --remove 'Safari'
 dockutil --remove 'Siri'
 dockutil --remove 'System Preferences'
 dockutil --remove 'Trash'
+
+exit 0

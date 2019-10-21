@@ -26,3 +26,5 @@ function pip_install () {
 # installing sqlparse for now.
 pip_install "pip" "pip/pip-requirements.txt"
 pip_install "pip3" "pip/pip3-requirements.txt"
+
+exit 0
