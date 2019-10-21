@@ -10,7 +10,7 @@ jobs:
         os: [ubuntu-latest, macOS-latest]
 
     steps:
-      name: Run main installer
-      run: ./install.sh
-      env:
-        CI: true
+      - name: Run main installer
+        run: ./install.sh
+        env:
+          CI: true
