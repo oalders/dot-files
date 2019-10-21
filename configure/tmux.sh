@@ -4,9 +4,16 @@ set -eu -o pipefail
 
 source bash_functions.sh
 
-ln -sf $SELF_PATH/../tmux.conf ~/.tmux.conf
-ln -sf $SELF_PATH/../tmux/macos ~/.tmux-macos
-ln -sf $SELF_PATH/../tmux/linux ~/.tmux-linux
+pushd ~/dot-files
+
+ln -sf ~/dot-files/tmux.conf ~/.tmux.conf
+exit
+ln -sf ~/dot-files/tmux/macos ~/.tmux-macos
+ln -sf ~/dot-files/tmux/linux ~/.tmux-linux
+
+if [[! $IS_DARWIN ]]; then
+    sudo apt-get install tree
+fi
 
 LOCALCHECKOUT=~/.tmux/plugins/tpm
 if [ ! -d $LOCALCHECKOUT ]; then
@@ -17,8 +24,14 @@ else
     popd
 fi
 
+tree ~/.tmux
+
+tmux source ~/.tmux.conf
+
 ~/.tmux/plugins/tpm/bin/install_plugins
 ~/.tmux/plugins/tpm/bin/update_plugins all
 ~/.tmux/plugins/tpm/bin/clean_plugins
+
+popd
 
 exit 0

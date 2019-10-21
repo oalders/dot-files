@@ -61,7 +61,6 @@ alias redo='fpp --redo'
 # http://stackoverflow.com/questions/13064613/how-to-prune-local-tracking-branches-that-do-not-exist-on-remote-anymore
 alias show-local-only-branches="git branch -r | awk '{print \$1}' | egrep -v -f /dev/fd/0 <(git branch -vv | grep origin) | awk '{print \$1}'"
 alias show-merged-branches='git branch --no-color --merged | grep -v "\*" | grep -v master'
-alias source-perlbrew='source ~/perl5/perlbrew/etc/bashrc'
 alias ssh-fingerprints='ls ~/.ssh/*.pub | xargs -L 1 ssh-keygen -l -f'
 alias stp='git status | fpp --no-file-checks'
 # https://stackoverflow.com/a/19280187/406224

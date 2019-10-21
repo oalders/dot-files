@@ -3,6 +3,7 @@
 set -eu -o pipefail
 
 source ~/dot-files/bash_functions.sh
+pushd ~/dot-files
 
 # https://stackoverflow.com/a/17072017/406224
 if [ $IS_DARWIN = true ]; then
@@ -11,18 +12,20 @@ if [ $IS_DARWIN = true ]; then
     fi
     brew config
     brew update
-    brew bundle install --file=brew/defaults
 
-    # These packages are installed because they are needed for the Linux tests.
-    # It's not clear how to have them not be installed for MacOS on Travis
-    if [[ $USER != 'travis' ]]; then
+    if [[ $IS_GITHUB = true ]]; then
+        brew unlink node@6 || true
+        brew bundle install --file=brew/defaults
+    else
+        brew bundle install --file=brew/defaults
         brew bundle install --file=brew/local-only
         brew install vim -- --with-override-system-vi --without-perl || brew upgrade vim && brew link vim
 
-        if [[ -e ~/local-dot-files/Brewfile ]]; then
-            brew bundle install --file=~/local-dot-files/Brewfile
-        fi
+    fi
+    if [[ -e ~/local-dot-files/Brewfile ]]; then
+        brew bundle install --file=~/local-dot-files/Brewfile
     fi
 fi
 
+popd
 exit 0

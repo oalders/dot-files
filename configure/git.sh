@@ -93,4 +93,13 @@ source ~/dot-files/bash_functions.sh
 if [[ $IS_DARWIN ]]; then
     git lfs install
 fi
+
+if [ $IS_MM = true ]; then
+    git config --global --unset-all remote.origin.fetch
+fi
+
+if [[ $(which go) ]]; then
+    go get github.com/github/hub
+fi
+
 exit 0
