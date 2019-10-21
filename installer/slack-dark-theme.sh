@@ -1,6 +1,7 @@
 #!/bin/sh
 
-# Install a proper dark theme for Slack
+# Install a proper dark theme for Slack. This should no longer be necessary now
+# that Slack has built in dark theme support.
 
 set -eu -o pipefail
 
