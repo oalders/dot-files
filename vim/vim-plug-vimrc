@@ -27,11 +27,9 @@ Plug 'kristijanhusak/vim-carbon-now-sh'
 Plug 'lukhio/vim-mapping-conflicts'
 Plug 'mannih/vim-perl-variable-highlighter'
 Plug 'mbra/prettysql' " ,fs to format visually selected SQL
-"Plug 'oalders/syntax-check-perl',  { 'branch': 'executable-and-options' }
 Plug 'qstrahl/vim-matchmaker'
 Plug 'rhysd/git-messenger.vim'
 Plug 'rodjek/vim-puppet'
-"Plug 'rsrchboy/mojo.vim'
 Plug 'ryanpcmcquen/fix-vim-pasting'
 Plug 'scrooloose/nerdcommenter'
 Plug 'sheerun/vim-polyglot'
