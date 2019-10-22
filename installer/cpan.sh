@@ -6,10 +6,10 @@ source ~/dot-files/bash_functions.sh
 
 perl --version
 cpanm --version
+cpanm --verbose --notest App::cpm
 
 HAS_PLENV=$(which plenv)
 
-cpanm --notest App::cpm
 if [ $HAS_PLENV ]; then
     plenv rehash
 else
