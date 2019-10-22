@@ -6,11 +6,14 @@ source bash_functions.sh
 
 pushd ~/dot-files
 
-ln -sf tmux.conf ~/.tmux.conf
-ln -sf tmux/macos ~/.tmux-macos
-ln -sf tmux/linux ~/.tmux-linux
+ln -sf ~/dot-files/tmux.conf ~/.tmux.conf
+exit
+ln -sf ~/dot-files/tmux/macos ~/.tmux-macos
+ln -sf ~/dot-files/tmux/linux ~/.tmux-linux
 
-sudo apt-get install tree
+if [[! $IS_DARWIN ]]; then
+    sudo apt-get install tree
+fi
 
 LOCALCHECKOUT=~/.tmux/plugins/tpm
 if [ ! -d $LOCALCHECKOUT ]; then
@@ -22,6 +25,8 @@ else
 fi
 
 tree ~/.tmux
+
+tmux source ~/.tmux.conf
 
 ~/.tmux/plugins/tpm/bin/install_plugins
 ~/.tmux/plugins/tpm/bin/update_plugins all
