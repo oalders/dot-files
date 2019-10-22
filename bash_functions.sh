@@ -10,6 +10,11 @@ if [[ (-n "${GOPATH+set}" ) && ($(command -v go version)) ]]; then
     HAS_GO=1
 fi
 
+HAS_PLENV=0
+if [[ -d ~/.plenv ]]; then
+    HAS_PLENV=1
+fi
+
 IS_DARWIN=false
 LINK_FLAG=""
 
@@ -28,5 +33,6 @@ fi
 
 export LINK_FLAG
 export HAS_GO
+export HAS_PLENV
 export IS_DARWIN
 export IS_MM
