@@ -12,6 +12,9 @@ if [ $IS_DARWIN = true ]; then
     fi
     brew config
     brew update
+    if [[ $ENV{GITHUB_WORKSPACE} ]]; then
+        brew unlink node@6 || true
+    fi
     brew bundle install --file=brew/defaults
 
     # These packages are installed because they are needed for the Linux tests.
