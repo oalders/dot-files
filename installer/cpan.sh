@@ -4,6 +4,8 @@ set -eu -o pipefail
 
 source ~/dot-files/bash_functions.sh
 
+perl --version
+
 HAS_PLENV=$(which plenv);
 
 # silence warnings when perlbrew not installed
