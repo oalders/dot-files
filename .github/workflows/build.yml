@@ -21,12 +21,14 @@ jobs:
         run: ./configure/git.sh
       - name: Configure SSH
         run: ./configure/ssh.sh
+      # - name: Install pip
+      # run: ./installer/pip.sh
       - name: Configure vim
         run: ./configure/vim.sh
       - name: Install fpp
         run: ./installer/fpp.sh
-      - name: Configure tmux
-        run: ./configure/tmux.sh
+      # - name: Configure tmux
+      # run: ./configure/tmux.sh
       - name: Install yarn deps
         run: ./installer/yarn.sh
       - name: Install CPAN deps
