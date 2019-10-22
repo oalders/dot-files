@@ -2,14 +2,15 @@
 
 set -eu -o pipefail
 
-source ~/dot-files/bash_functions.sh
+pushd ~/dot-files
+source bash_functions.sh
 
 mkdir -p ~/.ssh/sockets
 
-ln -sf $SELF_PATH/../ssh/rc ~/.ssh/rc
+ln -sf ssh/rc ~/.ssh/rc
 
 if [ $IS_DARWIN = true ]; then
-    ln -sf $SELF_PATH/../ssh/config ~/.ssh/config
+    ln -sf ssh/config ~/.ssh/config
     mkdir -p ~/.ssh/config.d/
     if [[ -d ~/local-dot-files/ssh/config.d ]]; then
         pushd ~/.ssh/config.d/
@@ -18,7 +19,8 @@ if [ $IS_DARWIN = true ]; then
     fi
 else
     rm -f ~/.ssh/config
-    ln -sf $SELF_PATH/../ssh/no-include-config ~/.ssh/config
+    ln -sf ssh/no-include-config ~/.ssh/config
 fi
 
+popd
 exit 0

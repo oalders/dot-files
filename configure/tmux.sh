@@ -4,9 +4,11 @@ set -eu -o pipefail
 
 source bash_functions.sh
 
-ln -sf $SELF_PATH/../tmux.conf ~/.tmux.conf
-ln -sf $SELF_PATH/../tmux/macos ~/.tmux-macos
-ln -sf $SELF_PATH/../tmux/linux ~/.tmux-linux
+pushd ~/dot-files
+
+ln -sf tmux.conf ~/.tmux.conf
+ln -sf tmux/macos ~/.tmux-macos
+ln -sf tmux/linux ~/.tmux-linux
 
 LOCALCHECKOUT=~/.tmux/plugins/tpm
 if [ ! -d $LOCALCHECKOUT ]; then
@@ -20,5 +22,7 @@ fi
 ~/.tmux/plugins/tpm/bin/install_plugins
 ~/.tmux/plugins/tpm/bin/update_plugins all
 ~/.tmux/plugins/tpm/bin/clean_plugins
+
+popd
 
 exit 0
