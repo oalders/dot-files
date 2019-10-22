@@ -7,10 +7,12 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, macOS-latest]
+        os: [ubuntu-latest]
 
     steps:
       - uses: actions/checkout@v1
+      - name: Install Python setup tools
+        run: sudo apt-get install python-setuptools python3-setuptools
       - name: Set up symlink
         run: ln -s $GITHUB_WORKSPACE $HOME/dot-files
       - name: Run main installer
