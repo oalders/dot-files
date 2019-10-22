@@ -31,10 +31,6 @@ git submodule update
 
 ./configure/git.sh
 
-if [ $IS_MM = true ]; then
-    git config --global --unset-all remote.origin.fetch
-fi
-
 ./configure/ssh.sh
 
 go get github.com/github/hub
