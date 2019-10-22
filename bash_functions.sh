@@ -5,6 +5,11 @@ pathadd() {
     fi
 }
 
+HAS_GO=0
+if [[ (-n "${GOPATH+set}" ) && ($(command -v go version)) ]]; then
+    HAS_GO=1
+fi
+
 IS_DARWIN=false
 LINK_FLAG=""
 
@@ -22,5 +27,6 @@ if [ -e /usr/local/bin/mm-perl ]; then
 fi
 
 export LINK_FLAG
+export HAS_GO
 export IS_DARWIN
 export IS_MM

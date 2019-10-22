@@ -2,39 +2,38 @@
 
 set -eu -o pipefail
 
-pushd ~/dot-files
 source bash_functions.sh
+
+PREFIX=~/dot-files
 
 mkdir -p ~/.cpanreporter
 mkdir -p ~/.re.pl
 mkdir -p ~/.vagrant.d
 mkdir -p ~/.npm-packages
 
-ln -sf ackrc ~/.ackrc
-ln -sf bashrc ~/.bashrc
-ln -sf bash_profile ~/.bash_profile
-ln -sf cpanreporter/config.ini ~/.cpanreporter/config.ini
-cp dataprinter ~/.dataprinter # Data::Printer doesn't like symlinks
+ln -sf $PREFIX/ackrc ~/.ackrc
+ln -sf $PREFIX/bashrc ~/.bashrc
+ln -sf $PREFIX/bash_profile ~/.bash_profile
+ln -sf $PREFIX/cpanreporter/config.ini ~/.cpanreporter/config.ini
+cp $PREFIX/dataprinter ~/.dataprinter # Data::Printer doesn't like symlinks
 chmod 700 ~/.dataprinter
 
-ln -sf digrc ~/.digrc
-ln -sf $LINK_FLAG dzil ~/.dzil
-ln -sf gitignore_global ~/.gitignore_global
-ln -sf minicpanrc ~/.minicpanrc
+ln -sf $PREFIX/digrc ~/.digrc
+ln -sf $LINK_FLAG $PREFIX/dzil ~/.dzil
+ln -sf $PREFIX/gitignore_global ~/.gitignore_global
+ln -sf $PREFIX/minicpanrc ~/.minicpanrc
 if [ $IS_MM = false ]; then
-    ln -sf npmrc ~/.npmrc
+    ln -sf $PREFIX/npmrc ~/.npmrc
 fi
-ln -sf perlcriticrc ~/.perlcriticrc
-ln -sf perltidyrc ~/.perltidyrc
-ln -sf profile ~/.profile
-ln -sf proverc ~/.proverc
-ln -sf psqlrc ~/.psqlrc
-ln -sf re.pl/repl.rc ~/.re.pl/repl.rc
-ln -sf screenrc ~/.screenrc
-ln -sf $LINK_FLAG sqitch ~/.sqitch
-ln -sf tigrc ~/.tigrc
-ln -sf Vagrantfile ~/.vagrant.d/Vagrantfile
-
-popd
+ln -sf $PREFIX/perlcriticrc ~/.perlcriticrc
+ln -sf $PREFIX/perltidyrc ~/.perltidyrc
+ln -sf $PREFIX/profile ~/.profile
+ln -sf $PREFIX/proverc ~/.proverc
+ln -sf $PREFIX/psqlrc ~/.psqlrc
+ln -sf $PREFIX/re.pl/repl.rc ~/.re.pl/repl.rc
+ln -sf $PREFIX/screenrc ~/.screenrc
+ln -sf $LINK_FLAG $PREFIX/sqitch ~/.sqitch
+ln -sf $PREFIX/tigrc ~/.tigrc
+ln -sf $PREFIX/Vagrantfile ~/.vagrant.d/Vagrantfile
 
 exit 0

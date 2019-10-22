@@ -21,6 +21,6 @@ ln -s "$(pwd)/fpp" $bin_dir/fpp
 # This will fail if "future" needs to be installed
 source ~/dot-files/bash_functions.sh
 pathadd "$HOME/local/bin"
-fpp --help > /dev/null
+fpp --version
 
 exit 0
