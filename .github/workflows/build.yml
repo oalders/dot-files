@@ -21,6 +21,8 @@ jobs:
         run: ./installer/fpp.sh
       - name: Install Linux deps
         run: ./installer/linux.sh
+      - name: Install yarn deps
+        run: ./installer/yarn.sh
       - name: Configure Git
         run: ./configure/git.sh
       - name: Configure SSH
