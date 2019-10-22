@@ -50,9 +50,7 @@ touch $HOME/perl5/perlbrew/etc/bashrc
 
 NODE_MODULES='bash-language-server fkill-cli'
 
-if [ $IS_DARWIN = false ]; then
-    ./installer/linux.sh
-fi
+./installer/linux.sh
 
 ./installer/yarn.sh
 
