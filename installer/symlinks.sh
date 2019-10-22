@@ -9,6 +9,7 @@ mkdir -p ~/.re.pl
 mkdir -p ~/.vagrant.d
 mkdir -p ~/.npm-packages
 
+SELF_PATH = "${SELF_PATH}/.."
 echo "self path is $SELF_PATH"
 
 ln -sf $SELF_PATH/ackrc ~/.ackrc
