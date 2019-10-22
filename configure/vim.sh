@@ -16,7 +16,7 @@ else
     ln -sf $PREFIX/vim/vanilla_local_vim_plug_vimrc ~/.local_vim_plug_vimrc
 fi
 
-if [[ $HAS_GO ]]; then
+if [[ $HAS_GO = true ]]; then
     echo "Installing shfmt"
     go get -u mvdan.cc/sh/cmd/shfmt
 

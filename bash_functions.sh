@@ -5,16 +5,16 @@ pathadd() {
     fi
 }
 
-HAS_GO=0
+HAS_GO=false
 if [[ (-n "${GOPATH+set}" ) && ($(command -v go version)) ]]; then
-    HAS_GO=1
+    HAS_GO=true
 fi
 
-HAS_PLENV=0
+HAS_PLENV=false
 
 # should probably also ensure that Plenv version is not the system Perl
 if [[ (-n "${PLENV_SHELL+set}" ) ]]; then
-    HAS_PLENV=1
+    HAS_PLENV=true
 fi
 
 IS_DARWIN=false
