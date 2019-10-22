@@ -17,8 +17,6 @@ jobs:
         run: ./installer/homebrew.sh
       - name: Maybe install Linux deps
         run: ./installer/linux.sh
-      - name: Maybe clean up MacOS dock
-        run: ./configure/dock.sh
       - name: Install symlinks
         run: ./installer/symlinks.sh
       - name: Update Git submodules

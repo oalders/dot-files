@@ -1,5 +1,6 @@
 # don't install these on Travis CI
 brew "mas"
+brew "dockutil"
 brew "node"
 brew "python"
 brew "sqlite"
