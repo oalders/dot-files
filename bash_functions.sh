@@ -11,7 +11,9 @@ if [[ (-n "${GOPATH+set}" ) && ($(command -v go version)) ]]; then
 fi
 
 HAS_PLENV=0
-if [[ -d ~/.plenv ]]; then
+
+# should probably also ensure that Plenv version is not the system Perl
+if [[ (-n "${PLENV_SHELL+set}" ) ]]; then
     HAS_PLENV=1
 fi
 
