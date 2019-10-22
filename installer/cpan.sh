@@ -8,6 +8,11 @@ perl --version
 cpanm --version
 cpanm --verbose --notest App::cpm
 
+cpm install -g --verbose --cpanfile cpan/development.cpanfile
+cpm install -g --verbose --verbose --verbose --verbose --verbose --verbose --verbose --verbose --verbose --cpanfile cpan/cli.cpanfile
+
+exit 0
+
 HAS_PLENV=$(which plenv)
 
 if [ $HAS_PLENV ]; then
@@ -21,8 +26,8 @@ if [ $IS_DARWIN = true ]; then
     export CPPFLAGS="-I/usr/local/opt/openssl/include"
     export LDFLAGS="-L/usr/local/opt/openssl/lib"
 fi
-cpm install -g --cpanfile cpan/development.cpanfile
-cpm install -g --cpanfile cpan/cli.cpanfile
+cpm install -g --verbose --cpanfile cpan/development.cpanfile
+cpm install -g --verbose --verbose --verbose --verbose --verbose --verbose --verbose --verbose --verbose --cpanfile cpan/cli.cpanfile
 
 if [ $HAS_PLENV ]; then
     plenv rehash
