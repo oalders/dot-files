@@ -12,7 +12,7 @@ jobs:
     steps:
       - uses: actions/checkout@v1
       - name: Set up symlink
-        run: ln -s $ENV{GITHUB_WORKSPACE} $ENV{HOME}/dot-files
+        run: ln -s $GITHUB_WORKSPACE $HOME/dot-files
       - name: Run main installer
         run: ./install.sh
         env:
