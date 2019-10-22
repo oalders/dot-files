@@ -9,6 +9,8 @@ mkdir -p ~/.re.pl
 mkdir -p ~/.vagrant.d
 mkdir -p ~/.npm-packages
 
+echo "self path is $SELF_PATH"
+
 ln -sf $SELF_PATH/ackrc ~/.ackrc
 ln -sf $SELF_PATH/bashrc ~/.bashrc
 ln -sf $SELF_PATH/bash_profile ~/.bash_profile
