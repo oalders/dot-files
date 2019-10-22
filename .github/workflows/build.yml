@@ -10,6 +10,7 @@ jobs:
         os: [ubuntu-latest, macOS-latest]
 
     steps:
+      - uses: actions/checkout@v1
       - name: Run main installer
         run: ./install.sh
         env:
