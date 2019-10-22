@@ -4,6 +4,8 @@ set -eu -o pipefail
 
 source ~/dot-files/bash_functions.sh
 
+NODE_MODULES='bash-language-server fkill-cli'
+
 if [[ $(command -v yarnx -v) ]]; then
     echo "yarn already installed"
 else
