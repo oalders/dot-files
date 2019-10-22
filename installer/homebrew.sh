@@ -15,7 +15,7 @@ if [ $IS_DARWIN = true ]; then
 
     # These packages are installed because they are needed for the Linux tests.
     # It's not clear how to have them not be installed for MacOS on Travis
-    if [[ $USER != 'travis' ]]; then
+    if [[ ! $ENV{GITHUB_WORKSPACE} ]]; then
         brew bundle install --file=brew/local-only
         brew install vim -- --with-override-system-vi --without-perl || brew upgrade vim && brew link vim
 
