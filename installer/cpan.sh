@@ -13,11 +13,11 @@ fi
 
 cpanm --notest App::cpm
 
-# Maybe add ~/perl5/bin to $PATH
-source ~/dot-files/bashrc
-
 if [ $HAS_PLENV ]; then
+    echo "HAS PLENV"
     plenv rehash
+else
+    pathadd "$HOME/perl5/bin"
 fi
 
 if [ $IS_DARWIN = true ]; then

@@ -5,12 +5,13 @@ set -eu -o pipefail
 source ~/dot-files/bash_functions.sh
 
 ./installer/homebrew.sh
+./installer/linux.sh
+
 ./configure/dock.sh
 
 ./installer/symlinks.sh
 
-git submodule init
-git submodule update
+./installer/git-submodules.sh
 
 ./configure/git.sh
 
@@ -23,8 +24,6 @@ git submodule update
 ./installer/fpp.sh
 
 ./configure/tmux.sh
-
-./installer/linux.sh
 
 ./installer/yarn.sh
 
