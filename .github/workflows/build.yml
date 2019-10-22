@@ -11,13 +11,21 @@ jobs:
 
     steps:
       - uses: actions/checkout@v1
-      - name: apt-get update
-        run: sudo apt-get update
-      - name: Install Python setup tools
-        run: sudo apt-get install python-setuptools python3-setuptools python3-venv
       - name: Set up symlink
         run: ln -s $GITHUB_WORKSPACE $HOME/dot-files
-      - name: Run main installer
-        run: ./install.sh
+      - name: Install symlinks
+        run: ./installer/symlinks.sh
+      - name: Install fpp
+        run: ./installer/fpp.sh
+      - name: Install Linux deps
+        run: ./installer/linux.sh
+      - name: Configure Git
+        run: ./configure/git.sh
+      - name: Configure SSH
+        run: ./configure/ssh.sh
+      - name: Configure tmux
+        run: ./configure/tmux.sh
+      - name: Configure vim
+        run: ./configure/vim.sh
         env:
           CI: true
