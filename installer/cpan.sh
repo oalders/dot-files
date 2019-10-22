@@ -5,6 +5,7 @@ set -eu -o pipefail
 source ~/dot-files/bash_functions.sh
 
 perl --version
+cpanm --version
 
 HAS_PLENV=$(which plenv);
 
