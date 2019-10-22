@@ -6,14 +6,8 @@ source ~/dot-files/bash_functions.sh
 
 perl --version
 cpanm --version
-cpanm --local-lib=~/perl5 local::lib && eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)
 cpanm --verbose --notest App::cpm
 pathadd "$HOME/perl5/bin"
-
-cpm install -g --verbose --cpanfile cpan/development.cpanfile
-cpm install -g --verbose --verbose --verbose --verbose --verbose --verbose --verbose --verbose --verbose --cpanfile cpan/cli.cpanfile
-
-exit 0
 
 HAS_PLENV=$(which plenv)
 
