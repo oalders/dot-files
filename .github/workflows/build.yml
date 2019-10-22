@@ -17,19 +17,21 @@ jobs:
         run: sudo apt-get install tree && tree ~/dot-files
       - name: Install symlinks
         run: ./installer/symlinks.sh
-      - name: Install fpp
-        run: ./installer/fpp.sh
       - name: Install Linux deps
         run: ./installer/linux.sh
-      - name: Install yarn deps
-        run: ./installer/yarn.sh
       - name: Configure Git
         run: ./configure/git.sh
       - name: Configure SSH
         run: ./configure/ssh.sh
-      - name: Configure tmux
-        run: ./configure/tmux.sh
       - name: Configure vim
         run: ./configure/vim.sh
+      - name: Install fpp
+        run: ./installer/fpp.sh
+      - name: Configure tmux
+        run: ./configure/tmux.sh
+      - name: Install yarn deps
+        run: ./installer/yarn.sh
+      - name: Install CPAN deps
+        run: ./installer/cpan.sh
         env:
           CI: true
