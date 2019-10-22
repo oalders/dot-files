@@ -7,7 +7,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest]
+        os: ["ubuntu-latest", "macOS-latest"]
 
     steps:
       - uses: actions/checkout@v1
@@ -15,8 +15,10 @@ jobs:
         run: cd && ln -s $GITHUB_WORKSPACE .
       - name: Install symlinks
         run: ./installer/symlinks.sh
-      - name: Install Linux deps
+      - name: Maybe install Linux deps
         run: ./installer/linux.sh
+      - name: Maybe install MacOS deps
+        run: ./installer/homebrew.sh
       - name: Configure Git
         run: ./configure/git.sh
       - name: Configure SSH
@@ -27,8 +29,8 @@ jobs:
         run: ./configure/vim.sh
       - name: Install fpp
         run: ./installer/fpp.sh
-      # - name: Configure tmux
-      # run: ./configure/tmux.sh
+      - name: Configure tmux
+        run: ./configure/tmux.sh
       - name: Install yarn deps
         run: ./installer/yarn.sh
       - name: Install CPAN deps
