@@ -2,17 +2,19 @@
 
 set -eu -o pipefail
 
-source bash_functions.sh
+PREFIX=~/dot-files
 
-pushd ~/dot-files
+source $PREFIX/bash_functions.sh
 
-ln -sf ~/dot-files/tmux.conf ~/.tmux.conf
-exit
-ln -sf ~/dot-files/tmux/macos ~/.tmux-macos
-ln -sf ~/dot-files/tmux/linux ~/.tmux-linux
+tmux -V
 
-if [[! $IS_DARWIN ]]; then
-    sudo apt-get install tree
+ln -sf $PREFIX/tmux.conf ~/.tmux.conf
+
+if [[ $IS_DARWIN == true ]]; then
+    echo "Symlinking MacOS source file"
+    ln -sf $PREFIX/tmux/macos ~/.tmux-this-os
+else
+    ln -sf $PREFIX/tmux/linux ~/.tmux-this-os
 fi
 
 LOCALCHECKOUT=~/.tmux/plugins/tpm
@@ -24,14 +26,16 @@ else
     popd
 fi
 
-tree ~/.tmux
+# tmux needs to be running in order to source a config file etc
+if [[ $IS_GITHUB == true ]]; then
+    tmux new-session -d -s CI
+    tmux ls
+fi
 
 tmux source ~/.tmux.conf
 
 ~/.tmux/plugins/tpm/bin/install_plugins
 ~/.tmux/plugins/tpm/bin/update_plugins all
 ~/.tmux/plugins/tpm/bin/clean_plugins
-
-popd
 
 exit 0
