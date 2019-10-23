@@ -6,14 +6,14 @@ pathadd() {
 }
 
 HAS_GO=false
-if [[ (-n "${GOPATH+set}" ) && ($(command -v go version)) ]]; then
+if [[ (-n "${GOPATH+set}") && ($(command -v go version)) ]]; then
     HAS_GO=true
 fi
 
 HAS_PLENV=false
 
 # should probably also ensure that Plenv version is not the system Perl
-if [[ (-n "${PLENV_SHELL+set}" ) ]]; then
+if [[ (-n "${PLENV_SHELL+set}") ]]; then
     HAS_PLENV=true
 fi
 
@@ -28,6 +28,13 @@ elif [ "$(expr substr $(uname -s) 1 5)" == "Linux" ]; then
     LINK_FLAG="-T"
 fi
 
+IS_GITHUB=false
+
+LOOKS_LIKE_GITHUB=${GITHUB_WORKSPACE:-}
+if [[ ! -z $LOOKS_LIKE_GITHUB ]]; then
+    IS_GITHUB=true
+fi
+
 IS_MM=false
 if [ -e /usr/local/bin/mm-perl ]; then
     IS_MM=true
@@ -37,4 +44,5 @@ export LINK_FLAG
 export HAS_GO
 export HAS_PLENV
 export IS_DARWIN
+export IS_GITHUB
 export IS_MM
