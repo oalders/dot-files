@@ -3,9 +3,10 @@
 set -eu -o pipefail
 
 PREFIX=~/dot-files
-pushd $PREFIX
 
-source bash_functions.sh
+source $PREFIX/bash_functions.sh
+
+tmux -V
 
 ln -sf $PREFIX/tmux.conf ~/.tmux.conf
 
@@ -25,12 +26,16 @@ else
     popd
 fi
 
+# tmux needs to be running in order to source a config file etc
+if [[ $IS_GITHUB == true ]]; then
+    tmux new-session -d -s CI
+    tmux ls
+fi
+
 tmux source ~/.tmux.conf
 
 ~/.tmux/plugins/tpm/bin/install_plugins
 ~/.tmux/plugins/tpm/bin/update_plugins all
 ~/.tmux/plugins/tpm/bin/clean_plugins
-
-popd
 
 exit 0
