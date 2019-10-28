@@ -27,15 +27,15 @@ else
 fi
 
 # tmux needs to be running in order to source a config file etc
-if [[ $IS_GITHUB == true ]]; then
-    tmux new-session -d -s CI
-    tmux ls
-fi
+tmux new-session -d -s CI
+tmux ls
 
 tmux source ~/.tmux.conf
 
 ~/.tmux/plugins/tpm/bin/install_plugins
 ~/.tmux/plugins/tpm/bin/update_plugins all
 ~/.tmux/plugins/tpm/bin/clean_plugins
+
+tmux kill-session -t CI
 
 exit 0
