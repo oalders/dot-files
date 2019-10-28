@@ -26,8 +26,7 @@ if [ $IS_DARWIN = true ]; then
     export LDFLAGS="-L/usr/local/opt/openssl/lib"
 fi
 
-cpm install -g --verbose --cpanfile cpan/development.cpanfile
-cpm install -g --verbose --verbose --verbose --verbose --verbose --verbose --verbose --verbose --verbose --cpanfile cpan/cli.cpanfile
+cpm install -g --verbose --cpanfile cpan/cli.cpanfile
 
 if [ $HAS_PLENV = true ]; then
     plenv rehash
