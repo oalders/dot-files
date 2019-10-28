@@ -281,7 +281,7 @@ if [ -d $GOPATH ]; then
     export PATH="$GOPATH/bin:$PATH"
 fi
 
-if [[ $IS_DARWIN ]]; then
+if [[ $IS_DARWIN = true ]]; then
     export PATH="~/dot-files/bin/osx:$PATH"
 fi
 

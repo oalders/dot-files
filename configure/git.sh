@@ -90,7 +90,7 @@ git config --global --unset branch.master.merge
 
 source ~/dot-files/bash_functions.sh
 # Requires git-lfs to have been installed
-if [[ $IS_DARWIN ]]; then
+if [[ $IS_DARWIN = true ]]; then
     git lfs install
 fi
 

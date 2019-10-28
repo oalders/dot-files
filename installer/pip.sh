@@ -28,7 +28,7 @@ pip_install "pip3" "pip/pip3-requirements.txt"
 # The prettysql plugin uses /usr/bin/env python, which finds the first python
 # in the path, which will not be python3, so we'll need to double up on
 # installing sqlparse for now.
-if [[ $IS_DARWIN ]]; then
+if [[ $IS_DARWIN == true ]]; then
     pathadd "/Users/$USER/Library/Python/2.7/bin"
     if [[ ! $(which pip) ]]; then
         pushd /tmp
