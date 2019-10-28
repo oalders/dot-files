@@ -40,9 +40,17 @@ if [ -e /usr/local/bin/mm-perl ]; then
     IS_MM=true
 fi
 
-export LINK_FLAG
+IS_SUDOER=false
+if [[ $(sudo -n true 2>&1 | grep 'password') ]]; then
+    IS_SUDOER=false
+else
+    IS_SUDOER=true
+fi
+
 export HAS_GO
 export HAS_PLENV
 export IS_DARWIN
 export IS_GITHUB
 export IS_MM
+export IS_SUDOER
+export LINK_FLAG
