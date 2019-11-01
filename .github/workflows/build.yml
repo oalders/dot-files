@@ -37,5 +37,3 @@ jobs:
         run: ./installer/yarn.sh
       - name: Install CPAN deps
         run: ./installer/cpan.sh
-        env:
-          CI: true
