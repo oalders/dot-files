@@ -178,7 +178,7 @@ function tmux() {
             BRANCH=$(git rev-parse --abbrev-ref HEAD)
             CURRENT_DIR=${PWD##*/}
 
-            SESSION_NAME="$CURRENT_DIR ⚡ $BRANCH"
+            SESSION_NAME="$CURRENT_DIR    $BRANCH"
         else
             SESSION_NAME=$(pwd)
             STRIP="$HOME/"
