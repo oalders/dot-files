@@ -17,10 +17,12 @@ if [ $IS_DARWIN = true ]; then
     dockutil --remove 'Maps'
     dockutil --remove 'News'
     dockutil --remove 'Notes'
+    dockutil --remove 'Podcasts'
     dockutil --remove 'Safari'
     dockutil --remove 'Siri'
     dockutil --remove 'System Preferences'
     dockutil --remove 'Trash'
+    dockutil --remove 'TV'
 
 fi
 
