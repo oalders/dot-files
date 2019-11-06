@@ -29,4 +29,6 @@ source ~/dot-files/bash_functions.sh
 
 ./installer/cpan.sh
 
+./installer/cargo.sh
+
 exit 0

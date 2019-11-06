@@ -93,6 +93,9 @@ pathadd "$HOME/dot-files/node_modules/.bin"
 # Homebrew installs some binaries here
 pathadd "/usr/local/sbin"
 
+# Rust binaries installed via cargo
+pathadd "$HOME/.cargo/bin"
+
 LOCALPERLBIN=~/perl5/bin
 
 if [[ ! -d ~/.plenv && -d $LOCALPERLBIN ]]; then
