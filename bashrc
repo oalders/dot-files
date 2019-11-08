@@ -92,6 +92,7 @@ pathadd "$HOME/dot-files/node_modules/.bin"
 
 # Homebrew installs some binaries here
 pathadd "/usr/local/sbin"
+pathadd "/usr/local/bin"
 
 # Rust binaries installed via cargo
 pathadd "$HOME/.cargo/bin"
