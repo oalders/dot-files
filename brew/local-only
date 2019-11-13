@@ -1,4 +1,4 @@
-# don't install these on Travis CI
+# don't install these on CI
 brew "mas"
 brew "dockutil"
 brew "node"
@@ -21,3 +21,4 @@ mas "PopClip", id: 445189367
 mas "Skip Tunes", id: 499695659
 mas "Slack", id: 803453959
 mas "Textual IRC Client", id: 1262957439
+tap "gpgsuite/gpgsuite"
