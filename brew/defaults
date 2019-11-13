@@ -1,5 +1,6 @@
 tap "homebrew/bundle"
 tap "homebrew/core"
+tag "gpgsuite/gpgsuite"
 tap "neovim/neovim"
 brew "ansible"
 brew "aspell"
