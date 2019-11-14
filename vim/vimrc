@@ -171,6 +171,7 @@ let g:ale_fixers = {
 \   'json': ['prettier'],
 \   'perl': ['perltidy'],
 \   'sh': ['shfmt'],
+\   'toml': ['prettier'],
 \   'yaml': ['prettier'],
 \}
 
