@@ -39,6 +39,7 @@ alias dzil-prove='dzil run --nobuild prove -lv t/my-test.t'
 alias dzil-prove-xs='dzil run prove -lv t/my-test.t'
 alias dzil-stale='dzil stale --all | xargs cpm install --global'
 alias fig=docker-compose
+alias fix-gpg='pkill -9 gpg-agent && export GPG_TTY=$(tty)'
 # https://serverfault.com/questions/207100/how-can-i-find-phantom-storage-usage
 alias g=git
 alias gdf='git domo|fpp'
