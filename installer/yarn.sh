@@ -4,23 +4,22 @@ set -eu -o pipefail
 
 source ~/dot-files/bash_functions.sh
 
-NODE_MODULES='bash-language-server fkill-cli'
-
-if [[ $(command -v yarnx -v) ]]; then
+if [[ $(command -v yarn -v) ]]; then
     echo "yarn already installed"
 else
     rm -rf $HOME/.yarn
     curl -o- -L https://yarnpkg.com/install.sh | bash
 fi
 
-if [ $IS_MM = false ]; then
-    yarn global add $NODE_MODULES || true
-else
-    yarn add $NODE_MODULES || true
-fi
+# The --production flag is a hack which allows us to use the same package.json
+# for both MacOS and Linux.  alfred-fkill will prevent a clean install on
+# Linux, so we declare it as a dev dependency and don't install dev
+# dependencies on "production", which is Linux in this case.
 
 if [ $IS_DARWIN = true ]; then
-    yarn global add alfred-fkill || true
+    yarn install
+else
+    yarn install --production=true
 fi
 
 exit 0

@@ -17,10 +17,10 @@
   },
   "homepage": "https://github.com/oalders/dot-files#readme",
   "devDependencies": {
-    "acorn": "^7.1.0"
+    "alfred-fkill": "^0.4.1"
   },
   "dependencies": {
-    "alfred-fkill": "^0.4.1",
+    "acorn": "^7.1.0",
     "bash-language-server": "^1.6.1",
     "eslint": "^6.6.0",
     "fkill-cli": "^5.2.0",
