@@ -15,8 +15,11 @@ fi
 # for both MacOS and Linux.  alfred-fkill will prevent a clean install on
 # Linux, so we declare it as a dev dependency and don't install dev
 # dependencies on "production", which is Linux in this case.
+#
+# Also, Alfred will not be installed on GitHub, so treat that as a Linux
+# install.
 
-if [ $IS_DARWIN = true ]; then
+if [[ $IS_DARWIN = true ]] && [[ $IS_GITHUB = false ]]; then
     yarn install
 else
     yarn install --production=true
