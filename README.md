@@ -1,3 +1,5 @@
+[![Actions Status](https://github.com/oalders/dot-files/workflows/Build/badge.svg)](https://github.com/oalders/dot-files/actions)
+
 # Homebrew
 
 https://github.com/Homebrew/homebrew-bundle
