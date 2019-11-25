@@ -106,7 +106,6 @@ if [[ ! -d ~/.plenv && -d $LOCALPERLBIN ]]; then
     [ $SHLVL -eq 1 ] && eval "$(perl -I$HOME/perl5/lib/perl5 -Mlocal::lib)"
 
     if [ -d $LOCALPERLBIN ]; then
-        export PATH="$LOCALPERLBIN:$PATH"
         pathadd $LOCALPERLBIN
     fi
 fi
@@ -306,7 +305,7 @@ fi
 
 NPM_PACKAGES="${HOME}/.npm-packages"
 
-PATH="$NPM_PACKAGES/bin:$PATH"
+pathadd $NPM_PACKAGES
 
 # Unset manpath so we can inherit from /etc/manpath via the `manpath` command
 unset MANPATH # delete if you already modified MANPATH elsewhere in your config
