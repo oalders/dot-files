@@ -322,7 +322,8 @@ fi
 
 include ~/.local_bashrc
 
-export PATH="$HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules/.bin:$PATH"
+pathadd "$HOME/.yarn/bin"
+pathadd "$HOME/.config/yarn/global/node_modules/.bin"
 
 # clean up PATH
 # http://linuxg.net/oneliners-for-removing-the-duplicates-in-your-path/
