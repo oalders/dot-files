@@ -289,10 +289,6 @@ if [[ $IS_DARWIN = true ]]; then
     export PATH="~/dot-files/bin/osx:$PATH"
 fi
 
-# clean up PATH
-# http://linuxg.net/oneliners-for-removing-the-duplicates-in-your-path/
-PATH=$(echo -n $PATH | awk -v RS=: -v ORS=: '!arr[$0]++')
-
 # https://unix.stackexchange.com/questions/19317/can-less-retain-colored-output
 fancydiff() {
     git $1 --color=always $2 | diff-so-fancy | less -R
@@ -327,3 +323,7 @@ fi
 include ~/.local_bashrc
 
 export PATH="$HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules/.bin:$PATH"
+
+# clean up PATH
+# http://linuxg.net/oneliners-for-removing-the-duplicates-in-your-path/
+PATH=$(echo -n $PATH | awk -v RS=: -v ORS=: '!arr[$0]++')
