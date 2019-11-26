@@ -52,7 +52,6 @@ alias ll='ls -alhG'
 alias ls='ls -G'
 alias lsd='ls --group-directories-first'
 alias octal_perms='stat -c "%a %n"'
-alias path="tr : '\n' <<<$PATH"
 alias penv='perl -MDDP -e "p(%ENV)"'
 alias pine=alpine
 alias pretty='python -mjson.tool'
@@ -110,11 +109,19 @@ if [[ ! -d ~/.plenv && -d $LOCALPERLBIN ]]; then
     fi
 fi
 
-function clean_path () {
+# path used to be an alias, but that keeps a copy of $PATH in it, which is
+# really confusing
+unalias path
+
+function path() {
+    tr : '\n' <<<$PATH
+}
+
+function clean_path() {
     tr : '\n' <<<$PATH | grep \/ | grep -v game | uniq | paste -sd ":" -
 }
 
-function reset_path () {
+function reset_path() {
     export PATH=$(clean_path)
 }
 
