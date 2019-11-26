@@ -110,6 +110,14 @@ if [[ ! -d ~/.plenv && -d $LOCALPERLBIN ]]; then
     fi
 fi
 
+function clean_path () {
+    tr : '\n' <<<$PATH | grep \/ | grep -v game | uniq | paste -sd ":" -
+}
+
+function reset_path () {
+    export PATH=$(clean_path)
+}
+
 function whosonport() {
     sudo lsof -i :$1
 }
@@ -321,6 +329,4 @@ include ~/.local_bashrc
 pathadd "$HOME/.yarn/bin"
 pathadd "$HOME/.config/yarn/global/node_modules/.bin"
 
-# clean up PATH
-# http://linuxg.net/oneliners-for-removing-the-duplicates-in-your-path/
-PATH=$(echo -n $PATH | awk -v RS=: -v ORS=: '!arr[$0]++')
+reset_path
