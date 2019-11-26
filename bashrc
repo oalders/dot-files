@@ -285,10 +285,6 @@ if [ -d $GOPATH ]; then
     export PATH="$GOPATH/bin:$PATH"
 fi
 
-if [[ $IS_DARWIN = true ]]; then
-    export PATH="~/dot-files/bin/osx:$PATH"
-fi
-
 # https://unix.stackexchange.com/questions/19317/can-less-retain-colored-output
 fancydiff() {
     git $1 --color=always $2 | diff-so-fancy | less -R
