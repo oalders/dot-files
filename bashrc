@@ -111,7 +111,7 @@ fi
 
 # path used to be an alias, but that keeps a copy of $PATH in it, which is
 # really confusing
-unalias path
+alias | grep path && unalias path
 
 function path() {
     tr : '\n' <<<$PATH
