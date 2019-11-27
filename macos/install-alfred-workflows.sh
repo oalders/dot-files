@@ -29,5 +29,9 @@ wait_for_input
 
 wget https://github.com/fniephaus/alfred-travis-ci/releases/download/v2.1/Travis-CI-for-Alfred.alfredworkflow
 open Travis-CI-for-Alfred.alfredworkflow
+wait_for_input
+
+wget https://github.com/ruedap/alfred-font-awesome-workflow/raw/master/Font-Awesome.alfredworkflow
+open Font-Awesome.alfredworkflow
 
 exit 0
