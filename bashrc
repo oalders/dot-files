@@ -38,7 +38,6 @@ alias du='du -h'
 alias dzil-prove='dzil run --nobuild prove -lv t/my-test.t'
 alias dzil-prove-xs='dzil run prove -lv t/my-test.t'
 alias dzil-stale='dzil stale --all | xargs cpm install --global'
-alias fig=docker-compose
 alias fix-gpg='pkill -9 gpg-agent && export GPG_TTY=$(tty)'
 # https://serverfault.com/questions/207100/how-can-i-find-phantom-storage-usage
 alias g=git
@@ -119,6 +118,12 @@ function path() {
 
 function clean_path() {
     tr : '\n' <<<$PATH | grep \/ | grep -v game | uniq | paste -sd ":" -
+}
+
+function fig {
+    pushd ~/Documents/github/metacpan-docker > /dev/null
+    docker-compose $@
+    popd > /dev/null
 }
 
 function reset_path() {
