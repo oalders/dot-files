@@ -157,6 +157,7 @@ nmap <silent> <C-j> <Plug>(ale_next_wrap)
 
 " gometalinter currently not enabled
 let g:ale_linters = {
+\   'ansible' : ['ansible-lint'],
 \   'go': ['gofmt', 'golint', 'go vet', 'golangci-lint'],
 \   'dockerfile': ['hadolint'],
 \   'perl': ['syntax-check', 'perlcritic'],
