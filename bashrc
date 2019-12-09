@@ -117,7 +117,7 @@ function path() {
 }
 
 function clean_path() {
-    tr : '\n' <<<$PATH | grep \/ | grep -v game | uniq | paste -sd ":" -
+    tr : '\n' <<<$PATH | awk '!x[$0]++' | grep \/ | grep -v game | paste -sd ":" -
 }
 
 function fig {
