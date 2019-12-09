@@ -21,9 +21,9 @@ LOCALCHECKOUT=~/.tmux/plugins/tpm
 if [ ! -d $LOCALCHECKOUT ]; then
     git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
 else
-    pushd $LOCALCHECKOUT
+    pushd $LOCALCHECKOUT > /dev/null
     git pull origin master
-    popd
+    popd > /dev/null
 fi
 
 # tmux needs to be running in order to source a config file etc

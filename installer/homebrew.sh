@@ -3,7 +3,7 @@
 set -eu -o pipefail
 
 source ~/dot-files/bash_functions.sh
-pushd ~/dot-files
+pushd ~/dot-files > /dev/null
 
 # https://stackoverflow.com/a/17072017/406224
 if [ $IS_DARWIN = true ]; then
@@ -28,5 +28,5 @@ if [ $IS_DARWIN = true ]; then
     fi
 fi
 
-popd
+popd > /dev/null
 exit 0
