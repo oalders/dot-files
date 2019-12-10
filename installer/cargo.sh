@@ -6,6 +6,8 @@ if [ $IS_DARWIN = false ]; then
     exit 0
 fi
 
+source ~/dot-files/bash_functions.sh
+
 # Maybe add to $PATH just to be safe
 pathadd "$HOME/.cargo/bin"
 
