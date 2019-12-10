@@ -2,6 +2,8 @@
 
 set -eu -o pipefail
 
+git submodule init && git submodule update
+
 source ~/dot-files/bash_functions.sh
 
 ./installer/homebrew.sh
