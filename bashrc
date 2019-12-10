@@ -120,6 +120,10 @@ function clean_path() {
     tr : '\n' <<<$PATH | awk '!x[$0]++' | grep \/ | grep -v game | paste -sd ":" -
 }
 
+function remove_path() {
+    export PATH=$(tr : '\n' <<<$PATH | grep -v ^$1$ | paste -sd ":" -)
+}
+
 function fig {
     pushd ~/Documents/github/metacpan-docker > /dev/null
     docker-compose $@
