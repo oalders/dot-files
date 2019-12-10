@@ -80,21 +80,21 @@ alias o2d="perl -e 'printf qq|%d\n|, oct( shift )'"
 alias o2h="perl -e 'printf qq|%X\n|, oct( shift )'"
 
 # python scripts via pip install --user
-pathadd "$HOME/Library/Python/3.7/bin"
-pathadd "$HOME/.local/bin"
+add_path "$HOME/Library/Python/3.7/bin"
+add_path "$HOME/.local/bin"
 
-pathadd "/usr/local/sbin"
-pathadd "$HOME/local/bin"
+add_path "/usr/local/sbin"
+add_path "$HOME/local/bin"
 
 # node modules locally installing bin files
-pathadd "$HOME/dot-files/node_modules/.bin"
+add_path "$HOME/dot-files/node_modules/.bin"
 
 # Homebrew installs some binaries here
-pathadd "/usr/local/sbin"
-pathadd "/usr/local/bin"
+add_path "/usr/local/sbin"
+add_path "/usr/local/bin"
 
 # Rust binaries installed via cargo
-pathadd "$HOME/.cargo/bin"
+add_path "$HOME/.cargo/bin"
 
 LOCALPERLBIN=~/perl5/bin
 
@@ -104,7 +104,7 @@ if [[ ! -d ~/.plenv && -d $LOCALPERLBIN ]]; then
     [ $SHLVL -eq 1 ] && eval "$(perl -I$HOME/perl5/lib/perl5 -Mlocal::lib)"
 
     if [ -d $LOCALPERLBIN ]; then
-        pathadd $LOCALPERLBIN
+        add_path $LOCALPERLBIN
     fi
 fi
 
@@ -317,7 +317,7 @@ fi
 
 NPM_PACKAGES="${HOME}/.npm-packages"
 
-pathadd $NPM_PACKAGES
+add_path $NPM_PACKAGES
 
 # Unset manpath so we can inherit from /etc/manpath via the `manpath` command
 unset MANPATH # delete if you already modified MANPATH elsewhere in your config
@@ -338,7 +338,7 @@ fi
 
 include ~/.local_bashrc
 
-pathadd "$HOME/.yarn/bin"
-pathadd "$HOME/.config/yarn/global/node_modules/.bin"
+add_path "$HOME/.yarn/bin"
+add_path "$HOME/.config/yarn/global/node_modules/.bin"
 
 reset_path

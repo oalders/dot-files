@@ -17,7 +17,7 @@ if [ $HAS_PLENV = true ]; then
     echo "HAS PLENV"
     plenv rehash
 else
-    pathadd "$HOME/perl5/bin"
+    add_path "$HOME/perl5/bin"
 fi
 
 if [ $IS_DARWIN = true ]; then

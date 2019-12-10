@@ -9,7 +9,7 @@ fi
 source ~/dot-files/bash_functions.sh
 
 # Maybe add to $PATH just to be safe
-pathadd "$HOME/.cargo/bin"
+add_path "$HOME/.cargo/bin"
 
 if [[ $(command -v precious --version) ]]; then
     echo "precious already installed"

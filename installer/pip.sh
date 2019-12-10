@@ -29,7 +29,7 @@ pip_install "pip3" "pip/pip3-requirements.txt"
 # in the path, which will not be python3, so we'll need to double up on
 # installing sqlparse for now.
 if [[ $IS_DARWIN == true ]]; then
-    pathadd "/Users/$USER/Library/Python/2.7/bin"
+    add_path "/Users/$USER/Library/Python/2.7/bin"
     if [[ ! $(which pip) ]]; then
         pushd /tmp > /dev/null
         curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
