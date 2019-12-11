@@ -7,6 +7,7 @@ brew "sqlite"
 brew "vagrant-completion"
 cask "alfred"
 cask "dash"
+cask "gpg-suite"
 cask "google-chrome"
 cask "iterm2"
 cask "macdown"
@@ -21,4 +22,3 @@ mas "PopClip", id: 445189367
 mas "Skip Tunes", id: 499695659
 mas "Slack", id: 803453959
 mas "Textual IRC Client", id: 1262957439
-tap "gpgsuite/gpgsuite"
