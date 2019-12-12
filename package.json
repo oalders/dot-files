@@ -21,7 +21,7 @@
   },
   "dependencies": {
     "acorn": "^7.1.0",
-    "bash-language-server": "^1.6.1",
+    "bash-language-server": "^1.7.0",
     "eslint": "^6.7.2",
     "fkill-cli": "^5.2.0",
     "jsonlint": "^1.6.3",
