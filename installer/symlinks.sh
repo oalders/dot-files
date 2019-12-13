@@ -6,14 +6,16 @@ source bash_functions.sh
 
 PREFIX=~/dot-files
 
+mkdir -p ~/.config/yamllint
 mkdir -p ~/.cpanreporter
+mkdir -p ~/.npm-packages
 mkdir -p ~/.re.pl
 mkdir -p ~/.vagrant.d
-mkdir -p ~/.npm-packages
 
 ln -sf $PREFIX/ackrc ~/.ackrc
 ln -sf $PREFIX/bashrc ~/.bashrc
 ln -sf $PREFIX/bash_profile ~/.bash_profile
+ln -sf $PREFIX/yamllint.yml ~/.config/yamllint/config
 ln -sf $PREFIX/cpanreporter/config.ini ~/.cpanreporter/config.ini
 cp $PREFIX/dataprinter ~/.dataprinter # Data::Printer doesn't like symlinks
 chmod 700 ~/.dataprinter
