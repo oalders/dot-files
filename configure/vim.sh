@@ -20,8 +20,9 @@ if [[ $HAS_GO = true ]]; then
     echo "Installing shfmt"
     go get -u mvdan.cc/sh/cmd/shfmt
 
+    # https://github.com/golangci/golangci-lint#binary
     echo "Installing golangci-lint"
-    go get -u github.com/golangci/golangci-lint/cmd/golangci-lint
+    curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.21.0
 else
     echo "Go not found. Not installing shfmt or golangci-lint"
 fi
