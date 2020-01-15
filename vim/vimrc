@@ -288,11 +288,13 @@ endfun
 fun HideGutter()
     :GitGutterDisable
     :set nonumber
+    :set nolist
 endfun
 
 fun ShowGutter()
     :GitGutterEnable
     :set number
+    :set list
 endfun
 
 " Remove last character from each line
