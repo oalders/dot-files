@@ -216,6 +216,9 @@ let g:go_info_mode='gopls'
 
 let g:go_rename_command = 'gopls'
 
+" vim-polyglot
+let g:polyglot_disabled = ['go', 'perl']
+
 " ########### All file Types ###########
 "
 " Exec current file
