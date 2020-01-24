@@ -191,7 +191,7 @@ autocmd BufEnter .tidyallrc       :setlocal filetype=dosini
 autocmd BufEnter .yath.rc         :setlocal filetype=dosini
 autocmd BufEnter .yath.user.rc    :setlocal filetype=dosini
 
-" ########### Golang ###########
+" ########### Go ###########
 " Hide tabs and show numbers for Go files
 autocmd FileType go setlocal nolist
 autocmd FileType go set number
