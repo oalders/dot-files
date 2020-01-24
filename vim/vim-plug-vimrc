@@ -28,6 +28,7 @@ Plug 'junegunn/vim-slash'
 Plug 'kristijanhusak/vim-carbon-now-sh'
 Plug 'lukhio/vim-mapping-conflicts'
 Plug 'mannih/vim-perl-variable-highlighter'
+Plug 'mzlogin/vim-markdown-toc'
 Plug 'mbra/prettysql' " ,fs to format visually selected SQL
 Plug 'qstrahl/vim-matchmaker'
 Plug 'rhysd/git-messenger.vim'

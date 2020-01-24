@@ -28,3 +28,4 @@ Remind myself of vim shortcuts etc.
 * `:Maps` - fzf normal mode mappings
 * `:BLines` - fzf lines in current buffer
 * `:Lines` - fzf lines in loaded buffers
+* `:GenTocGFM` - generate GitHub flavoured markdown table of contents
