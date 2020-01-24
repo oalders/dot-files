@@ -182,6 +182,9 @@ let g:ale_type_map = {
 \    'perlcritic': {'ES': 'WS', 'E': 'W'},
 \}
 
+let g:ale_sign_warning = emoji#for('poop')
+let g:ale_sign_error = emoji#for('bomb')
+
 autocmd BufEnter .vim-plug-vimrc  :setlocal filetype=vim
 
 " syntax highlighting for some Perl utility rc files
