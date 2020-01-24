@@ -160,6 +160,7 @@ let g:ale_linters = {
 \   'ansible' : ['ansible-lint'],
 \   'go': ['gofmt', 'golangci-lint', 'gopls'],
 \   'dockerfile': ['hadolint'],
+\   'markdown': ['markdownlint'],
 \   'perl': ['syntax-check', 'perlcritic'],
 \   'sh': ['language-server'],
 \   'vim': ['vint'],
