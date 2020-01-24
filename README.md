@@ -19,3 +19,16 @@ Ctrl-a
 
 * prefix + Ctrl-s - save
 * prefix + Ctrl-r - restore
+
+# vim
+
+Remind myself of vim shortcuts etc.
+
+* `:bp` - previous buffer
+* `:bn` - next buffer
+* `:GFiles` - `git ls-files | fzf`
+* `:GFiles?` - `git status | fzf` with preview pane
+* `:BCommits` - git commits for the current buffer
+* `:Maps` - fzf normal mode mappings
+* `:BLines` - fzf lines in current buffer
+* `:Lines` - fzf lines in loaded buffers
