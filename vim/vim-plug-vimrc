@@ -23,6 +23,7 @@ Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
 Plug 'junegunn/fzf.vim'
 Plug 'junegunn/rainbow_parentheses.vim'
 Plug 'junegunn/vader.vim'
+Plug 'junegunn/vim-emoji'
 Plug 'junegunn/vim-slash'
 Plug 'kristijanhusak/vim-carbon-now-sh'
 Plug 'lukhio/vim-mapping-conflicts'

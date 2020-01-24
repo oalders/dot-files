@@ -328,3 +328,11 @@ let g:deoplete#auto_complete_start_length = 5
 
 " fzf
 nnoremap <leader>f : <C-u>FZF<CR>
+
+" vim-emoji
+
+set completefunc=emoji#complete
+let g:gitgutter_sign_added = emoji#for('small_blue_diamond')
+let g:gitgutter_sign_modified = emoji#for('small_orange_diamond')
+let g:gitgutter_sign_removed = emoji#for('small_red_triangle')
+let g:gitgutter_sign_modified_removed = emoji#for('collision')
