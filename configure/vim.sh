@@ -23,6 +23,8 @@ if [[ $HAS_GO = true ]]; then
     # https://github.com/golangci/golangci-lint#binary
     echo "Installing golangci-lint"
     curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.21.0
+
+    go get -u golang.org/x/tools/gopls@master
 else
     echo "Go not found. Not installing shfmt or golangci-lint"
 fi
