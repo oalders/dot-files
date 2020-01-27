@@ -53,7 +53,6 @@ alias lsd='ls --group-directories-first'
 alias octal_perms='stat -c "%a %n"'
 alias penv='perl -MDDP -e "p(%ENV)"'
 alias pine=alpine
-alias pretty='python -mjson.tool'
 alias prune-local-branches='git remote prune origin && git branch -vv | grep -v origin'
 alias ps='ps auxw'
 alias redo='fpp --redo'
