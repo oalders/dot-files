@@ -182,8 +182,10 @@ let g:ale_type_map = {
 \    'perlcritic': {'ES': 'WS', 'E': 'W'},
 \}
 
-let g:ale_sign_warning = emoji#for('poop')
-let g:ale_sign_error = emoji#for('bomb')
+"let g:ale_sign_warning = emoji#for('poop')
+"let g:ale_sign_error = emoji#for('bomb')
+"highlight clear ALEErrorSign
+"highlight clear ALEWarningSign
 
 autocmd BufEnter .vim-plug-vimrc  :setlocal filetype=vim
 
@@ -335,7 +337,7 @@ nnoremap <leader>f : <C-u>FZF<CR>
 " vim-emoji
 
 set completefunc=emoji#complete
-let g:gitgutter_sign_added = emoji#for('small_blue_diamond')
-let g:gitgutter_sign_modified = emoji#for('small_orange_diamond')
-let g:gitgutter_sign_removed = emoji#for('small_red_triangle')
-let g:gitgutter_sign_modified_removed = emoji#for('collision')
+"let g:gitgutter_sign_added = emoji#for('plus-sign')
+"let g:gitgutter_sign_modified = emoji#for('small_orange_diamond')
+"let g:gitgutter_sign_removed = emoji#for('small_red_triangle')
+"let g:gitgutter_sign_modified_removed = emoji#for('collision')
