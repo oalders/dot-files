@@ -29,3 +29,10 @@ Remind myself of vim shortcuts etc.
 * `:BLines` - fzf lines in current buffer
 * `:Lines` - fzf lines in loaded buffers
 * `:GenTocGFM` - generate GitHub flavoured markdown table of contents
+
+## Alfred
+
+After Alfred and Dash are installed, click the `Integration` tab in `Dash` and
+then choose `Alfred`.  If, for instance the `HTTP Status Codes` cheat sheet has
+been downloaded via `Dash`, this will then be available in Alfred using `http`
+to begin the search.
