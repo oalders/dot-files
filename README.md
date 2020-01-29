@@ -1,5 +1,15 @@
 # My Dot Files
 
+<!-- vim-markdown-toc GFM -->
+
+* [tmux Prefix](#tmux-prefix)
+* [tmux Plugins](#tmux-plugins)
+* [tmux-resurrect](#tmux-resurrect)
+* [vim](#vim)
+* [Alfred](#alfred)
+
+<!-- vim-markdown-toc -->
+
 [![Actions Status](https://github.com/oalders/dot-files/workflows/Build/badge.svg)](https://github.com/oalders/dot-files/actions)
 
 ## tmux Prefix
