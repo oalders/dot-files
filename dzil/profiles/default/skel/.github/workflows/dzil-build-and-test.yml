@@ -1,8 +1,12 @@
 ---
-name: test
+name: dzil build and test
 
 on:
-  - push
+  push:
+    branches:
+      - "*"
+  schedule:
+    - cron: "15 4 * * 0" # Every Sunday morning
 
 jobs:
   build:
