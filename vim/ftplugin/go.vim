@@ -4,3 +4,10 @@
 " re-enable it if there's a way to get the pane to close automaticall.
 " See https://github.com/fatih/vim-go/issues/1106
 set completeopt-=preview
+
+" Much like the version in .vimrc, but without the :set list, which causes
+" tabs to have visual markers
+fun! ShowGutter()
+    :GitGutterEnable
+    :set number
+endfun
