@@ -23,7 +23,7 @@
     "acorn": "^7.1.0",
     "bash-language-server": "^1.7.0",
     "eslint": "^6.8.0",
-    "fkill-cli": "^5.2.0",
+    "fkill-cli": "^6.0.0",
     "jsonlint": "^1.6.3",
     "markdownlint": "^0.19.0",
     "markdownlint-cli": "^0.22.0",
