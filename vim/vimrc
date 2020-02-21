@@ -152,6 +152,10 @@ let g:airline#extensions#tabline#enabled = 0
 " Show Ale warnings and messages in statusline
 let g:airline#extensions#ale#enabled = 1
 
+" statusline error display doesn't seem to work
+let g:ale_set_quickfix = 1
+let g:ale_open_list = 1
+
 nmap <silent> <C-k> <Plug>(ale_previous_wrap)
 nmap <silent> <C-j> <Plug>(ale_next_wrap)
 
