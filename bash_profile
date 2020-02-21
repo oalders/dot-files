@@ -33,3 +33,6 @@ if [ -f '/Users/olaf/Documents/maxmind/google-cloud-sdk/path.bash.inc' ]; then .
 # The next line enables shell command completion for gcloud.
 if [ -f '/Users/olaf/Documents/maxmind/google-cloud-sdk/completion.bash.inc' ]; then . '/Users/olaf/Documents/maxmind/google-cloud-sdk/completion.bash.inc'; fi
 export GPG_TTY=$(tty)
+
+# Make MacOS less annoying
+export BASH_SILENCE_DEPRECATION_WARNING=1
