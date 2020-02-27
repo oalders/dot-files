@@ -16,7 +16,6 @@ if [ $IS_DARWIN = true ]; then
     if [[ $IS_GITHUB = true ]]; then
         brew unlink node@6 || true
         brew unlink node@12 || true
-        brew unlink libpq   || true
         brew bundle install --file=brew/defaults
     else
         brew bundle install --file=brew/defaults
