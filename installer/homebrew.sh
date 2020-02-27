@@ -14,7 +14,6 @@ if [ $IS_DARWIN = true ]; then
     brew update
 
     if [[ $IS_GITHUB = true ]]; then
-        brew unlink node@6 || true
         brew unlink node@12 || true
         brew bundle install --file=brew/defaults
     else
