@@ -205,7 +205,8 @@ autocmd BufEnter .yath.user.rc    :setlocal filetype=dosini
 autocmd FileType go setlocal nolist
 autocmd FileType go set number
 
-let g:go_auto_sameids = 1
+" some other plugin is already highlighting matches
+"let g:go_auto_sameids = 1
 let g:go_auto_type_info = 0
 let g:go_fmt_command = "goimports"
 let g:go_highlight_extra_types = 1
