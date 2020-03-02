@@ -2,3 +2,9 @@
 linters:
   disable:
     - wsl
+linters-settings:
+  funlen:
+    lines: 75
+    statements: 40
+  lll:
+    line-length: 100
