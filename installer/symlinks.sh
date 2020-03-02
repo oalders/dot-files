@@ -34,7 +34,6 @@ ln -sf $PREFIX/profile ~/.profile
 ln -sf $PREFIX/proverc ~/.proverc
 ln -sf $PREFIX/psqlrc ~/.psqlrc
 ln -sf $PREFIX/re.pl/repl.rc ~/.re.pl/repl.rc
-ln -sf $PREFIX/screenrc ~/.screenrc
 ln -sf $LINK_FLAG $PREFIX/sqitch ~/.sqitch
 ln -sf $PREFIX/sqliterc ~/.sqliterc
 ln -sf $PREFIX/tigrc ~/.tigrc
