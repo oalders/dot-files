@@ -1125,10 +1125,10 @@ find-up@^4.1.0:
     locate-path "^5.0.0"
     path-exists "^4.0.0"
 
-fkill-cli@^6.0.0:
-  version "6.0.0"
-  resolved "https://registry.yarnpkg.com/fkill-cli/-/fkill-cli-6.0.0.tgz#9bcf85e06d41f9e09a5e3cf893290868e333ae6c"
-  integrity sha512-YlxeZ1Oid9No7mUMVAuHX1hHhzaydXihUNM2s52y/EkCyVAbQyrSt7+E/Ij+jLO3houXG2k4d2pz4vev0jVqlQ==
+fkill-cli@^6.0.1:
+  version "6.0.1"
+  resolved "https://registry.yarnpkg.com/fkill-cli/-/fkill-cli-6.0.1.tgz#6593bd4d084a38327af3b10b54966119035ae6fd"
+  integrity sha512-eJdNdyHofekXmSGI76E2A4GBJ7FAvuAgLV7rAgL6uZXV9+ZKwNoBjt/2hxHWmDZZ9x0EEWM3wHb2b0J7UNGbBw==
   dependencies:
     chalk "^3.0.0"
     cli-truncate "^2.1.0"
