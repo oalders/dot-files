@@ -305,12 +305,12 @@ base64-js@1.2.0:
   resolved "https://registry.yarnpkg.com/base64-js/-/base64-js-1.2.0.tgz#a39992d723584811982be5e290bb6a53d86700f1"
   integrity sha1-o5mS1yNYSBGYK+XikLtqU9hnAPE=
 
-bash-language-server@^1.7.0:
-  version "1.7.0"
-  resolved "https://registry.yarnpkg.com/bash-language-server/-/bash-language-server-1.7.0.tgz#9b7e93d056ac26bebde08decdf9689685352853d"
-  integrity sha512-7LoZPq2jYPov87LDnoYY5/3KdwTjjUQbQAim9zvRvjV2DI6sku5CKLGmoqaivOyx0Ah8mUWwnvHg/1R+H5N9qg==
+bash-language-server@^1.8.0:
+  version "1.8.0"
+  resolved "https://registry.yarnpkg.com/bash-language-server/-/bash-language-server-1.8.0.tgz#bd086cc74123dcc70712dfbaff370e8d2978af16"
+  integrity sha512-qtHfFMbxX0moz0+C5ZYiV9N227KObJUWIfUURC1r5iorA98530dWkNrNet9R7fQCWzbTUlupbZIEj50uJl45Qg==
   dependencies:
-    glob "^7.1.2"
+    glob "^7.1.6"
     request "^2.83.0"
     request-promise-native "^1.0.5"
     turndown "^4.0.2"
@@ -1270,7 +1270,7 @@ glob-parent@^5.0.0:
   dependencies:
     is-glob "^4.0.1"
 
-glob@^7.0.3, glob@^7.1.2, glob@^7.1.3, glob@~7.1.2:
+glob@^7.0.3, glob@^7.1.3, glob@^7.1.6, glob@~7.1.2:
   version "7.1.6"
   resolved "https://registry.yarnpkg.com/glob/-/glob-7.1.6.tgz#141f33b81a7c2492e125594307480c46679278a6"
   integrity sha512-LwaxwyZ72Lk7vZINtNNrywX0ZuLyStrdDtabefZKAY5ZGJhVtgdznluResxNmPitE0SAO+O26sWTHeKSI2wMBA==
