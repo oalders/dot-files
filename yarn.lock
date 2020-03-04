@@ -305,10 +305,10 @@ base64-js@1.2.0:
   resolved "https://registry.yarnpkg.com/base64-js/-/base64-js-1.2.0.tgz#a39992d723584811982be5e290bb6a53d86700f1"
   integrity sha1-o5mS1yNYSBGYK+XikLtqU9hnAPE=
 
-bash-language-server@^1.8.0:
-  version "1.8.0"
-  resolved "https://registry.yarnpkg.com/bash-language-server/-/bash-language-server-1.8.0.tgz#bd086cc74123dcc70712dfbaff370e8d2978af16"
-  integrity sha512-qtHfFMbxX0moz0+C5ZYiV9N227KObJUWIfUURC1r5iorA98530dWkNrNet9R7fQCWzbTUlupbZIEj50uJl45Qg==
+bash-language-server@^1.9.0:
+  version "1.9.0"
+  resolved "https://registry.yarnpkg.com/bash-language-server/-/bash-language-server-1.9.0.tgz#b0878f3ee8776064f7f9f5782c9e53bdbf3345d2"
+  integrity sha512-ApCrZ2BXSrxQ7sCl/cyg6FY0HSSp+uNUNoKvVFlvM1pT0mBAns2wdDKCk0rdEIQzWDSaIqx/nAzJASYAYP3V+A==
   dependencies:
     glob "^7.1.6"
     request "^2.83.0"
