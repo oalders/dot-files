@@ -305,18 +305,19 @@ base64-js@1.2.0:
   resolved "https://registry.yarnpkg.com/base64-js/-/base64-js-1.2.0.tgz#a39992d723584811982be5e290bb6a53d86700f1"
   integrity sha1-o5mS1yNYSBGYK+XikLtqU9hnAPE=
 
-bash-language-server@^1.9.0:
-  version "1.9.0"
-  resolved "https://registry.yarnpkg.com/bash-language-server/-/bash-language-server-1.9.0.tgz#b0878f3ee8776064f7f9f5782c9e53bdbf3345d2"
-  integrity sha512-ApCrZ2BXSrxQ7sCl/cyg6FY0HSSp+uNUNoKvVFlvM1pT0mBAns2wdDKCk0rdEIQzWDSaIqx/nAzJASYAYP3V+A==
+bash-language-server@^1.11.1:
+  version "1.11.1"
+  resolved "https://registry.yarnpkg.com/bash-language-server/-/bash-language-server-1.11.1.tgz#a23cb42a2916a7cda342ef6b4a20aaaaf0f81dfb"
+  integrity sha512-1fF8RVa/y3yKvMAeorLbapFtRQx85c51V2P+P25U6Cl6HyDzh1IezgmdW6Rau4jg2hDWVN1hCpce36UGjCGE2g==
   dependencies:
+    fuzzy-search "^3.2.1"
     glob "^7.1.6"
     request "^2.83.0"
     request-promise-native "^1.0.5"
     turndown "^4.0.2"
     urijs "^1.19.1"
     vscode-languageserver "^5.2.1"
-    web-tree-sitter "^0.15.9"
+    web-tree-sitter "^0.16.2"
 
 bcrypt-pbkdf@^1.0.0:
   version "1.0.2"
@@ -1211,6 +1212,11 @@ functional-red-black-tree@^1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/functional-red-black-tree/-/functional-red-black-tree-1.0.1.tgz#1b0ab3bd553b2a0d6399d29c0e3ea0b252078327"
   integrity sha1-GwqzvVU7Kg1jmdKcDj6gslIHgyc=
+
+fuzzy-search@^3.2.1:
+  version "3.2.1"
+  resolved "https://registry.yarnpkg.com/fuzzy-search/-/fuzzy-search-3.2.1.tgz#65d5faad6bc633aee86f1898b7788dfe312ac6c9"
+  integrity sha512-vAcPiyomt1ioKAsAL2uxSABHJ4Ju/e4UeDM+g1OlR0vV4YhLGMNsdLNvZTpEDY4JCSt0E4hASCNM5t2ETtsbyg==
 
 generate-function@^1.0.1:
   version "1.1.0"
@@ -3327,10 +3333,10 @@ w3c-hr-time@^1.0.1:
   dependencies:
     browser-process-hrtime "^0.1.2"
 
-web-tree-sitter@^0.15.9:
-  version "0.15.10"
-  resolved "https://registry.yarnpkg.com/web-tree-sitter/-/web-tree-sitter-0.15.10.tgz#daa75c8f0a31c8ebba6f879627f698c19edd5605"
-  integrity sha512-8utowZB5h5djbotf1umt4na9Vt6Q18ZICUeC9jW4qWWjUrtQ2xvxDuAJ+EibmqUJBAKATrDMXnY2xYaskGg8wg==
+web-tree-sitter@^0.16.2:
+  version "0.16.2"
+  resolved "https://registry.yarnpkg.com/web-tree-sitter/-/web-tree-sitter-0.16.2.tgz#fc6b62681d7ca524a9ffc8498448f8e23be7b1ea"
+  integrity sha512-vxZHqu4nItCARmE+oGvTgjFBrMbhEuGI9PWYSgF4ET/nLuW3K11KQQIVhAsoGtYvTI9jdbjc/THj38P7nhYwow==
 
 webidl-conversions@^4.0.2:
   version "4.0.2"
