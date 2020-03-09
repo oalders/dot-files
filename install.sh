@@ -6,7 +6,10 @@ git submodule init && git submodule update
 
 source ~/dot-files/bash_functions.sh
 
+./installer/xcode.sh
+
 ./installer/homebrew.sh
+
 ./installer/linux.sh
 
 ./configure/dock.sh
