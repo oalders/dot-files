@@ -44,5 +44,7 @@ function chrome_tab_action( url_substring, url_to_visit_if_tab_not_found )
     ]])
 end
 
+hs.hotkey.bind({"cmd", "option"}, 'g', nil, chrome_tab_action('mail.google.com/mail/u/0','https://mail.google.com/mail/u/0/#inbox'))
+hs.hotkey.bind({"cmd", "option"}, 'i', nil, chrome_tab_action('https://www.irccloud.com/irc/magnet/','https://www.irccloud.com/irc/magnet/channel/metacpan'))
 hs.hotkey.bind({"cmd", "option"}, 'l', nil, open_app_action('Slack'))
-hs.hotkey.bind({"cmd", "option"}, 'g', nil,  chrome_tab_action('mail.google.com/mail/u/0','https://mail.google.com/mail/u/0/#inbox'))
+hs.hotkey.bind({"cmd", "option"}, 'm', nil, chrome_tab_action('https://meet.google.com/',''))
