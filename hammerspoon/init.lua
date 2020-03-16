@@ -49,5 +49,5 @@ hs.hotkey.bind(my_hotkeys, 'g', nil, chrome_tab_action('mail.google.com/mail/u/0
 hs.hotkey.bind(my_hotkeys, 'i', nil, open_app_action('iTerm'))
 hs.hotkey.bind(my_hotkeys, 'l', nil, open_app_action('Slack'))
 hs.hotkey.bind(my_hotkeys, 'm', nil, chrome_tab_action('https://meet.google.com/',''))
-hs.hotkey.bind(my_hotkeys, 'r', nil, chrome_tab_action('https://www.irccloud.com/irc/magnet/','https://www.irccloud.com/irc/magnet/channel/metacpan'))
+hs.hotkey.bind(my_hotkeys, 'o', nil, chrome_tab_action('https://www.irccloud.com/irc/magnet/','https://www.irccloud.com/irc/magnet/channel/metacpan'))
 hs.hotkey.bind(my_hotkeys, 'p', nil, chrome_tab_action('https://www.pivotaltracker.com/','https://www.pivotaltracker.com/'))
