@@ -343,5 +343,6 @@ include ~/.local_bashrc
 
 add_path "$HOME/.yarn/bin"
 add_path "$HOME/.config/yarn/global/node_modules/.bin"
+add_path "/usr/local/go/bin"
 
 reset_path
