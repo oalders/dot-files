@@ -3,7 +3,7 @@
 # sqlparse: required by mbra/prettysql
 # vint: required by ALE
 # yamllint: required by ALE
-ansible-lint
+# ansible-lint segfaults on Linux
 future
 neovim
 pynvim
