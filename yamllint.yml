@@ -6,4 +6,6 @@ rules:
   line-length:
     max: 80
     level: warning
-  truthy: enable
+  truthy:
+    enable: true
+    allowed-values: ["true", "false", "on"]
