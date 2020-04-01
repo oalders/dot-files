@@ -12,6 +12,9 @@ if [ $IS_DARWIN = true ]; then
     fi
     brew config
     brew update
+    brew upgrade
+    brew cleanup
+    brew doctor || true
 
     if [[ $IS_GITHUB = true ]]; then
         brew unlink node@12 || true
