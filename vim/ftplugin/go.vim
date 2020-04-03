@@ -11,3 +11,27 @@ fun! ShowGutter()
     :GitGutterEnable
     :set number
 endfun
+
+" Hide tabs and show numbers for Go files
+setlocal nolist
+set number
+
+" some other plugin is already highlighting matches
+"let g:go_auto_sameids = 1
+let g:go_auto_type_info = 0
+let g:go_fmt_command = "goimports"
+let g:go_highlight_extra_types = 1
+let g:go_highlight_fields = 1
+"let g:go_highlight_functions = 1
+let g:go_highlight_generate_tags = 1
+let g:go_highlight_methods = 1
+let g:go_highlight_operators = 1
+let g:go_highlight_types = 1
+let g:go_fmt_fail_silently = 1 " Ale handles this already
+
+nmap <leader>t  <Plug>(go-test)
+nmap <leader>b  <Plug>(go-build)
+
+let g:go_def_mode='gopls'
+let g:go_info_mode='gopls'
+let g:go_rename_command = 'gopls'
