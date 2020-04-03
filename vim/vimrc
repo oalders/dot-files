@@ -134,15 +134,6 @@ map <leader>t :call TidyAll()<cr>
 " ########### NERDTree ###########
 map <F2> :NERDTreeToggle<CR>
 
-map <silent> w <Plug>CamelCaseMotion_w
-map <silent> b <Plug>CamelCaseMotion_b
-map <silent> e <Plug>CamelCaseMotion_e
-map <silent> ge <Plug>CamelCaseMotion_ge
-sunmap w
-sunmap b
-sunmap e
-sunmap ge
-
 " ########### Airline ###########
 " Show open buffers at top.  Disabled by default, but leave this here so I
 " don't forget about the setting.
