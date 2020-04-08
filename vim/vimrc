@@ -101,7 +101,7 @@ vnoremap > >gv
 " make tab in v mode ident code
 vmap <tab> >gv
 vmap <s-tab> <gv
-" make tab in normal mode ident code
+" make tab in normal mode indent code
 nmap <tab> I<tab><esc>
 nmap <s-tab> ^i<bs><esc>
 

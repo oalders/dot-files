@@ -32,6 +32,7 @@ Remind myself of vim shortcuts etc.
 
 * `:bp` - previous buffer
 * `:bn` - next buffer
+* `ctrl-w =` - equalize width and height of all windows
 * `:GFiles` - `git ls-files | fzf`
 * `:GFiles?` - `git status | fzf` with preview pane
 * `:BCommits` - git commits for the current buffer
