@@ -7,6 +7,7 @@ source $PREFIX/bash_functions.sh
 
 mkdir -p ~/.vim/rc/plug
 mkdir -p ~/.vim
+mkdir -p ~/.vimtmp
 
 ln -sf $LINK_FLAG $PREFIX/vim/ftplugin ~/.vim/ftplugin
 

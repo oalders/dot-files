@@ -303,3 +303,6 @@ set completefunc=emoji#complete
 "let g:gitgutter_sign_modified = emoji#for('small_orange_diamond')
 "let g:gitgutter_sign_removed = emoji#for('small_red_triangle')
 "let g:gitgutter_sign_modified_removed = emoji#for('collision')
+
+" Prevent vim swap files from being included with important files
+set directory=$HOME/.vimtmp
