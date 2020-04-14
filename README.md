@@ -7,6 +7,7 @@
 * [tmux-resurrect](#tmux-resurrect)
 * [vim](#vim)
 * [Alfred](#alfred)
+* [Yarn](#yarn)
 
 <!-- vim-markdown-toc -->
 
@@ -48,3 +49,7 @@ After Alfred and Dash are installed, click the `Integration` tab in `Dash` and
 then choose `Alfred`.  If, for instance the `HTTP Status Codes` cheat sheet has
 been downloaded via `Dash`, this will then be available in Alfred using `http`
 to begin the search.
+
+## Yarn
+
+Upgrade deps via `yarn upgrade`.
