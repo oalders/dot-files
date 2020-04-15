@@ -6,7 +6,7 @@ test -e ~/.plenv || git clone https://github.com/tokuhirom/plenv.git ~/.plenv
 source ~/.bash_profile
 test -e ~/.plenv/plugins/perl-build || git clone https://github.com/tokuhirom/Perl-Build.git ~/.plenv/plugins/perl-build/
 
-PERL_VERSION=5.30.0
+PERL_VERSION=5.30.1
 
 plenv install $PERL_VERSION
 plenv global $PERL_VERSION
