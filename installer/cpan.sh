@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+# To install everything:
+# find cpan | grep cpanfile | xargs -n 1 cpm install -g --cpanfile
+
 set -eu -o pipefail
 
 source ~/dot-files/bash_functions.sh
