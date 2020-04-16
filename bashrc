@@ -29,7 +29,6 @@ alias brewski='brew update && brew upgrade && brew cleanup; brew doctor'
 alias bytes_human='perl -MNumber::Bytes::Human -e "print Number::Bytes::Human::format_bytes shift"'
 alias c='clear && tmux clear-history && perl -E "say (qq{\n}x65,q{-}x78); system('date');print qq{-}x78, qq{\n}"'
 alias cdr='cd `git root`'
-alias cpanx='cpanm --local-lib ~/perl5 --metacpan --mirror http://cpan.metacpan.org'
 alias d=docker
 alias delete-merged-branches='show-merged-branches | xargs -n 1 git branch -d'
 alias df='df -h'
@@ -64,19 +63,7 @@ alias stp='git status | fpp --no-file-checks'
 # https://stackoverflow.com/a/19280187/406224
 alias takeover="tmux detach -a"
 alias tg='tidyall -g && git add -p'
-alias xkcdalt='perl -MWWW::xkcd -E "say WWW::xkcd->new->fetch_metadata->{alt}"'
 alias xpasswd='perl -MCrypt::XkcdPassword -E "say Crypt::XkcdPassword->make_password"'
-
-# conversions
-alias d2b="perl -e 'printf qq|%b\n|, int( shift )'"
-alias d2h="perl -e 'printf qq|%X\n|, int( shift )'"
-alias d2o="perl -e 'printf qq|%o\n|, int( shift )'"
-alias h2b="perl -e 'printf qq|%b\n|, hex( shift )'"
-alias h2d="perl -e 'printf qq|%d\n|, hex( shift )'"
-alias h2o="perl -e 'printf qq|%o\n|, hex( shift )'"
-alias o2b="perl -e 'printf qq|%b\n|, oct( shift )'"
-alias o2d="perl -e 'printf qq|%d\n|, oct( shift )'"
-alias o2h="perl -e 'printf qq|%X\n|, oct( shift )'"
 
 # python scripts via pip install --user
 add_path "$HOME/Library/Python/3.7/bin"
