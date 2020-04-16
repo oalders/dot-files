@@ -109,10 +109,10 @@ function remove_path() {
     export PATH=$(tr : '\n' <<<$PATH | grep -v ^$1$ | paste -sd ":" -)
 }
 
-function fig {
-    pushd ~/Documents/github/metacpan-docker > /dev/null
+function fig() {
+    pushd ~/Documents/github/metacpan-docker >/dev/null
     docker-compose $@
-    popd > /dev/null
+    popd >/dev/null
 }
 
 function reset_path() {
