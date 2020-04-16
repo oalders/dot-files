@@ -38,7 +38,6 @@ alias dzil-prove='dzil run --nobuild prove -lv'
 alias dzil-prove-xs='dzil run prove -lv'
 alias dzil-stale='dzil stale --all | xargs cpm install --global'
 alias fix-gpg='pkill -9 gpg-agent && export GPG_TTY=$(tty)'
-# https://serverfault.com/questions/207100/how-can-i-find-phantom-storage-usage
 alias g=git
 alias gdf='git domo|fpp'
 alias grep='grep --color=auto'
@@ -130,6 +129,10 @@ function check_compression() {
 
 function trace_process() {
     sudo lsof -p $1 && sudo strace -fp $1
+}
+
+function open_files() {
+    sudo lsof -s | awk '$5 == "REG"' | sort -n -r -k 7,7 | head -n 50
 }
 
 function git-recover-file() {
