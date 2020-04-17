@@ -12,54 +12,9 @@ map ,ss <esc>:syntax sync fromstart<CR>
 set laststatus=2
 set backspace=2
 filetype on
-filetype plugin indent on
 
-" case insensitive search
-set ignorecase smartcase
-
-" highlight all matches
-set hlsearch
-
-hi Search ctermbg=LightYellow
-hi Search ctermfg=Red
-
-" lookahead as search pattern is specified
-set incsearch
-
-" indents
-set autoindent
-
-" reload files which have changed
-:autocmd CursorHold * checktime
-set autoread
-
-" ensure long lines get full syntax highlighting
-set synmaxcol=2000
-
-"remove all trailing whitespace
-:nnoremap <silent> - :FixWhitespace<CR>
-:vnoremap <silent> - :FixWhitespace<CR>
-
-"dictionary sort
-:vnoremap <silent> so :!sort -d --ignore-case<CR>
-
-"dictionary sort unique
-:vnoremap <silent> su :!sort -d --ignore-case<bar> uniq<CR>
-
-"ws shortcut to sort lists of words and move to one line. requires tidying
-"after the fact.
-" http://stackoverflow.com/questions/1327978/sorting-words-not-lines-in-vim
-:vnoremap <silent> ws :!perl -ne '$,=" ";print sort split /\s+/'<CR>
-
-" enables shift-tab for outdent
-exe 'set t_kB=' . nr2char(27) . '[Z'
-
-" reflow text
-nnoremap Q gqap
-vnoremap Q gq
-
-" highlight comments
-highlight Comment term=bold ctermfg=white
+" Prevent vim swap files from being included with important files
+set directory=$HOME/.vimtmp
 
 "====[ Goto last location in non-empty files ]=======
 
@@ -86,7 +41,37 @@ highlight Normal ctermbg=none
 " https://www.johnhawthorn.com/2012/09/vi-escape-delays/
 set timeoutlen=1000 ttimeoutlen=1000
 
-" ########### tabs ###########
+" reload files which have changed
+:autocmd CursorHold * checktime
+set autoread
+
+" ensure long lines get full syntax highlighting
+set synmaxcol=2000
+
+" highlight comments
+highlight Comment term=bold ctermfg=white
+
+" ########### Search ###########
+"
+" case insensitive search
+set ignorecase smartcase
+
+" highlight all matches
+set hlsearch
+
+hi Search ctermbg=LightYellow
+hi Search ctermfg=Red
+
+" lookahead as search pattern is specified
+set incsearch
+
+" ########### Indent ###########
+
+filetype plugin indent on
+set autoindent
+
+" enable shift-tab for outdent
+exe 'set t_kB=' . nr2char(27) . '[Z'
 
 set softtabstop=4
 set shiftwidth=4
@@ -98,15 +83,18 @@ set expandtab
 " Indent using tabs (while in visual mode)
 vnoremap < <gv
 vnoremap > >gv
+
 " make tab in v mode ident code
 vmap <tab> >gv
 vmap <s-tab> <gv
+
 " make tab in normal mode indent code
 nmap <tab> I<tab><esc>
 nmap <s-tab> ^i<bs><esc>
 
 :set list!
 :set listchars=tab:\|.
+
 " ########### TidyAll ###########
 
 " https://github.com/jonswar/perl-code-tidyall/blob/master/etc/editors/tidyall.vim
@@ -182,6 +170,11 @@ let g:ale_type_map = {
 "highlight clear ALEErrorSign
 "highlight clear ALEWarningSign
 
+" vim-polyglot
+let g:polyglot_disabled = ['go', 'perl']
+
+" ########### Set File Types ###########
+"
 autocmd BufEnter .vim-plug-vimrc  :setlocal filetype=vim
 
 " syntax highlighting for some Perl utility rc files
@@ -191,25 +184,17 @@ autocmd BufEnter .tidyallrc       :setlocal filetype=dosini
 autocmd BufEnter .yath.rc         :setlocal filetype=dosini
 autocmd BufEnter .yath.user.rc    :setlocal filetype=dosini
 
-" vim-polyglot
-let g:polyglot_disabled = ['go', 'perl']
-
-" ########### All file Types ###########
-"
-" Exec current file
-nnoremap <Leader>e <Esc>:call ExecFile()<CR>
-
-fun ExecFile()
-    ":call setfperm(expand("%"), "rwxr-xr-x")
-    :silent !chmod u+x %
-    :!"%:p"
-endfun
-
-" ########### Perl ###########
-
-" Treat Mojo templates (mostly) like HTML
+" Treat Perl Mojo templates (mostly) like HTML
 autocmd FileType html.epl setlocal sw=2 ts=2 sts=2
 autocmd FileType html.ep setlocal sw=2 ts=2 sts=2
+
+autocmd BufRead,BufNewFile *.tmpl set filetype=html
+
+autocmd BufRead,BufNewFile *.yml set filetype=yaml
+autocmd FileType yaml :setlocal sw=2 ts=2 sts=2
+
+au BufRead,BufNewFile bash_profile set filetype=sh
+au BufRead,BufNewFile local_bashrc set filetype=sh
 
 " ########### SplitJoin ###########
 
@@ -219,25 +204,24 @@ let g:splitjoin_join_mapping = ''
 nmap <Leader>j :SplitjoinJoin<cr>
 nmap <Leader>s :SplitjoinSplit<cr>
 
-" ########### Python ###########
-autocmd FileType python nnoremap <leader>y :0,$!yapf<Cr><C-o>
-
 " ########### SQL ###########
-vnoremap <silent> + :!sql-webformat<CR>
 
 " prevent left and right arrows from being disabled in insert mode when
 " editing SQL files
 let g:omni_sql_no_default_maps = 1
 
-" ########### HTML ###########
-autocmd BufRead,BufNewFile *.tmpl set filetype=html
-
-" ########### YAML ###########
-
-autocmd BufRead,BufNewFile *.yml set filetype=yaml
-autocmd FileType yaml :setlocal sw=2 ts=2 sts=2
-
 highlight ColorColumn ctermbg=0
+
+" ########### Functions ###########
+"
+" Exec current file
+nnoremap <Leader>e <Esc>:call ExecFile()<CR>
+
+fun ExecFile()
+    ":call setfperm(expand("%"), "rwxr-xr-x")
+    :silent !chmod u+x %
+    :!"%:p"
+endfun
 
 " Set line markers to make indentation easier in Mojo templates
 " Enable via :call ShowLines()
@@ -274,6 +258,8 @@ fun Truncate()
     :%s/.$//
 endfun
 
+" ########### Mappings ###########
+"
 nnoremap <leader>xx :call setfperm(expand('%'),"rwxrw-rw-")<cr>
 
 " Change hyphens to underscores
@@ -281,10 +267,6 @@ vnoremap <silent> uu :s/\%V\-/_/g<cr>
 
 " Change underscores to hyphens
 vnoremap <silent> hh :s/\%V_/-/g<cr>
-
-" maybe this should live in ~/.vim/ftdetect/bash_profile.vim
-au BufRead,BufNewFile bash_profile set filetype=sh
-au BufRead,BufNewFile local_bashrc set filetype=sh
 
 " https://github.com/roxma/vim-hug-neovim-rpc/issues/28
 set pyxversion=3
@@ -296,6 +278,15 @@ let g:deoplete#auto_complete_start_length = 5
 " fzf
 nnoremap <leader>f : <C-u>FZF<CR>
 
+"remove all trailing whitespace
+:nnoremap <silent> - :FixWhitespace<CR>
+:vnoremap <silent> - :FixWhitespace<CR>
+
+"dictionary sort
+:vnoremap <silent> so :!sort -d --ignore-case<CR>
+
+"dictionary sort unique
+:vnoremap <silent> su :!sort -d --ignore-case<bar> uniq<CR>
 " vim-emoji
 
 set completefunc=emoji#complete
@@ -303,6 +294,3 @@ set completefunc=emoji#complete
 "let g:gitgutter_sign_modified = emoji#for('small_orange_diamond')
 "let g:gitgutter_sign_removed = emoji#for('small_red_triangle')
 "let g:gitgutter_sign_modified_removed = emoji#for('collision')
-
-" Prevent vim swap files from being included with important files
-set directory=$HOME/.vimtmp
