@@ -196,14 +196,6 @@ autocmd FileType yaml :setlocal sw=2 ts=2 sts=2
 au BufRead,BufNewFile bash_profile set filetype=sh
 au BufRead,BufNewFile local_bashrc set filetype=sh
 
-" ########### SplitJoin ###########
-
-let g:splitjoin_split_mapping = ''
-let g:splitjoin_join_mapping = ''
-
-nmap <Leader>j :SplitjoinJoin<cr>
-nmap <Leader>s :SplitjoinSplit<cr>
-
 " ########### SQL ###########
 
 " prevent left and right arrows from being disabled in insert mode when
