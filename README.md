@@ -8,6 +8,7 @@
 * [vim](#vim)
 * [Alfred](#alfred)
 * [Yarn](#yarn)
+* [Bash](#bash)
 
 <!-- vim-markdown-toc -->
 
@@ -53,3 +54,8 @@ to begin the search.
 ## Yarn
 
 Upgrade deps via `yarn upgrade`.
+
+## Bash
+
+* `fc` - open previous command in `$EDITOR`
+* `fc 2009` - open line 2009 of `history` in `$EDITOR`
