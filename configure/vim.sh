@@ -3,15 +3,16 @@
 set -eu -o pipefail
 
 PREFIX=~/dot-files
+
 source $PREFIX/bash_functions.sh
 
 mkdir -p ~/.vim/rc/plug
 mkdir -p ~/.vim
 mkdir -p ~/.vimtmp
 
-ln -sf $LINK_FLAG $PREFIX/vim/ftplugin ~/.vim/ftplugin
+ln -sf "$LINK_FLAG" $PREFIX/vim/ftplugin ~/.vim/ftplugin
 
-if [ $IS_MM = true ]; then
+if [ "$IS_MM" = true ]; then
     ln -sf ~/local-dot-files/maxmind_local_vimrc ~/.local_vimrc
 else
     ln -sf $PREFIX/vim/vanilla_local_vim_plug_vimrc ~/.local_vim_plug_vimrc
@@ -23,7 +24,7 @@ if [[ $HAS_GO = true ]]; then
 
     # https://github.com/golangci/golangci-lint#binary
     echo "Installing golangci-lint"
-    curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.24.0
+    curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b "$(go env GOPATH)"/bin v1.24.0
 
     go get -u golang.org/x/tools/gopls@master
 else
@@ -46,6 +47,6 @@ rm ~/.vimrc
 
 ln -sf $PREFIX/vim/vimrc ~/.vimrc
 ln -sf $PREFIX/vim/vim-plug-vimrc ~/.vim/vim-plug-vimrc
-ln -sf $LINK_FLAG $PREFIX/vim/after ~/.vim/after
+ln -sf "$LINK_FLAG" $PREFIX/vim/after ~/.vim/after
 
 exit 0
