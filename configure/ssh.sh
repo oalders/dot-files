@@ -2,14 +2,16 @@
 
 set -eu -o pipefail
 
+# shellcheck source=/Users/olafalders/dot-files/bash_functions.sh
+source ~/dot-files/bash_functions.sh
+
 PREFIX=~/dot-files
-source $PREFIX/bash_functions.sh
 
 mkdir -p ~/.ssh/sockets
 
 ln -sf $PREFIX/ssh/rc ~/.ssh/rc
 
-if [ $IS_DARWIN = true ]; then
+if [ "$IS_DARWIN" = true ]; then
     ln -sf $PREFIX/ssh/config ~/.ssh/config
     mkdir -p ~/.ssh/config.d/
     if [[ -d ~/local-dot-files/ssh/config.d ]]; then
