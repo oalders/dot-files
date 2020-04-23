@@ -4,6 +4,7 @@ set -eu -o pipefail
 
 git submodule init && git submodule update
 
+# shellcheck source=bash_functions.sh
 source ~/dot-files/bash_functions.sh
 
 ./installer/xcode.sh

@@ -11,13 +11,13 @@ function pip_install() {
     # make explicit cases for Travis, MacOS and Linux
     if [ $(which $PIP) ]; then
         if [[ $USER == "travis" ]]; then
-            $PIP install -r $REQUIREMENTS
+            "$PIP" install -r "$REQUIREMENTS"
         else
-            $PIP install --user --upgrade -r $REQUIREMENTS
+            "$PIP" install --user --upgrade -r "$REQUIREMENTS"
         fi
     else
         which apt-get && sudo apt-get install -y python3-pip
-        $PIP install --user -v --upgrade -r $REQUIREMENTS
+        "$PIP" install --user -v --upgrade -r "$REQUIREMENTS"
     fi
 }
 

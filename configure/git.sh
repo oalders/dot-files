@@ -96,7 +96,7 @@ if [[ $IS_DARWIN = true ]]; then
     git lfs install
 fi
 
-if [ $IS_MM = true ]; then
+if [ "$IS_MM" = true ]; then
     git config --global --unset-all remote.origin.fetch
 fi
 
