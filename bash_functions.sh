@@ -1,3 +1,5 @@
+# shellcheck shell=bash
+
 # http://superuser.com/questions/39751/add-directory-to-path-if-its-not-already-there
 add_path() {
     if [ -d "$1" ] && [[ ":$PATH:" != *":$1:"* ]]; then
