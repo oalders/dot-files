@@ -5,7 +5,7 @@ wait_for_input() {
     read -n 1 -s -r -p "Press any key to continue"
 }
 
-cd /tmp
+cd /tmp || exit 1
 
 wget https://github.com/deanishe/alfred-vpn-manager/releases/download/v3.2.0/VPN-Manager-3.2.alfredworkflow
 open VPN-Manager-3.2.alfredworkflow
