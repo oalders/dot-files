@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # Alfred won't let you add multiple workflows at once
 wait_for_input() {
