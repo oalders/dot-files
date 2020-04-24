@@ -2,10 +2,11 @@
 
 set -eu -o pipefail
 
-if [ $IS_DARWIN = false ]; then
+if [ "$IS_DARWIN" = false ]; then
     exit 0
 fi
 
+# shellcheck source=../bash_functions.sh
 source ~/dot-files/bash_functions.sh
 
 # Maybe add to $PATH just to be safe
