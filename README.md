@@ -35,6 +35,8 @@ Remind myself of vim shortcuts etc.
 * `:bp` - previous buffer
 * `:bn` - next buffer
 * `ctrl-w =` - equalize width and height of all windows
+* `ctrl-w m` - toggle zooming of splits
+* `ctrl-o` - return to previous position in file
 * `ý¿¿»šº:vertical terminal` - vertical split into a terminal buffer
 * `:GFiles` - `git ls-files | fzf`
 * `:GFiles?` - `git status | fzf` with preview pane
