@@ -165,6 +165,8 @@ let g:ale_type_map = {
 \    'perlcritic': {'ES': 'WS', 'E': 'W'},
 \}
 
+let g:ale_sh_shellcheck_change_directory = 0
+let g:ale_shellcheck_options = '-x'
 let g:ale_writegood_options = '--no-passive'
 
 "let g:ale_sign_warning = emoji#for('poop')
