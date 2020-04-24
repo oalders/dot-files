@@ -188,7 +188,7 @@ if ( $config->{perl} ) {
             'Perl::Tidy',
         );
 
-        my $parts = join ' ', map { split ' ' } @$before;
+        my $parts        = join ' ', map { split ' ' } @$before;
         my @pre_selected = indexes { $parts =~ m{$_} } @choices;
         @before_install = choose( \@choices, { mark => \@pre_selected } );
 
