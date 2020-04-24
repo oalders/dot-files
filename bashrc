@@ -30,28 +30,24 @@ alias c='clear && tmux clear-history && perl -E "say (qq{\n}x65,q{-}x78); system
 alias cdr='cd `git root`'
 alias d=docker
 alias delete-merged-branches='show-merged-branches | xargs -n 1 git branch -d'
-alias df='df -h'
 alias dangling-dockers='docker rmi -f $(docker images -f "dangling=true" -q)'
-alias du='du -h'
 alias dzil-prove='dzil run --nobuild prove -lv'
 alias dzil-prove-xs='dzil run prove -lv'
 alias dzil-stale='dzil stale --all | xargs cpm install --global'
 alias fix-gpg='pkill -9 gpg-agent && export GPG_TTY=$(tty)'
 alias g=git
 alias gdf='git domo|fpp'
-alias grep='grep --color=auto'
+alias grep='grep --color=auto --exclude-dir=.git'
 alias hh='SwitchAudioSource -s "Built-in Output"'
 alias l='ls -lAtr'
 alias l.='ls -ldF .[a-zA-Z0-9]* --color=tty' #only show dotfiles
 alias linebreaks="perl -pi -e 's/\r/\n/g'"
 alias ll='ls -alhG'
-alias ls='ls -G'
 alias lsd='ls --group-directories-first'
 alias octal_perms='stat -c "%a %n"'
 alias penv='perl -MDDP -e "p(%ENV)"'
 alias pine=alpine
 alias prune-local-branches='git remote prune origin && git branch -vv | grep -v origin'
-alias ps='ps auxw'
 alias redo='fpp --redo'
 # http://stackoverflow.com/questions/13064613/how-to-prune-local-tracking-branches-that-do-not-exist-on-remote-anymore
 alias show-local-only-branches="git branch -r | awk '{print \$1}' | egrep -v -f /dev/fd/0 <(git branch -vv | grep origin) | awk '{print \$1}'"
@@ -95,6 +91,12 @@ fi
 # path used to be an alias, but that keeps a copy of $PATH in it, which is
 # really confusing
 alias | grep path && unalias path
+
+# remove some aliases that override real binaries
+alias | grep " df=" && unalias df
+alias | grep " du=" && unalias du
+alias | grep " ls=" && unalias ls
+alias | grep " ps=" && unalias ps
 
 function path() {
     tr : '\n' <<<"$PATH"
