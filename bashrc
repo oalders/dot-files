@@ -85,7 +85,7 @@ LOCALPERLBIN=~/perl5/bin
 if [[ ! -d ~/.plenv && -d $LOCALPERLBIN ]]; then
     PERL_CPANM_OPT="--local-lib=~/perl5"
     # adds $HOME/perl5/bin to PATH
-    [ $SHLVL -eq 1 ] && eval "$(perl -I$HOME/perl5/lib/perl5 -Mlocal::lib)"
+    [ "$SHLVL" -eq 1 ] && eval "$(perl -I$HOME/perl5/lib/perl5 -Mlocal::lib)"
 
     if [ -d $LOCALPERLBIN ]; then
         add_path $LOCALPERLBIN
@@ -97,15 +97,15 @@ fi
 alias | grep path && unalias path
 
 function path() {
-    tr : '\n' <<<$PATH
+    tr : '\n' <<<"$PATH"
 }
 
 function clean_path() {
-    tr : '\n' <<<$PATH | awk '!x[$0]++' | grep \/ | grep -v game | paste -sd ":" -
+    tr : '\n' <<<"$PATH" | awk '!x[$0]++' | grep \/ | grep -v game | paste -sd ":" -
 }
 
 function remove_path() {
-    export PATH=$(tr : '\n' <<<$PATH | grep -v ^$1$ | paste -sd ":" -)
+    export PATH=$(tr : '\n' <<<$PATH | grep -v ^$1$ | paste -sd ':' -)
 }
 
 function fig() {
@@ -123,11 +123,11 @@ function whosonport() {
 }
 
 function check_compression() {
-    curl -I -H 'Accept-Encoding: gzip,deflate' $1 | grep "Content-Encoding"
+    curl -I -H 'Accept-Encoding: gzip,deflate' "$1" | grep "Content-Encoding"
 }
 
 function trace_process() {
-    sudo lsof -p $1 && sudo strace -fp $1
+    sudo lsof -p $1 && sudo strace -fp "$1"
 }
 
 function open_files() {
@@ -139,7 +139,7 @@ function git-recover-file() {
 }
 
 function md() {
-    pandoc $1 | lynx -stdin
+    pandoc "$1" | lynx -stdin
 }
 
 if [ -f /etc/bash_completion.d/git ]; then
@@ -155,14 +155,8 @@ if ! type "ack" >/dev/null 2>&1; then
         alias ack='ack-grep'
     fi
 fi
-function gi() { curl http://gitignore.io/api/$@; }
 
-function youtube-mp3() { youtube-download $1 && ffmpeg -i $1.mp4 $1.mp3; }
-
-function wwwman() {
-    perl -we 'use URI::Escape;$cmd=shift;$args = uri_escape(join q[  ],@ARGV);
-           exec open => qq!http://explainshell.com/explain/$cmd?args=$args!' $@
-}
+function youtube-mp3() { youtube-download "$1" && ffmpeg -i "$1.mp4" "$1.mp3"; }
 
 # https://raim.codingfarm.de/blog/2013/01/30/tmux-update-environment/
 function tmux() {
@@ -245,7 +239,7 @@ function fpp() {
         return 1
         ;;
     --redo)
-        if [ $2 ]; then
+        if [ "$2" ]; then
             if [ $2 \> 0 ]; then
                 LAST_HISTORY_LINE=$(head -n $2 $HISTORY_FILE | tail -n 1)
             else
@@ -276,8 +270,8 @@ function fpp() {
 # http://www.somethingorothersoft.com/2012/05/22/pulling-github-pull-requests-with-git/
 # fetch-pull-request origin 1234
 fetch-pull-request() {
-    git fetch $1 refs/pull/$2/head:refs/remotes/pr/$2
-    git co -b pr/$2 pr/$2
+    git fetch "$1" "refs/pull/$2/head:refs/remotes/pr/$2"
+    git co -b "pr/$2" "pr/$2"
 }
 source ~/dot-files/inc/oh-my-git/prompt.sh
 
@@ -294,7 +288,7 @@ fi
 
 # https://unix.stackexchange.com/questions/19317/can-less-retain-colored-output
 fancydiff() {
-    git $1 --color=always $2 | diff-so-fancy | less -R
+    git "$1" --color=always "$2" | diff-so-fancy | less -R
 }
 
 SOCK=~/.ssh/ssh_auth_sock
@@ -304,7 +298,7 @@ fi
 
 NPM_PACKAGES="${HOME}/.npm-packages"
 
-add_path $NPM_PACKAGES
+add_path "$NPM_PACKAGES"
 
 # Unset manpath so we can inherit from /etc/manpath via the `manpath` command
 unset MANPATH # delete if you already modified MANPATH elsewhere in your config
