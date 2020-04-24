@@ -23,7 +23,6 @@ export HISTFILESIZE=2000
 export CLICOLOR=1
 export LSCOLORS=exfxcxdxbxegedabagacad
 
-alias batterylife='pmset -g batt | grep Internal | awk "{print $2}" | sed "s/;//"'
 # https://superuser.com/a/975878/120685
 alias brewski='brew update && brew upgrade && brew cleanup; brew doctor'
 alias bytes_human='perl -MNumber::Bytes::Human -e "print Number::Bytes::Human::format_bytes shift"'
