@@ -326,3 +326,6 @@ add_path "$HOME/.config/yarn/global/node_modules/.bin"
 add_path "/usr/local/go/bin"
 
 reset_path
+
+# Add RVM to PATH for scripting. Make sure this is the last PATH variable change.
+export PATH="$PATH:$HOME/.rvm/bin"
