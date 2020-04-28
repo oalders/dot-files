@@ -200,6 +200,10 @@ function tmux() {
         tmux_session_name
         tmux rename-session "$SESSION_NAME"
         ;;
+    '')
+        tmux_session_name
+        tmux new -s "$SESSION_NAME"
+        ;;
     *)
         $tmux "$@"
         ;;
