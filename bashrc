@@ -160,6 +160,24 @@ fi
 
 function youtube-mp3() { youtube-download "$1" && ffmpeg -i "$1.mp4" "$1.mp3"; }
 
+function tmux_session_name() {
+    INSIDE_GIT_REPO="$(git rev-parse --is-inside-work-tree 2>/dev/null)"
+
+    if [ "$INSIDE_GIT_REPO" ]; then
+        BRANCH=$(git rev-parse --abbrev-ref HEAD)
+        CURRENT_DIR=${PWD##*/}
+
+        SESSION_NAME="$CURRENT_DIR    $BRANCH"
+    else
+        SESSION_NAME=$(pwd)
+        STRIP="$HOME/"
+        SESSION_NAME=${SESSION_NAME/$STRIP/}
+    fi
+
+    # A "." will produce a "bad session name" error
+    SESSION_NAME=${SESSION_NAME//./-}
+}
+
 # https://raim.codingfarm.de/blog/2013/01/30/tmux-update-environment/
 function tmux() {
     local tmux=$(type -fp tmux)
@@ -179,21 +197,7 @@ function tmux() {
         ;;
     # https://gist.github.com/marczych/10524654
     ns)
-        INSIDE_GIT_REPO="$(git rev-parse --is-inside-work-tree 2>/dev/null)"
-
-        if [ $INSIDE_GIT_REPO ]; then
-            BRANCH=$(git rev-parse --abbrev-ref HEAD)
-            CURRENT_DIR=${PWD##*/}
-
-            SESSION_NAME="$CURRENT_DIR    $BRANCH"
-        else
-            SESSION_NAME=$(pwd)
-            STRIP="$HOME/"
-            SESSION_NAME=${SESSION_NAME/$STRIP/}
-        fi
-
-        # A "." will produce a "bad session name" error
-        SESSION_NAME=${SESSION_NAME//./-}
+        tmux_session_name
         tmux rename-session "$SESSION_NAME"
         ;;
     *)
