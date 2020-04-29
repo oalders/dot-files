@@ -1,8 +1,5 @@
 call plug#begin('~/.vim/plugged')
 
-" On demand
-Plug 'scrooloose/nerdtree', { 'on':  'NERDTreeToggle' }
-
 Plug 'airblade/vim-gitgutter'
 Plug 'ajh17/VimCompletesMe'
 Plug 'altercation/vim-colors-solarized'
@@ -31,20 +28,21 @@ Plug 'lukhio/vim-mapping-conflicts'
 Plug 'mannih/vim-perl-variable-highlighter'
 Plug 'mbra/prettysql' " ,fs to format visually selected SQL
 Plug 'mzlogin/vim-markdown-toc'
+Plug 'oalders/vim-perl', { 'branch': 'dev', 'for': 'perl', 'do': 'make clean carp dancer highlight-all-pragmas moose test-more try-tiny' }
 Plug 'othree/html5.vim'
 Plug 'qstrahl/vim-matchmaker'
 Plug 'rhysd/git-messenger.vim'
 Plug 'rodjek/vim-puppet'
 Plug 'ryanpcmcquen/fix-vim-pasting'
 Plug 'scrooloose/nerdcommenter'
+Plug 'scrooloose/nerdtree', { 'on':  'NERDTreeToggle' } " On demand
 Plug 'sheerun/vim-polyglot'
-Plug 'skaji/syntax-check-perl'
 "Plug 'SirVer/ultisnips'
+Plug 'skaji/syntax-check-perl'
 Plug 'tpope/vim-abolish'
 Plug 'tpope/vim-eunuch'
 Plug 'tpope/vim-fugitive'
 Plug 'tpope/vim-surround'
-Plug 'oalders/vim-perl', { 'branch': 'dev', 'for': 'perl', 'do': 'make clean carp dancer highlight-all-pragmas moose test-more try-tiny' }
 Plug 'vim-ruby/vim-ruby'
 Plug 'vim-scripts/vim-json-bundle'
 Plug 'w0rp/ale'
