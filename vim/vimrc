@@ -156,6 +156,7 @@ let g:ale_fixers = {
 \   'json': ['prettier'],
 \   'markdown': ['prettier'],
 \   'perl': ['perltidy'],
+\   'ruby': ['rubocop'],
 \   'sh': ['shfmt'],
 \   'toml': ['prettier'],
 \   'yaml': ['prettier'],
