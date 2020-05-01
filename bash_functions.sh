@@ -33,7 +33,7 @@ fi
 IS_GITHUB=false
 
 LOOKS_LIKE_GITHUB=${GITHUB_WORKSPACE:-}
-if [[ ! -z $LOOKS_LIKE_GITHUB ]]; then
+if [[ -n "$LOOKS_LIKE_GITHUB" ]]; then
     IS_GITHUB=true
 fi
 
