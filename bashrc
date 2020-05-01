@@ -111,17 +111,18 @@ function remove_path() {
 }
 
 function fig() {
-    pushd ~/Documents/github/metacpan-docker >/dev/null
-    docker-compose $@
-    popd >/dev/null
+    pushd ~/Documents/github/etacpan-docker >/dev/null || return
+    docker-compose "$@"
+    popd >/dev/null || return
 }
 
 function reset_path() {
-    export PATH=$(clean_path)
+    PATH=$(clean_path)
+    export PATH
 }
 
 function whosonport() {
-    sudo lsof -i :$1
+    sudo lsof -i :"$1"
 }
 
 function check_compression() {
@@ -129,7 +130,7 @@ function check_compression() {
 }
 
 function trace_process() {
-    sudo lsof -p $1 && sudo strace -fp "$1"
+    sudo lsof -p "$1" && sudo strace -fp "$1"
 }
 
 function open_files() {
