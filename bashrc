@@ -334,6 +334,9 @@ add_path "$HOME/.yarn/bin"
 add_path "$HOME/.config/yarn/global/node_modules/.bin"
 add_path "/usr/local/go/bin"
 
+# homebrew's curl needs to come first
+add_path "/usr/local/opt/curl/bin"
+
 reset_path
 
 # Add RVM to PATH for scripting. Make sure this is the last PATH variable change.
