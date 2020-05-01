@@ -26,7 +26,7 @@ LINK_FLAG=""
 if [ "$(uname)" == "Darwin" ]; then
     IS_DARWIN=true
     LINK_FLAG="-hF"
-elif [ "$(expr substr $(uname -s) 1 5)" == "Linux" ]; then
+elif [ "$(uname -s)" == "Linux" ]; then
     LINK_FLAG="-T"
 fi
 
