@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # To install everything:
-# find cpan | grep cpanfile | xargs -n 1 cpm install -g --cpanfile
+# ./installer/cpan-deps.sh
 
 set -eu -o pipefail
 
