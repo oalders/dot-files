@@ -3,10 +3,12 @@
 # On OSX plenv will have been installed via homebrew
 
 test -e ~/.plenv || git clone https://github.com/tokuhirom/plenv.git ~/.plenv
+
+# shellcheck source=bash_functions.sh
 source ~/.bash_profile
 test -e ~/.plenv/plugins/perl-build || git clone https://github.com/tokuhirom/Perl-Build.git ~/.plenv/plugins/perl-build/
 
-PERL_VERSION=5.30.1
+PERL_VERSION=5.30.2
 
 plenv install $PERL_VERSION
 plenv global $PERL_VERSION
