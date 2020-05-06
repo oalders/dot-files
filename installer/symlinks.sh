@@ -2,7 +2,7 @@
 
 set -eu -o pipefail
 
-# shellcheck source=../bash_functions.sh
+# shellcheck source=bash_functions.sh
 source bash_functions.sh
 
 PREFIX=~/dot-files

@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
+# shellcheck source=bash_functions.sh
 source ~/dot-files/bash_functions.sh
 
 set -eu -o pipefail
@@ -9,7 +10,7 @@ function pip_install() {
     REQUIREMENTS=$2
 
     # make explicit cases for Travis, MacOS and Linux
-    if [ $(which $PIP) ]; then
+    if [ "$(which "$PIP")" ]; then
         if [[ $USER == "travis" ]]; then
             "$PIP" install -r "$REQUIREMENTS"
         else

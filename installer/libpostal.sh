@@ -2,15 +2,15 @@
 
 MYDIR=libpostal
 
-cd /tmp
+cd /tmp || exit 1
 rm -rf $MYDIR
 git clone https://github.com/openvenues/libpostal
-cd libpostal
+cd libpostal || exit 1
 ./bootstrap.sh
 
 DATADIR=$HOME/$MYDIR
-mkdir -p $DATADIR
+mkdir -p "$DATADIR"
 
-./configure --datadir=$DATADIR
+./configure --datadir="$DATADIR"
 make
 sudo make install

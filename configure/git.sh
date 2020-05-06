@@ -52,6 +52,7 @@ git config --global alias.rgrep "grep --recurse-submodules"
 # Invoke as "git revert-file-in-commit path/to/file commit"
 # which translates to:
 # git show dedca812826 -- path/to/file | git apply -R
+# shellcheck disable=SC2016
 git config --global alias.revert-file-in-commit '!f() { git show $2 -- $1 | git apply -R;}; f'
 
 git config --global alias.root "rev-parse --show-toplevel"
@@ -77,10 +78,12 @@ if [ -d '/Applications/Meld.app' ]; then
     git config --global diff.tool 'meld'
     git config --global difftool.prompt false
     git config --global difftool.meld.trustExitCode true
+    # shellcheck disable=SC2016
     git config --global difftool.meld.cmd 'open -W -a Meld --args "$LOCAL" "$PWD/$REMOTE"'
     git config --global merge.tool 'meld'
     git config --global mergetool.prompt false
     git config --global mergetool.meld.trustExitCode true
+    # shellcheck disable=SC2016
     git config --global mergetool.meld.cmd 'open -W -a Meld --args --auto-merge "$PWD/$LOCAL" "$PWD/$BASE" "$PWD/$REMOTE" --output="$PWD/$MERGED"'
 fi
 
@@ -90,6 +93,7 @@ fi
 set +e
 git config --global --unset branch.master.merge
 
+# shellcheck source=bash_functions.sh
 source ~/dot-files/bash_functions.sh
 # Requires git-lfs to have been installed
 if [[ $IS_DARWIN = true ]]; then

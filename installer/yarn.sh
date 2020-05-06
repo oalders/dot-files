@@ -2,12 +2,13 @@
 
 set -eu -o pipefail
 
+# shellcheck source=bash_functions.sh
 source ~/dot-files/bash_functions.sh
 
 if [[ $(command -v yarn -v) ]]; then
     echo "yarn already installed"
 else
-    rm -rf $HOME/.yarn
+    rm -rf "$HOME/.yarn"
     curl -o- -L https://yarnpkg.com/install.sh | bash
 fi
 
