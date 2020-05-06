@@ -8,3 +8,6 @@ bind stash a !?git stash apply %(stash)
 
 # Drop the selected stash item
 bind stash x !?git stash drop %(stash)
+
+# Check out branch at this commit
+bind main B !git checkout -b "%(prompt Checkout at new branch: )" %(commit)
