@@ -21,7 +21,7 @@ fi
 
 if [[ $HAS_GO = true ]]; then
     echo "Installing shfmt"
-    go get -u mvdan.cc/sh/cmd/shfmt
+    go get -u mvdan.cc/sh/v3/cmd/shfmt
 
     # https://github.com/golangci/golangci-lint#binary
     echo "Installing golangci-lint"
