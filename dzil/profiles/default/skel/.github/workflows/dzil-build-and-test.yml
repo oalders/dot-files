@@ -20,7 +20,7 @@ jobs:
     container:
       image: perldocker/perl-tester:5.30
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v2
       - name: Get latest author bundle
         run: >
           cpm install -g
