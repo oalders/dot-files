@@ -51,6 +51,9 @@ else
     IS_SUDOER=true
 fi
 
+HARNESS_OPTIONS="j$(nproc):c"
+
+export HARNESS_OPTIONS
 export HAS_GO
 export HAS_PLENV
 export IS_DARWIN
