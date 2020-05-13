@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-my $filename = $ENV{PERL_SYNTAX_CHECK_FILENAME} || "";
+my $filename = $ENV{PERL_SYNTAX_CHECK_FILENAME} || q{};
 
 # must return a hash that represents configuration for syntax_check
 my $config = {
