@@ -51,7 +51,7 @@ else
     IS_SUDOER=true
 fi
 
-if [[ $IS_DARWIN ]]; then
+if [[ $IS_DARWIN = true ]]; then
     HARNESS_OPTIONS="j$(sysctl -n hw.logicalcpu):c"
 else
     HARNESS_OPTIONS="j$(nproc):c"
