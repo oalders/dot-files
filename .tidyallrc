@@ -1,6 +1,6 @@
 [PerlTidy]
 argv  = --profile=$ROOT/.perltidyrc
-select = {bin,lib,t}/**/*.{pl,pm,t,psgi}
+select = {bin,lib,syntax-check-perl,t}/**/*.{pl,pm,t,psgi}
 
 [SortLines::Naturally]
 select = .gitignore
