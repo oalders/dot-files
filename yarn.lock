@@ -315,10 +315,10 @@ base64-js@1.2.0:
   resolved "https://registry.yarnpkg.com/base64-js/-/base64-js-1.2.0.tgz#a39992d723584811982be5e290bb6a53d86700f1"
   integrity sha1-o5mS1yNYSBGYK+XikLtqU9hnAPE=
 
-bash-language-server@^1.14.0:
-  version "1.14.0"
-  resolved "https://registry.yarnpkg.com/bash-language-server/-/bash-language-server-1.14.0.tgz#3735bad74bf95090168f0e5b68ce7bafc3625dac"
-  integrity sha512-xUeUzpJLLPgdiMiRfEMeZvausL+xdGclQkUSIQR2QV6Y8Ei1tI+FPQQloqg53Q46/ba+yrp2iCb2FMJBLk0QPg==
+bash-language-server@^1.15.0:
+  version "1.15.0"
+  resolved "https://registry.yarnpkg.com/bash-language-server/-/bash-language-server-1.15.0.tgz#4ba35734751e9988913e00c0beb42b31ee557255"
+  integrity sha512-Hd8c0keP2pYIE7Kohp1EzI/1xYMUX6asRrk3jMj+qDpTg49KQ9GvF0ZyUJCBAzZJZHhIP3Mw6N18LDmmW8K6ow==
   dependencies:
     fuzzy-search "^3.2.1"
     glob "^7.1.6"
