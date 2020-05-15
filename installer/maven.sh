@@ -7,6 +7,7 @@ if [ "$IS_DARWIN" = false ]; then
 fi
 
 brew install maven
+brew cask install oracle-jdk
 open vscode:extension/vscjava.vscode-java-pack
 
 exit 0
