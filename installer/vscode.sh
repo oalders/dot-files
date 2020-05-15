@@ -7,5 +7,6 @@ if [ "$IS_DARWIN" = false ]; then
 fi
 
 brew cask install visual-studio-code
+open vscode:extension/vscodevim.vim
 
 exit 0
