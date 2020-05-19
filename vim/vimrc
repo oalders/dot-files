@@ -151,7 +151,8 @@ let g:ale_linters = {
 \}
 
 let g:ale_fixers = {
-\   '*': ['remove_trailing_lines', 'trim_whitespace',],
+\   '*': ['remove_trailing_lines', 'trim_whitespace'],
+\   'java': ['remove_trailing_lines', 'trim_whitespace', 'google_java_format'],
 \   'javascript': ['eslint'],
 \   'json': ['prettier'],
 \   'markdown': ['prettier'],
