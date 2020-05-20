@@ -1,6 +1,7 @@
 # don't install these on CI
 brew "mas"
 brew "dockutil"
+brew "git-lfs"
 brew "node"
 brew "python"
 brew "sqlite"
