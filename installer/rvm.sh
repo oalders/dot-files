@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+# Ruby installer
+
 set -eu -o pipefail
 
 if [ "$IS_DARWIN" = false ]; then
