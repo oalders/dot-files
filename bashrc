@@ -14,8 +14,9 @@ export HISTCONTROL=ignoreboth
 export PROMPT_COMMAND='history -a'
 
 # for setting history length see HISTSIZE and HISTFILESIZE in bash(1)
-export HISTSIZE=1000
-export HISTFILESIZE=2000
+export HISTSIZE=50000000
+export HISTFILESIZE=500000000
+export HISTTIMEFORMAT="%Y-%m-%d %H:%M:%S  "
 
 export CLICOLOR=1
 export LSCOLORS=exfxcxdxbxegedabagacad
