@@ -1,5 +1,6 @@
 export EDITOR=vim
 
+# shellcheck source=bash_functions.sh
 source ~/dot-files/bash_functions.sh
 
 include() {
