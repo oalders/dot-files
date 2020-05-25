@@ -3,10 +3,6 @@ export EDITOR=vim
 # shellcheck source=bash_functions.sh
 source ~/dot-files/bash_functions.sh
 
-include() {
-    [[ -f "$1" ]] && source "$1"
-}
-
 # use vim mappings to move around the command line
 set -o vi
 
@@ -329,7 +325,7 @@ fi
 # completion via **<TAB> does not work.
 [ -f ~/.fzf.bash ] && source ~/.fzf.bash
 
-include ~/.local_bashrc
+[ -f ~/.local_bashrc ] && source ~/.local_bashrc
 
 add_path "$HOME/.yarn/bin"
 add_path "$HOME/.config/yarn/global/node_modules/.bin"
