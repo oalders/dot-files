@@ -1,17 +1,27 @@
+#!/usr/bin/bash
+# shellcheck shell=bash
+
 # Reset PATH to keep it from being clobbered in tmux
 # https://github.com/dmend/dotfiles/blob/master/.bash_profile#L3-L7
 if [ -x /usr/libexec/path_helper ]; then
     PATH=''
-    source /etc/profile
+    . /etc/profile
 fi
 
 # Load .bashrc
 if [ -f ~/.bashrc ]; then
-    source ~/.bashrc
+    . ~/.bashrc
 fi
 
-if [ hash brew 2>/dev/null && -f $(brew --prefix)/etc/bash_completion ]; then
-    . $(brew --prefix)/etc/bash_completion
+if type brew &>/dev/null; then
+  HOMEBREW_PREFIX="$(brew --prefix)"
+  if [[ -r "${HOMEBREW_PREFIX}/etc/profile.d/bash_completion.sh" ]]; then
+    source "${HOMEBREW_PREFIX}/etc/profile.d/bash_completion.sh"
+  else
+    for COMPLETION in "${HOMEBREW_PREFIX}/etc/bash_completion.d/"*; do
+      [[ -r "$COMPLETION" ]] && source "$COMPLETION"
+    done
+  fi
 fi
 
 test -e "${HOME}/.iterm2_shell_integration.bash" && source "${HOME}/.iterm2_shell_integration.bash"
@@ -25,14 +35,14 @@ if [[ -d ~/.rbenv ]]; then
     export PATH="$HOME/.rbenv/bin:$PATH"
     eval "$(rbenv init -)"
 fi
-export GPG_TTY=$(tty)
 
 # The next line updates PATH for the Google Cloud SDK.
 if [ -f '/Users/olaf/Documents/maxmind/google-cloud-sdk/path.bash.inc' ]; then . '/Users/olaf/Documents/maxmind/google-cloud-sdk/path.bash.inc'; fi
 
 # The next line enables shell command completion for gcloud.
 if [ -f '/Users/olaf/Documents/maxmind/google-cloud-sdk/completion.bash.inc' ]; then . '/Users/olaf/Documents/maxmind/google-cloud-sdk/completion.bash.inc'; fi
-export GPG_TTY=$(tty)
+GPG_TTY=$(tty)
+export GPG_TTY
 
 # Make MacOS less annoying
 export BASH_SILENCE_DEPRECATION_WARNING=1
