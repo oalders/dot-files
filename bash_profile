@@ -26,10 +26,7 @@ fi
 
 test -e "${HOME}/.iterm2_shell_integration.bash" && source "${HOME}/.iterm2_shell_integration.bash"
 
-if [[ -d ~/.plenv ]]; then
-    export PATH="$HOME/.plenv/bin:$PATH"
-    eval "$(plenv init -)"
-fi
+if which plenv > /dev/null; then eval "$(plenv init -)"; fi
 
 if [[ -d ~/.rbenv ]]; then
     export PATH="$HOME/.rbenv/bin:$PATH"
