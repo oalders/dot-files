@@ -15,7 +15,6 @@ Plug 'ConradIrwin/vim-bracketed-paste'
 Plug 'dhruvasagar/vim-zoom'
 Plug 'fatih/vim-go' ", { 'do': ':GoUpdateBinaries' } messes up Travis runs
 Plug 'haya14busa/vim-auto-mkdir' " create directory path on save
-Plug 'henrik/vim-indexed-search'
 Plug 'jreybert/vimagit'
 Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
 Plug 'junegunn/fzf.vim'
