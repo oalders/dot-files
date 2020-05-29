@@ -58,7 +58,9 @@ endif
 
 Plug 'tpope/vim-sensible'
 
-source ~/.local_vim_plug_vimrc
+if filereadable(expand('~/local-dot-files/local_vim_plug_vimrc'))
+    source ~/local-dot-files/local_vim_plug_vimrc
+endif
 
 " Initialize plugin system
 call plug#end()
