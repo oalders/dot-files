@@ -1,6 +1,6 @@
 call plug#begin('~/.vim/plugged')
 
-Plug 'airblade/vim-gitgutter'
+Plug 'airblade/vim-gitgutter' " show git diff markers in the sign colum
 Plug 'ajh17/VimCompletesMe'
 Plug 'altercation/vim-colors-solarized'
 Plug 'AndrewRadev/splitjoin.vim'
@@ -8,13 +8,13 @@ Plug 'AndrewRadev/tagalong.vim'
 Plug 'avakhov/vim-yaml'
 Plug 'bkad/CamelCaseMotion'
 Plug 'bling/vim-airline'
-Plug 'bronson/vim-trailing-whitespace'
+Plug 'bronson/vim-trailing-whitespace' " highlight trailing whitespace
 Plug 'c9s/perlomni.vim'
 Plug 'chrisbra/unicode.vim'
 Plug 'ConradIrwin/vim-bracketed-paste'
 Plug 'dhruvasagar/vim-zoom'
 Plug 'fatih/vim-go' ", { 'do': ':GoUpdateBinaries' } messes up Travis runs
-Plug 'haya14busa/vim-auto-mkdir'
+Plug 'haya14busa/vim-auto-mkdir' " create directory path on save
 Plug 'henrik/vim-indexed-search'
 Plug 'jreybert/vimagit'
 Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
