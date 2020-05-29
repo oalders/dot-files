@@ -1,5 +1,4 @@
+brew/*.lock.json
 .DS_Store
-mm/Gemfile.lock
 src/
-*.sw*
 .tidyall.d/
