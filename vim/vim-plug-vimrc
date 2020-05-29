@@ -4,7 +4,6 @@ Plug 'airblade/vim-gitgutter' " show git diff markers in the sign colum
 Plug 'ajh17/VimCompletesMe'
 Plug 'altercation/vim-colors-solarized'
 Plug 'AndrewRadev/splitjoin.vim'
-Plug 'AndrewRadev/tagalong.vim'
 Plug 'bkad/CamelCaseMotion'
 Plug 'bling/vim-airline'
 Plug 'bronson/vim-trailing-whitespace' " highlight trailing whitespace
