@@ -5,7 +5,6 @@ Plug 'ajh17/VimCompletesMe'
 Plug 'altercation/vim-colors-solarized'
 Plug 'AndrewRadev/splitjoin.vim'
 Plug 'AndrewRadev/tagalong.vim'
-Plug 'avakhov/vim-yaml'
 Plug 'bkad/CamelCaseMotion'
 Plug 'bling/vim-airline'
 Plug 'bronson/vim-trailing-whitespace' " highlight trailing whitespace
