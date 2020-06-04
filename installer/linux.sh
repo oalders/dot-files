@@ -9,7 +9,7 @@ if [[ $IS_SUDOER = false ]]; then
 fi
 
 if [[ $IS_DARWIN = false ]]; then
-    sudo apt-get install -y cpanminus jq libnet-ssleay-perl nodejs pandoc shellcheck tmux
+    sudo apt-get install -y cpanminus jq libnet-ssleay-perl nodejs pandoc shellcheck tig tmux
     if [[ ! $HAS_GO ]]; then
         sudo apt-get install golang-go
     fi
