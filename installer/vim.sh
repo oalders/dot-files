@@ -6,7 +6,7 @@ if [ "$IS_DARWIN" = true ]; then
     exit 0
 fi
 
-sudo add-apt-repository ppa:jonathonf/vim
+sudo add-apt-repository -y ppa:jonathonf/vim
 sudo apt update
 sudo apt install vim
 
