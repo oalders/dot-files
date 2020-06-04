@@ -25,7 +25,11 @@ ln -sf $PREFIX/digrc ~/.digrc
 ln -sf $LINK_FLAG $PREFIX/dzil ~/.dzil
 ln -sf $PREFIX/gitignore_global ~/.gitignore_global
 ln -sf $PREFIX/golangci.yml ~/.golangci.yml
-ln -sf $PREFIX/hammerspoon ~/.hammerspoon
+
+if [ "$IS_DARWIN" = true ]; then
+    ln -sf $PREFIX/hammerspoon ~/.hammerspoon
+fi
+
 ln -sf $PREFIX/minicpanrc ~/.minicpanrc
 if [ $IS_MM = false ]; then
     ln -sf $PREFIX/npmrc ~/.npmrc
