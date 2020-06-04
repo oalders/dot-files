@@ -46,6 +46,8 @@ rm ~/.vimrc
 
 ln -sf $PREFIX/vim/vimrc ~/.vimrc
 ln -sf $PREFIX/vim/vim-plug-vimrc ~/.vim/vim-plug-vimrc
-ln -sf "$LINK_FLAG" $PREFIX/vim/after ~/.vim/after
+
+mkdir -p ~/.vim/after/plugin
+ln -sf "$LINK_FLAG" $PREFIX/vim/after/plugin/abolish.vim ~/.vim/after/plugin/abolish.vim
 
 exit 0
