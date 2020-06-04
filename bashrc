@@ -326,7 +326,7 @@ fi
 # completion via **<TAB> does not work.
 [ -f ~/.fzf.bash ] && source ~/.fzf.bash
 
-[ -f ~/.local_bashrc ] && source ~/.local_bashrc
+[ -f ~/local-dot-files/local_bashrc ] && . ~/local-dot-files/local_bashrc
 
 add_path "$HOME/.yarn/bin"
 add_path "$HOME/.config/yarn/global/node_modules/.bin"
