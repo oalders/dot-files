@@ -209,25 +209,6 @@ function tmux() {
     esac
 }
 
-# If the first arg to "vi" contains "::" then assume it's a Perl module that's
-# either in lib or t/lib
-
-function vi() {
-    local vi=$(type -fp vim)
-    string=$1
-    if [[ ! $string == *"::"* ]]; then
-        $vi "$@"
-        return 1
-    fi
-
-    string=$(sed 's/::/\//g;' <<<$1)
-    string="lib/$string.pm"
-    if [[ ! -e $string ]]; then
-        string="t/$string"
-    fi
-    $vi "$string"
-}
-
 export FPP_DIR="$HOME/.fpp"
 function fpp() {
     local fpp=$(type -fp fpp)
