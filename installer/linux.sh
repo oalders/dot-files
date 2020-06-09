@@ -10,7 +10,7 @@ fi
 
 if [[ $IS_DARWIN = false ]]; then
     sudo apt-get install -y cpanminus jq libnet-ssleay-perl nodejs pandoc shellcheck tig tmux
-    if [[ ! $HAS_GO ]]; then
+    if [[ $HAS_GO = false ]]; then
         sudo apt-get install golang-go
     fi
 fi
