@@ -7,13 +7,15 @@ git submodule init && git submodule update
 # shellcheck source=bash_functions.sh
 source ~/dot-files/bash_functions.sh
 
-./installer/xcode.sh
+set -x
 
-./installer/homebrew.sh
+if [[ $IS_DARWIN = true ]]; then
+    ./installer/xcode.sh
+    ./installer/homebrew.sh
+    ./configure/dock.sh
+fi
 
 ./installer/linux.sh
-
-./configure/dock.sh
 
 ./installer/symlinks.sh
 
