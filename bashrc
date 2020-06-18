@@ -216,7 +216,7 @@ function fpp() {
     HISTORY_FILE="$FPP_DIR/.fpp_history"
     FPP_CACHE="$FPP_DIR/.fpp.sh"
 
-    touch $HISTORY_FILE
+    touch "$HISTORY_FILE"
 
     # fpp --history just displays entire history prefixed by line numbers
     # fpp --redo will re-exec the last entry in the history file
@@ -225,35 +225,40 @@ function fpp() {
     # fpp --redo 11 will re-exec entry number 11 in the history file
     case "$1" in
     --history)
-        cat -n $HISTORY_FILE
+        cat -n "$HISTORY_FILE"
         return 1
         ;;
     --redo)
         if [ "$2" ]; then
-            if [ $2 \> 0 ]; then
-                LAST_HISTORY_LINE=$(head -n $2 $HISTORY_FILE | tail -n 1)
+            if [ "$2" -gt 0 ]; then
+                LAST_HISTORY_LINE=$(head -n "$2" "$HISTORY_FILE" | tail -n 1)
             else
                 LINE_NUMBER=$(($2 * -1))
-                LAST_HISTORY_LINE=$(tail -n $LINE_NUMBER $HISTORY_FILE | head -n 1)
+                LAST_HISTORY_LINE=$(tail -n "$LINE_NUMBER" "$HISTORY_FILE" | head -n 1)
             fi
         else
-            LAST_HISTORY_LINE=$(tail -n 1 $HISTORY_FILE)
+            LAST_HISTORY_LINE=$(tail -n 1 "$HISTORY_FILE")
         fi
 
-        eval $LAST_HISTORY_LINE
+        eval "$LAST_HISTORY_LINE"
         return 1
         ;;
     esac
 
-    LAST_HISTORY_LINE=$(tail -n 1 $HISTORY_FILE)
+    LAST_HISTORY_LINE=$(tail -n 1 "$HISTORY_FILE")
     $fpp "$@"
-    LAST_COMMAND=$(tail -n 2 $FPP_CACHE | head -n 1)
+    LAST_COMMAND=$(tail -n 2 "$FPP_CACHE" | head -n 1)
 
     # Don't keep adding the same command to the history file.
     # Also, don't log a message about a no-op.
 
     if [[ ("$LAST_COMMAND" != '') && ("$LAST_COMMAND" != "$LAST_HISTORY_LINE") ]]; then
-        echo $LAST_COMMAND >>$HISTORY_FILE
+        echo "$LAST_COMMAND" >>"$HISTORY_FILE"
+
+        # This doesn't work yet.
+        #HISTFILE=~/.bash_history
+        #set -o history
+        #history -s "$LAST_COMMAND"
     fi
 }
 
