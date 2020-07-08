@@ -1,0 +1,8 @@
+---
+ignored:
+    # PDL3007 asks you to pin the FROM version explicitly to a release tag.
+    - DL3007
+    # Version pin in apt-get
+    - DL3008
+    # Version pinning in npm
+    - DL3016
