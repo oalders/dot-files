@@ -1,4 +1,5 @@
 ---
+    # See rules at https://github.com/hadolint/hadolint#rules
 ignored:
     # PDL3007 asks you to pin the FROM version explicitly to a release tag.
     - DL3007
