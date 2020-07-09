@@ -30,7 +30,7 @@ if [ "$IS_DARWIN" = true ]; then
     export LDFLAGS="-L/usr/local/opt/openssl/lib"
 fi
 
-cpm install -g --verbose --cpanfile cpan/cli.cpanfile
+cpm install -g --verbose --show-build-log-on-failure --cpanfile cpan/cli.cpanfile
 
 if [ "$HAS_PLENV" = true ]; then
     plenv rehash
