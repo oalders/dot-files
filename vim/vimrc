@@ -295,3 +295,13 @@ set completefunc=emoji#complete
 "let g:gitgutter_sign_modified = emoji#for('small_orange_diamond')
 "let g:gitgutter_sign_removed = emoji#for('small_red_triangle')
 "let g:gitgutter_sign_modified_removed = emoji#for('collision')
+
+" CamelCaseMotion
+map <silent> w <Plug>CamelCaseMotion_w
+map <silent> b <Plug>CamelCaseMotion_b
+map <silent> e <Plug>CamelCaseMotion_e
+map <silent> ge <Plug>CamelCaseMotion_ge
+sunmap w
+sunmap b
+sunmap e
+sunmap ge
