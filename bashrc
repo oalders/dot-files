@@ -312,11 +312,13 @@ fi
 # completion via **<TAB> does not work.
 [ -f ~/.fzf.bash ] && source ~/.fzf.bash
 
-[ -f ~/local-dot-files/local_bashrc ] && . ~/local-dot-files/local_bashrc
-
 add_path "$HOME/.yarn/bin"
 add_path "$HOME/.config/yarn/global/node_modules/.bin"
 add_path "/usr/local/go/bin"
+
+# Do this late so that any local additions to $PATH will come first
+# shellcheck disable=SC1090
+[ -f ~/local-dot-files/local_bashrc ] && . ~/local-dot-files/local_bashrc
 
 # homebrew's curl needs to come first
 add_path "/usr/local/opt/curl/bin"
