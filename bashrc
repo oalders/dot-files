@@ -58,7 +58,7 @@ alias tg='tidyall -g && git add -p'
 alias xpasswd='perl -MCrypt::XkcdPassword -E "say Crypt::XkcdPassword->make_password"'
 
 # python scripts via pip install --user
-add_path "$HOME/Library/Python/3.7/bin"
+add_path "$HOME/Library/Python/3.8/bin"
 add_path "$HOME/.local/bin"
 
 add_path "/usr/local/sbin"
