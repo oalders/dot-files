@@ -36,6 +36,7 @@ alias fix-gpg='pkill -9 gpg-agent && export GPG_TTY=$(tty)'
 alias g=git
 alias gdf='git domo|fpp'
 alias grep='grep --color=auto --exclude-dir=.git'
+alias heavy-cpu='ps --sort=-pcpu -aux|head -10'
 alias hh='SwitchAudioSource -s "Built-in Output"'
 alias l='ls -lAtr'
 alias l.='ls -ldF .[a-zA-Z0-9]* --color=tty' #only show dotfiles
