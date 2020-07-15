@@ -24,7 +24,7 @@ export LSCOLORS=exfxcxdxbxegedabagacad
 # https://superuser.com/a/975878/120685
 alias brewski='brew update && brew upgrade && brew cleanup; brew doctor'
 alias bytes_human='perl -MNumber::Bytes::Human -e "print Number::Bytes::Human::format_bytes shift"'
-alias c='clear && tmux clear-history && perl -E "say (qq{\n}x65,q{-}x78); system('date');print qq{-}x78, qq{\n}"'
+alias c="clear && tmux clear-history && perl -E 'say (qq{\n}x65,q{-}x78); system('date');print qq{-}x78, qq{\n}'"
 alias cdr='cd `git root`'
 alias d=docker
 alias delete-merged-branches='show-merged-branches | xargs -n 1 git branch -d'
@@ -102,6 +102,7 @@ function path() {
 }
 
 function clean_path() {
+    # shellcheck disable=SC1001
     tr : '\n' <<<"$PATH" | awk '!x[$0]++' | grep \/ | grep -v game | paste -sd ":" -
 }
 
@@ -191,7 +192,7 @@ function tmux() {
                 # Add quotes around the argument
                 v=${v/=/=\"}
                 v=${v/%/\"}
-                eval export $v
+                eval export "$v"
             fi
         done < <(tmux show-environment)
         ;;
