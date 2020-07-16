@@ -24,7 +24,7 @@ else
     add_path "$HOME/perl5/bin"
 fi
 
-if [ "$IS_DARWIN" = true ] && [ "$IS_GITHUB" = false ]; then
+if [ "$IS_DARWIN" = true ]; then
     # Install Net::SSLeay on MacOS
     export OPENSSL_PREFIX="/usr/local/Cellar/openssl@1.1/1.1.1g"
 fi
