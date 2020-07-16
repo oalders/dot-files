@@ -24,7 +24,7 @@ else
     add_path "$HOME/perl5/bin"
 fi
 
-if [ "$IS_DARWIN" = true ]; then
+if [ "$IS_DARWIN" = true ] && [ "$IS_GITHUB" = false ]; then
     # Install Net::SSLeay on MacOS
     export CPPFLAGS="-I/usr/local/opt/openssl/include"
     export LDFLAGS="-L/usr/local/opt/openssl/lib"
