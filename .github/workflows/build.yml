@@ -11,6 +11,13 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
+      # Should basically be a no-op on Linux
+      - name: Cache
+        uses: actions/cache@v2
+        with:
+          path: |
+            $HOME/Library/Caches/Homebrew
+          key: homebrew-${{ runner.os }}
       - name: Set up symlink to ~/dot-files
         run: cd && ln -s $GITHUB_WORKSPACE .
       - name: Maybe install MacOS deps
