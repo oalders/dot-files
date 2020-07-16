@@ -305,3 +305,7 @@ sunmap w
 sunmap b
 sunmap e
 sunmap ge
+
+" Format selected JSON via jq
+" The dot is not required for jq version >= 1.6
+vnoremap jq :!jq -S .<cr>
