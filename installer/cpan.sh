@@ -26,8 +26,7 @@ fi
 
 if [ "$IS_DARWIN" = true ] && [ "$IS_GITHUB" = false ]; then
     # Install Net::SSLeay on MacOS
-    export CPPFLAGS="-I/usr/local/opt/openssl/include"
-    export LDFLAGS="-L/usr/local/opt/openssl/lib"
+    export OPENSSL_PREFIX="/usr/local/Cellar/openssl@1.1/1.1.1g"
 fi
 
 cpm install -g --verbose --show-build-log-on-failure --cpanfile cpan/cli.cpanfile
