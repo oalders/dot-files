@@ -42,8 +42,5 @@ jobs:
         run: ./configure/tmux.sh
       - name: Install yarn deps
         run: ./installer/yarn.sh
-
-      # Net::SSLeay is a total pain on macOS and I'm not currently using plenv in CI
       - name: Install CPAN deps
         run: ./installer/cpan.sh
-        if: matrix.os == "ubuntu-latest"
