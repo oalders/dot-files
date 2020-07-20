@@ -25,6 +25,8 @@ else
 fi
 
 if [ "$IS_DARWIN" = true ]; then
+    brew list openssl
+
     # Install Net::SSLeay on MacOS
     export OPENSSL_PREFIX="/usr/local/Cellar/openssl@1.1/1.1.1g"
 fi
