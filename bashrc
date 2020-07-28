@@ -107,7 +107,8 @@ function clean_path() {
 }
 
 function remove_path() {
-    export PATH=$(tr : '\n' <<<$PATH | grep -v ^$1$ | paste -sd ':' -)
+    PATH=$(tr : '\n' <<<$PATH | grep -v ^$1$ | paste -sd ':' -)
+    export PATH
 }
 
 function fig() {
@@ -299,7 +300,8 @@ add_path "$NPM_PACKAGES"
 
 # Unset manpath so we can inherit from /etc/manpath via the `manpath` command
 unset MANPATH # delete if you already modified MANPATH elsewhere in your config
-export MANPATH="$NPM_PACKAGES/share/man:$(manpath)"
+MANPATH="$NPM_PACKAGES/share/man:$(manpath)"
+export MANPATH
 
 # enable bash completion in interactive shells
 if ! shopt -oq posix; then
