@@ -75,6 +75,9 @@ add_path "/usr/local/bin"
 # Rust binaries installed via cargo
 add_path "$HOME/.cargo/bin"
 
+# Haskell binaries installed via cabal
+add_path "$HOME/.cabal/bin"
+
 LOCALPERLBIN=~/perl5/bin
 
 if [[ ! -d ~/.plenv && -d $LOCALPERLBIN ]]; then
