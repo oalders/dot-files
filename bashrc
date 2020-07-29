@@ -1,3 +1,5 @@
+# shellcheck shell=sh
+
 export EDITOR=vim
 
 # shellcheck source=bash_functions.sh
