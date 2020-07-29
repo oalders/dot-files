@@ -11,5 +11,8 @@ select = dzil/profiles/default/skel/MANIFEST.SKIP
 cmd = shellcheck
 argv = -x --check-sourced --color=always
 ok_exit_codes = 0
+select = bash_functions.sh
+select = bash_profile
+select = bashrc
 select = configure/*
 select = installer/*
