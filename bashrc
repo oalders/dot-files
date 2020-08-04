@@ -183,6 +183,7 @@ function tmux_session_name() {
 
     # A "." will produce a "bad session name" error
     SESSION_NAME=${SESSION_NAME//./-}
+    export SESSION_NAME
 }
 
 # https://raim.codingfarm.de/blog/2013/01/30/tmux-update-environment/
