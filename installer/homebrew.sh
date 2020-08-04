@@ -11,8 +11,14 @@ if [ "$IS_DARWIN" = true ]; then
     if [ ! "$(which brew)" ]; then
         /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
     fi
+
     brew config
     brew update
+
+    if [[ $IS_GITHUB = true ]]; then
+        brew unlink bazel || true
+    fi
+
     brew upgrade
     brew cleanup
     brew doctor || true
