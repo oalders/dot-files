@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # If a machine can't fetch from github, we can copy stuff over from an installed set of dot files
 

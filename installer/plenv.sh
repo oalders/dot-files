@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # On OSX plenv will have been installed via homebrew
 

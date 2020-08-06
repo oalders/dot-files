@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Partly stolen from inc/oh-my-git/README.md
 

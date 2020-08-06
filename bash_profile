@@ -1,9 +1,11 @@
-#!/usr/bin/bash
+#!/usr/bin/env bash
 # shellcheck shell=bash
+# shellcheck disable=SC1090
 
 # Reset PATH to keep it from being clobbered in tmux
 # https://github.com/dmend/dotfiles/blob/master/.bash_profile#L3-L7
 if [ -x /usr/libexec/path_helper ]; then
+    # shellcheck disable=SC2123
     PATH=''
     . /etc/profile
 fi
@@ -15,6 +17,7 @@ fi
 
 if type brew &>/dev/null; then
   HOMEBREW_PREFIX="$(brew --prefix)"
+  # shellcheck disable=SC1090
   if [[ -r "${HOMEBREW_PREFIX}/etc/profile.d/bash_completion.sh" ]]; then
     source "${HOMEBREW_PREFIX}/etc/profile.d/bash_completion.sh"
   else
