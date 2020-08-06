@@ -332,4 +332,15 @@ add_path "/usr/local/go/bin"
 # homebrew's curl needs to come first
 add_path "/usr/local/opt/curl/bin"
 
+if [[ ("${BASH_VERSINFO[0]}" -gt 3 ) && -f /usr/local/bin/cz ]]; then
+    add_path "/usr/local/bin/cz"
+    . /usr/local/bin/cz
+    export CZ_GUI=0
+    bind -x '"\C-xx":rleval "cz meta -q"'
+    bind -x '"\C-xX":rleval "cz meta -p"'
+    bind -x '"\C-xz":rleval "cz meta -r"'
+    bind -x '"\C-xZ":rleval "cz meta -s"'
+    bind -x '"\C-xc": "cz meta -r"'
+fi
+
 reset_path

@@ -39,4 +39,6 @@ fi
 
 ./installer/cargo.sh
 
+./installer/cz.sh
+
 exit 0

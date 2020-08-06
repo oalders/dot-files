@@ -44,3 +44,5 @@ jobs:
         run: ./installer/yarn.sh
       - name: Install CPAN deps
         run: ./installer/cpan.sh
+      - name: Maybe install cz
+        run: ./installer/cpan.sh
