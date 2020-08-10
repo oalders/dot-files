@@ -26,7 +26,7 @@ jobs:
           EXTENDED_TESTING: 1
           RELEASE_TESTING: 1
         run: auto-build-and-test-dist
-      - uses: actions/upload-artifact@master
+      - uses: actions/upload-artifact@v2
         with:
           name: build_dir
           path: build_dir
@@ -38,7 +38,7 @@ jobs:
       image: perldocker/perl-tester:5.32
     steps:
       - uses: actions/checkout@v2 # codecov wants to be inside a Git repository
-      - uses: actions/download-artifact@master
+      - uses: actions/download-artifact@v2
         with:
           name: build_dir
           path: .
@@ -83,12 +83,12 @@ jobs:
         with:
           perl-version: ${{ matrix.perl-version }}
           distribution: strawberry # this option only used on Windows
-      - uses: actions/download-artifact@master
+      - uses: actions/download-artifact@v2
         with:
           name: build_dir
           path: .
       - name: install deps using cpm
-        uses: perl-actions/install-with-cpm@v1.3
+        uses: perl-actions/install-with-cpm@v1
         with:
           cpanfile: "cpanfile"
           args: "--with-suggests --with-recommends --with-test"
