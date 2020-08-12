@@ -20,7 +20,7 @@
     "alfred-fkill": "^0.4.1"
   },
   "dependencies": {
-    "acorn": "^7.4.0",
+    "acorn": "^8.0.1",
     "bash-language-server": "^1.16.1",
     "eslint": "^7.6.0",
     "fkill-cli": "^6.0.1",
