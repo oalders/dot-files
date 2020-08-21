@@ -13,13 +13,6 @@ mkdir -p ~/.vimtmp
 
 ln -sf "$LINK_FLAG" $PREFIX/vim/ftplugin ~/.vim/ftplugin
 
-if [ "$IS_MM" = true ]; then
-    ln -sf ~/local-dot-files/maxmind_local_vimrc ~/.local_vimrc
-
-    mkdir -p  ~/.vim/after/ftplugin
-    ln -sf ~/local-dot-files/vim/after/ftplugin/perl.vim ~/.vim/after/ftplugin/perl.vim
-fi
-
 if [[ $HAS_GO = true ]]; then
     echo "Installing shfmt"
     go get -u mvdan.cc/sh/v3/cmd/shfmt
@@ -49,5 +42,12 @@ ln -sf $PREFIX/vim/vimrc ~/.vimrc
 ln -sf $PREFIX/vim/vim-plug-vimrc ~/.vim/vim-plug-vimrc
 
 ln -sf "$LINK_FLAG" $PREFIX/vim/after ~/.vim/after
+
+if [ "$IS_MM" = true ]; then
+    ln -sf ~/local-dot-files/maxmind_local_vimrc ~/.local_vimrc
+
+    mkdir -p  ~/.vim/after/ftplugin
+    ln -sf ~/local-dot-files/vim/after/ftplugin/perl.vim ~/.vim/after/ftplugin/perl.vim
+fi
 
 exit 0
