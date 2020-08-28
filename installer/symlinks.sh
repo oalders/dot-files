@@ -36,6 +36,7 @@ if [ $IS_MM = false ]; then
 fi
 ln -sf $PREFIX/perlcriticrc ~/.perlcriticrc
 ln -sf $PREFIX/perltidyrc ~/.perltidyrc
+ln -sf $PREFIX/prettierrc.yaml ~/.prettierrc.yaml
 ln -sf $PREFIX/profile ~/.profile
 ln -sf $PREFIX/proverc ~/.proverc
 ln -sf $PREFIX/psqlrc ~/.psqlrc

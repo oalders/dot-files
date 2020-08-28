@@ -1,0 +1,12 @@
+# .prettierrc or .prettierrc.yaml
+semi: false
+singleQuote: true
+overrides:
+  - files: "*.test.js"
+    options:
+      semi: true
+  - files:
+      - "**/*.yaml"
+      - "**/*.yml"
+    options:
+      tabWidth: 2
