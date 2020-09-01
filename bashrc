@@ -128,7 +128,7 @@ function reset_path() {
 }
 
 function whosonport() {
-    sudo lsof -i :"$1"
+    sudo lsof +c 0 -i :"$1"
 }
 
 function check_compression() {
@@ -136,7 +136,7 @@ function check_compression() {
 }
 
 function trace_process() {
-    sudo lsof -p "$1" && sudo strace -fp "$1"
+    sudo lsof +c 0 -p "$1" && sudo strace -fp "$1"
 }
 
 function open_files() {
