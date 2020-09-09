@@ -111,11 +111,6 @@ function clean_path() {
     tr : '\n' <<<"$PATH" | awk '!x[$0]++' | grep \/ | grep -v game | paste -sd ":" -
 }
 
-function remove_path() {
-    PATH=$(tr : '\n' <<<$PATH | grep -v ^$1$ | paste -sd ':' -)
-    export PATH
-}
-
 function fig() {
     pushd ~/Documents/github/etacpan-docker >/dev/null || return
     docker-compose "$@"

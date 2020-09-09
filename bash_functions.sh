@@ -7,6 +7,11 @@ add_path() {
     fi
 }
 
+function remove_path() {
+    PATH=$(tr : '\n' <<<"$PATH" | grep -v "^$1$" | paste -sd ':' -)
+    export PATH
+}
+
 HAS_GO=false
 if [[ (-n "${GOPATH+set}") && ($(command -v go version)) ]]; then
     HAS_GO=true
