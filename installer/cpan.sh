@@ -11,7 +11,7 @@ source ~/dot-files/bash_functions.sh
 perl --version
 
 if [[ ! $(which cpm) ]]; then
-    curl -fsSL --compressed https://git.io/cpm >/usr/loca/bin/cpm
+    curl -fsSL --compressed https://git.io/cpm >/usr/local/bin/cpm
     chmod +x /usr/local/bin/cpm
     cpm --version
 fi
