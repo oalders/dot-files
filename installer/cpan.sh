@@ -3,25 +3,17 @@
 # To install everything:
 # ./installer/cpan-deps.sh
 
-set -eu -o pipefail
+set -eux -o pipefail
 
 # shellcheck source=bash_functions.sh
 source ~/dot-files/bash_functions.sh
 
 perl --version
-cpanm --version
 
-if [ "$HAS_PLENV" = false ]; then
-    cpanm --local-lib=~/perl5 local::lib && eval "$(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)"
-fi
-
-cpanm --notest App::cpm
-
-if [ "$HAS_PLENV" = true ]; then
-    echo "HAS PLENV"
-    plenv rehash
-else
-    add_path "$HOME/perl5/bin"
+if [[ ! $(which cpm) ]]; then
+    curl -fsSL --compressed https://git.io/cpm >/usr/loca/bin/cpm
+    chmod +x /usr/local/bin/cpm
+    cpm --version
 fi
 
 if [ "$IS_DARWIN" = true ]; then
