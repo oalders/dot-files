@@ -11,7 +11,8 @@ source ~/dot-files/bash_functions.sh
 perl --version
 
 if [[ ! $(which cpm) ]]; then
-    curl -fsSL --compressed https://git.io/cpm | perl - install App::cpm
+    curl -fsSL --compressed https://git.io/cpm | perl - install --global App::cpm
+    #add_path "$HOME/perl5/bin"
     #curl -fsSL --compressed https://git.io/cpm >cpm
     #chmod +x cpm
     #./cpm --version
