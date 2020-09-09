@@ -11,9 +11,11 @@ source ~/dot-files/bash_functions.sh
 perl --version
 
 if [[ ! $(which cpm) ]]; then
-    curl -fsSL --compressed https://git.io/cpm >/usr/local/bin/cpm
-    chmod +x /usr/local/bin/cpm
-    cpm --version
+    curl -fsSL --compressed https://git.io/cpm | perl - install App::cpm
+    #curl -fsSL --compressed https://git.io/cpm >cpm
+    #chmod +x cpm
+    #./cpm --version
+    #cpm install -g App::cpm
 fi
 
 if [ "$IS_DARWIN" = true ]; then
