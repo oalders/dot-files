@@ -1,3 +1,6 @@
+" vim-polyglot
+let g:polyglot_disabled = ['go', 'perl']
+
 source ~/.vim/vim-plug-vimrc
 
 let g:mapleader = ","
@@ -178,9 +181,6 @@ let g:ale_writegood_options = '--no-passive'
 "let g:ale_sign_error = emoji#for('bomb')
 "highlight clear ALEErrorSign
 "highlight clear ALEWarningSign
-
-" vim-polyglot
-let g:polyglot_disabled = ['go', 'perl']
 
 " ########### Set File Types ###########
 "
