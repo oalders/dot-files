@@ -58,8 +58,10 @@ fi
 
 if [[ $IS_DARWIN = true ]]; then
     HARNESS_OPTIONS="j$(sysctl -n hw.logicalcpu):c"
-else
+elif [[ $IS_MM = false ]]; then
     HARNESS_OPTIONS="j$(nproc):c"
+else
+    HARNESS_OPTIONS="j1:c"
 fi
 
 export HARNESS_OPTIONS
