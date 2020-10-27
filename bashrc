@@ -82,7 +82,7 @@ add_path "$HOME/.cabal/bin"
 
 LOCALPERLBIN=~/perl5/bin
 
-if [[ ! -d ~/.plenv && -d $LOCALPERLBIN ]]; then
+if [[ $IS_MM = false && ! -d ~/.plenv && -d $LOCALPERLBIN ]]; then
     export PERL_CPANM_OPT="--local-lib=~/perl5"
     # adds $HOME/perl5/bin to PATH
     [ "$SHLVL" -eq 1 ] && eval "$(perl -I$HOME/perl5/lib/perl5 -Mlocal::lib)"
