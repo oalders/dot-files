@@ -29,8 +29,6 @@ if [ "$IS_DARWIN" = true ]; then
     else
         brew bundle install --file=brew/defaults
         brew bundle install --file=brew/local-only
-        brew install vim -- --with-override-system-vi --without-perl || brew upgrade vim && brew link vim
-
     fi
     if [[ -e ~/local-dot-files/Brewfile ]]; then
         brew bundle install --file=~/local-dot-files/Brewfile
