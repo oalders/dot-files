@@ -3,7 +3,7 @@
 # shellcheck source=bash_functions.sh
 source ~/dot-files/bash_functions.sh
 
-set -eu -o pipefail
+set -eux -o pipefail
 
 function pip_install() {
     PIP=$1
@@ -17,6 +17,7 @@ function pip_install() {
             "$PIP" install --user --upgrade -r "$REQUIREMENTS"
         fi
     else
+        # We want to install recommended packages here
         which apt-get && sudo apt-get install -y python3-pip
         "$PIP" install --user -v --upgrade -r "$REQUIREMENTS"
     fi
