@@ -2,14 +2,15 @@
 
 <!-- vim-markdown-toc GFM -->
 
-* [tmux Prefix](#tmux-prefix)
-* [tmux Plugins](#tmux-plugins)
-* [tmux-resurrect](#tmux-resurrect)
-* [vim](#vim)
-* [Alfred](#alfred)
-* [Yarn](#yarn)
-* [Bash](#bash)
-* [macOS](#macos)
+  * [tmux Prefix](#tmux-prefix)
+  * [tmux Plugins](#tmux-plugins)
+  * [tmux-resurrect](#tmux-resurrect)
+  * [vim](#vim)
+  * [Alfred](#alfred)
+  * [Yarn](#yarn)
+  * [Bash](#bash)
+  * [macOS](#macos)
+* [Testing with Docker](#testing-with-docker)
 
 <!-- vim-markdown-toc -->
 
@@ -67,3 +68,23 @@ Upgrade deps via `yarn upgrade`.
 ## macOS
 
 * Eject disc from superdrive: `/usr/bin/drutil eject`
+
+# Testing with Docker
+
+```
+docker build -t dotfiles .
+```
+
+Get build SHA from output and use below:
+
+```
+docker run -it --volume $PWD:/root/dot-files dotfiles:latest /bin/bash
+```
+
+In the shell:
+
+```
+cd /root/dot-files
+USER=root ./install.sh
+vim
+```
