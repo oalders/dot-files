@@ -27,6 +27,8 @@ fi
 
 ./installer/pip.sh
 
+./installer/vim.sh
+
 ./configure/vim.sh
 
 ./installer/fpp.sh
