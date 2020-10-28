@@ -2,12 +2,14 @@
 
 set -eu -o pipefail
 
+# shellcheck source=bash_functions.sh
+source ~/dot-files/bash_functions.sh
+
 if [ "$IS_DARWIN" = false ]; then
     exit 0
 fi
 
-# shellcheck source=bash_functions.sh
-source ~/dot-files/bash_functions.sh
+set -x
 
 # Maybe add to $PATH just to be safe
 add_path "$HOME/.cargo/bin"
