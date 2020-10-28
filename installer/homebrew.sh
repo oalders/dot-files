@@ -17,6 +17,7 @@ if [ "$IS_DARWIN" = true ]; then
 
     if [[ $IS_GITHUB = true ]]; then
         brew unlink bazel || true
+        brew unlink python@3.8 || true
     fi
 
     brew upgrade
