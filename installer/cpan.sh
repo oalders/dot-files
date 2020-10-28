@@ -8,6 +8,12 @@ set -eux -o pipefail
 # shellcheck source=bash_functions.sh
 source ~/dot-files/bash_functions.sh
 
+# There are SSL issues on the GitHub macOS install that will cause some module
+# installs to fail.
+if [[ $IS_DARWIN = true ]] && [[ $IS_GITHUB = true ]]; then
+    exit 0
+fi
+
 perl --version
 
 # Set up some ENV vars so that global installs go to ~/perl5
