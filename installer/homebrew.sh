@@ -21,8 +21,14 @@ if [ "$IS_DARWIN" = true ]; then
     fi
 
     brew upgrade
-    brew cleanup
-    brew doctor || true
+
+    # brew cleanup causes some failures on GitHub around OpenSSL. Those
+    # failures are hard to debug and probably not helpful to spend time on when
+    # I so rarely set up a brand new macOS environment.
+    if [[ $IS_GITHUB = false ]]; then
+        brew cleanup
+        brew doctor || true
+    fi
 
     if [[ $IS_GITHUB = true ]]; then
         brew unlink node@12 || true
