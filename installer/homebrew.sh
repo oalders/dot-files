@@ -4,7 +4,7 @@ set -eux -o pipefail
 
 # shellcheck source=bash_functions.sh
 source ~/dot-files/bash_functions.sh
-pushd ~/dot-files > /dev/null
+pushd ~/dot-files >/dev/null
 
 # https://stackoverflow.com/a/17072017/406224
 if [ "$IS_DARWIN" = true ]; then
@@ -36,5 +36,5 @@ if [ "$IS_DARWIN" = true ]; then
     fi
 fi
 
-popd > /dev/null
+popd >/dev/null
 exit 0
