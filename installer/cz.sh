@@ -12,7 +12,7 @@ source ~/dot-files/bash_functions.sh
 
 set -x
 
-curl -sS https://raw.githubusercontent.com/apathor/cz/master/cz -o /usr/local/bin/cz
-chmod +x /usr/local/bin/cz
+curl -sS https://raw.githubusercontent.com/apathor/cz/master/cz -o ~/local/bin/cz
+chmod +x ~/local/bin/cz
 
 exit 0
