@@ -13,6 +13,10 @@ if [[ $(which vim) ]]; then
     exit 0
 fi
 
+if [[ $IS_SUDOER = false ]]; then
+    exit 0
+fi
+
 set -x
 
 # maybe install add-apt-repository

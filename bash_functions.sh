@@ -42,11 +42,6 @@ if [[ -n "$LOOKS_LIKE_GITHUB" ]]; then
     IS_GITHUB=true
 fi
 
-IS_MM=false
-if [ -e /usr/local/bin/mm-perl ]; then
-    IS_MM=true
-fi
-
 IS_SUDOER=false
 # The sudo -n gets misinterpreted by shellcheck
 # shellcheck disable=SC2143
@@ -54,6 +49,13 @@ if [[ $(sudo -n true 2>&1 | grep 'password') ]]; then
     IS_SUDOER=false
 else
     IS_SUDOER=true
+fi
+
+IS_MM=false
+if [ -e /usr/local/bin/mm-perl ]; then
+    IS_MM=true
+    # Don't try to sudo on MM machines
+    IS_SUDOER=false
 fi
 
 if [[ $IS_DARWIN = true ]]; then

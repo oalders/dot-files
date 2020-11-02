@@ -15,7 +15,7 @@ else
     add_path "$HOME/.yarn/bin"
 fi
 
-if [[ $IS_DARWIN = false ]] && [[ $IS_MM = false ]]; then
+if [[ $IS_DARWIN = false ]] && [[ $IS_SUDOER = true ]]; then
     curl -sL https://deb.nodesource.com/setup_14.x | sudo -E bash -
     sudo apt-get install -y nodejs
 fi

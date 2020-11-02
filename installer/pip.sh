@@ -18,7 +18,9 @@ function pip_install() {
         fi
     else
         # We want to install recommended packages here
-        which apt-get && sudo apt-get install -y python3-pip
+        if [[ $IS_SUDOER = true ]]; then
+            which apt-get && sudo apt-get install -y python3-pip
+        fi
         "$PIP" install --user -v --upgrade -r "$REQUIREMENTS"
     fi
 }
