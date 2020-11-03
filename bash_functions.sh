@@ -7,7 +7,7 @@ add_path() {
     fi
 }
 
-function remove_path() {
+remove_path() {
     PATH=$(tr : '\n' <<<"$PATH" | grep -v "^$1$" | paste -sd ':' -)
     export PATH
 }

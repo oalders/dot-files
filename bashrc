@@ -102,47 +102,47 @@ alias | grep " du=" && unalias du
 alias | grep " ls=" && unalias ls
 alias | grep " ps=" && unalias ps
 
-function path() {
+path() {
     tr : '\n' <<<"$PATH"
 }
 
-function clean_path() {
+clean_path() {
     # shellcheck disable=SC1001
     tr : '\n' <<<"$PATH" | awk '!x[$0]++' | grep \/ | grep -v game | paste -sd ":" -
 }
 
-function fig() {
+fig() {
     pushd ~/Documents/github/metacpan-docker >/dev/null || return
     docker-compose "$@"
     popd >/dev/null || return
 }
 
-function reset_path() {
+reset_path() {
     PATH=$(clean_path)
     export PATH
 }
 
-function whosonport() {
+whosonport() {
     sudo lsof +c 0 -i :"$1"
 }
 
-function check_compression() {
+check_compression() {
     curl -I -H 'Accept-Encoding: gzip,deflate' "$1" | grep "Content-Encoding"
 }
 
-function trace_process() {
+trace_process() {
     sudo lsof +c 0 -p "$1" && sudo strace -fp "$1"
 }
 
-function open_files() {
+open_files() {
     sudo lsof -s | awk '$5 == "REG"' | sort -n -r -k 7,7 | head -n 50
 }
 
-function git-recover-file() {
+git-recover-file() {
     git checkout $(git rev-list -n 1 HEAD -- "$1")^ -- "$1"
 }
 
-function md() {
+md() {
     pandoc "$1" | lynx -stdin
 }
 
@@ -160,9 +160,9 @@ if ! type "ack" >/dev/null 2>&1; then
     fi
 fi
 
-function youtube-mp3() { youtube-download "$1" && ffmpeg -i "$1.mp4" "$1.mp3"; }
+youtube-mp3() { youtube-download "$1" && ffmpeg -i "$1.mp4" "$1.mp3"; }
 
-function tmux_session_name() {
+tmux_session_name() {
     INSIDE_GIT_REPO="$(git rev-parse --is-inside-work-tree 2>/dev/null)"
 
     if [ "$INSIDE_GIT_REPO" ]; then
