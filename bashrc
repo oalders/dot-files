@@ -112,7 +112,7 @@ function clean_path() {
 }
 
 function fig() {
-    pushd ~/Documents/github/etacpan-docker >/dev/null || return
+    pushd ~/Documents/github/metacpan-docker >/dev/null || return
     docker-compose "$@"
     popd >/dev/null || return
 }
