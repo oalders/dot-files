@@ -11,6 +11,9 @@ mkdir -p $bin_dir
 mkdir -p $src_dir
 mkdir -p ~/.fpp
 
+brew install tree
+tree ~/local
+
 pushd $src_dir > /dev/null
 
 rm -rf PathPicker && git clone --depth 1 https://github.com/facebook/PathPicker.git
