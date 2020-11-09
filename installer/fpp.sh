@@ -2,7 +2,7 @@
 
 # Install fpp (Facebook Path Picker)
 
-set -eu -o pipefail
+set -eux -o pipefail
 
 bin_dir=~/local/bin
 src_dir=~/local/src
