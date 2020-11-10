@@ -20,6 +20,7 @@ git config --global rebase.instructionFormat "(%an <%ae>) %s"
 git config --global rerere.enabled 1
 
 git config --global branch.autosetuprebase always
+git config --global alias.auto-set-head 'remote set-head origin -a'
 git config --global alias.b 'branch'
 git config --global alias.ba 'branch -a'
 git config --global alias.ca 'commit --amend'
