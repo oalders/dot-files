@@ -14,6 +14,8 @@ jobs:
       - uses: actions/checkout@v2
       - name: Set up symlink to ~/dot-files
         run: cd && ln -s $GITHUB_WORKSPACE .
+      - name: Install fpp
+        run: ./installer/fpp.sh
       - name: Maybe install MacOS deps
         run: ./installer/homebrew.sh
       - name: Maybe install Linux deps
@@ -30,8 +32,6 @@ jobs:
       # run: ./installer/pip.sh
       - name: Configure vim
         run: ./configure/vim.sh
-      - name: Install fpp
-        run: ./installer/fpp.sh
       - name: Configure tmux
         run: ./configure/tmux.sh
       - name: Install yarn deps

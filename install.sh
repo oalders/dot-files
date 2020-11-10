@@ -23,6 +23,8 @@ fi
 
 ./configure/git.sh
 
+./installer/fpp.sh
+
 ./configure/ssh.sh
 
 ./installer/pip.sh
@@ -30,8 +32,6 @@ fi
 ./installer/vim.sh
 
 ./configure/vim.sh
-
-./installer/fpp.sh
 
 ./configure/tmux.sh
 
