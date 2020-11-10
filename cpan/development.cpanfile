@@ -12,5 +12,6 @@ requires 'Data::Printer::Filter::JSON';
 requires 'Data::Printer::Filter::URI';
 requires 'Modern::Perl';
 requires 'Perl::Critic';
+requires 'Perl::Critic::TooMuchCode';
 requires 'Perl::Tidy';
 requires 'Test::Perl::Critic';

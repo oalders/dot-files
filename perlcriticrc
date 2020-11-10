@@ -5,3 +5,7 @@ verbose = 11
 
 [TestingAndDebugging::RequireUseStrict]
 equivalent_modules = Modern::Perl Moose Test2::V0
+
+[TooMuchCode::ProhibitUnusedImport]
+
+[TooMuchCode::ProhibitUnusedInclude]
