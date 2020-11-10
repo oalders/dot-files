@@ -194,10 +194,9 @@ autocmd BufEnter .yath.rc         :setlocal filetype=dosini
 autocmd BufEnter .yath.user.rc    :setlocal filetype=dosini
 
 " Treat Perl Mojo templates (mostly) like HTML
-autocmd FileType html.epl setlocal sw=2 ts=2 sts=2
-autocmd FileType html.ep setlocal sw=2 ts=2 sts=2
-
-autocmd BufRead,BufNewFile *.tmpl set filetype=html
+autocmd BufRead,BufNewFile *.html.ep  set filetype=html
+autocmd BufRead,BufNewFile *.html.epl set filetype=html
+autocmd BufRead,BufNewFile *.tmpl     set filetype=html
 
 autocmd BufRead,BufNewFile *.yml set filetype=yaml
 autocmd FileType yaml :setlocal sw=2 ts=2 sts=2
@@ -227,7 +226,7 @@ endfun
 " Set line markers to make indentation easier in Mojo templates
 " Enable via :call ShowLines()
 fun ShowLines()
-    if &ft ==# "html" || &ft ==# "html.epl"
+    if &ft ==# "html"
         :set colorcolumn=5,9,13,17,21,25,29
     else
         :set colorcolumn=78
