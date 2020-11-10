@@ -2,3 +2,6 @@ exclude = Perl::Critic::Policy::Subroutines::RequireArgUnpacking
 exclude = Perl::Critic::Policy::ValuesAndExpressions::ProhibitAccessOfPrivateData
 exclude = Subroutines::ProhibitExplicitReturnUndef
 verbose = 11
+
+[TestingAndDebugging::RequireUseStrict]
+equivalent_modules = Modern::Perl Moose Test2::V0
