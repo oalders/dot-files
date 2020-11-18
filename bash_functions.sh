@@ -66,6 +66,10 @@ else
     HARNESS_OPTIONS="j1:c"
 fi
 
+# Since ripgrep has no default config file location, we don't need to bother
+# with symlinks.
+RIPGREP_CONFIG_PATH=~/dot-files/ripgreprc
+
 export HARNESS_OPTIONS
 export HAS_GO
 export HAS_PLENV
@@ -74,3 +78,4 @@ export IS_GITHUB
 export IS_MM
 export IS_SUDOER
 export LINK_FLAG
+export RIPGREP_CONFIG_PATH
