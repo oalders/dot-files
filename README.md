@@ -73,18 +73,12 @@ Upgrade deps via `yarn upgrade`.
 
 ```
 docker build -t dotfiles .
-```
-
-Get build SHA from output and use below:
-
-```
 docker run -it --volume $PWD:/root/dot-files dotfiles:latest /bin/bash
 ```
 
-In the shell:
+In the Docker container:
 
 ```
 cd /root/dot-files
 USER=root ./install.sh
-vim
 ```
