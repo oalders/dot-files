@@ -27,7 +27,7 @@
     "jsonlint": "^1.6.3",
     "markdownlint": "^0.21.1",
     "markdownlint-cli": "^0.25.0",
-    "prettier": "^2.1.2",
+    "prettier": "^2.2.0",
     "write-good": "^1.0.3"
   }
 }
