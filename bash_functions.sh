@@ -31,6 +31,11 @@ LINK_FLAG=""
 if [ "$(uname)" == "Darwin" ]; then
     IS_DARWIN=true
     LINK_FLAG="-hF"
+
+    # A homebrew update of Python to > 3.8 has broken Google Cloud tools.
+    CLOUDSDK_PYTHON=python2
+    export CLOUDSDK_PYTHON
+
 elif [ "$(uname -s)" == "Linux" ]; then
     LINK_FLAG="-T"
 fi
