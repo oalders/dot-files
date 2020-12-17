@@ -18,7 +18,6 @@ mkdir -p ~/.vim/after/plugin
 ln -sf "$LINK_FLAG" $PREFIX/vim/after/syntax/perl/heredoc-sql.vim ~/.vim/after/syntax/perl/heredoc-sql.vim
 ln -sf "$LINK_FLAG" $PREFIX/vim/after/plugin/abolish.vim ~/.vim/after/plugin/abolish.vim
 
-exit 0
 if [[ $HAS_GO = true ]]; then
     echo "Installing shfmt"
     go get -u mvdan.cc/sh/v3/cmd/shfmt
