@@ -48,6 +48,7 @@ Remind myself of vim shortcuts etc.
 * `:BLines` - fzf lines in current buffer
 * `:Lines` - fzf lines in loaded buffers
 * `:GenTocGFM` - generate GitHub flavoured markdown table of contents
+* `[c` and `]c` - navigate to next changed hunk
 
 ## Alfred
 
