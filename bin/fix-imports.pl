@@ -16,7 +16,7 @@ if ( !$filename ) {
     exit(1);
 }
 
-my $input = <STDIN>;
+my $input = shift @ARGV || <STDIN>;
 
 my ($module);
 
