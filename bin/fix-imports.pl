@@ -6,7 +6,7 @@ use strict;
 use warnings;
 
 use Data::Printer;
-use List::AllUtils qw( uniq );
+use List::AllUtils qw( any uniq );
 use Module::Runtime qw( require_module );
 use Path::Tiny qw( path );
 
@@ -35,6 +35,8 @@ $module->import;
 no strict 'refs';
 my @imports
     = uniq( @{ $module . '::EXPORT' }, @{ $module . '::EXPORT_OK' } );
+my $test_builder
+    = any { $_ eq 'Test::Builder::Module' } @{ $module . '::ISA' };
 use strict;
 ## use critic
 
@@ -49,9 +51,17 @@ for my $symbol (@imports) {
 }
 
 if (@found) {
-    my $statement = sprintf( 'use %s qw( %s );', $module, join q{ }, sort @found );
-    if ( length($statement) > 78 ) {
-        $statement = sprintf("use %s qw(\n", $module);
+
+    my $template
+        = $test_builder
+        ? 'use %s import => [ qw( %s ) ];'
+        : 'use %s qw( %s );';
+
+    my $statement = sprintf( $template, $module, join q{ }, sort @found );
+
+    # Don't deal with Test::Builder classes here to keep is simple for now
+    if ( length($statement) > 78 && !$test_builder ) {
+        $statement = sprintf( "use %s qw(\n", $module );
         for (@found) {
             $statement .= "    $_\n";
         }
