@@ -5,10 +5,10 @@
 use strict;
 use warnings;
 
-use Data::Printer;
 use List::AllUtils qw( any uniq );
 use Module::Runtime qw( require_module );
 use Path::Tiny qw( path );
+use PPI ();
 
 my $filename = shift @ARGV;
 if ( !$filename ) {
@@ -40,24 +40,42 @@ my $test_builder
 use strict;
 ## use critic
 
-my @found;
-
 my $content = path($filename)->slurp;
-for my $symbol (@imports) {
-    $symbol =~ s{\A&}{};
-    if ( $content =~ m{\Q$symbol\E} ) {
-        push @found, $symbol;
+my $doc     = PPI::Document->new( \$content );
+
+my %imports = map { $_ => 1 } @imports;
+
+# Stolen from Perl::Critic::Policy::TooMuchCode::ProhibitUnfoundImport
+my %found;
+for my $word (
+    @{
+        $doc->find(
+            sub {
+                $_[1]->isa('PPI::Token::Word')
+                    || ( $_[1]->isa('PPI::Token::Symbol')
+                    && $_[1]->symbol_type eq '&' );
+            }
+            )
+            || []
+    }
+) {
+    if ( $word->isa('PPI::Token::Symbol') ) {
+        $word =~ s{^&}{};
+    }
+    if ( exists $imports{"$word"} ) {
+        $found{"$word"}++;
     }
 }
 
-if (@found) {
+if ( keys %found ) {
+    my @found = sort { $a cmp $b } keys %found;
 
     my $template
         = $test_builder
         ? 'use %s import => [ qw( %s ) ];'
         : 'use %s qw( %s );';
 
-    my $statement = sprintf( $template, $module, join q{ }, sort @found );
+    my $statement = sprintf( $template, $module, join q{ }, @found );
 
     # Don't deal with Test::Builder classes here to keep is simple for now
     if ( length($statement) > 78 && !$test_builder ) {
