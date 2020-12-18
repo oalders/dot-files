@@ -46,4 +46,9 @@ for my $symbol (@imports) {
     }
 }
 
-printf( 'use %s qw( %s );', $module, join q{ }, sort @found );
+if (@found) {
+    printf( 'use %s qw( %s );', $module, join q{ }, sort @found );
+}
+else {
+    printf( 'use %s ();', $module );
+}
