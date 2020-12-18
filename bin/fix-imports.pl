@@ -1,5 +1,7 @@
 #!/usr/bin/env perl
 
+# Does not work with modules using Sub::Exporter
+
 use strict;
 use warnings;
 
@@ -41,13 +43,21 @@ my @found;
 my $content = path($filename)->slurp;
 for my $symbol (@imports) {
     $symbol =~ s{\A&}{};
-    if ( $content =~ m{$symbol} ) {
+    if ( $content =~ m{\Q$symbol\E} ) {
         push @found, $symbol;
     }
 }
 
 if (@found) {
-    printf( 'use %s qw( %s );', $module, join q{ }, sort @found );
+    my $statement = sprintf( 'use %s qw( %s );', $module, join q{ }, sort @found );
+    if ( length($statement) > 78 ) {
+        $statement = sprintf("use %s qw(\n", $module);
+        for (@found) {
+            $statement .= "    $_\n";
+        }
+        $statement .= ");\n";
+    }
+    print $statement;
 }
 else {
     printf( 'use %s ();', $module );
