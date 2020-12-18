@@ -227,9 +227,7 @@ sub _build_uses_sub_exporter {
 
         my $included_module = $st->schild(1);
         if ( $included_module eq 'Sub::Exporter' ) {
-            for my $i ( 0 .. 10 ) {
-                print "$i) " . $st->schild($i), "\n";
-            }
+            return 1;
         }
     }
     return 0;
