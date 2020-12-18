@@ -140,6 +140,15 @@ sub _build_imports {
 sub formatted_import_statement {
     my $self = shift;
 
+    # pragma?
+    if ( lc($self->module_name) eq $self->module_name ) {
+        return $self->_source_text;
+    }
+
+    if ( !@{$self->imports}) {
+        return sprintf('use %s ();', $self->module_name);
+    }
+
     my $template
         = $self->_isa_test_builder_module
         ? 'use %s import => [ qw( %s ) ];'

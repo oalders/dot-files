@@ -35,9 +35,4 @@ if ( !@found ) {
     }
 }
 
-if ( !@found ) {
-    printf( 'use %s ();', $e->module_name );
-    exit(0);
-}
-
 print $e->formatted_import_statement;
