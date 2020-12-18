@@ -145,8 +145,13 @@ sub formatted_import_statement {
         return $self->_source_text;
     }
 
-    if ( !@{$self->imports}) {
-        return sprintf('use %s ();', $self->module_name);
+    if ( !@{ $self->imports } ) {
+        return sprintf(
+            'use %s ();%s', $self->module_name,
+            ( !@{ $self->exports } && $self->uses_sub_exporter )
+            ? ' # uses Sub::Exporter'
+            : q{}
+        );
     }
 
     my $template
