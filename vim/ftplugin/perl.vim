@@ -49,3 +49,5 @@ map ,2mod :s/\.pm//<CR>gv:s/\//::/g<CR>
 " Try to install missing Perl modules
 nnoremap <leader>l :!perl -Mlazy -c %:p
 
+" Try to fix module imports
+:vnoremap <silent> im :!~/dot-files/bin/fix-imports.pl '%:p'<CR>
