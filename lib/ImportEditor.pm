@@ -191,7 +191,7 @@ sub _maybe_find_local_module {
 
 # Stolen from Open::This
 sub _maybe_find_installed_module {
-    my $self->shift;
+    my $self = shift;
 
     # This is a loadable module.  Have this come after the local module checks
     # so that we don't default to installed modules.
