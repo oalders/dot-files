@@ -25,14 +25,4 @@ if (!$e->module_name) {
     exit(0);
 }
 
-
-my @found = @{$e->imports};
-
-if ( !@found ) {
-    if ( $e->uses_sub_exporter ) {
-        print( $input . ' # uses Sub::Exporter' );
-        exit(0);
-    }
-}
-
 print $e->formatted_import_statement;
