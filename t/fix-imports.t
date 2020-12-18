@@ -45,7 +45,7 @@ subtest 'Test::More' => sub {
     );
 };
 
-subtest 'Test::More' => sub {
+subtest 'strict' => sub {
     my $e = ImportEditor->new(
         filename    => 't/test-data/foo.t',
         source_text => 'use strict;',

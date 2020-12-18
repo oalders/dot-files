@@ -141,7 +141,7 @@ sub formatted_import_statement {
     my $self = shift;
 
     # pragma?
-    if ( lc($self->module_name) eq $self->module_name ) {
+    if ( lc( $self->module_name ) eq $self->module_name ) {
         return $self->_source_text;
     }
 
