@@ -20,7 +20,7 @@ my $input = shift @ARGV || <STDIN>;
 
 my $e = ImportEditor->new( filename => $filename, source_text => $input );
 
-if (!$e->module_name) {
+if ( !$e->module_name ) {
     print $input;
     exit(0);
 }

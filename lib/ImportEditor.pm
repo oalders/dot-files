@@ -115,8 +115,7 @@ sub _build_imports {
             $doc->find(
                 sub {
                     $_[1]->isa('PPI::Token::Word')
-                        || ( $_[1]->isa('PPI::Token::Symbol')
-                        && $_[1]->symbol_type eq '&' );
+                        || $_[1]->isa('PPI::Token::Symbol');
                 }
                 )
                 || []

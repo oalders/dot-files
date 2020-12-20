@@ -1,6 +1,8 @@
 use strict;
 use warnings;
 
+use lib 't/lib';
+
 use ImportEditor ();
 use Test::More import => [ qw( done_testing is is_deeply ok subtest ) ];
 
@@ -57,7 +59,7 @@ subtest 'strict' => sub {
 
     ok( !@{ $e->exports },             'Found some exports' );
     ok( !$e->_isa_test_builder_module, 'isa_test_builder_module' );
-    is_deeply( $e->imports, [ ], 'imports' );
+    is_deeply( $e->imports, [], 'imports' );
     ok( !$e->uses_sub_exporter, 'uses_sub_exporter' );
     is(
         $e->formatted_import_statement,
@@ -77,13 +79,37 @@ subtest 'FindBin' => sub {
         'module_name'
     );
 
-    ok( @{ $e->exports },             'Found some exports' );
+    ok( @{ $e->exports },              'Found some exports' );
     ok( !$e->_isa_test_builder_module, 'isa_test_builder_module' );
-    is_deeply( $e->imports, [ ], 'imports' );
+    is_deeply( $e->imports, [], 'imports' );
     ok( !$e->uses_sub_exporter, 'uses_sub_exporter' );
     is(
         $e->formatted_import_statement,
         q{use FindBin ();},
+        'formatted_import_statement'
+    );
+};
+
+subtest 'ViaExporter' => sub {
+    my $e = ImportEditor->new(
+        filename    => 't/test-data/via-exporter.pl',
+        source_text => 'use ViaExporter qw( foo $foo @foo %foo );',
+    );
+    is(
+        $e->module_name(), 'ViaExporter',
+        'module_name'
+    );
+
+    is_deeply(
+        $e->exports, [qw( foo $foo @foo %foo )],
+        'Found some exports'
+    );
+    ok( !$e->_isa_test_builder_module, 'isa_test_builder_module' );
+    is_deeply( $e->imports, [qw( $foo %foo @foo foo )], 'imports' );
+    ok( !$e->uses_sub_exporter, 'uses_sub_exporter' );
+    is(
+        $e->formatted_import_statement,
+        'use ViaExporter qw( $foo %foo @foo foo );',
         'formatted_import_statement'
     );
 };
