@@ -20,7 +20,7 @@ my $input = shift @ARGV || <STDIN>;
 
 my $e = PerlImports->new( filename => $filename, source_text => $input );
 
-if ( !$e->module_name ) {
+if ( !$e->module_name || $e->is_noop ) {
     print $input;
     exit(0);
 }

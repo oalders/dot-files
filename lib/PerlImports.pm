@@ -32,6 +32,13 @@ has imports => (
     builder => '_build_imports',
 );
 
+has is_noop => (
+    is      => 'ro',
+    isa     => Bool,
+    lazy    => 1,
+    builder => '_build_is_noop',
+);
+
 has _isa_test_builder_module => (
     is      => 'ro',
     isa     => Bool,
@@ -134,6 +141,14 @@ sub _build_imports {
 
     my @found = sort { $a cmp $b } keys %found;
     return \@found;
+}
+
+sub _build_is_noop {
+    my $self = shift;
+    my %noop = (
+        'Types::Standard' => 1,
+    );
+    return exists $noop{ $self->module_name };
 }
 
 sub formatted_import_statement {
