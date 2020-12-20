@@ -8,7 +8,7 @@ use warnings;
 use FindBin qw( $Bin );
 use lib "$Bin/../lib";
 
-use ImportEditor ();
+use PerlImports ();
 
 my $filename = shift @ARGV;
 if ( !$filename ) {
@@ -18,7 +18,7 @@ if ( !$filename ) {
 
 my $input = shift @ARGV || <STDIN>;
 
-my $e = ImportEditor->new( filename => $filename, source_text => $input );
+my $e = PerlImports->new( filename => $filename, source_text => $input );
 
 if ( !$e->module_name ) {
     print $input;

@@ -1,4 +1,4 @@
-package ImportEditor;
+package PerlImports;
 
 # Does not work with modules using Sub::Exporter
 

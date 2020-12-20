@@ -3,11 +3,11 @@ use warnings;
 
 use lib 't/lib';
 
-use ImportEditor ();
+use PerlImports ();
 use Test::More import => [ qw( done_testing is is_deeply ok subtest ) ];
 
 subtest 'Getopt::Long' => sub {
-    my $e = ImportEditor->new(
+    my $e = PerlImports->new(
         filename    => 't/test-data/foo.pl',
         source_text => 'use Getopt::Long;',
     );
@@ -27,7 +27,7 @@ subtest 'Getopt::Long' => sub {
 };
 
 subtest 'Test::More' => sub {
-    my $e = ImportEditor->new(
+    my $e = PerlImports->new(
         filename    => 't/test-data/foo.t',
         source_text => 'use Test::More;',
     );
@@ -48,7 +48,7 @@ subtest 'Test::More' => sub {
 };
 
 subtest 'strict' => sub {
-    my $e = ImportEditor->new(
+    my $e = PerlImports->new(
         filename    => 't/test-data/foo.t',
         source_text => 'use strict;',
     );
@@ -70,7 +70,7 @@ subtest 'strict' => sub {
 
 # This test demonstrates that we can't handle FindBin
 subtest 'FindBin' => sub {
-    my $e = ImportEditor->new(
+    my $e = PerlImports->new(
         filename    => 't/test-data/find-bin.pl',
         source_text => 'use FindBin qw( $Bin );',
     );
@@ -91,7 +91,7 @@ subtest 'FindBin' => sub {
 };
 
 subtest 'ViaExporter' => sub {
-    my $e = ImportEditor->new(
+    my $e = PerlImports->new(
         filename    => 't/test-data/via-exporter.pl',
         source_text => 'use ViaExporter qw( foo $foo @foo %foo );',
     );
