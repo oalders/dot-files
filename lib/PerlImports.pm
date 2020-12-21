@@ -146,16 +146,18 @@ sub _build_imports {
 sub _build_is_noop {
     my $self = shift;
     my %noop = (
+        'Moo'             => 1,
+        'Moose'           => 1,
         'Types::Standard' => 1,
     );
-    return exists $noop{ $self->module_name };
+    return 1 if exists $noop{ $self->module_name };
+    return lc( $self->module_name ) eq $self->module_name;
 }
 
 sub formatted_import_statement {
     my $self = shift;
 
-    # pragma?
-    if ( lc( $self->module_name ) eq $self->module_name ) {
+    if ( $self->is_noop ) {
         return $self->_source_text;
     }
 
@@ -232,10 +234,11 @@ sub _build_uses_sub_exporter {
     my $doc     = PPI::Document->new( \$content );
 
     # Stolen from Perl::Critic::Policy::TooMuchCode::ProhibitUnfoundImport
-    my $include_statements
-        = $doc->find(
-        sub { $_[1]->isa('PPI::Statement::Include') && !$_[1]->pragma } )
-        || [];
+    my $include_statements = $doc->find(
+        sub {
+            $_[1]->isa('PPI::Statement::Include') && !$_[1]->pragma;
+        }
+    ) || [];
     for my $st (@$include_statements) {
         next if $st->schild(0) eq 'no';
 

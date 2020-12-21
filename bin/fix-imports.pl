@@ -20,9 +20,5 @@ my $input = shift @ARGV || <STDIN>;
 
 my $e = PerlImports->new( filename => $filename, source_text => $input );
 
-if ( !$e->module_name || $e->is_noop ) {
-    print $input;
-    exit(0);
-}
-
 print $e->formatted_import_statement;
+exit(0);

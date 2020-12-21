@@ -47,7 +47,7 @@ subtest 'Test::More' => sub {
     );
 };
 
-subtest 'strict' => sub {
+subtest 'pragma' => sub {
     my $e = PerlImports->new(
         filename    => 't/test-data/foo.t',
         source_text => 'use strict;',
