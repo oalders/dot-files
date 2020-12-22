@@ -90,6 +90,20 @@ sub _build_exports {
     use strict;
 ## use critic
 
+    # Moose Type library? And yes, private method bad.
+    if ( !@exports && require_module('Class::Inspector') ) {
+        if (
+            any { $_ eq 'MooseX::Types::Combine::_provided_types' }
+            @{ Class::Inspector->methods(
+                    $self->module_name, 'full', 'private'
+                )
+            }
+        ) {
+            my %types = $self->module_name->_provided_types;
+            @exports = keys %types;
+        }
+    }
+
     return \@exports;
 }
 
