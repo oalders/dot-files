@@ -164,6 +164,16 @@ sub _build_is_noop {
         && Moose::Util::find_meta( $self->module_name ) ) {
         return 1;
     }
+
+    # This should catch Moo classes
+    if ( require_module('Class::Inspector') ) {
+        return 1
+            if any { $_ eq 'Moo::is_class' }
+        @{ Class::Inspector->methods( $self->module_name, 'full', 'public' )
+        };
+    }
+
+    return 0;
 }
 
 sub formatted_import_statement {

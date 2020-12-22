@@ -6,9 +6,8 @@ use lib 't/lib';
 use PerlImports ();
 use Test::More import => [ qw( done_testing is is_deeply ok ) ];
 
-# This test demonstrates that we can't handle FindBin
 my $e = PerlImports->new(
-    filename    => 't/lib/UsesMoose.pm',
+    filename    => 't/lib/UsesMoo.pm',
     source_text => 'use Moo;',
 );
 is(

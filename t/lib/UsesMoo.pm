@@ -1,6 +1,6 @@
-package UsesMoose;
+package UsesMoo;
 
-use Moose;
+use Moo;
 
 __PACKAGE__->meta->make_immutable;
 1;

@@ -4,7 +4,7 @@ use warnings;
 use lib 't/lib';
 
 use PerlImports ();
-use Test::More import => [qw( done_testing is is_deeply ok subtest )];
+use Test::More import => [ qw( done_testing is is_deeply ok subtest ) ];
 
 subtest 'Getopt::Long' => sub {
     my $e = PerlImports->new(

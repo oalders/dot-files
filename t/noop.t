@@ -4,9 +4,8 @@ use warnings;
 use lib 't/lib';
 
 use PerlImports ();
-use Test::More import => [qw( done_testing is is_deeply ok subtest )];
+use Test::More import => [ qw( done_testing is ok subtest ) ];
 
-# This test demonstrates that we can't handle FindBin
 subtest 'Types::Standard' => sub {
     my $e = PerlImports->new(
         filename    => 'lib/PerlImports.pm',
