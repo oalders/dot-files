@@ -145,13 +145,25 @@ sub _build_imports {
 
 sub _build_is_noop {
     my $self = shift;
+
+    return 0 if @{ $self->imports };
+
     my %noop = (
         'Moo'             => 1,
         'Moose'           => 1,
         'Types::Standard' => 1,
     );
+
     return 1 if exists $noop{ $self->module_name };
+
+    # Is it a pragma?
     return lc( $self->module_name ) eq $self->module_name;
+
+    # This should catch Moose classes
+    if (   require_module('Moose::Util')
+        && Moose::Util::find_meta( $self->module_name ) ) {
+        return 1;
+    }
 }
 
 sub formatted_import_statement {
