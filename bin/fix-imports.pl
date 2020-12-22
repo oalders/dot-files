@@ -16,9 +16,19 @@ if ( !$filename ) {
     exit(1);
 }
 
-my $input = shift @ARGV || <STDIN>;
+my $input = shift @ARGV || join q{}, <STDIN>;
 
-my $e = PerlImports->new( filename => $filename, source_text => $input );
+my @sources = sort { "\L$a" cmp "\L$b" } grep { $_ =~ m{\w} } (
+    split m{;\n},
+    $input
+);
 
-print $e->formatted_import_statement;
+foreach my $source (@sources) {
+    my $e = PerlImports->new(
+        filename    => $filename,
+        source_text => $source . ";"
+    );
+    print $e->formatted_import_statement . "\n";
+}
+
 exit(0);
