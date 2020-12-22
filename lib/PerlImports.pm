@@ -149,8 +149,6 @@ sub _build_is_noop {
     return 0 if @{ $self->imports };
 
     my %noop = (
-        'Moo'             => 1,
-        'Moose'           => 1,
         'Types::Standard' => 1,
     );
 
