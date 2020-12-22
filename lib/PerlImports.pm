@@ -157,7 +157,7 @@ sub _build_is_noop {
     return 1 if exists $noop{ $self->module_name };
 
     # Is it a pragma?
-    return lc( $self->module_name ) eq $self->module_name;
+    return 1 if lc( $self->module_name ) eq $self->module_name;
 
     # This should catch Moose classes
     if (   require_module('Moose::Util')
