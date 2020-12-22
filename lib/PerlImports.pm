@@ -8,7 +8,7 @@ use List::AllUtils qw( any uniq );
 use Module::Runtime qw( module_notional_filename require_module );
 use Module::Util qw( find_installed );
 use Path::Tiny qw( path );
-use PPI ();
+use PPI::Document ();
 use Types::Standard qw(ArrayRef Bool Maybe Str);
 
 has exports => (
