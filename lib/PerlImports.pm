@@ -171,6 +171,8 @@ sub _build_is_noop {
     # Is it a pragma?
     return 1 if lc( $self->module_name ) eq $self->module_name;
 
+    return 1 if $self->uses_sub_exporter;
+
     # This should catch Moose classes
     if (   require_module('Moose::Util')
         && Moose::Util::find_meta( $self->module_name ) ) {
@@ -191,17 +193,12 @@ sub _build_is_noop {
 sub formatted_import_statement {
     my $self = shift;
 
-    if ( $self->is_noop ) {
+    if ( $self->is_noop || !@{ $self->exports } ) {
         return $self->_source_text;
     }
 
     if ( !@{ $self->imports } ) {
-        return sprintf(
-            'use %s ();%s', $self->module_name,
-            ( !@{ $self->exports } && $self->uses_sub_exporter )
-            ? ' # uses Sub::Exporter'
-            : q{}
-        );
+        return sprintf( 'use %s ();', $self->module_name );
     }
 
     my $template
