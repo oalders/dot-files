@@ -169,7 +169,7 @@ sub _build_imports {
         my @found = sort { $a cmp $b } keys %found;
     }
 
-    my @found = sort { $a cmp $b } keys %found;
+    my @found = sort { "\L$a" cmp "\L$b" } keys %found;
     return \@found;
 }
 
