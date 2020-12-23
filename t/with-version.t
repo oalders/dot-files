@@ -15,7 +15,6 @@ is(
     'module_name'
 );
 
-use DDP;
 ok( @{$e->exports}, 'some exports' );
 ok( !$e->is_noop, 'is_noop' );
 is_deeply( $e->imports, ['GetOptions'], 'imports' );
