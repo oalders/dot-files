@@ -210,20 +210,30 @@ sub formatted_import_statement {
     my $self = shift;
 
     if ( $self->is_noop || !@{ $self->exports } ) {
-        return $self->_include . q{};
+        return $self->_include;
     }
 
     if ( !@{ $self->imports } ) {
-        return sprintf( 'use %s ();', $self->module_name );
+        return $self->_new_include(
+            sprintf(
+                'use %s %s();', $self->module_name,
+                $self->_include->module_version
+                ? $self->_include->module_version . q{ }
+                : q{}
+            )
+        );
     }
 
     my $template
         = $self->_isa_test_builder_module
-        ? 'use %s import => [ qw( %s ) ];'
-        : 'use %s qw( %s );';
+        ? 'use %s%s import => [ qw( %s ) ];'
+        : 'use %s%s qw( %s );';
 
     my $statement = sprintf(
-        $template, $self->module_name, join q{ },
+        $template, $self->module_name,
+        $self->_include->module_version
+        ? q{ } . $self->_include->module_version
+        : q{}, join q{ },
         @{ $self->imports }
     );
 
@@ -235,7 +245,17 @@ sub formatted_import_statement {
         }
         $statement .= ");";
     }
-    return $statement;
+
+    return $self->_new_include($statement);
+}
+
+sub _new_include {
+    my $self      = shift;
+    my $statement = shift;
+    my $doc       = PPI::Document->new( \$statement );
+    my $includes
+        = $doc->find( sub { $_[1]->isa('PPI::Statement::Include'); } );
+    return $includes->[0]->clone;
 }
 
 # Stolen from Open::This

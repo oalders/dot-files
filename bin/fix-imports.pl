@@ -26,11 +26,17 @@ my $includes = $doc->find(
     }
 );
 
-foreach my $include (@{$includes}) {
+foreach my $include ( @{$includes} ) {
     my $e = PerlImports->new(
-        filename    => $filename,
-        include     => $include,
+        filename => $filename,
+        include  => $include,
     );
+
+    my $elem = $e->formatted_import_statement;
+
+    # https://github.com/adamkennedy/PPI/issues/189
+    $include->insert_before( $elem->clone );
+    $include->remove;
 }
 
 print "$doc";
