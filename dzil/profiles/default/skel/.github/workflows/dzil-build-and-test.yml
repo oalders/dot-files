@@ -92,7 +92,7 @@ jobs:
         with:
           cpanfile: "cpanfile"
           args: "--with-suggests --with-recommends --with-test"
-      - run: prove -l t xt
+      - run: prove -lr t xt
         env:
           AUTHOR_TESTING: 1
           RELEASE_TESTING: 1
