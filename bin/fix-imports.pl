@@ -18,17 +18,21 @@ if ( !$filename ) {
 
 my $input = shift @ARGV || join q{}, <STDIN>;
 
-my @sources = sort { "\L$a" cmp "\L$b" } grep { $_ =~ m{\w} } (
-    split m{;\n},
-    $input
+my $doc = PPI::Document->new( \$input );
+
+my $includes = $doc->find(
+    sub {
+        $_[1]->isa('PPI::Statement::Include');
+    }
 );
 
-foreach my $source (@sources) {
+foreach my $include (@{$includes}) {
     my $e = PerlImports->new(
         filename    => $filename,
-        source_text => $source . ";"
+        include     => $include,
     );
-    print $e->formatted_import_statement . "\n";
 }
+
+print "$doc";
 
 exit(0);

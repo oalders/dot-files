@@ -4,12 +4,12 @@ package PerlImports;
 
 use Moo;
 
-use List::AllUtils qw( any uniq );
+use List::AllUtils qw( any uniq );    # comment here
 use Module::Runtime qw( module_notional_filename require_module );
 use Module::Util qw( find_installed );
 use Path::Tiny qw( path );
 use PPI::Document ();
-use Types::Standard qw(ArrayRef Bool Maybe Str);
+use Types::Standard qw(ArrayRef Bool InstanceOf Maybe Str);
 
 has exports => (
     is      => 'ro',
@@ -30,6 +30,13 @@ has imports => (
     isa     => ArrayRef,
     lazy    => 1,
     builder => '_build_imports',
+);
+
+has _include => (
+    is       => 'ro',
+    isa      => InstanceOf ['PPI::Statement::Include'],
+    init_arg => 'include',
+    required => 1,
 );
 
 has is_noop => (
@@ -53,12 +60,12 @@ has module_name => (
     builder => '_build_module_name',
 );
 
-has _source_text => (
-    is       => 'ro',
-    isa      => Str,
-    init_arg => 'source_text',
-    required => 1,
-);
+#has _source_text => (
+#is       => 'ro',
+#isa      => Str,
+#init_arg => 'source_text',
+#required => 1,
+#);
 
 has uses_sub_exporter => (
     is      => 'ro',
@@ -67,14 +74,23 @@ has uses_sub_exporter => (
     builder => '_build_uses_sub_exporter',
 );
 
-sub _build_module_name {
-    my $self = shift;
+around BUILDARGS => sub {
+    my ( $orig, $class, @args ) = @_;
 
-    if ( $self->_source_text =~ m{use ([\w:]+)} ) {
-        return $1;
+    my %args = @args;
+    if ( my $source = delete $args{source_text} ) {
+        my $doc = PPI::Document->new( \$source );
+        my $includes
+            = $doc->find( sub { $_[1]->isa('PPI::Statement::Include'); } );
+        $args{include} = $includes->[0]->clone;
     }
 
-    return undef;
+    return $class->$orig(%args);
+};
+
+sub _build_module_name {
+    my $self = shift;
+    return $self->_include->module;
 }
 
 sub _build_exports {
@@ -169,7 +185,7 @@ sub _build_is_noop {
     return 1 if exists $noop{ $self->module_name };
 
     # Is it a pragma?
-    return 1 if lc( $self->module_name ) eq $self->module_name;
+    return 1 if $self->_include->pragma;
 
     return 1 if $self->uses_sub_exporter;
 
@@ -194,7 +210,7 @@ sub formatted_import_statement {
     my $self = shift;
 
     if ( $self->is_noop || !@{ $self->exports } ) {
-        return $self->_source_text;
+        return $self->_include . q{};
     }
 
     if ( !@{ $self->imports } ) {

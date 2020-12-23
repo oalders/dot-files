@@ -4,18 +4,16 @@ use warnings;
 use lib 't/lib';
 
 use PerlImports ();
-use Test::More import => [ qw( done_testing is ok subtest ) ];
+use Test::More import => [qw( done_testing is ok subtest )];
 
-subtest 'Types::Standard' => sub {
-    my $e = PerlImports->new(
-        filename    => 'lib/PerlImports.pm',
-        source_text => 'use Types::Standard;',
-    );
-    is(
-        $e->module_name, 'Types::Standard',
-        'module_name'
-    );
-    ok( $e->is_noop, 'noop' );
-};
+my $e = PerlImports->new(
+    filename    => 'lib/PerlImports.pm',
+    source_text => 'use Types::Standard;',
+);
+is(
+    $e->module_name, 'Types::Standard',
+    'module_name'
+);
+ok( $e->is_noop, 'noop' );
 
 done_testing();
