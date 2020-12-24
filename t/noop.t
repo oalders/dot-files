@@ -33,7 +33,10 @@ subtest 'Test::RequiresInternet' => sub {
     # don't know what can be exported. It will basically pass through without
     # changes, though.
     ok( !$e->is_noop, 'noop' );
-    diag $e->formatted_import_statement;
+    is(
+        $e->formatted_import_statement,
+        q{use Test::RequiresInternet ('www.example.com' => 80 );}
+    );
 };
 
 done_testing();
