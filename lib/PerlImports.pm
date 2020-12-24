@@ -163,7 +163,13 @@ sub _build_imports {
         }
 
         # Getopt::Long exports &GetOptions
-        if ( exists $exports{"$word"} || exists $exports{ '&' . "$word" } ) {
+        # If a module exports %foo and we find $foo{bar}, $word->canonical returns $foo and $word->symbol returns %foo
+        if ( $word->isa('PPI::Token::Symbol')
+            && exists $exports{ $word->symbol } ) {
+            $found{ $word->symbol }++;
+        }
+        elsif (exists $exports{"$word"}
+            || exists $exports{ '&' . "$word" } ) {
             $found{"$word"}++;
         }
         my @found = sort { $a cmp $b } keys %found;
