@@ -8,15 +8,31 @@ use warnings;
 use FindBin qw( $Bin );
 use lib "$Bin/../lib";
 
+use Path::Tiny qw( path );
 use PerlImports ();
+use Getopt::Long::Descriptive;
 
-my $filename = shift @ARGV;
-if ( !$filename ) {
-    print STDERR 'File name not passed as first arg';
-    exit(1);
+my ( $opt, $usage ) = describe_options(
+    'perlimports %o <some-arg>',
+    [ 'file|f=s', 'the file containing the imports', { required => 1 } ],
+    [ 'read!', 'read STDIN', ],
+    [],
+
+    #[ 'verbose|v', "print extra stuff" ],
+    [ 'help', "print usage message and exit", { shortcircuit => 1 } ],
+);
+
+print( $usage->text ), exit if $opt->help;
+
+my $input;
+
+if ( $opt->read ) {
+    local $/;
+    $input = <STDIN>;
 }
-
-my $input = shift @ARGV || join q{}, <STDIN>;
+else {
+    $input = path( $opt->file )->slurp;
+}
 
 my $doc = PPI::Document->new( \$input );
 
@@ -28,7 +44,7 @@ my $includes = $doc->find(
 
 foreach my $include ( @{$includes} ) {
     my $e = PerlImports->new(
-        filename => $filename,
+        filename => $opt->file,
         include  => $include,
     );
 
@@ -39,6 +55,11 @@ foreach my $include ( @{$includes} ) {
     $include->remove;
 }
 
-print "$doc";
+if ( $opt->read ) {
+    print "$doc";
+}
+else {
+    path( $opt->file )->spew($doc);
+}
 
 exit(0);
