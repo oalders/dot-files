@@ -185,7 +185,11 @@ sub _build_is_noop {
 
     return 0 if @{ $self->imports };
 
+    # We know what FindBin exports, but we need to be smarter about checking
+    # for exported variables inside quotes in order for this to be correct.
+
     my %noop = (
+        'FindBin'         => 1,
         'Types::Standard' => 1,
     );
 

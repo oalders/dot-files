@@ -16,13 +16,10 @@ is(
     'module_name'
 );
 
-ok( @{ $e->exports },              'Found some exports' );
-ok( !$e->_isa_test_builder_module, 'isa_test_builder_module' );
-is_deeply( $e->imports, [], 'imports' );
-ok( !$e->uses_sub_exporter, 'uses_sub_exporter' );
+ok( $e->is_noop, 'noop' );
 is(
     $e->formatted_import_statement,
-    q{use FindBin ();},
+    q{use FindBin qw( $Bin );},
     'formatted_import_statement'
 );
 
