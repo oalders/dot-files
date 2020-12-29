@@ -16,7 +16,6 @@ ln -sf "$LINK_FLAG" $PREFIX/vim/ftplugin ~/.vim/ftplugin
 mkdir -p ~/.vim/after/syntax/perl
 mkdir -p ~/.vim/after/plugin
 ln -sf "$LINK_FLAG" $PREFIX/vim/after/syntax/perl/heredoc-sql.vim ~/.vim/after/syntax/perl/heredoc-sql.vim
-ln -sf "$LINK_FLAG" $PREFIX/vim/after/plugin/abolish.vim ~/.vim/after/plugin/abolish.vim
 
 if [[ $HAS_GO = true ]]; then
     echo "Installing shfmt"
@@ -53,4 +52,6 @@ if [ "$IS_MM" = true ]; then
     ln -sf ~/local-dot-files/vim/after/ftplugin/perl.vim ~/.vim/after/ftplugin/perl.vim
 fi
 
+# Add abolish config *after* we know the plugin has been installed
+ln -sf "$LINK_FLAG" $PREFIX/vim/after/plugin/abolish.vim ~/.vim/after/plugin/abolish.vim
 exit 0
