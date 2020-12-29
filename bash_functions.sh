@@ -12,7 +12,26 @@ remove_path() {
     export PATH
 }
 
+echo_path() {
+    echo "path..."
+    tr : '\n' <<<"$PATH"
+}
+
+clean_path() {
+    # shellcheck disable=SC1001
+    tr : '\n' <<<"$PATH" | awk '!x[$0]++' | grep \/ | grep -v game | paste -sd ":" -
+}
+
+reset_path() {
+    PATH=$(clean_path)
+    export PATH
+}
+
+GO111MODULE=on
+GOPATH=~/go
 HAS_GO=false
+add_path "/usr/local/go/bin"
+
 if [[ (-n "${GOPATH+set}") && ($(command -v go version)) ]]; then
     HAS_GO=true
 fi
@@ -75,6 +94,8 @@ fi
 # with symlinks.
 RIPGREP_CONFIG_PATH=~/dot-files/ripgreprc
 
+export GOPATH
+export GO111MODULE
 export HARNESS_OPTIONS
 export HAS_GO
 export HAS_PLENV

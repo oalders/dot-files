@@ -102,26 +102,6 @@ alias | grep " du=" && unalias du
 alias | grep " ls=" && unalias ls
 alias | grep " ps=" && unalias ps
 
-path() {
-    tr : '\n' <<<"$PATH"
-}
-
-clean_path() {
-    # shellcheck disable=SC1001
-    tr : '\n' <<<"$PATH" | awk '!x[$0]++' | grep \/ | grep -v game | paste -sd ":" -
-}
-
-fig() {
-    pushd ~/Documents/github/metacpan-docker >/dev/null || return
-    docker-compose "$@"
-    popd >/dev/null || return
-}
-
-reset_path() {
-    PATH=$(clean_path)
-    export PATH
-}
-
 whosonport() {
     sudo lsof +c 0 -i :"$1"
 }
@@ -279,8 +259,6 @@ export LANG=en_US.UTF-8
 
 source ~/dot-files/inc/finna-be-octo-hipster/iterm2_helpers.sh
 
-export GOPATH=~/go
-export GO111MODULE=on
 if [ -d $GOPATH ]; then
     export PATH="$GOPATH/bin:$PATH"
 fi
