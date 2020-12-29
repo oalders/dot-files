@@ -12,31 +12,48 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
+
       - name: Set up symlink to ~/dot-files
         run: cd && ln -s $GITHUB_WORKSPACE .
-      - name: Install fpp
-        run: ./installer/fpp.sh
+
       - name: Maybe install MacOS deps
         run: ./installer/homebrew.sh
+
       - name: Maybe install Linux deps
         run: ./installer/linux.sh
+
       - name: Install symlinks
         run: ./installer/symlinks.sh
+
       - name: Update Git submodules
         run: ./installer/git-submodules.sh
+
       - name: Configure Git
         run: ./configure/git.sh
+
+      - name: Install fpp
+        run: ./installer/fpp.sh
+
       - name: Configure SSH
         run: ./configure/ssh.sh
-      # - name: Install pip
-      # run: ./installer/pip.sh
+
+      - name: Install pip
+        run: ./installer/pip.sh
+
       - name: Configure vim
         run: ./configure/vim.sh
+
       - name: Configure tmux
         run: ./configure/tmux.sh
+
       - name: Install yarn deps
         run: ./installer/yarn.sh
+
       - name: Install CPAN deps
         run: ./installer/cpan.sh
+
+      - name: Install Cargo
+        run: ./installer/cargo.sh
+
       - name: Maybe install cz
         run: ./installer/cpan.sh
