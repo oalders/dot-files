@@ -11,7 +11,7 @@ fi
 set -x
 
 if [[ $IS_DARWIN = false ]]; then
-    sudo apt-get install -y -q --no-install-recommends cpanminus curl jq libnet-ssleay-perl nodejs pandoc shellcheck tig tmux
+    sudo apt-get install -y -q --no-install-recommends cpanminus curl jq libnet-ssleay-perl nodejs pandoc python3-setuptools shellcheck tig tmux
     if [[ $HAS_GO = false ]]; then
         GO_PKG=go1.15.6.linux-amd64.tar.gz
         curl -L -o /tmp/$GO_PKG https://golang.org/dl/go1.15.6.linux-amd64.tar.gz
