@@ -24,6 +24,12 @@ chmod 700 ~/.dataprinter
 ln -sf $PREFIX/digrc ~/.digrc
 ln -sf $LINK_FLAG $PREFIX/dzil ~/.dzil
 ln -sf $PREFIX/gitignore_global ~/.gitignore_global
+
+# Runs after homebrew, so should be fine
+if [ "$IS_DARWIN" = true ]; then
+    ln -sf $PREFIX/gnupg/gpg-agent.conf ~/.gnupg/gpg-agent.conf
+fi
+
 ln -sf $PREFIX/golangci.yml ~/.golangci.yml
 
 if [ "$IS_DARWIN" = true ]; then
