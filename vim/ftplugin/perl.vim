@@ -50,4 +50,4 @@ map ,2mod :s/\.pm//<CR>gv:s/\//::/g<CR>
 nnoremap <leader>l :!perl -Mlazy -c %:p
 
 " Try to fix module imports
-:vnoremap <silent> im :!~/dot-files/bin/fix-imports.pl '%:p'<CR>
+:vnoremap <silent> im :!perlimports --read-stdin --filename '%:p'<CR>
