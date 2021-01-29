@@ -320,4 +320,4 @@ if [[ ("${BASH_VERSINFO[0]}" -gt 3 ) && -f /usr/local/bin/cz ]]; then
 fi
 
 reset_path
-[ -f "~/.ghcup/env" ] && source "~/.ghcup/env" # ghcup-env
+[ -f "$HOME/.ghcup/env" ] && source "$HOME/.ghcup/env" # ghcup-env
