@@ -57,8 +57,8 @@ alias ssh-fingerprints='ls ~/.ssh/*.pub | xargs -L 1 ssh-keygen -l -f'
 alias stp='git status | fpp --no-file-checks'
 # https://stackoverflow.com/a/19280187/406224
 alias takeover="tmux detach -a"
-alias tidy-test-imports="find t -type f | grep .t$ | xargs -L 1 perlimports --libs lib,t/lib -i -v --ignore-modules Test::More -f"
-alias tidy-lib-imports="find lib -type f | grep .pm$ | xargs -n 1 perlimports -i -v --libs lib -f"
+alias tidy-test-imports='find t -type f | grep "\.t$" | xargs -L 1 perlimports --libs lib,t/lib -i -v --ignore-modules Test::More -f'
+alias tidy-lib-imports='find lib -type f | grep "\.pm$" | xargs -n 1 perlimports -i -v --libs lib -f'
 alias tg='tidyall -g && git add -p'
 alias xpasswd='perl -MCrypt::XkcdPassword -E "say Crypt::XkcdPassword->make_password"'
 
