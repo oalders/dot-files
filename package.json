@@ -28,6 +28,6 @@
     "markdownlint": "^0.22.0",
     "markdownlint-cli": "^0.26.0",
     "prettier": "^2.2.1",
-    "write-good": "^1.0.4"
+    "write-good": "^1.0.5"
   }
 }
