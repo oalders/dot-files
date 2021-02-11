@@ -82,7 +82,7 @@ jobs:
         with:
           cpanfile: "cpanfile"
           args: "--with-suggests --with-recommends --with-test --with-develop"
-      - run: prove -lrv t xt
+      - run: prove -lr t xt
         env:
           AUTHOR_TESTING: 1
           RELEASE_TESTING: 1
@@ -122,7 +122,7 @@ jobs:
         with:
           cpanfile: "cpanfile"
           args: "--with-suggests --with-recommends --with-test --with-develop"
-      - run: prove -lrv t xt
+      - run: prove -lr t xt
         env:
           AUTHOR_TESTING: 1
           RELEASE_TESTING: 1
@@ -159,7 +159,7 @@ jobs:
         with:
           cpanfile: "cpanfile"
           args: "--with-suggests --with-recommends --with-test"
-      - run: prove -lrv t
+      - run: prove -lr t
         env:
           AUTHOR_TESTING: 0
           RELEASE_TESTING: 0
