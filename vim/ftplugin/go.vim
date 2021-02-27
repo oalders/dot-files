@@ -19,7 +19,8 @@ set number
 " some other plugin is already highlighting matches
 "let g:go_auto_sameids = 1
 let g:go_auto_type_info = 0
-let g:go_fmt_command = "gofumports"
+let g:go_fmt_command="gopls"
+let g:go_gopls_gofumpt=1
 let g:go_highlight_extra_types = 1
 let g:go_highlight_fields = 1
 "let g:go_highlight_functions = 1
