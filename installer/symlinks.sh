@@ -18,8 +18,7 @@ ln -sf $PREFIX/bashrc ~/.bashrc
 ln -sf $PREFIX/bash_profile ~/.bash_profile
 ln -sf $PREFIX/yamllint.yml ~/.config/yamllint/config
 ln -sf $PREFIX/cpanreporter/config.ini ~/.cpanreporter/config.ini
-cp $PREFIX/dataprinter ~/.dataprinter # Data::Printer doesn't like symlinks
-chmod 700 ~/.dataprinter
+ln -sf $PREFIX/dataprinter ~/.dataprinter
 
 ln -sf $PREFIX/digrc ~/.digrc
 ln -sf $LINK_FLAG $PREFIX/dzil ~/.dzil
