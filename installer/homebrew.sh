@@ -13,7 +13,7 @@ if [ "$IS_DARWIN" = true ]; then
     fi
 
     brew config
-    brew update
+    brew update -v
 
     if [[ $IS_GITHUB = true ]]; then
         brew unlink bazel || true

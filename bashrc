@@ -24,7 +24,7 @@ export CLICOLOR=1
 export LSCOLORS=exfxcxdxbxegedabagacad
 
 # https://superuser.com/a/975878/120685
-alias brewski='brew update && brew upgrade && brew cleanup; brew doctor'
+alias brewski='brew update -v && brew upgrade && brew cleanup; brew doctor'
 alias bytes_human='perl -MNumber::Bytes::Human -e "print Number::Bytes::Human::format_bytes shift"'
 alias c="clear && tmux clear-history && perl -E 'say (qq{\n}x65,q{-}x78); system('date');print qq{-}x78, qq{\n}'"
 alias cdr='cd `git root`'
