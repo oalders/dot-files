@@ -13,7 +13,7 @@ Plug 'ConradIrwin/vim-bracketed-paste'
 Plug 'dhruvasagar/vim-zoom' " Toggle zoom in / out individual windows (splits)
 Plug 'fatih/vim-go' ", { 'do': ':GoUpdateBinaries' } messes up Travis runs
 Plug 'haya14busa/vim-auto-mkdir' " create directory path on save
-Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
+Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
 Plug 'junegunn/fzf.vim'
 Plug 'junegunn/rainbow_parentheses.vim'
 Plug 'junegunn/vader.vim'
