@@ -6,7 +6,10 @@ set -eu -o pipefail
 source ~/dot-files/bash_functions.sh
 
 if [ "$IS_DARWIN" = false ]; then
-    exit 0
+    if [ "$IS_SUDOER" = true ]; then
+        sudo apt-get install rustc cargo
+        cargo install bats
+    fi
 fi
 
 set -x
