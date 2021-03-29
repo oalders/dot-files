@@ -79,7 +79,7 @@ IS_MM=false
 if [ -e /usr/local/bin/mm-perl ]; then
     IS_MM=true
     # Don't try to sudo on MM machines
-    IS_SUDOER=false
+    IS_SUDOER="${IS_SUDOER:=false}"
 fi
 
 if [[ $IS_DARWIN = true ]]; then
