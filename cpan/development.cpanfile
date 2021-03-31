@@ -7,7 +7,6 @@ requires 'Code::TidyAll';
 requires 'Code::TidyAll::Plugin::SortLines::Naturally';
 requires 'Code::TidyAll::Plugin::UniqueLines';
 requires 'Code::TidyAll::Plugin::YAML';
-requires 'Data::Printer::Filter::DBIx::Class';
 requires 'Data::Printer::Filter::JSON';
 requires 'Data::Printer::Filter::URI';
 requires 'Modern::Perl';
