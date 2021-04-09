@@ -94,6 +94,14 @@ fi
 # with symlinks.
 RIPGREP_CONFIG_PATH=~/dot-files/ripgreprc
 
+# Keep fzf config and functions together
+export FZF_DEFAULT_COMMAND='fd --type f --hidden --follow --exclude .git'
+export FZF_DEFAULT_OPTS='--multi --pointer ">>"'
+
+f () {
+    fzf --preview "bat --style=numbers --color=always --line-range :500 {}" "$@"
+}
+
 export GOPATH
 export GO111MODULE
 export HARNESS_OPTIONS

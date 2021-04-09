@@ -282,6 +282,7 @@ let g:deoplete#auto_complete_start_length = 5
 
 " fzf
 nnoremap <leader>f : <C-u>FZF<CR>
+let g:fzf_preview_window = ['right:50%', 'ctrl-/']
 
 "remove all trailing whitespace
 :nnoremap <silent> - :FixWhitespace<CR>
