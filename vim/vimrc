@@ -12,6 +12,10 @@ colorscheme solarized
 " Display number of matches for a search, with index. eg: [2/5]
 set shortmess-=S
 
+" Don't clobber the Attention message that appears if two processes are trying
+" to edit the same file.
+set shortmess-=A
+
 " https://superuser.com/questions/1255985/syntax-highlighting-breaks-off-on-vim-as-you-page-up-down-on-osx-terminal-and-i
 map ,ss <esc>:syntax sync fromstart<CR>
 
