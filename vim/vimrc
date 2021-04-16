@@ -215,7 +215,7 @@ au BufRead,BufNewFile local_bashrc set filetype=sh
 " editing SQL files
 let g:omni_sql_no_default_maps = 1
 
-highlight ColorColumn ctermbg=0
+highlight ColorColumn ctermbg=0 guibg=lightgrey
 
 " ########### Functions ###########
 "
