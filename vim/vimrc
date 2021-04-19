@@ -318,3 +318,14 @@ vnoremap jq :!jq -S .<cr>
 " Fix up TeamCity Perl module names into something that looks like a Perl
 " module name
 map ,tcmod gv:s/\:/::/g<CR>gv:s/\./::/g<CR>
+
+" Example without a preview window:
+"command! GEmo
+  "\ call fzf#run({'source': 'git diff -w -M origin/main...HEAD --name-only', 'sink': 'e'})
+
+command! GDomo
+  \ call fzf#run(
+  \   fzf#vim#with_preview(
+  \     fzf#wrap({ 'source': 'git domo' })
+  \   )
+  \ )
