@@ -323,9 +323,9 @@ map ,tcmod gv:s/\:/::/g<CR>gv:s/\./::/g<CR>
 "command! GEmo
   "\ call fzf#run({'source': 'git diff -w -M origin/main...HEAD --name-only', 'sink': 'e'})
 
-command! GDomo
+command! -bang GDomo
   \ call fzf#run(
   \   fzf#vim#with_preview(
-  \     fzf#wrap({ 'source': 'git domo' })
+  \     fzf#wrap({ 'source': 'git domo' }, <bang>0)
   \   )
   \ )
