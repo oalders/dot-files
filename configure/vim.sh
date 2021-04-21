@@ -24,7 +24,7 @@ if [[ $HAS_GO = true ]]; then
 
     # https://github.com/golangci/golangci-lint#binary
     echo "Installing golangci-lint"
-    curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b "$(go env GOPATH)"/bin v1.30.0
+    curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b "$(go env GOPATH)"/bin v1.39.0
 
     go get -u golang.org/x/tools/gopls@master
     GO111MODULE=on go get mvdan.cc/gofumpt/gofumports
