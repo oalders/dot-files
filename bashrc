@@ -295,7 +295,9 @@ fi
 
 # If this happens *before* bash completion setup then command line tab
 # completion via **<TAB> does not work.
-[ -f ~/.fzf.bash ] && source ~/.fzf.bash
+add_path "$HOME/.vim/plugged/fzf/bin"
+[ -f "$HOME"/.vim/plugged/fzf/shell/key-bindings.bash ] && source "$HOME"/.vim/plugged/fzf/shell/key-bindings.bash
+[ -f "$HOME"/.vim/plugged/fzf/shell/completion.bash ] && source "$HOME"/.vim/plugged/fzf/shell/completion.bash
 
 add_path "$HOME/.yarn/bin"
 add_path "$HOME/.config/yarn/global/node_modules/.bin"
