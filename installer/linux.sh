@@ -5,6 +5,7 @@ set -eu -o pipefail
 source ~/dot-files/bash_functions.sh
 
 if [[ $IS_SUDOER = false ]]; then
+    echo "Skip linux.sh (Not a sudoer)"
     exit 0
 fi
 
