@@ -30,7 +30,6 @@ Plug 'rhysd/git-messenger.vim'
 Plug 'rodjek/vim-puppet', { 'for': 'puppet' } " Formatting, syntax highlighting etc
 Plug 'ryanpcmcquen/fix-vim-pasting' " Automaticall set paste mode when inserting via insert mode
 Plug 'scrooloose/nerdcommenter'
-Plug 'scrooloose/nerdtree', { 'on': 'NERDTreeToggle' } " On demand
 Plug 'sheerun/vim-polyglot'
 Plug 'skaji/syntax-check-perl'
 Plug 'tpope/vim-abolish'
