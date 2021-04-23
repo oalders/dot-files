@@ -39,7 +39,7 @@ Plug 'tpope/vim-fugitive'
 Plug 'tpope/vim-surround'
 Plug 'vim-ruby/vim-ruby'
 Plug 'vim-scripts/vim-json-bundle'
-Plug 'dense-analysis/ale', { 'tag': 'v2.7.0' }
+Plug 'dense-analysis/ale', { 'tag': 'v3.1.0' }
 Plug 'yko/mojo.vim'
 
 if has('nvim')
