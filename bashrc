@@ -5,6 +5,9 @@ export EDITOR=vim
 # shellcheck source=bash_functions.sh
 source ~/dot-files/bash_functions.sh
 
+# shellcheck source=bash_functions.sh
+. ~/dot-files/fzf_functions.sh
+
 # use vim mappings to move around the command line
 set -o vi
 
