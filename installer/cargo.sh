@@ -17,9 +17,7 @@ set -x
 add_path "$HOME/.cargo/bin"
 
 if [[ $(command -v cargo --version) ]]; then
-    cargo install -q bats
-    cargo install -q fd-find
-    cargo install -q precious
+    cargo install bats fd-find precious
 else
     echo "cargo not installed?"
 fi
