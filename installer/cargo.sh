@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-set -eu -o pipefail
+set -eux -o pipefail
 
 # shellcheck source=bash_functions.sh
 source ~/dot-files/bash_functions.sh
