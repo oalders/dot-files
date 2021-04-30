@@ -2,5 +2,9 @@
 # list of the running sessions.
 tm() {
     SESSION=$(tmux list-session | cut -d' ' -f1 | fzf)
+    if [ -z "$SESSION" ]; then
+        echo "No session selected"
+        return
+    fi
     tmux attach "$@" -t "$SESSION"
 }
