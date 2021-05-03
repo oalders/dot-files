@@ -32,7 +32,7 @@ fi
 ln -sf $PREFIX/golangci.yml ~/.golangci.yml
 
 if [ "$IS_DARWIN" = true ]; then
-    ln -sf $PREFIX/hammerspoon ~/.hammerspoon
+    ln -sf "$LINK_FLAG" $PREFIX/hammerspoon ~/.hammerspoon
 fi
 
 ln -sf $PREFIX/minicpanrc ~/.minicpanrc
