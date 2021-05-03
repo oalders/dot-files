@@ -16,6 +16,7 @@ ln -sf "$LINK_FLAG" $PREFIX/vim/ftplugin ~/.vim/ftplugin
 mkdir -p ~/.vim/after/syntax/perl
 mkdir -p ~/.vim/after/plugin
 ln -sf "$LINK_FLAG" $PREFIX/vim/after/syntax/perl/heredoc-sql.vim ~/.vim/after/syntax/perl/heredoc-sql.vim
+ln -sf "$LINK_FLAG" $PREFIX/vim/after/syntax/gitcommit.vim ~/.vim/after/syntax/gitcommit.vim
 
 if [[ $HAS_GO = true ]]; then
     echo "Installing shfmt"
