@@ -28,7 +28,7 @@
     "markdownlint": "^0.23.1",
     "markdownlint-cli": "^0.27.1",
     "prettier": "^2.3.0",
-    "xmldom": "^0.6.0",
-    "write-good": "^1.0.8"
+    "write-good": "^1.0.8",
+    "xmldom": "^0.6.0"
   }
 }
