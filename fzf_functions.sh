@@ -8,11 +8,24 @@ f () {
 
 # Can't add this as a fzf completion for tmux as I need tmux itself to get a
 # list of the running sessions.
+#
+# From the command line, to get a tmux session picker:
+# tm<cr>
+#
+# to get a tmux kill-session picker:
+# tm kill-session<cr>
+
 tm() {
     SESSION=$(tmux list-session | cut -d' ' -f1 | fzf)
     if [ -z "$SESSION" ]; then
         echo "No session selected"
         return
     fi
-    tmux attach "$@" -t "$SESSION"
+    SUBCOMMAND="attach"
+
+    if [ $# -gt 0 ]; then
+        SUBCOMMAND="$1"
+    fi
+
+    tmux "$SUBCOMMAND" -t "$SESSION"
 }
