@@ -19,6 +19,7 @@ ln -sf "$LINK_FLAG" $PREFIX/vim/after/syntax/perl/heredoc-sql.vim ~/.vim/after/s
 ln -sf "$LINK_FLAG" $PREFIX/vim/after/syntax/gitcommit.vim ~/.vim/after/syntax/gitcommit.vim
 
 if [[ $HAS_GO = true ]]; then
+    go version
     echo "Installing shfmt"
     go get -u mvdan.cc/sh/v3/cmd/shfmt
     go get mvdan.cc/gofumpt
