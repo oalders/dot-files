@@ -28,7 +28,7 @@ if [[ $HAS_GO = true ]]; then
     echo "Installing golangci-lint"
     curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b "$(go env GOPATH)"/bin v1.40.1
 
-    GO111MODULE=on go get -u golang.org/x/tools/gopls@v0.6.11
+    GO111MODULE=on go get -u golang.org/x/tools/gopls@v0.7.0-pre.3
     GO111MODULE=on go get mvdan.cc/gofumpt/gofumports
 else
     echo "Go not found. Not installing shfmt or golangci-lint"
