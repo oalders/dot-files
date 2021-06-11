@@ -50,4 +50,10 @@ map ,2mod :s/\.pm//<CR>gv:s/\//::/g<CR>
 nnoremap <leader>l :!perl -Mlazy -c %:p
 
 " Try to fix module imports
-:vnoremap <silent> im :!perlimports --read-stdin --libs lib,t/lib,dev/lib --log-level error --no-preserve-duplicates --no-preserve-unused --filename '%:p'<CR>
+:vnoremap <silent> im :!perlimports
+  \ --read-stdin
+  \ --libs lib,t/lib,dev/lib
+  \ --log-level error
+  \ --no-preserve-duplicates
+  \ --no-preserve-unused
+  \ --filename '%:p'<CR>
