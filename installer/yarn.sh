@@ -20,19 +20,6 @@ if [[ $IS_DARWIN = false ]] && [[ $IS_SUDOER = true ]]; then
     sudo apt-get install -y nodejs
 fi
 
-# The --production flag is a hack which allows us to use the same package.json
-# for both MacOS and Linux.  A macOS dependency can prevent a clean install on
-# Linux, so we declare macOS requirements as dev dependencies and won't install
-# dev dependencies on "production", which is Linux in this case.
-#
-# I'm removing alfred-fkill as it's no longer maintained and fzf's kill
-# integration is amazing, but I'll leave this logic in place for the next
-# macOS-only dependency.
-
-if [[ $IS_DARWIN = true ]] && [[ $IS_GITHUB = false ]]; then
-    yarn install
-else
-    yarn install --production=true
-fi
+yarn install
 
 exit 0
