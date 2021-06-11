@@ -16,14 +16,10 @@
     "url": "https://github.com/oalders/dot-files/issues"
   },
   "homepage": "https://github.com/oalders/dot-files#readme",
-  "devDependencies": {
-    "alfred-fkill": "^0.4.1"
-  },
   "dependencies": {
     "acorn": "^8.3.0",
     "bash-language-server": "^1.17.0",
     "eslint": "^7.28.0",
-    "fkill-cli": "^6.1.0",
     "jsonlint": "^1.6.3",
     "markdownlint": "^0.23.1",
     "markdownlint-cli": "^0.27.1",
