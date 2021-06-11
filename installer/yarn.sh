@@ -20,6 +20,7 @@ if [[ $IS_DARWIN = false ]] && [[ $IS_SUDOER = true ]]; then
     sudo apt-get install -y nodejs
 fi
 
+yarn config set --home enableTelemetry 0
 yarn install
 
 exit 0
