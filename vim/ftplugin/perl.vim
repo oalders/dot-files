@@ -51,6 +51,7 @@ nnoremap <leader>l :!perl -Mlazy -c %:p
 
 " Try to fix module imports
 :vnoremap <silent> im :!perlimports
+  \ --cache
   \ --read-stdin
   \ --libs lib,t/lib,dev/lib
   \ --log-level error
