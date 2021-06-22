@@ -302,8 +302,6 @@ add_path "$HOME/.vim/plugged/fzf/bin"
 [ -f "$HOME"/.vim/plugged/fzf/shell/key-bindings.bash ] && source "$HOME"/.vim/plugged/fzf/shell/key-bindings.bash
 [ -f "$HOME"/.vim/plugged/fzf/shell/completion.bash ] && source "$HOME"/.vim/plugged/fzf/shell/completion.bash
 
-add_path "$HOME/.yarn/bin"
-add_path "$HOME/.config/yarn/global/node_modules/.bin"
 add_path "/usr/local/go/bin"
 
 # Do this late so that any local additions to $PATH will come first

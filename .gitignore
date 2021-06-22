@@ -3,9 +3,3 @@ brew/*.lock.json
 .pnp.*
 src/
 .tidyall.d/
-.yarn/*
-!.yarn/patches
-!.yarn/plugins
-!.yarn/releases
-!.yarn/sdks
-!.yarn/versions

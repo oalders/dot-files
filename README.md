@@ -7,7 +7,6 @@
   * [tmux-resurrect](#tmux-resurrect)
   * [vim](#vim)
   * [Alfred](#alfred)
-  * [Yarn](#yarn)
   * [Bash](#bash)
   * [macOS](#macos)
 * [Testing with Docker](#testing-with-docker)
@@ -56,10 +55,6 @@ After Alfred and Dash are installed, click the `Integration` tab in `Dash` and
 then choose `Alfred`.  If, for instance the `HTTP Status Codes` cheat sheet has
 been downloaded via `Dash`, this will then be available in Alfred using `http`
 to begin the search.
-
-## Yarn
-
-Upgrade deps via `yarn upgrade`.
 
 ## Bash
 
