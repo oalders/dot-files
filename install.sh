@@ -35,7 +35,7 @@ fi
 
 ./configure/tmux.sh
 
-./installer/yarn.sh
+./installer/npm.sh
 
 ./installer/cpan.sh
 
