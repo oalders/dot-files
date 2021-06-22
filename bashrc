@@ -63,6 +63,7 @@ alias takeover="tmux detach -a"
 alias tidy-test-imports='find t -type f | grep "\.t$" | xargs -L 1 perlimports --libs lib,t/lib -i --log-level notice --ignore-modules Test::More -f'
 alias tidy-lib-imports='find lib -type f | grep "\.pm$" | xargs -n 1 perlimports -i --log-level notice --libs lib -f'
 alias tg='tidyall -g && git add -p'
+alias wat='ps --sort=-pcpu -aux|head -10'
 alias xpasswd='perl -MCrypt::XkcdPassword -E "say Crypt::XkcdPassword->make_password"'
 
 # python scripts via pip install --user
