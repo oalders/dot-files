@@ -50,8 +50,8 @@ jobs:
       - name: Configure tmux
         run: ./configure/tmux.sh
 
-      - name: Install yarn deps
-        run: ./installer/yarn.sh
+      - name: Install npm deps
+        run: ./installer/npm.sh
 
       - name: Install CPAN deps
         run: ./installer/cpan.sh
