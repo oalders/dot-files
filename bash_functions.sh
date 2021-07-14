@@ -83,13 +83,7 @@ else
   fi
 fi
 
-if [[ $IS_DARWIN = true ]]; then
-    HARNESS_OPTIONS="j$(sysctl -n hw.logicalcpu):c"
-elif [[ $IS_MM = false ]]; then
-    HARNESS_OPTIONS="j$(nproc):c"
-else
-    HARNESS_OPTIONS="j1:c"
-fi
+HARNESS_OPTIONS="j1:c"
 
 # Since ripgrep has no default config file location, we don't need to bother
 # with symlinks.
