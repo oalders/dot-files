@@ -11,7 +11,6 @@ mkdir -p ~/.config/yamllint
 mkdir -p ~/.cpanreporter
 mkdir -p ~/.npm-packages
 mkdir -p ~/.re.pl
-mkdir -p ~/.vagrant.d
 
 ln -sf $PREFIX/ackrc ~/.ackrc
 ln -sf $PREFIX/bashrc ~/.bashrc
@@ -49,6 +48,5 @@ ln -sf $PREFIX/re.pl/repl.rc ~/.re.pl/repl.rc
 ln -sf "$LINK_FLAG" $PREFIX/sqitch ~/.sqitch
 ln -sf $PREFIX/sqliterc ~/.sqliterc
 ln -sf $PREFIX/tigrc ~/.tigrc
-ln -sf $PREFIX/Vagrantfile ~/.vagrant.d/Vagrantfile
 
 exit 0

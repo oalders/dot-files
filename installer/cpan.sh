@@ -18,9 +18,6 @@ perl --version
 
 # Set up some ENV vars so that global installs go to ~/perl5
 if [ "$HAS_PLENV" = false ]; then
-    if [[ "$IS_MM" = true ]]; then
-        remove_path "/vagrant/dev/bin/cpan"
-    fi
     cpanm --local-lib=~/perl5 local::lib && eval "$(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)"
 fi
 
