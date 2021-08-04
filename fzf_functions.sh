@@ -32,7 +32,7 @@ tm() {
 
 # prove
 _fzf_complete_prove() {
-  _fzf_complete --reverse --multi --prompt="prove> " -- "$@" < <(
+  _fzf_complete  --bind='ctrl-/:toggle-preview' --preview 'bat --style=numbers --color=always --line-range :50 {}' --reverse --multi --prompt="prove> " -- "$@" < <(
       fd -e t
   )
 }
