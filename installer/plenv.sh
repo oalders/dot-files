@@ -10,7 +10,7 @@ if [ "$IS_DARWIN" != true ]; then
     test -e ~/.plenv/plugins/perl-build || git clone https://github.com/tokuhirom/Perl-Build.git ~/.plenv/plugins/perl-build/
 fi
 
-PERL_VERSION=5.30.2
+PERL_VERSION=5.34.0
 
 plenv install $PERL_VERSION
 plenv global $PERL_VERSION
