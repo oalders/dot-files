@@ -23,7 +23,7 @@
     "jsonlint": "^1.6.3",
     "markdownlint": "^0.23.1",
     "markdownlint-cli": "^0.28.1",
-    "normalize-url": "^7.0.0",
+    "normalize-url": "^7.0.1",
     "prettier": "^2.3.2",
     "underscore": "^1.12.1",
     "urijs": ">=1.19.7",
