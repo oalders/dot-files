@@ -83,6 +83,13 @@ else
   fi
 fi
 
+tmux_version() {
+    if [[ $(which tmux) ]]; then
+        TMUX_VERSION=$(tmux -V | sed -En "s/^tmux[^0-9]*([.0-9]+).*/\1/p")
+        export TMUX_VERSION
+    fi
+}
+
 HARNESS_OPTIONS="j1:c"
 
 # Since ripgrep has no default config file location, we don't need to bother
