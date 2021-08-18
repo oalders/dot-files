@@ -72,15 +72,15 @@ if [ -e /usr/local/bin/mm-perl ]; then
     # Don't try to sudo on MM machines
     IS_SUDOER="${IS_SUDOER:=false}"
 else
-  IS_SUDOER="${IS_SUDOER:=false}"
+    IS_SUDOER="${IS_SUDOER:=false}"
 
-  # The sudo -n gets misinterpreted by shellcheck
-  # shellcheck disable=SC2143
-  if [[ $(sudo -n true 2>&1 | grep 'password') ]]; then
-      IS_SUDOER=false
-  else
-      IS_SUDOER=true
-  fi
+    # The sudo -n gets misinterpreted by shellcheck
+    # shellcheck disable=SC2143
+    if [[ $(sudo -n true 2>&1 | grep 'password') ]]; then
+        IS_SUDOER=false
+    else
+        IS_SUDOER=true
+    fi
 fi
 
 tmux_version() {
