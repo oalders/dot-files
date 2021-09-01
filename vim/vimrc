@@ -11,6 +11,11 @@ set background=dark
 colorscheme OceanicNext
 let g:airline_theme='oceanicnext'
 
+" Ensure bg color for OceanicNext doesn't get clobbered
+" https://stackoverflow.com/a/41587510/406224
+highlight clear LineNr
+highlight clear SignColumn
+
 " Display number of matches for a search, with index. eg: [2/5]
 set shortmess-=S
 
