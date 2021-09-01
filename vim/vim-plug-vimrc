@@ -22,6 +22,7 @@ Plug 'junegunn/vim-slash'
 Plug 'lifepillar/vim-solarized8'
 Plug 'lukhio/vim-mapping-conflicts'
 Plug 'mannih/vim-perl-variable-highlighter'
+Plug 'mhartington/oceanic-next'
 Plug 'mzlogin/vim-markdown-toc'
 Plug 'oalders/prettysql' " ,fs to format visually selected SQL
 Plug 'oalders/vim-perl', { 'branch': 'dev', 'for': 'perl', 'do': 'make clean carp dancer highlight-all-pragmas moose test-more try-tiny' }
