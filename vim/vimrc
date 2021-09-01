@@ -7,7 +7,9 @@ let g:mapleader = ","
 
 syntax enable
 set background=dark
-colorscheme solarized
+
+colorscheme OceanicNext
+let g:airline_theme='oceanicnext'
 
 " Display number of matches for a search, with index. eg: [2/5]
 set shortmess-=S
