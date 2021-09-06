@@ -17,7 +17,7 @@
   },
   "homepage": "https://github.com/oalders/dot-files#readme",
   "dependencies": {
-    "acorn": "^8.4.1",
+    "acorn": "^8.5.0",
     "bash-language-server": "^2.0.0",
     "eslint": "^7.32.0",
     "jsonlint": "^1.6.3",
