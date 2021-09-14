@@ -7,17 +7,19 @@ source bash_functions.sh
 
 PREFIX=~/dot-files
 
+mkdir -p ~/.config/nvim
 mkdir -p ~/.config/yamllint
 mkdir -p ~/.cpanreporter
 mkdir -p ~/.npm-packages
 mkdir -p ~/.re.pl
 
 ln -sf $PREFIX/ackrc ~/.ackrc
-ln -sf $PREFIX/bashrc ~/.bashrc
 ln -sf $PREFIX/bash_profile ~/.bash_profile
-ln -sf $PREFIX/yamllint.yml ~/.config/yamllint/config
+ln -sf $PREFIX/bashrc ~/.bashrc
 ln -sf $PREFIX/cpanreporter/config.ini ~/.cpanreporter/config.ini
 ln -sf $PREFIX/dataprinter ~/.dataprinter
+ln -sf $PREFIX/nvim/init.vim ~/.config/nvim/init.vim
+ln -sf $PREFIX/yamllint.yml ~/.config/yamllint/config
 
 ln -sf $PREFIX/digrc ~/.digrc
 ln -sf $LINK_FLAG $PREFIX/dzil ~/.dzil
