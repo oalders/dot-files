@@ -63,6 +63,7 @@ jobs:
         run: ./installer/cargo.sh
         env:
           PREFER_PKGS: 1
+        if: ${{ matrix.os != 'ubuntu-18.04' }}
 
       - name: Maybe install cz
         run: ./installer/cpan.sh

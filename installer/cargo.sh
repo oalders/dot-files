@@ -8,7 +8,7 @@ source ~/dot-files/bash_functions.sh
 
 if [ "$IS_DARWIN" = false ]; then
     if [ "$IS_SUDOER" = true ]; then
-        if [ "$PREFER_PKGS" = true ]; then
+        if [[ (-n "${PREFER_PKGS+set}") ]]; then
             sudo apt-get install -y bats fd-find ripgrep
             exit 0
         fi
