@@ -59,5 +59,10 @@ jobs:
       - name: Install Cargo
         run: ./installer/cargo.sh
 
+      - name: Install Rust deps via pkgs
+        run: ./installer/cargo.sh
+        env:
+          PREFER_PKGS: 1
+
       - name: Maybe install cz
         run: ./installer/cpan.sh
