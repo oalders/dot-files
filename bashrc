@@ -281,7 +281,7 @@ fi
 
 NPM_PACKAGES="${HOME}/.npm-packages"
 
-add_path "$NPM_PACKAGES"
+add_path "$NPM_PACKAGES/bin"
 
 # Unset manpath so we can inherit from /etc/manpath via the `manpath` command
 unset MANPATH # delete if you already modified MANPATH elsewhere in your config
