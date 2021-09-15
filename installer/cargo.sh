@@ -5,8 +5,13 @@ set -eux -o pipefail
 # shellcheck source=bash_functions.sh
 source ~/dot-files/bash_functions.sh
 
+
 if [ "$IS_DARWIN" = false ]; then
     if [ "$IS_SUDOER" = true ]; then
+        if [ "$PREFER_PKGS" = true ]; then
+            sudo apt-get install -y bats fd-find ripgrep
+            exit 0
+        fi
         sudo apt-get -y install rustc cargo
     fi
 fi
