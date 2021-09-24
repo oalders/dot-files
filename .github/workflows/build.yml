@@ -67,3 +67,9 @@ jobs:
 
       - name: Maybe install cz
         run: ./installer/cpan.sh
+
+      - name: Install ubi
+        run: ./installer/ubi.sh
+
+      - name: Install omegasort
+        run: ./installer/omegasort.sh
