@@ -18,6 +18,7 @@
   "homepage": "https://github.com/oalders/dot-files#readme",
   "dependencies": {
     "acorn": "^8.5.0",
+    "ansi-regex": ">=5.0.1",
     "bash-language-server": "^2.0.0",
     "eslint": "^7.32.0",
     "jsonlint": "^1.6.3",
@@ -29,6 +30,6 @@
     "urijs": ">=1.19.7",
     "write-good": "^1.0.8",
     "ws": "^8.2.2",
-    "xmldom": "^0.6.0"
+    "@xmldom/xmldom": ">=0.7.0"
   }
 }
