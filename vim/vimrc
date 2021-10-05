@@ -337,3 +337,8 @@ command! -bang GDomo
   \     fzf#wrap({ 'source': 'git domo' }, <bang>0)
   \   )
   \ )
+
+" Show comments in italics
+highlight Comment cterm=italic
+set t_ZH=[3m
+set t_ZR=[23m
