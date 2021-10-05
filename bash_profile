@@ -48,3 +48,6 @@ export GPG_TTY
 export BASH_SILENCE_DEPRECATION_WARNING=1
 
 [[ -s "$HOME/.rvm/scripts/rvm" ]] && source "$HOME/.rvm/scripts/rvm" # Load RVM into a shell session *as a function*
+if [ -f "$HOME/.cargo/env" ]; then
+    . "$HOME/.cargo/env"
+fi
