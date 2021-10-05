@@ -175,6 +175,7 @@ let g:ale_fixers = {
 \   'markdown': ['prettier'],
 \   'perl': ['perltidy'],
 \   'ruby': ['rubocop'],
+\   'rust': ['rustfmt'],
 \   'sh': ['shfmt'],
 \   'toml': ['prettier'],
 \   'yaml': ['prettier'],
