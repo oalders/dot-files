@@ -43,4 +43,6 @@ fi
 
 ./installer/cz.sh
 
+./installer/powerline.sh
+
 exit 0

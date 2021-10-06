@@ -258,7 +258,6 @@ fetch-pull-request() {
     git fetch "$1" "refs/pull/$2/head:refs/remotes/pr/$2"
     git co -b "pr/$2" "pr/$2"
 }
-source ~/dot-files/inc/oh-my-git/prompt.sh
 
 # make sure NERDTree arrows work
 export LANG=en_US.UTF-8
@@ -327,4 +326,19 @@ reset_path
 [ -f "$HOME/.ghcup/env" ] && source "$HOME/.ghcup/env" # ghcup-env
 if [ -f "$HOME/.cargo/env" ]; then
     . "$HOME/.cargo/env"
+fi
+
+function _update_ps1() {
+    PS1="$($GOPATH/bin/powerline-go -error $? -jobs $(jobs -p | wc -l))"
+
+    # Uncomment the following line to automatically clear errors after showing
+    # them once. This not only clears the error for powerline-go, but also for
+    # everything else you run in that shell. Don't enable this if you're not
+    # sure this is what you want.
+
+    #set "?"
+}
+
+if [ "$TERM" != "linux" ] && [ -f "$GOPATH/bin/powerline-go" ]; then
+    PROMPT_COMMAND="_update_ps1; $PROMPT_COMMAND"
 fi
