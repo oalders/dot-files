@@ -150,20 +150,25 @@ youtube-mp3() { youtube-download "$1" && ffmpeg -i "$1.mp4" "$1.mp3"; }
 
 tmux_session_name() {
     INSIDE_GIT_REPO="$(git rev-parse --is-inside-work-tree 2>/dev/null)"
+    PADDING=50
 
     if [ "$INSIDE_GIT_REPO" ]; then
+
         BRANCH=$(git rev-parse --abbrev-ref HEAD)
         CURRENT_DIR=${PWD##*/}
+        CURRENT_DIR=$(printf "%-20s" "$CURRENT_DIR")
 
-        SESSION_NAME="$CURRENT_DIR    $BRANCH"
+        SESSION_NAME="$CURRENT_DIR  $BRANCH"
     else
         SESSION_NAME=$(pwd)
         STRIP="$HOME/"
         SESSION_NAME=${SESSION_NAME/$STRIP/}
+        PADDING=48
     fi
 
     # A "." will produce a "bad session name" error
     SESSION_NAME=${SESSION_NAME//./-}
+    SESSION_NAME=$(printf "%-${PADDING}s" "$SESSION_NAME")
     export SESSION_NAME
 }
 
