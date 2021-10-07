@@ -90,6 +90,10 @@ tmux_version() {
     fi
 }
 
+rename_tab() {
+    echo -en "\033]0;$1\a"
+}
+
 HARNESS_OPTIONS="j1:c"
 
 # Since ripgrep has no default config file location, we don't need to bother
