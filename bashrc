@@ -174,34 +174,37 @@ tmux_session_name() {
 
 # https://raim.codingfarm.de/blog/2013/01/30/tmux-update-environment/
 function tmux() {
+    #set -eux
     local tmux=$(type -fp tmux)
-    case "$1" in
-    update-environment | update-env | ue)
-        local v
-        while read v; do
-            if [[ $v == -* ]]; then
-                unset ${v/#-/}
-            else
-                # Add quotes around the argument
-                v=${v/=/=\"}
-                v=${v/%/\"}
-                eval export "$v"
-            fi
-        done < <(tmux show-environment)
-        ;;
-    # https://gist.github.com/marczych/10524654
-    ns)
+
+    if [ $# -ge 1 ] && [ -n "$1" ]; then
+        case "$1" in
+        update-environment | update-env | ue)
+            local v
+            while read v; do
+                if [[ $v == -* ]]; then
+                    unset ${v/#-/}
+                else
+                    # Add quotes around the argument
+                    v=${v/=/=\"}
+                    v=${v/%/\"}
+                    eval export "$v"
+                fi
+            done < <(tmux show-environment)
+            ;;
+        # https://gist.github.com/marczych/10524654
+        ns)
+            tmux_session_name
+            tmux rename-session "$SESSION_NAME"
+            ;;
+        *)
+            $tmux "$@"
+            ;;
+        esac
+    else
         tmux_session_name
-        tmux rename-session "$SESSION_NAME"
-        ;;
-    '')
-        tmux_session_name
-        tmux new -s "$SESSION_NAME"
-        ;;
-    *)
-        $tmux "$@"
-        ;;
-    esac
+        $tmux new -s "$SESSION_NAME"
+    fi
 }
 
 export FPP_DIR="$HOME/.fpp"
