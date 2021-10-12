@@ -319,7 +319,7 @@ add_path "/usr/local/go/bin"
 # homebrew's curl needs to come first
 add_path "/usr/local/opt/curl/bin"
 
-if [[ ("${BASH_VERSINFO[0]}" -gt 3 ) && -f /usr/local/bin/cz ]]; then
+if [[ ("${BASH_VERSINFO[0]}" -gt 3) && -f /usr/local/bin/cz ]]; then
     add_path "/usr/local/bin/cz"
     . /usr/local/bin/cz
     export CZ_GUI=0
