@@ -5,7 +5,6 @@ Plug 'ajh17/VimCompletesMe'
 Plug 'altercation/vim-colors-solarized' " Solarized colour scheme
 Plug 'AndrewRadev/splitjoin.vim'
 Plug 'bkad/CamelCaseMotion' " provide CamelCase motion through words
-Plug 'bling/vim-airline'
 Plug 'bronson/vim-trailing-whitespace' " highlight trailing whitespace
 Plug 'c9s/perlomni.vim'
 Plug 'chrisbra/unicode.vim'
@@ -44,8 +43,10 @@ Plug 'dense-analysis/ale', { 'tag': 'v3.1.0' }
 Plug 'yko/mojo.vim'
 
 if has('nvim')
+  Plug 'itchyny/lightline.vim'
   Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
 else
+  Plug 'bling/vim-airline'
   Plug 'Shougo/deoplete.nvim'
   Plug 'roxma/nvim-yarp'
   Plug 'roxma/vim-hug-neovim-rpc'
