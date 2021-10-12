@@ -55,6 +55,12 @@ if [ "$(uname)" == "Darwin" ]; then
     CLOUDSDK_PYTHON=python2
     export CLOUDSDK_PYTHON
 
+    # Not sure if this is needed in the longer term
+    export TERM=xterm-256color
+
+    alias vi="vi"
+    alias vim="nvim"
+
 elif [ "$(uname -s)" == "Linux" ]; then
     LINK_FLAG="-T"
 fi
