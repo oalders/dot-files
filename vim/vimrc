@@ -10,6 +10,7 @@ set background=dark
 
 colorscheme OceanicNext
 let g:airline_theme='oceanicnext'
+let g:airline_powerline_fonts = 1
 
 " Ensure bg color for OceanicNext doesn't get clobbered
 " https://stackoverflow.com/a/41587510/406224
