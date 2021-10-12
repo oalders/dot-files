@@ -163,7 +163,7 @@ tmux_session_name() {
         SESSION_NAME=$(pwd)
         STRIP="$HOME/"
         SESSION_NAME=${SESSION_NAME/$STRIP/}
-        PADDING=$PADDING - 2
+        PADDING=58
     fi
 
     # A "." will produce a "bad session name" error
