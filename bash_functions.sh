@@ -63,7 +63,6 @@ if [ "$(uname)" == "Darwin" ]; then
     alias vim="nvim"
 
     PATH_ALIASES=\~/dot-files=@dots,\~/Documents/github=@gh,\~/Documents/github/oalders=@gho
-
 elif [ "$(uname -s)" == "Linux" ]; then
     LINK_FLAG="-T"
 fi
