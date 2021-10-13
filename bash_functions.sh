@@ -108,8 +108,8 @@ HARNESS_OPTIONS="j1:c"
 # with symlinks.
 RIPGREP_CONFIG_PATH=~/dot-files/ripgreprc
 
-export GOPATH
 export GO111MODULE
+export GOPATH
 export HARNESS_OPTIONS
 export HAS_GO
 export HAS_PLENV
@@ -118,5 +118,5 @@ export IS_GITHUB
 export IS_MM
 export IS_SUDOER
 export LINK_FLAG
-export RIPGREP_CONFIG_PATH
 export PATH_ALIASES
+export RIPGREP_CONFIG_PATH
