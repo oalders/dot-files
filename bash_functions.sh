@@ -45,7 +45,7 @@ fi
 
 IS_DARWIN=false
 LINK_FLAG=""
-PATH_ALIASES="~/dot-files=dots"
+PATH_ALIASES=\~/dot-files=@dots
 
 # https://stackoverflow.com/a/17072017/406224
 if [ "$(uname)" == "Darwin" ]; then
@@ -62,7 +62,7 @@ if [ "$(uname)" == "Darwin" ]; then
     alias vi="vi"
     alias vim="nvim"
 
-    PATH_ALIASES=\~/dot-files=dots,\~/Documents/github=gh,\~/Documents/github/oalders=gho
+    PATH_ALIASES=\~/dot-files=@dots,\~/Documents/github=@gh,\~/Documents/github/oalders=@gho
 
 elif [ "$(uname -s)" == "Linux" ]; then
     LINK_FLAG="-T"
