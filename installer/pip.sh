@@ -5,7 +5,7 @@ source ~/dot-files/bash_functions.sh
 
 set -eux -o pipefail
 
-function pip_install() {
+pip_install() {
     PIP=$1
     REQUIREMENTS=$2
 

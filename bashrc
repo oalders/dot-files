@@ -173,7 +173,7 @@ tmux_session_name() {
 }
 
 # https://raim.codingfarm.de/blog/2013/01/30/tmux-update-environment/
-function tmux() {
+tmux() {
     #set -eux
     local tmux=$(type -fp tmux)
 
@@ -208,7 +208,7 @@ function tmux() {
 }
 
 export FPP_DIR="$HOME/.fpp"
-function fpp() {
+fpp() {
     local fpp=$(type -fp fpp)
 
     HISTORY_FILE="$FPP_DIR/.fpp_history"
@@ -336,7 +336,7 @@ if [ -f "$HOME/.cargo/env" ]; then
     . "$HOME/.cargo/env"
 fi
 
-function _update_ps1() {
+_update_ps1() {
     PS1="$($GOPATH/bin/powerline-go -max-width 60 -truncate-segment-width 10 -cwd-max-depth 3 -hostname-only-if-ssh -error $? -jobs $(jobs -p | wc -l))"
 
     # Uncomment the following line to automatically clear errors after showing
