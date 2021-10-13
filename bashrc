@@ -335,7 +335,7 @@ if [ -f "$HOME/.cargo/env" ]; then
 fi
 
 _update_ps1() {
-    PS1="$($GOPATH/bin/powerline-go -max-width 60 -truncate-segment-width 10 -cwd-max-depth 3 -hostname-only-if-ssh -error $? -jobs $(jobs -p | wc -l))"
+    PS1="$($GOPATH/bin/powerline-go -max-width 60 -truncate-segment-width 10 -cwd-max-depth 3 -path-aliases "$PATH_ALIASES" -hostname-only-if-ssh -error $? -jobs $(jobs -p | wc -l))"
 
     # Uncomment the following line to automatically clear errors after showing
     # them once. This not only clears the error for powerline-go, but also for
