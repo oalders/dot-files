@@ -124,8 +124,8 @@ open_files() {
     sudo lsof -s | awk '$5 == "REG"' | sort -n -r -k 7,7 | head -n 50
 }
 
-git-recover-file() {
-    git checkout $(git rev-list -n 1 HEAD -- "$1")^ -- "$1"
+git_recover_file() {
+    git checkout "$(git rev-list -n 1 HEAD -- "$1")"^ -- "$1"
 }
 
 md() {
@@ -145,8 +145,6 @@ if ! type "ack" >/dev/null 2>&1; then
         alias ack='ack-grep'
     fi
 fi
-
-youtube-mp3() { youtube-download "$1" && ffmpeg -i "$1.mp4" "$1.mp3"; }
 
 tmux_session_name() {
     INSIDE_GIT_REPO="$(git rev-parse --is-inside-work-tree 2>/dev/null)"
@@ -262,7 +260,7 @@ fpp() {
 
 # http://www.somethingorothersoft.com/2012/05/22/pulling-github-pull-requests-with-git/
 # fetch-pull-request origin 1234
-fetch-pull-request() {
+fetch_pull_request() {
     git fetch "$1" "refs/pull/$2/head:refs/remotes/pr/$2"
     git co -b "pr/$2" "pr/$2"
 }
