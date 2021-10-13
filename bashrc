@@ -3,7 +3,7 @@
 export EDITOR=vim
 
 # shellcheck source=bash_functions.sh
-source ~/dot-files/bash_functions.sh
+. ~/dot-files/bash_functions.sh
 
 # shellcheck source=bash_functions.sh
 . ~/dot-files/fzf_functions.sh
@@ -133,7 +133,7 @@ md() {
 }
 
 if [ -f /etc/bash_completion.d/git ]; then
-    source /etc/bash_completion.d/git
+    . /etc/bash_completion.d/git
 elif [ -f /usr/local/bin/brew ]; then
     if [ -f $(brew --prefix)/etc/bash_completion ]; then
         . $(brew --prefix)/etc/bash_completion
@@ -270,7 +270,7 @@ fetch-pull-request() {
 # make sure NERDTree arrows work
 export LANG=en_US.UTF-8
 
-source ~/dot-files/inc/finna-be-octo-hipster/iterm2_helpers.sh
+. ~/dot-files/inc/finna-be-octo-hipster/iterm2_helpers.sh
 
 if [ -d $GOPATH ]; then
     export PATH="$GOPATH/bin:$PATH"
@@ -307,8 +307,8 @@ fi
 # If this happens *before* bash completion setup then command line tab
 # completion via **<TAB> does not work.
 add_path "$HOME/.vim/plugged/fzf/bin"
-[ -f "$HOME"/.vim/plugged/fzf/shell/key-bindings.bash ] && source "$HOME"/.vim/plugged/fzf/shell/key-bindings.bash
-[ -f "$HOME"/.vim/plugged/fzf/shell/completion.bash ] && source "$HOME"/.vim/plugged/fzf/shell/completion.bash
+[ -f "$HOME"/.vim/plugged/fzf/shell/key-bindings.bash ] && . "$HOME"/.vim/plugged/fzf/shell/key-bindings.bash
+[ -f "$HOME"/.vim/plugged/fzf/shell/completion.bash ] && . "$HOME"/.vim/plugged/fzf/shell/completion.bash
 
 add_path "/usr/local/go/bin"
 
@@ -331,7 +331,7 @@ if [[ ("${BASH_VERSINFO[0]}" -gt 3) && -f /usr/local/bin/cz ]]; then
 fi
 
 reset_path
-[ -f "$HOME/.ghcup/env" ] && source "$HOME/.ghcup/env" # ghcup-env
+[ -f "$HOME/.ghcup/env" ] && . "$HOME/.ghcup/env" # ghcup-env
 if [ -f "$HOME/.cargo/env" ]; then
     . "$HOME/.cargo/env"
 fi
