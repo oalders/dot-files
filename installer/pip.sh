@@ -11,11 +11,7 @@ pip_install() {
 
     # make explicit cases for Travis, MacOS and Linux
     if [ "$(which "$PIP")" ]; then
-        if [[ $USER == "travis" ]]; then
-            "$PIP" install -r "$REQUIREMENTS"
-        else
-            "$PIP" install --user --upgrade -r "$REQUIREMENTS"
-        fi
+        "$PIP" install --user --upgrade -r "$REQUIREMENTS"
     else
         # We want to install recommended packages here
         if [[ $IS_SUDOER = true ]]; then

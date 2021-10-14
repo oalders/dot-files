@@ -23,10 +23,6 @@ wget https://github.com/mrodalgaard/alfred-network-workflow/releases/download/v1
 open Network.alfredworkflow
 wait_for_input
 
-wget https://github.com/fniephaus/alfred-travis-ci/releases/download/v2.1/Travis-CI-for-Alfred.alfredworkflow
-open Travis-CI-for-Alfred.alfredworkflow
-wait_for_input
-
 git clone git@github.com:oalders/alfred-metacpan-workflow.git
 cd alfred-metacpan-workflow && mkdir -p dist && make && open dist/metacpan-0.0.5.alfredworkflow
 wait_for_input
