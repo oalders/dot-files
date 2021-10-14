@@ -20,7 +20,7 @@
     "acorn": "^8.5.0",
     "ansi-regex": ">=5.0.1",
     "bash-language-server": "^2.0.0",
-    "eslint": "^8.0.0",
+    "eslint": "^8.0.1",
     "jsonlint": "^1.6.3",
     "markdownlint": "^0.24.0",
     "markdownlint-cli": "^0.29.0",
