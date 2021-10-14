@@ -14,6 +14,10 @@ if [[ $IS_DARWIN = true ]] && [[ $IS_GITHUB = true ]]; then
     exit 0
 fi
 
+if [ "$IS_MM" = true ]; then
+    exit 0
+fi
+
 perl --version
 
 # Set up some ENV vars so that global installs go to ~/perl5
