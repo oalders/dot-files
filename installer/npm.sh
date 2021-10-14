@@ -12,7 +12,7 @@ if [[ $IS_DARWIN = false ]] && [[ $IS_SUDOER = true ]]; then
     sudo apt-get install -y nodejs
 fi
 
-npm install npm@latest -g
+npm install npm@latest
 npm install
 
 exit 0
