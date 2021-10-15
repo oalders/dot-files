@@ -335,7 +335,19 @@ if [ -f "$HOME/.cargo/env" ]; then
 fi
 
 _update_ps1() {
-    PS1="$($GOPATH/bin/powerline-go -max-width 60 -truncate-segment-width 10 -cwd-max-depth 3 -path-aliases "$PATH_ALIASES" -hostname-only-if-ssh -error $? -jobs $(jobs -p | wc -l))"
+    # defaults
+    CONDENSED=""
+    MAX_WIDTH=60
+    PRIORITY="root,cwd,user,host,ssh,perms,git-branch,git-status,hg,jobs,exit,cwd-path"
+    TRUNCATE_SEGMENT_WIDTH=14
+    if test "${TMUX_PANE+x}"; then
+        CONDENSED="-condensed"
+        MAX_WIDTH=40
+        PRIORITY="cwd,perms,git-status,jobs,exit,cwd-path,root,git-branch,user,host,ssh"
+        TRUNCATE_SEGMENT_WIDTH=10
+    fi
+
+    PS1="$($GOPATH/bin/powerline-go "$CONDENSED" -max-width "$MAX_WIDTH" -truncate-segment-width "$TRUNCATE_SEGMENT_WIDTH" -cwd-max-depth 3 -path-aliases "$PATH_ALIASES" -hostname-only-if-ssh -priority "$PRIORITY" -error $? -jobs $(jobs -p | wc -l))"
 
     # Uncomment the following line to automatically clear errors after showing
     # them once. This not only clears the error for powerline-go, but also for
