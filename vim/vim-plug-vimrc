@@ -2,14 +2,12 @@ call plug#begin('~/.vim/plugged')
 
 Plug 'airblade/vim-gitgutter' " show git diff markers in the sign colum
 Plug 'ajh17/VimCompletesMe'
-Plug 'altercation/vim-colors-solarized' " Solarized colour scheme
 Plug 'AndrewRadev/splitjoin.vim'
 Plug 'bkad/CamelCaseMotion' " provide CamelCase motion through words
 Plug 'bronson/vim-trailing-whitespace' " highlight trailing whitespace
 Plug 'c9s/perlomni.vim'
 Plug 'chrisbra/unicode.vim'
 Plug 'ConradIrwin/vim-bracketed-paste'
-Plug 'dhruvasagar/vim-zoom' " Toggle zoom in / out individual windows (splits)
 Plug 'fatih/vim-go' ", { 'do': ':GoUpdateBinaries' } messes up Travis runs
 Plug 'haya14busa/vim-auto-mkdir' " create directory path on save
 Plug 'itchyny/vim-cursorword'
@@ -19,7 +17,6 @@ Plug 'junegunn/rainbow_parentheses.vim'
 Plug 'junegunn/vader.vim'
 Plug 'junegunn/vim-emoji'
 Plug 'junegunn/vim-slash'
-Plug 'lifepillar/vim-solarized8'
 Plug 'lukhio/vim-mapping-conflicts'
 Plug 'mannih/vim-perl-variable-highlighter'
 Plug 'mhartington/oceanic-next'
@@ -63,6 +60,9 @@ endif
 call plug#end()
 
 " Plugins to revisit
+" Plug 'altercation/vim-colors-solarized' " Solarized colour scheme
+" Plug 'dhruvasagar/vim-zoom' " Toggle zoom in / out individual windows (splits)
 " Plug 'jreybert/vimagit' " Ease your git workflow within Vim
 " Plug 'kristijanhusak/vim-carbon-now-sh' " Open selected text in https://carbon.now.sh
 " Plug 'SirVer/ultisnips' " The ultimate snippet solution for Vim
+" Plug 'lifepillar/vim-solarized8'
