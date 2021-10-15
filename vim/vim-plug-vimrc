@@ -12,6 +12,7 @@ Plug 'ConradIrwin/vim-bracketed-paste'
 Plug 'dhruvasagar/vim-zoom' " Toggle zoom in / out individual windows (splits)
 Plug 'fatih/vim-go' ", { 'do': ':GoUpdateBinaries' } messes up Travis runs
 Plug 'haya14busa/vim-auto-mkdir' " create directory path on save
+Plug 'itchyny/vim-cursorword'
 Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
 Plug 'junegunn/fzf.vim'
 Plug 'junegunn/rainbow_parentheses.vim'
@@ -26,7 +27,6 @@ Plug 'mzlogin/vim-markdown-toc'
 Plug 'oalders/prettysql' " ,fs to format visually selected SQL
 Plug 'oalders/vim-perl', { 'branch': 'dev', 'for': 'perl', 'do': 'make clean carp dancer highlight-all-pragmas moose test-more try-tiny' }
 Plug 'othree/html5.vim'
-Plug 'qstrahl/vim-matchmaker'
 Plug 'rhysd/git-messenger.vim'
 Plug 'rodjek/vim-puppet', { 'for': 'puppet' } " Formatting, syntax highlighting etc
 Plug 'ryanpcmcquen/fix-vim-pasting' " Automaticall set paste mode when inserting via insert mode
