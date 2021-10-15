@@ -19,3 +19,8 @@ require'nvim-treesitter.configs'.setup {
   },
 }
 EOF
+
+" https://github.com/mhartington/oceanic-next#installation
+if (has("termguicolors"))
+  set termguicolors
+endif
