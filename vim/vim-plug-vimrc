@@ -44,6 +44,7 @@ Plug 'yko/mojo.vim'
 
 if has('nvim')
   Plug 'itchyny/lightline.vim'
+  Plug 'nvim-treesitter/nvim-treesitter', { 'branch': '0.5-compat', 'do': ':TSUpdate'}  " We recommend updating the parsers on update
   Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
 else
   Plug 'bling/vim-airline'
