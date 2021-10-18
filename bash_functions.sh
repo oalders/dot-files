@@ -99,7 +99,11 @@ tmux_version() {
 }
 
 rename_tab() {
-    echo -en "\033]0;$1\a"
+    if test "${TMUX_PANE+x}"; then
+        echo -en "\033Ptmux;\033\033]0;$1\a\033\\"
+    else
+        echo -en "\033]0;$1\a"
+    fi
 }
 
 HARNESS_OPTIONS="j1:c"
