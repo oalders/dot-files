@@ -9,7 +9,8 @@ source ~/dot-files/bash_functions.sh
 if [ "$IS_DARWIN" = false ]; then
     if [ "$IS_SUDOER" = true ]; then
         if [[ (-n "${PREFER_PKGS+set}") ]]; then
-            sudo apt-get install -y bat fd-find ripgrep
+            # https://askubuntu.com/questions/1290262/unable-to-install-bat-error-trying-to-overwrite-usr-crates2-json-which
+            sudo apt-get install -o Dpkg::Options::="--force-overwrite" -y bat fd-find ripgrep
             exit 0
         fi
         sudo apt-get -y install rustc cargo
