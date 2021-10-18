@@ -9,7 +9,7 @@ source ~/dot-files/bash_functions.sh
 if [ "$IS_DARWIN" = false ]; then
     if [ "$IS_SUDOER" = true ]; then
         if [[ (-n "${PREFER_PKGS+set}") ]]; then
-            sudo apt-get install -y bats fd-find ripgrep
+            sudo apt-get install -y bat fd-find ripgrep
             exit 0
         fi
         sudo apt-get -y install rustc cargo
@@ -22,7 +22,7 @@ set -x
 add_path "$HOME/.cargo/bin"
 
 if [[ $(command -v cargo --version) ]]; then
-    cargo install bats fd-find precious tidy-viewer
+    cargo install bat fd-find precious tidy-viewer
 else
     echo "cargo not installed?"
 fi
