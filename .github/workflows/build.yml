@@ -58,6 +58,7 @@ jobs:
 
       - name: Install Cargo
         run: ./installer/cargo.sh
+        if: ${{ matrix.os == 'ubuntu-18.04' }}
 
       - name: Install Rust deps via pkgs
         run: ./installer/cargo.sh
