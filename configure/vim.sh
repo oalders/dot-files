@@ -21,15 +21,14 @@ ln -sf "$LINK_FLAG" $PREFIX/vim/after/syntax/gitcommit.vim ~/.vim/after/syntax/g
 if [[ $HAS_GO = true ]]; then
     go version
     echo "Installing shfmt"
-    go get -u mvdan.cc/sh/v3/cmd/shfmt
-    go get mvdan.cc/gofumpt
+    go install mvdan.cc/sh/v3/cmd/shfmt@latest
+    go install mvdan.cc/gofumpt@latest
+    go install mvdan.cc/gofumpt/gofumports@latest
+    go install golang.org/x/tools/gopls@latest
 
     # https://github.com/golangci/golangci-lint#binary
     echo "Installing golangci-lint"
     curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b "$(go env GOPATH)"/bin v1.42.1
-
-    GO111MODULE=on go get -u golang.org/x/tools/gopls@v0.7.0-pre.3
-    GO111MODULE=on go get mvdan.cc/gofumpt/gofumports
 else
     echo "Go not found. Not installing shfmt or golangci-lint"
 fi
