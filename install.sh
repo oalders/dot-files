@@ -12,6 +12,7 @@ set -x
 if [[ $IS_DARWIN = true ]]; then
     ./installer/xcode.sh
     ./installer/homebrew.sh
+    ./installer/homebrew-maintenance.sh || true
     ./installer/fonts.sh
     ./configure/dock.sh
 fi
