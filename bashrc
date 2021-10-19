@@ -360,3 +360,6 @@ _update_ps1() {
 if [ "$TERM" != "linux" ] && [ -f "$GOPATH/bin/powerline-go" ]; then
     PROMPT_COMMAND="_update_ps1; $PROMPT_COMMAND"
 fi
+
+# nvim nightly build
+add_path ~/local/nvim-osx64/bin
