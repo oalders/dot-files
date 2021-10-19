@@ -141,13 +141,13 @@ endfunction
 " Bind to ,t (or leader+t)
 map <leader>t :call TidyAll()<cr>
 
-" ########### NERDTree ###########
-map <F2> :NERDTreeToggle<CR>
+map <leader>ot :call OT()<cr>
 
-" ########### Airline ###########
-" Show open buffers at top.  Disabled by default, but leave this here so I
-" don't forget about the setting.
-let g:airline#extensions#tabline#enabled = 0
+function! OT()
+    let fname = input("ot: ", "", "file")
+    let res = system("ot --editor vim --print " . fname)
+    execute "e " res
+endfunction
 
 " ########### Ale ###########
 " Show Ale warnings and messages in statusline
