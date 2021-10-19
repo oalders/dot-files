@@ -59,7 +59,7 @@ if [ "$(uname)" == "Darwin" ]; then
     # Not sure if this is needed in the longer term
     export TERM=xterm-256color
 
-    alias vi="vi"
+    alias vi="nvim"
     alias vim="nvim"
 
     PATH_ALIASES=\~/dot-files=@dots,\~/Documents/github=@gh,\~/Documents/github/oalders=@gho
