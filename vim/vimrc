@@ -146,7 +146,11 @@ map <leader>ot :call OT()<cr>
 function! OT()
     let fname = input("ot: ", "", "file")
     let res = system("ot --editor vim --print " . fname)
-    execute "e " res
+    if v:shell_error
+        echo "\n" . res
+    else
+        execute "e " res
+    endif
 endfunction
 
 " ########### Ale ###########
