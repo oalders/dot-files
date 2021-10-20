@@ -16,8 +16,7 @@ fi
 
 URL=https://github.com/neovim/neovim/releases/download/nightly/$FILE
 
-rm -rf $FILE
-curl -LO $URL
+curl -LO -z $FILE $URL
 
 if [ "$IS_DARWIN" = true ]; then
     tar xzvf $FILE
