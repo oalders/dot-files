@@ -49,4 +49,8 @@ fi
 
 ./installer/powerline.sh
 
+./installer/ubi.sh
+
+./installer/omegasort.sh
+
 exit 0
