@@ -33,6 +33,8 @@ fi
 
 ./installer/vim.sh
 
+./installer/nvim.sh
+
 ./configure/vim.sh
 
 ./configure/tmux.sh

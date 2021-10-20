@@ -362,4 +362,6 @@ if [ "$TERM" != "linux" ] && [ -f "$GOPATH/bin/powerline-go" ]; then
 fi
 
 # nvim nightly build
-add_path ~/local/nvim-osx64/bin
+if [ "$IS_DARWIN" = true ]; then
+    add_path ~/local/nvim-osx64/bin
+fi
