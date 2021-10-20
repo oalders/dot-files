@@ -1,7 +1,6 @@
 tap "homebrew/bundle"
 tap "homebrew/core"
 tap "homebrew/php"
-tap "neovim/neovim"
 tap "universal-ctags/universal-ctags"
 brew "libyaml"
 brew "openssl@1.1"
