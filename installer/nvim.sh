@@ -3,6 +3,9 @@
 set -eux
 cd /tmp || exit
 
+# shellcheck source=bash_functions.sh
+source ~/dot-files/bash_functions.sh
+
 if [ "$IS_DARWIN" = true ]; then
     DIR=nvim-osx64
     FILE=nvim-macos.tar.gz
