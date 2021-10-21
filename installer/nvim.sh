@@ -9,14 +9,14 @@ source ~/dot-files/bash_functions.sh
 if [ "$IS_DARWIN" = true ]; then
     DIR=nvim-osx64
     FILE=nvim-macos.tar.gz
+    URL=https://github.com/neovim/neovim/releases/download/nightly/
     rm -rf $DIR
 else
     FILE=nvim.appimage
+    URL=https://github.com/neovim/neovim/releases/latest/download/
 fi
 
-URL=https://github.com/neovim/neovim/releases/download/nightly/$FILE
-
-curl -LO -z $FILE $URL
+curl -LO -z $FILE "$URL$FILE"
 
 if [ "$IS_DARWIN" = true ]; then
     tar xzvf $FILE
