@@ -16,3 +16,4 @@ rm -rf /usr/local/etc/luarocks
 rm -rf /usr/local/etc/luarocks51
 brew remove truncate
 brew remove virtualbox
+brew untap neovim/neovim
