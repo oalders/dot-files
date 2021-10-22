@@ -1,10 +1,12 @@
 #!/usr/bin/env bash
 
-set -eux -o pipefail
+set -eu -o pipefail
 
 # shellcheck source=bash_functions.sh
 source ~/dot-files/bash_functions.sh
 pushd ~/dot-files >/dev/null
+
+set -x
 
 # https://stackoverflow.com/a/17072017/406224
 if [ "$IS_DARWIN" = true ]; then

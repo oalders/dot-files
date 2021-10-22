@@ -1,11 +1,13 @@
 #!/usr/bin/env bash
 
-set -eux -o pipefail
+set -eu -o pipefail
 
 PREFIX=~/dot-files
 
 # shellcheck source=bash_functions.sh
 source $PREFIX/bash_functions.sh
+
+set -x
 
 mkdir -p ~/.vim/rc/plug
 mkdir -p ~/.vim

@@ -1,9 +1,11 @@
 #!/bin/bash
 
-set -eux
+set -eu
 
 # shellcheck source=bash_functions.sh
 source ~/dot-files/bash_functions.sh
+
+set -x
 
 add_path "$HOME/local/bin"
 

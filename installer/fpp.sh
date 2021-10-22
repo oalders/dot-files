@@ -19,6 +19,7 @@ git checkout 0.9.2
 rm -rf $bin_dir/fpp
 ln -s "$(pwd)/fpp" $bin_dir/fpp
 
+set +x
 # This will fail if "future" needs to be installed
 # shellcheck source=bash_functions.sh
 source ~/dot-files/bash_functions.sh

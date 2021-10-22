@@ -7,8 +7,6 @@ git submodule init && git submodule update
 # shellcheck source=bash_functions.sh
 source ~/dot-files/bash_functions.sh
 
-set -x
-
 if [[ $IS_DARWIN = true ]]; then
     ./installer/xcode.sh
     ./installer/homebrew.sh
