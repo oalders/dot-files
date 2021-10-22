@@ -33,7 +33,7 @@ fi
 
 ./installer/vim.sh
 
-./installer/nvim.sh
+#./installer/nvim.sh
 
 ./configure/vim.sh
 
