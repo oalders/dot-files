@@ -20,7 +20,7 @@ else
     URL=https://github.com/neovim/neovim/releases/latest/download/
 fi
 
-curl -LO -z $FILE "$URL$FILE"
+curl -LO --fail -z $FILE "$URL$FILE"
 
 if [ "$IS_DARWIN" = true ]; then
     tar xzvf $FILE
