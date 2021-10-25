@@ -10,6 +10,7 @@ Plug 'chrisbra/unicode.vim'
 Plug 'ConradIrwin/vim-bracketed-paste'
 Plug 'fatih/vim-go' ", { 'do': ':GoUpdateBinaries' } messes up Travis runs
 Plug 'haya14busa/vim-auto-mkdir' " create directory path on save
+Plug 'itchyny/lightline.vim'
 Plug 'itchyny/vim-cursorword'
 Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
 Plug 'junegunn/fzf.vim'
@@ -42,11 +43,9 @@ Plug 'dense-analysis/ale', { 'tag': 'v3.1.0' }
 Plug 'yko/mojo.vim'
 
 if has('nvim')
-  Plug 'itchyny/lightline.vim'
   Plug 'nvim-treesitter/nvim-treesitter', { 'do': ':TSUpdate'}  " We recommend updating the parsers on update
   Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
 else
-  Plug 'bling/vim-airline'
   Plug 'Shougo/deoplete.nvim'
   Plug 'roxma/nvim-yarp'
   Plug 'roxma/vim-hug-neovim-rpc'

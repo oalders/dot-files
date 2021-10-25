@@ -12,9 +12,6 @@ colorscheme OceanicNext
 let g:oceanic_next_terminal_bold = 1
 let g:oceanic_next_terminal_italic = 1
 
-let g:airline_theme='oceanicnext'
-let g:airline_powerline_fonts = 1
-
 " display relative file path rather than just name
 " See https://github.com/itchyny/lightline.vim/issues/87#issuecomment-189616314
 let g:lightline = {
@@ -187,8 +184,6 @@ function! OT(fname)
 endfunction
 
 " ########### Ale ###########
-" Show Ale warnings and messages in statusline
-let g:airline#extensions#ale#enabled = 1
 
 " statusline error display doesn't seem to work
 let g:ale_set_quickfix = 1
