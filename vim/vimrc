@@ -15,12 +15,13 @@ let g:oceanic_next_terminal_italic = 1
 let g:airline_theme='oceanicnext'
 let g:airline_powerline_fonts = 1
 
-" display entire file path rather than just name
+" display relative file path rather than just name
+" See https://github.com/itchyny/lightline.vim/issues/87#issuecomment-189616314
 let g:lightline = {
+      \ 'active': {
+      \   'left': [ [ 'mode', 'paste' ], [ 'readonly', 'relativepath', 'modified' ] ]
+      \ },
       \ 'colorscheme': 'PaperColor',
-      \ 'component': {
-      \   'filename': '%F',
-      \  },
       \ }
 
 " Ensure bg color for OceanicNext doesn't get clobbered
