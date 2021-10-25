@@ -20,6 +20,7 @@ Plug 'junegunn/vim-slash'
 Plug 'lukhio/vim-mapping-conflicts'
 Plug 'luochen1990/rainbow'
 Plug 'mannih/vim-perl-variable-highlighter'
+Plug 'maximbaz/lightline-ale'
 Plug 'mhartington/oceanic-next'
 Plug 'mzlogin/vim-markdown-toc'
 Plug 'oalders/prettysql' " ,fs to format visually selected SQL
