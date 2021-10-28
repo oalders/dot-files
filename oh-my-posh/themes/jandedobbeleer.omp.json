@@ -37,7 +37,9 @@
           "background": "#fffb38",
           "properties": {
             "display_stash_count": true,
+            "display_status": true,
             "display_upstream_icon": true,
+            "display_worktree_count": true,
             "status_colors_enabled": true,
             "local_changes_color": "#ff9248",
             "ahead_and_behind_color": "#f26d50",
