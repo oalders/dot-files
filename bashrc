@@ -334,34 +334,9 @@ if [ -f "$HOME/.cargo/env" ]; then
     . "$HOME/.cargo/env"
 fi
 
-_update_ps1() {
-    # defaults
-    CONDENSED=""
-    MAX_WIDTH=60
-    PRIORITY="root,cwd,user,host,ssh,perms,git-branch,git-status,hg,jobs,exit,cwd-path"
-    TRUNCATE_SEGMENT_WIDTH=14
-    if test "${TMUX_PANE+x}"; then
-        CONDENSED="-condensed"
-        MAX_WIDTH=40
-        PRIORITY="cwd,perms,git-status,jobs,exit,cwd-path,root,git-branch,user,host,ssh"
-        TRUNCATE_SEGMENT_WIDTH=10
-    fi
-
-    PS1="$($GOPATH/bin/powerline-go "$CONDENSED" -max-width "$MAX_WIDTH" -truncate-segment-width "$TRUNCATE_SEGMENT_WIDTH" -cwd-max-depth 3 -path-aliases "$PATH_ALIASES" -hostname-only-if-ssh -priority "$PRIORITY" -error $? -jobs $(jobs -p | wc -l))"
-
-    # Uncomment the following line to automatically clear errors after showing
-    # them once. This not only clears the error for powerline-go, but also for
-    # everything else you run in that shell. Don't enable this if you're not
-    # sure this is what you want.
-
-    #set "?"
-}
-
-if [ "$TERM" != "linux" ] && [ -f "$GOPATH/bin/powerline-go" ]; then
-    PROMPT_COMMAND="_update_ps1; $PROMPT_COMMAND"
-fi
-
 # nvim nightly build
 if [ "$IS_DARWIN" = true ]; then
     add_path ~/local/nvim-osx64/bin
 fi
+
+eval "$(oh-my-posh --init --shell bash --config ~/.config/oh-my-posh/themes/jandedobbeleer.omp.json)"

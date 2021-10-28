@@ -45,8 +45,6 @@ fi
 
 ./installer/cz.sh
 
-./installer/powerline.sh
-
 ./installer/ubi.sh
 
 ./installer/omegasort.sh
