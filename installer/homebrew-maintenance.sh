@@ -1,5 +1,12 @@
 #!/usr/bin/env bash
 
+set -eu -o pipefail
+
+# shellcheck source=bash_functions.sh
+source ~/dot-files/bash_functions.sh
+
+set -x
+
 brew remove bats
 brew remove bison
 brew remove diff-so-fancy
@@ -15,5 +22,7 @@ brew remove postgresql
 rm -rf /usr/local/etc/luarocks
 rm -rf /usr/local/etc/luarocks51
 brew remove truncate
-brew remove virtualbox
-brew untap neovim/neovim
+
+if [ "$IS_MM" = false ]; then
+    brew remove virtualbox
+fi
