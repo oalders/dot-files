@@ -7,8 +7,8 @@
         {
           "type": "session",
           "style": "diamond",
-          "foreground": "#ffffff",
-          "background": "#c386f1",
+          "foreground": "#193549",
+          "background": "#707880",
           "leading_diamond": "",
           "trailing_diamond": "",
           "properties": {
@@ -21,8 +21,8 @@
           "type": "path",
           "style": "powerline",
           "powerline_symbol": "",
-          "foreground": "#ffffff",
-          "background": "#ff479c",
+          "foreground": "#193549",
+          "background": "#5f819d",
           "properties": {
             "prefix": "   ",
             "home_icon": "~",
@@ -35,15 +35,15 @@
           "style": "powerline",
           "powerline_symbol": "",
           "foreground": "#193549",
-          "background": "#fffb38",
+          "background": "#5e8d87",
           "properties": {
             "display_stash_count": true,
             "display_status": true,
             "display_upstream_icon": true,
             "display_worktree_count": false,
             "status_colors_enabled": true,
-            "local_changes_color": "#ff9248",
-            "ahead_and_behind_color": "#f26d50",
+            "local_changes_color": "#f0c674",
+            "ahead_and_behind_color": "#de935f",
             "behind_color": "#f17c37",
             "ahead_color": "#89d1dc",
             "stash_count_icon": "\uF692 "
@@ -98,7 +98,7 @@
         {
           "type": "executiontime",
           "style": "plain",
-          "foreground": "#ffffff",
+          "foreground": "#193549",
           "background": "#83769c",
           "leading_diamond": "",
           "trailing_diamond": "",
@@ -111,14 +111,14 @@
         {
           "type": "exit",
           "style": "diamond",
-          "foreground": "#ffffff",
-          "background": "#2e9599",
+          "foreground": "#193549",
+          "background": "#8abeb7",
           "leading_diamond": "",
           "trailing_diamond": "",
           "properties": {
             "display_exit_code": false,
             "always_enabled": true,
-            "error_color": "#f1184c",
+            "error_color": "#cc6666",
             "color_background": true,
             "prefix": "<#83769c></> ♥"
           }
