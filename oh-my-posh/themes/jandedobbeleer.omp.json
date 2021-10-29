@@ -13,7 +13,8 @@
           "trailing_diamond": "",
           "properties": {
             "postfix": " ",
-            "display_host": false
+            "display_host": true,
+            "display_user": false
           }
         },
         {
