@@ -18,8 +18,6 @@ if [ "$IS_DARWIN" = false ]; then
     fi
 fi
 
-set -x
-
 # Maybe add to $PATH just to be safe
 add_path "$HOME/.cargo/bin"
 
