@@ -269,8 +269,6 @@ fetch_pull_request() {
 # make sure NERDTree arrows work
 export LANG=en_US.UTF-8
 
-. ~/dot-files/inc/finna-be-octo-hipster/iterm2_helpers.sh
-
 if [ -d $GOPATH ]; then
     export PATH="$GOPATH/bin:$PATH"
 fi

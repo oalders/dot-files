@@ -27,8 +27,6 @@ if type brew &>/dev/null; then
   fi
 fi
 
-test -e "${HOME}/.iterm2_shell_integration.bash" && source "${HOME}/.iterm2_shell_integration.bash"
-
 if which plenv > /dev/null; then eval "$(plenv init -)"; fi
 
 if [[ -d ~/.rbenv ]]; then
