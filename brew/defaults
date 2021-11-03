@@ -41,3 +41,6 @@ brew "watch"
 brew "wget"
 brew "zlib"
 cask "font-jetbrains-mono-nerd-font"
+
+# Needed for Alfred's gh workflow
+brew "php"
