@@ -8,7 +8,7 @@ Plug 'bronson/vim-trailing-whitespace' " highlight trailing whitespace
 Plug 'c9s/perlomni.vim'
 Plug 'chrisbra/unicode.vim'
 Plug 'ConradIrwin/vim-bracketed-paste'
-Plug 'fatih/vim-go' ", { 'do': ':GoUpdateBinaries' } messes up Travis runs
+Plug 'fatih/vim-go', { 'do': ':GoUpdateBinaries' }
 Plug 'haya14busa/vim-auto-mkdir' " create directory path on save
 Plug 'itchyny/lightline.vim'
 Plug 'itchyny/vim-cursorword'
