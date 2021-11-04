@@ -166,7 +166,7 @@ mas "Kindle", id: 405399194
 mas "Pixelmator", id: 407963104
 mas "PopClip", id: 445189367
 mas "Scratch 3", id: 1446785996
-mas "Skip Tunes", id: 499695659
+mas "Silicio", id: 933627574
 mas "Skitch", id: 425955336
 mas "Slack", id: 803453959
 mas "Space Gremlin", id: 414515628
