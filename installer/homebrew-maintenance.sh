@@ -26,3 +26,5 @@ brew remove truncate
 if [ "$IS_MM" = false ]; then
     brew remove virtualbox
 fi
+
+brew unlink md5sha1sum
