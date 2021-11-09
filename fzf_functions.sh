@@ -21,7 +21,12 @@ tm() {
         echo "No session selected"
         return
     fi
+
     SUBCOMMAND="attach"
+
+    if test "${TMUX_PANE+x}"; then
+        SUBCOMMAND="switch"
+    fi
 
     if [ $# -gt 0 ]; then
         SUBCOMMAND="$1"
