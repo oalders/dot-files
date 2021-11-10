@@ -25,7 +25,6 @@ if [[ $HAS_GO = true ]]; then
     echo "Installing shfmt"
     go install mvdan.cc/sh/v3/cmd/shfmt@latest
     go install mvdan.cc/gofumpt@latest
-    go install mvdan.cc/gofumpt/gofumports@latest
     go install golang.org/x/tools/gopls@latest
 
     # https://github.com/golangci/golangci-lint#binary
