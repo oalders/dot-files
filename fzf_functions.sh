@@ -16,7 +16,7 @@ f () {
 # tm kill-session<cr>
 
 tm() {
-    SESSION=$(tmux list-session | cut -d' ' -f1 | fzf)
+    SESSION=$(tmux list-session | cut -d':' -f1 | fzf)
     if [ -z "$SESSION" ]; then
         echo "No session selected"
         return
