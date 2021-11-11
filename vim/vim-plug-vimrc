@@ -14,7 +14,6 @@ Plug 'itchyny/lightline.vim'
 Plug 'itchyny/vim-cursorword'
 Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
 Plug 'junegunn/fzf.vim'
-Plug 'junegunn/rainbow_parentheses.vim'
 Plug 'junegunn/vader.vim'
 Plug 'junegunn/vim-emoji'
 Plug 'junegunn/vim-slash'
