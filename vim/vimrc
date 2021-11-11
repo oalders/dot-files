@@ -385,3 +385,10 @@ set t_ZR=[23m
 
 " 'luochen1990/rainbow'
 let g:rainbow_active = 1 "set to 0 if you want to enable it later via :RainbowToggle
+
+" vim-slash plugin can force the cursor to blink when it first arrives at a
+" match
+if has('timers')
+  " Blink 2 times with 50ms interval
+  noremap <expr> <plug>(slash-after) slash#blink(2, 50)
+endif
