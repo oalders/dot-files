@@ -24,12 +24,14 @@ tm() {
 
     SUBCOMMAND="attach"
 
-    if test "${TMUX_PANE+x}"; then
-        SUBCOMMAND="switch"
-    fi
-
+    # If there's an argument, then it should be a tmux subcommand
     if [ $# -gt 0 ]; then
         SUBCOMMAND="$1"
+
+    # If we got this far then we're inside tmux and we'd need to switch rather
+    # than attach, since we're avoiding nested sessions.
+    elif test "${TMUX_PANE+x}"; then
+        SUBCOMMAND="switch"
     fi
 
     tmux "$SUBCOMMAND" -t "$SESSION"
