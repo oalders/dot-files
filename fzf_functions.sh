@@ -2,7 +2,7 @@
 export FZF_DEFAULT_COMMAND='fd --type f --hidden --follow --exclude .git'
 export FZF_DEFAULT_OPTS='--multi --pointer ">>"'
 
-f () {
+f() {
     fzf --bind='ctrl-/:toggle-preview' --preview "bat --style=numbers --color=always --line-range :500 {}" "$@"
 }
 
@@ -37,9 +37,9 @@ tm() {
 
 # prove
 _fzf_complete_prove() {
-  _fzf_complete  --bind='ctrl-/:toggle-preview' --preview 'bat --style=numbers --color=always --line-range :50 {}' --reverse --multi --prompt="prove> " -- "$@" < <(
-      fd -e t
-  )
+    _fzf_complete --bind='ctrl-/:toggle-preview' --preview 'bat --style=numbers --color=always --line-range :50 {}' --reverse --multi --prompt="prove> " -- "$@" < <(
+        fd -e t
+    )
 }
 
 _fzf_complete_prove_post() {
