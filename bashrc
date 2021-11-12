@@ -39,6 +39,8 @@ alias dzil-prove-xs='dzil run prove -lv'
 alias dzil-stale='dzil stale --all | xargs cpm install --global'
 alias fix-gpg='pkill -9 gpg-agent && export GPG_TTY=$(tty)'
 alias g=git
+alias gi=git # fix typos
+alias gti=git # fix typos
 alias gdf='git domo|fpp'
 alias grep='grep --color=auto --exclude-dir=.git'
 alias heavy-cpu='ps --sort=-pcpu -aux|head -10'
