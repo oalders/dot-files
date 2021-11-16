@@ -30,10 +30,10 @@ reset_path() {
 toggle_posh() {
     if [[ $MY_POSH_THEME == "tiny" ]]; then
         MY_POSH_THEME="jandedobbeleer"
-        source ~/.bashrc
+        posh_me
     else
         MY_POSH_THEME="tiny"
-        source ~/.bashrc
+        posh_me
     fi
 }
 
@@ -118,6 +118,10 @@ rename_tab() {
     else
         echo -en "\033]0;$1\a"
     fi
+}
+
+posh_me() {
+    eval "$(oh-my-posh --init --shell bash --config ~/.config/oh-my-posh/themes/${MY_POSH_THEME}.omp.json)"
 }
 
 HARNESS_OPTIONS="j1:c"

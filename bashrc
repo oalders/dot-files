@@ -340,4 +340,4 @@ if [ "$IS_DARWIN" = true ]; then
     add_path ~/local/nvim-osx64/bin
 fi
 
-eval "$(oh-my-posh --init --shell bash --config ~/.config/oh-my-posh/themes/${MY_POSH_THEME}.omp.json)"
+posh_me
