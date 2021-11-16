@@ -22,6 +22,7 @@ ln -sf $PREFIX/cpanreporter/config.ini ~/.cpanreporter/config.ini
 ln -sf $PREFIX/dataprinter ~/.dataprinter
 ln -sf $PREFIX/nvim/init.vim ~/.config/nvim/init.vim
 ln -sf $PREFIX/oh-my-posh/themes/jandedobbeleer.omp.json ~/.config/oh-my-posh/themes/jandedobbeleer.omp.json
+ln -sf $PREFIX/oh-my-posh/themes/tiny.omp.json ~/.config/oh-my-posh/themes/tiny.omp.json
 ln -sf $PREFIX/wezterm/wezterm.lua ~/.config/wezterm/wezterm.lua
 ln -sf $PREFIX/yamllint.yml ~/.config/yamllint/config
 

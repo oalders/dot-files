@@ -27,6 +27,16 @@ reset_path() {
     export PATH
 }
 
+toggle_posh() {
+    if [[ $MY_POSH_THEME == "tiny" ]]; then
+        MY_POSH_THEME="jandedobbeleer"
+        source ~/.bashrc
+    else
+        MY_POSH_THEME="tiny"
+        source ~/.bashrc
+    fi
+}
+
 GO111MODULE=on
 GOPATH=~/go
 HAS_GO=false
@@ -72,6 +82,10 @@ IS_GITHUB=false
 LOOKS_LIKE_GITHUB=${GITHUB_WORKSPACE:-}
 if [[ -n "$LOOKS_LIKE_GITHUB" ]]; then
     IS_GITHUB=true
+fi
+
+if [[ -z $MY_POSH_THEME ]]; then
+    MY_POSH_THEME="jandedobbeleer"
 fi
 
 IS_MM=false
@@ -122,5 +136,6 @@ export IS_GITHUB
 export IS_MM
 export IS_SUDOER
 export LINK_FLAG
+export MY_POSH_THEME
 export PATH_ALIASES
 export RIPGREP_CONFIG_PATH
