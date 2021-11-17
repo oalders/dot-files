@@ -1,5 +1,6 @@
 # shellcheck shell=bash
 
+# path handling
 # http://superuser.com/questions/39751/add-directory-to-path-if-its-not-already-there
 add_path() {
     if [ -d "$1" ] && [[ ":$PATH:" != *":$1:"* ]]; then
@@ -25,6 +26,11 @@ clean_path() {
 reset_path() {
     PATH=$(clean_path)
     export PATH
+}
+
+# posh handling
+posh_me() {
+    eval "$(oh-my-posh --init --shell bash --config ~/.config/oh-my-posh/themes/"${MY_POSH_THEME}".omp.json)"
 }
 
 toggle_posh() {
@@ -84,7 +90,7 @@ if [[ -n "$LOOKS_LIKE_GITHUB" ]]; then
     IS_GITHUB=true
 fi
 
-if [[ -z $MY_POSH_THEME ]]; then
+if [[ ! "${MY_POSH_THEME:-}" ]]; then
     MY_POSH_THEME="jandedobbeleer"
 fi
 
@@ -118,10 +124,6 @@ rename_tab() {
     else
         echo -en "\033]0;$1\a"
     fi
-}
-
-posh_me() {
-    eval "$(oh-my-posh --init --shell bash --config ~/.config/oh-my-posh/themes/${MY_POSH_THEME}.omp.json)"
 }
 
 HARNESS_OPTIONS="j1:c"
