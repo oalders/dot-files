@@ -91,7 +91,11 @@ if [[ -n "$LOOKS_LIKE_GITHUB" ]]; then
 fi
 
 if [[ ! "${MY_POSH_THEME:-}" ]]; then
-    MY_POSH_THEME="jandedobbeleer"
+    if test "${TMUX_PANE+x}"; then
+        MY_POSH_THEME="tiny"
+    else
+        MY_POSH_THEME="jandedobbeleer"
+    fi
 fi
 
 IS_MM=false
