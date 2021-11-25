@@ -28,6 +28,16 @@ reset_path() {
     export PATH
 }
 
+if [[ ! "${MY_POSH_THEME:-}" ]]; then
+    if test "${TMUX_PANE+x}"; then
+        MY_POSH_THEME="tiny"
+    elif test !"${SSH_CLIENT+x}";then
+        MY_POSH_THEME="local"
+    else
+        MY_POSH_THEME="jandedobbeleer"
+    fi
+fi
+
 # posh handling
 posh_me() {
     eval "$(oh-my-posh --init --shell bash --config ~/.config/oh-my-posh/themes/"${MY_POSH_THEME}".omp.json)"
@@ -88,14 +98,6 @@ IS_GITHUB=false
 LOOKS_LIKE_GITHUB=${GITHUB_WORKSPACE:-}
 if [[ -n "$LOOKS_LIKE_GITHUB" ]]; then
     IS_GITHUB=true
-fi
-
-if [[ ! "${MY_POSH_THEME:-}" ]]; then
-    if test "${TMUX_PANE+x}"; then
-        MY_POSH_THEME="tiny"
-    else
-        MY_POSH_THEME="jandedobbeleer"
-    fi
 fi
 
 IS_MM=false

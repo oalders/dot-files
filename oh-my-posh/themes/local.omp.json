@@ -1,0 +1,92 @@
+{
+  "blocks": [
+    {
+      "type": "prompt",
+      "alignment": "left",
+      "segments": [
+        {
+          "type": "os",
+          "style": "powerline",
+          "foreground": "#26C6DA",
+          "background": "#546E7A",
+          "properties": {
+          }
+        },
+        {
+          "type": "path",
+          "style": "powerline",
+          "powerline_symbol": "",
+          "foreground": "#193549",
+          "background": "#5f819d",
+          "properties": {
+            "prefix": "   ",
+            "home_icon": "~",
+            "folder_separator_icon": " \uE0b1 ",
+            "style": "folder"
+          }
+        },
+        {
+          "type": "git",
+          "style": "powerline",
+          "powerline_symbol": "",
+          "foreground": "#193549",
+          "background": "#5e8d87",
+          "properties": {
+            "display_stash_count": true,
+            "display_status": true,
+            "display_upstream_icon": true,
+            "display_worktree_count": false,
+            "status_colors_enabled": true,
+            "local_changes_color": "#f0c674",
+            "ahead_and_behind_color": "#de935f",
+            "behind_color": "#f17c37",
+            "ahead_color": "#89d1dc",
+            "stash_count_icon": "\uF692 "
+          }
+        },
+        {
+          "type": "root",
+          "style": "powerline",
+          "powerline_symbol": "",
+          "foreground": "#111111",
+          "background": "#ffff66",
+          "properties": {
+            "root_icon": ""
+          }
+        },
+        {
+          "type": "executiontime",
+          "style": "plain",
+          "foreground": "#193549",
+          "background": "#83769c",
+          "leading_diamond": "",
+          "trailing_diamond": "",
+          "properties": {
+            "always_enabled": true,
+            "prefix": "<transparent></> \ufa1e",
+            "postfix": "\u2800"
+          }
+        },
+        {
+          "type": "exit",
+          "style": "diamond",
+          "foreground": "#193549",
+          "background": "#8abeb7",
+          "leading_diamond": "",
+          "trailing_diamond": "",
+          "properties": {
+            "display_exit_code": false,
+            "always_enabled": true,
+            "error_color": "#cc6666",
+            "color_background": true,
+            "prefix": "<#83769c></> ♥"
+          }
+        }
+      ]
+    }
+  ],
+  "final_space": true,
+  "console_title": false,
+  "console_title_style": "template",
+  "console_title_template": "{{ .Shell }} in {{ .Folder }}"
+}
