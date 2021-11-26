@@ -31,10 +31,10 @@ reset_path() {
 if [[ ! "${MY_POSH_THEME:-}" ]]; then
     if test "${TMUX_PANE+x}"; then
         MY_POSH_THEME="tiny"
-    elif test !"${SSH_CLIENT+x}";then
-        MY_POSH_THEME="local"
-    else
+    elif test "${SSH_CLIENT+x}";then
         MY_POSH_THEME="jandedobbeleer"
+    else
+        MY_POSH_THEME="local"
     fi
 fi
 
