@@ -28,11 +28,9 @@ reset_path() {
     export PATH
 }
 
-if [[ ! "${MY_POSH_THEME:-}" ]]; then
+detect_posh_settings() {
     MY_INSIDE_SSH=false
     MY_INSIDE_TMUX=false
-    MY_POSH_THEME="jandedobbeleer"
-
     if test "${SSH_CLIENT+x}"; then
         MY_INSIDE_SSH=true
     fi
@@ -40,9 +38,17 @@ if [[ ! "${MY_POSH_THEME:-}" ]]; then
         MY_INSIDE_TMUX=true
     fi
 
+    export MY_INSIDE_SSH
+    export MY_INSIDE_TMUX
+}
+
+if [[ ! "${MY_POSH_THEME:-}" ]]; then
+    detect_posh_settings
+    MY_POSH_THEME="remote"
+
     if [[ $MY_INSIDE_SSH = true ]]; then
         if [[ $MY_INSIDE_TMUX = true ]]; then
-            MY_POSH_THEME="tiny"
+            MY_POSH_THEME="remote-tiny"
         fi
     else
         MY_POSH_THEME="local"
@@ -58,13 +64,19 @@ posh_me() {
 }
 
 toggle_posh() {
-    if [[ $MY_POSH_THEME == "tiny" ]]; then
-        MY_POSH_THEME="jandedobbeleer"
-        posh_me
+    detect_posh_settings
+    if [[ $MY_POSH_THEME == "local" ]]; then
+        MY_POSH_THEME="local-tiny"
+    elif [[ $MY_POSH_THEME == "local-tiny" ]]; then
+        MY_POSH_THEME="local"
+    elif [[ $MY_POSH_THEME == "remote" ]]; then
+        MY_POSH_THEME="remote-tiny"
+    elif [[ $MY_POSH_THEME == "remote-tiny" ]]; then
+        MY_POSH_THEME="remote"
     else
-        MY_POSH_THEME="tiny"
-        posh_me
+        MY_POSH_THEME="remote"
     fi
+    posh_me
 }
 
 GO111MODULE=on
