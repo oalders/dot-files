@@ -29,12 +29,26 @@ reset_path() {
 }
 
 if [[ ! "${MY_POSH_THEME:-}" ]]; then
+    MY_INSIDE_SSH=false
+    MY_INSIDE_TMUX=false
+    MY_POSH_THEME="jandedobbeleer"
+
+    if test "${SSH_CLIENT+x}"; then
+        MY_INSIDE_SSH=true
+    fi
     if test "${TMUX_PANE+x}"; then
-        MY_POSH_THEME="tiny"
-    elif test "${SSH_CLIENT+x}";then
-        MY_POSH_THEME="jandedobbeleer"
+        MY_INSIDE_TMUX=true
+    fi
+
+    if [[ $MY_INSIDE_SSH = true ]]; then
+        if [[ $MY_INSIDE_TMUX = true ]]; then
+            MY_POSH_THEME="tiny"
+        fi
     else
         MY_POSH_THEME="local"
+        if [[ $MY_INSIDE_TMUX = true ]]; then
+            MY_POSH_THEME="local-tiny"
+        fi
     fi
 fi
 

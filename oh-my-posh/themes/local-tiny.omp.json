@@ -1,0 +1,63 @@
+{
+  "blocks": [
+    {
+      "type": "prompt",
+      "alignment": "left",
+      "segments": [
+        {
+          "type": "os",
+          "style": "powerline",
+          "foreground": "#26C6DA",
+          "background": "#546E7A",
+          "properties": {
+          }
+        },
+        {
+          "type": "path",
+          "style": "powerline",
+          "powerline_symbol": "",
+          "foreground": "#193549",
+          "background": "#5f819d",
+          "properties": {
+            "prefix": "   ",
+            "home_icon": "~",
+            "folder_separator_icon": " \uE0b1 ",
+            "style": "folder"
+          }
+        },
+        {
+          "type": "executiontime",
+          "style": "plain",
+          "foreground": "#193549",
+          "background": "#83769c",
+          "leading_diamond": "",
+          "trailing_diamond": "",
+          "properties": {
+            "always_enabled": true,
+            "prefix": "<transparent></> \ufa1e",
+            "postfix": "\u2800"
+          }
+        },
+        {
+          "type": "exit",
+          "style": "diamond",
+          "foreground": "#193549",
+          "background": "#8abeb7",
+          "leading_diamond": "",
+          "trailing_diamond": "",
+          "properties": {
+            "display_exit_code": false,
+            "always_enabled": true,
+            "error_color": "#cc6666",
+            "color_background": true,
+            "prefix": "<#83769c></> ♥"
+          }
+        }
+      ]
+    }
+  ],
+  "final_space": true,
+  "console_title": false,
+  "console_title_style": "template",
+  "console_title_template": "{{ .Shell }} in {{ .Folder }}"
+}
