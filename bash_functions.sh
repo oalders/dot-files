@@ -158,11 +158,26 @@ rename_tab() {
     fi
 }
 
+# https://stackoverflow.com/questions/9783507/how-can-i-check-in-my-bashrc-if-an-alias-was-already-set
+# remove this in future
+[ "$(type -t ll)" = "alias" ] && unalias ll
+
+# shellcheck disable=SC2002
+ll() {
+    SELECTION=$(cat ~/dot-files/launch.txt | fzf --reverse --no-multi)
+    COMMAND=$(echo "$SELECTION" | cut -d'#' -f2-)
+
+    echo "Running $COMMAND"
+    eval "$COMMAND"
+}
+
 HARNESS_OPTIONS="j1:c"
 
 # Since ripgrep has no default config file location, we don't need to bother
 # with symlinks.
 RIPGREP_CONFIG_PATH=~/dot-files/ripgreprc
+
+MY_PROCS="$(nproc)"
 
 export GO111MODULE
 export GOPATH
@@ -175,5 +190,6 @@ export IS_MM
 export IS_SUDOER
 export LINK_FLAG
 export MY_POSH_THEME
+export MY_PROCS
 export PATH_ALIASES
 export RIPGREP_CONFIG_PATH
