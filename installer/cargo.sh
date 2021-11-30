@@ -20,9 +20,8 @@ fi
 
 # Maybe add to $PATH just to be safe
 add_path "$HOME/.cargo/bin"
-
 if [[ $(command -v cargo --version) ]]; then
-    cargo install bat fd-find precious tidy-viewer
+    cargo install bat fd-find precious
 else
     echo "cargo not installed?"
 fi
