@@ -1,4 +1,4 @@
-1) install Perl deps   # cpm install -g --cpanfile cpanfile
-2) git gc              # git prune && git lfs prune && git gc
-3) install dot files   # cd ~/dot-files && bash install.sh
-4) prove in parallel   # prove -lr -j $MY_PROCS t
+1) dot files        # cd ~/dot-files && ./install.sh
+2) git gc           # git prune && git lfs prune && git gc
+3) cpm install      # cpm install -g --cpanfile cpanfile
+4) parallel prove   # prove -lr -j $MY_PROCS t
