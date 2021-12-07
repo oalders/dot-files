@@ -9,9 +9,9 @@ source ~/dot-files/bash_functions.sh
 URL=https://github.com/neovim/neovim/releases/download/nightly/
 
 if [ "$IS_DARWIN" = true ]; then
-    # Nightly tarballs seem to be missing right now
-    brew install --head neovim
-    exit 0
+    # Enable if nightly tarballs go missing again
+    #brew install --head neovim
+    #exit 0
 
     DIR=nvim-osx64
     FILE=nvim-macos.tar.gz
