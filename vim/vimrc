@@ -19,7 +19,14 @@ let g:lightline = {
       \   'left': [ [ 'mode', 'paste' ], [ 'readonly', 'relativepath', 'modified' ] ]
       \ },
       \ 'colorscheme': 'PaperColor',
+      \ 'component_function': {
+      \   'modified': 'LightlineModified',
       \ }
+      \ }
+
+function! LightlineModified()
+    return &modifiable && &modified ? '💾' : ''
+endfunction
 
 let g:lightline.component_expand = {
       \  'linter_checking': 'lightline#ale#checking',
