@@ -10,6 +10,7 @@ source ~/dot-files/bash_functions.sh
 if [[ $IS_DARWIN = true ]]; then
     ./installer/xcode.sh
     ./installer/homebrew.sh
+    ./installer/wezterm.sh
     ./installer/homebrew-maintenance.sh || true
     ./installer/fonts.sh
     ./configure/dock.sh
