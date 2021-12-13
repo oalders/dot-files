@@ -20,6 +20,7 @@ ln -sf $PREFIX/bash_profile ~/.bash_profile
 ln -sf $PREFIX/bashrc ~/.bashrc
 ln -sf $PREFIX/cpanreporter/config.ini ~/.cpanreporter/config.ini
 ln -sf $PREFIX/dataprinter ~/.dataprinter
+ln -sf $PREFIX/golangci.yml ~/.golangci.yml
 ln -sf $PREFIX/nvim/init.vim ~/.config/nvim/init.vim
 ln -sf $PREFIX/oh-my-posh/themes/local.omp.json ~/.config/oh-my-posh/themes/local.omp.json
 ln -sf $PREFIX/oh-my-posh/themes/local-tiny.omp.json ~/.config/oh-my-posh/themes/local-tiny.omp.json
