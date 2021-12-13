@@ -42,8 +42,8 @@ rm -rf ~/.vim/Trashed-Bundles ~/.vim/bundle
 
 rm -f ~/.vimrc
 ln -sf $PREFIX/vim/vim-plug-vimrc ~/.vimrc
-nvim +'PlugInstall --sync' +qa
-nvim +'PlugUpdate --sync' +qa
+vim +'PlugInstall --sync' +qa
+vim +'PlugUpdate --sync' +qa
 rm ~/.vimrc
 
 ln -sf $PREFIX/vim/vimrc ~/.vimrc
@@ -61,7 +61,7 @@ ln -sf "$LINK_FLAG" $PREFIX/vim/after/plugin/abolish.vim ~/.vim/after/plugin/abo
 
 # This takes forever to run in CI, so we'll just do it here so that we can skip the step on GH
 if [[ $IS_GITHUB = false ]]; then
-    nvim +':GoUpdateBinaries' +qa
+    vim +':GoUpdateBinaries' +qa
 fi
 
 exit 0

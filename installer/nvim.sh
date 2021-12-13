@@ -35,7 +35,6 @@ else
     echo_path
 fi
 
-# GH can't find ~/.vimrc
 if [[ $IS_GITHUB = false ]]; then
     nvim +'PlugInstall --sync' +qa
 fi
