@@ -1,10 +1,12 @@
 #!/bin/bash
 
-set -eux
+set -eu
 cd /tmp || exit
 
 # shellcheck source=bash_functions.sh
 source ~/dot-files/bash_functions.sh
+
+set -x
 
 URL=https://github.com/neovim/neovim/releases/download/nightly/
 
@@ -28,9 +30,15 @@ if [ "$IS_DARWIN" = true ]; then
     mv $DIR ~/local/
 else
     chmod u+x $FILE
-    mv $FILE ~/local/bin/nvim
+    mv $FILE "$HOME/local/bin/nvim"
+    add_path "$HOME/local/bin"
+    echo_path
 fi
 
-vim +'PlugInstall --sync' +qa
+# GH can't find ~/.vimrc
+if [[ $IS_GITHUB = false ]]; then
+    nvim +'PlugInstall --sync' +qa
+fi
+
 echo "done nvim install"
 exit 0

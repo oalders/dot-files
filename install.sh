@@ -34,7 +34,7 @@ fi
 
 ./installer/oh-my-posh.sh
 
-#./installer/nvim.sh
+./installer/nvim.sh
 
 ./configure/vim.sh
 
