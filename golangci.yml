@@ -1,6 +1,7 @@
 ---
 linters:
   disable:
+    - typecheck
     - wsl
 linters-settings:
   funlen:
