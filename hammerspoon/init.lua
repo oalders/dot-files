@@ -44,6 +44,11 @@ function chrome_tab_action( url_substring, url_to_visit_if_tab_not_found )
     ]])
 end
 
+hs.hotkey.bind(my_hotkeys, "r", function()
+  hs.reload()
+  hs.notify.new({title="Hammerspoon", informativeText="config reloaded"}):send()
+end)
+
 hs.hotkey.bind(my_hotkeys, 'c', nil, open_app_action('Google Chrome'))
 hs.hotkey.bind(my_hotkeys, 'g', nil, chrome_tab_action('mail.google.com/mail/u/0','https://mail.google.com/mail/u/0/#inbox'))
 hs.hotkey.bind(my_hotkeys, 'i', nil, open_app_action('wezterm'))
