@@ -313,6 +313,10 @@ fun ShowGutter()
     :set list
 endfun
 
+fun Requote()
+    :%s/[“”]/"/g
+endfun
+
 " Remove last character from each line
 fun Truncate()
     :%s/.$//
