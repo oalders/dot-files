@@ -127,19 +127,19 @@ if [[ -n "$LOOKS_LIKE_GITHUB" ]]; then
 fi
 
 IS_MM=false
-if [ -e /usr/local/bin/mm-perl ]; then
-    IS_MM=true
-    # Don't try to sudo on MM machines
-    IS_SUDOER="${IS_SUDOER:=false}"
-else
-    IS_SUDOER="${IS_SUDOER:=false}"
+if [[ -z ${IS_SUDOER+x} ]]; then
+    if [ -e /usr/local/bin/mm-perl ]; then
+        IS_MM=true
+        # Don't try to sudo on MM machines
+        IS_SUDOER="${IS_SUDOER:=false}"
 
-    # The sudo -n gets misinterpreted by shellcheck
-    # shellcheck disable=SC2143
-    if [[ $(sudo -n true 2>&1 | grep 'password') ]]; then
-        IS_SUDOER=false
-    else
-        IS_SUDOER=true
+        # The sudo -n gets misinterpreted by shellcheck
+        # shellcheck disable=SC2143
+        if [[ $(sudo -n true 2>&1 | grep 'password') ]]; then
+            IS_SUDOER=false
+        else
+            IS_SUDOER=true
+        fi
     fi
 fi
 
