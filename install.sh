@@ -2,8 +2,6 @@
 
 set -eu -o pipefail
 
-git submodule init && git submodule update
-
 # shellcheck source=bash_functions.sh
 source ~/dot-files/bash_functions.sh
 
@@ -19,8 +17,6 @@ fi
 ./installer/linux.sh
 
 ./installer/symlinks.sh
-
-./installer/git-submodules.sh
 
 ./configure/git.sh
 
