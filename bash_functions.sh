@@ -128,11 +128,12 @@ fi
 
 IS_MM=false
 if [[ -z ${IS_SUDOER+x} ]]; then
-    if [ -e /usr/local/bin/mm-perl ]; then
+    if [[ -e /usr/local/bin/mm-perl ]]; then
         IS_MM=true
         # Don't try to sudo on MM machines
         IS_SUDOER="${IS_SUDOER:=false}"
 
+    else
         # The sudo -n gets misinterpreted by shellcheck
         # shellcheck disable=SC2143
         if [[ $(sudo -n true 2>&1 | grep 'password') ]]; then
