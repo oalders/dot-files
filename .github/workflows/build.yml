@@ -29,9 +29,6 @@ jobs:
       - name: Install symlinks
         run: ./installer/symlinks.sh
 
-      - name: Update Git submodules
-        run: ./installer/git-submodules.sh
-
       - name: Configure Git
         run: ./configure/git.sh
 
