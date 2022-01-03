@@ -124,43 +124,6 @@
           }
         }
       ]
-    },
-    {
-      "type": "rprompt",
-      "segments": [
-        {
-          "type": "shell",
-          "style": "plain",
-          "foreground": "#ffffff",
-          "background": "#0077c2",
-          "properties": {
-            "prefix": "<#0077c2,transparent>\uE0B6</>  ",
-            "postfix": " <transparent,#0077c2>\uE0B2</>"
-          }
-        },
-        {
-          "type": "ytm",
-          "style": "powerline",
-          "powerline_symbol": "\uE0B2",
-          "invert_powerline": true,
-          "foreground": "#111111",
-          "background": "#1BD760",
-          "properties": {
-            "prefix": " \uF167 ",
-            "paused_icon": " ",
-            "playing_icon": " "
-          }
-        },
-        {
-          "type": "time",
-          "style": "diamond",
-          "invert_powerline": true,
-          "leading_diamond": "\uE0B2",
-          "trailing_diamond": "\uE0B4",
-          "background": "#2e9599",
-          "foreground": "#111111"
-        }
-      ]
     }
   ],
   "final_space": true,
