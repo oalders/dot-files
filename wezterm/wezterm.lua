@@ -6,7 +6,7 @@ return {
     "JetBrainsMono Nerd Font",
 }),
   allow_square_glyphs_to_overflow_width = "WhenFollowedBySpace",
-  color_scheme = "OceanicMaterial",
+  color_scheme = "nord",
 
   colors = {
     tab_bar = {
