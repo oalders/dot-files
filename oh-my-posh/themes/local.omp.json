@@ -37,7 +37,7 @@
             "display_upstream_icon": true,
             "display_worktree_count": false,
             "status_colors_enabled": true,
-            "local_changes_color": "#f0c674",
+            "local_changes_color": "#EBCB8B",
             "ahead_and_behind_color": "#de935f",
             "behind_color": "#f17c37",
             "ahead_color": "#89d1dc",
