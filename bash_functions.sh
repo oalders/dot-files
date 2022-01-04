@@ -131,9 +131,12 @@ if [[ -n "$LOOKS_LIKE_GITHUB" ]]; then
 fi
 
 IS_MM=false
+if [[ -e /usr/local/bin/mm-perl ]]; then
+    IS_MM=true
+fi
+
 if [[ -z ${IS_SUDOER+x} ]]; then
-    if [[ -e /usr/local/bin/mm-perl ]]; then
-        IS_MM=true
+    if [[ $IS_MM = true ]]; then
         # Don't try to sudo on MM machines
         IS_SUDOER="${IS_SUDOER:=false}"
 
