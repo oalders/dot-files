@@ -31,7 +31,7 @@ wget https://github.com/fniephaus/alfred-homebrew/releases/download/v5.0/Homebre
 open Homebrew-for-Alfred.alfredworkflow
 wait_for_input
 
-wget https://github.com/ruedap/alfred-font-awesome-workflow/raw/master/Font-Awesome.alfredworkflow
+wget https://github.com/ruedap/alfred-font-awesome-workflow/releases/download/v5.15.3.1/Font-Awesome.alfredworkflow
 open Font-Awesome.alfredworkflow
 
 exit 0
