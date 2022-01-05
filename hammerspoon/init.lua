@@ -97,11 +97,38 @@ function slackifyName()
         name = name:gsub(key, value)
     end
 
-    hs.pasteboard.setContents(name)
+    replaceIt(name)
+end
+
+function cpanAuthorLink()
+    name = currentSelection()
+    name = string.format("[%s](https://metacpan.org/author/%s)", name, name)
+    replaceIt(name)
+end
+
+function cpanDocumentationLink()
+    name = currentSelection()
+    name = string.format("[%s](https://metacpan.org/pod/%s)", name, name)
+    replaceIt(name)
+end
+
+function replaceIt(thing)
+    hs.pasteboard.setContents(thing)
     hs.timer.usleep(20000)
     hs.eventtap.keyStroke({"cmd"}, "v")
 end
 
+function xpasswd()
+    local output, status, type, rc = hs.execute("xpasswd", true)
+    if rc == 0 then
+        replaceIt(output)
+    else
+        hs.notify.new({title="Hammerspoon", informativeText="xpasswd failed"}):send()
+    end
+end
+
+hs.hotkey.bind(my_hotkeys, 'a', cpanAuthorLink)
+hs.hotkey.bind(my_hotkeys, 'b', cpanDocumentationLink)
 hs.hotkey.bind(my_hotkeys, 'c', nil, open_app_action('Google Chrome'))
 hs.hotkey.bind(my_hotkeys, 'g', nil, chrome_tab_action('mail.google.com/mail/u/0','https://mail.google.com/mail/u/0/#inbox'))
 hs.hotkey.bind(my_hotkeys, 'i', nil, open_app_action('wezterm'))
@@ -111,3 +138,4 @@ hs.hotkey.bind(my_hotkeys, 'n', nil, chrome_tab_action('https://github.com/notif
 hs.hotkey.bind(my_hotkeys, 'o', nil, chrome_tab_action('https://www.irccloud.com/irc/','https://www.irccloud.com/irc/magnet/channel/metacpan'))
 hs.hotkey.bind(my_hotkeys, 'p', nil, chrome_tab_action('https://www.pivotaltracker.com/','https://www.pivotaltracker.com/'))
 hs.hotkey.bind(my_hotkeys, 'q', slackifyName)
+hs.hotkey.bind(my_hotkeys, 'x', xpasswd)
