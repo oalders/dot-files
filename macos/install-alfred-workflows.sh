@@ -11,7 +11,7 @@ wget https://github.com/deanishe/alfred-vpn-manager/releases/download/v3.2.0/VPN
 open VPN-Manager-3.2.alfredworkflow
 wait_for_input
 
-wget https://github.com/gharlan/alfred-github-workflow/releases/download/v1.6.2/github.alfredworkflow
+wget https://github.com/gharlan/alfred-github-workflow/releases/download/v1.7.1/github.alfredworkflow
 open github.alfredworkflow
 wait_for_input
 
