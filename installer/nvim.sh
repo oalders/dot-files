@@ -32,7 +32,6 @@ else
     chmod u+x $FILE
     mv $FILE "$HOME/local/bin/nvim"
     add_path "$HOME/local/bin"
-    echo_path
 fi
 
 if [[ $IS_GITHUB = false ]]; then
