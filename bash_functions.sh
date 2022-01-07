@@ -42,17 +42,17 @@ detect_posh_settings() {
     export MY_INSIDE_TMUX
 }
 
-if [[ ! "${MY_POSH_THEME:-}" ]]; then
+if [[ ! "${MY_POSH_THEME:-}" || ! "${FORCE_POSH_THEME:-}" ]]; then
     detect_posh_settings
     MY_POSH_THEME="remote"
 
     if [[ $MY_INSIDE_SSH = true ]]; then
-        if [[ $MY_INSIDE_TMUX = true ]]; then
+        if [[ $MY_INSIDE_TMUX = true && ! "${FORCE_POSH_THEME:-}" ]]; then
             MY_POSH_THEME="remote-tiny"
         fi
     else
         MY_POSH_THEME="local"
-        if [[ $MY_INSIDE_TMUX = true ]]; then
+        if [[ $MY_INSIDE_TMUX = true && ! "${FORCE_POSH_THEME:-}" ]]; then
             MY_POSH_THEME="local-tiny"
         fi
     fi
@@ -76,6 +76,10 @@ toggle_posh() {
     else
         MY_POSH_THEME="remote"
     fi
+
+    FORCE_POSH_THEME=true
+    export FORCE_POSH_THEME
+
     posh_me
 }
 
