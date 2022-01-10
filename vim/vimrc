@@ -10,20 +10,25 @@ set background=dark
 
 colorscheme nord
 
-" display relative file path rather than just name
-" See https://github.com/itchyny/lightline.vim/issues/87#issuecomment-189616314
 let g:lightline = {
       \ 'active': {
       \   'left': [ [ 'mode', 'paste' ], [ 'readonly', 'relativepath', 'modified' ] ]
       \ },
       \ 'colorscheme': 'nord',
       \ 'component_function': {
+      \   'filename': 'LightlineFilename',
       \   'modified': 'LightlineModified',
       \ }
       \ }
 
 function! LightlineModified()
     return &modifiable && &modified ? '💾' : ''
+endfunction
+
+" display relative file path rather than just name
+" See https://github.com/itchyny/lightline.vim/issues/87#issuecomment-119130738
+function! LightlineFilename()
+    return expand('%')
 endfunction
 
 let g:lightline.component_expand = {
