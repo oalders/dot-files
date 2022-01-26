@@ -265,6 +265,8 @@ au BufRead,BufNewFile bash_profile set filetype=sh
 au BufRead,BufNewFile bashrc set filetype=sh
 au BufRead,BufNewFile local_bashrc set filetype=sh
 
+au BufRead,BufNewFile *.pm set filetype=perl
+
 " ########### SQL ###########
 
 " prevent left and right arrows from being disabled in insert mode when
