@@ -1,10 +1,11 @@
 exclude = Perl::Critic::Policy::Subroutines::RequireArgUnpacking
 exclude = Perl::Critic::Policy::ValuesAndExpressions::ProhibitAccessOfPrivateData
 exclude = Subroutines::ProhibitExplicitReturnUndef
+exclude = Subroutines::ProhibitSubroutinePrototypes
 verbose = 11
 
 [TestingAndDebugging::RequireUseStrict]
-equivalent_modules = Modern::Perl Moose Test2::V0
+equivalent_modules = Modern::Perl Moose operl Test2::V0
 
 [TooMuchCode::ProhibitUnusedImport]
 
