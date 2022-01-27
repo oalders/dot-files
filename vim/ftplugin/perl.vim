@@ -51,6 +51,7 @@ nnoremap <leader>l :!perl -Mlazy -c %:p
   \ --cache
   \ --read-stdin
   \ --libs lib,t/lib,dev/lib,lab/lib
+  \ --log-filename /tmp/perlimports.txt
   \ --log-level error
   \ --no-preserve-duplicates
   \ --no-preserve-unused
