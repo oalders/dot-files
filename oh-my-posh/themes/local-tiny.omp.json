@@ -1,63 +1,61 @@
 {
+  "$schema": "https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/schema.json",
   "blocks": [
     {
-      "type": "prompt",
       "alignment": "left",
       "segments": [
         {
-          "type": "os",
-          "style": "powerline",
-          "foreground": "#88C0D0",
           "background": "#4C566A",
+          "foreground": "#88C0D0",
           "properties": {
-          }
-        },
-        {
-          "type": "path",
+            "template": " {{ if .WSL }}WSL at {{ end }}{{.Icon}} "
+          },
           "style": "powerline",
-          "powerline_symbol": "",
-          "foreground": "#193549",
+          "type": "os"
+        },
+        {
           "background": "#5f819d",
+          "foreground": "#193549",
+          "powerline_symbol": "\ue0b0",
           "properties": {
-            "prefix": "   ",
+            "folder_separator_icon": " \ue0b1 ",
             "home_icon": "~",
-            "folder_separator_icon": " \uE0b1 ",
-            "style": "folder"
-          }
+            "style": "folder",
+            "template": " \uf74a  {{ .Path }} "
+          },
+          "style": "powerline",
+          "type": "path"
         },
         {
-          "type": "executiontime",
-          "style": "plain",
-          "foreground": "#193549",
           "background": "#83769c",
-          "leading_diamond": "",
-          "trailing_diamond": "",
+          "foreground": "#193549",
           "properties": {
             "always_enabled": true,
-            "prefix": "<transparent></> \ufa1e",
-            "postfix": "\u2800"
-          }
+            "template": "<transparent>\ue0b0</> \ufa1e{{ .FormattedMs }}\u2800"
+          },
+          "style": "plain",
+          "type": "executiontime"
         },
         {
-          "type": "exit",
-          "style": "diamond",
-          "foreground": "#193549",
           "background": "#8abeb7",
-          "leading_diamond": "",
-          "trailing_diamond": "",
+          "background_templates": [
+            "{{ if gt .Code 0 }}#BF616A{{ end }}"
+          ],
+          "foreground": "#193549",
           "properties": {
-            "display_exit_code": false,
             "always_enabled": true,
-            "error_color": "#BF616A",
-            "color_background": true,
-            "prefix": "<#83769c></> ♥"
-          }
+            "template": "<#83769c>\ue0b0</> \u2665 "
+          },
+          "style": "diamond",
+          "trailing_diamond": "\ue0b4",
+          "type": "exit"
         }
-      ]
+      ],
+      "type": "prompt"
     }
   ],
-  "final_space": true,
-  "console_title": false,
   "console_title_style": "template",
-  "console_title_template": "{{ .Shell }} in {{ .Folder }}"
+  "console_title_template": "{{ .Shell }} in {{ .Folder }}",
+  "final_space": true,
+  "version": 1
 }
