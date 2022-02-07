@@ -24,7 +24,7 @@
     "eslint": "^8.8.0",
     "jsonlint": "^1.6.3",
     "markdownlint": "^0.25.1",
-    "markdownlint-cli": "^0.30.0",
+    "markdownlint-cli": "^0.31.0",
     "normalize-url": "^7.0.3",
     "npm": "^8.4.1",
     "prettier": "^2.5.1",
