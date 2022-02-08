@@ -36,3 +36,8 @@ nmap <leader>b  <Plug>(go-build)
 let g:go_def_mode='gopls'
 let g:go_info_mode='gopls'
 let g:go_rename_command = 'gopls'
+
+function! ShowTabs()
+    :set list
+    :set listchars=tab:>-
+endfunction
