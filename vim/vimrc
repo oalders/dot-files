@@ -310,7 +310,7 @@ fun HideGutter()
     :set nolist
 endfun
 
-fun ShowGutter()
+fun! ShowGutter()
     :GitGutterEnable
     :set number
     :set list
