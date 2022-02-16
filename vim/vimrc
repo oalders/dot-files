@@ -31,12 +31,18 @@ function! LightlineFilename()
     return expand('%')
 endfunction
 
+let g:lightline#ale#indicator_checking = '👕👕👕'
+let g:lightline#ale#indicator_errors = '🚨'
+let g:lightline#ale#indicator_infos = 'ℹ️'
+let g:lightline#ale#indicator_ok = '🆗'
+let g:lightline#ale#indicator_warnings = '🚫'
+
 let g:lightline.component_expand = {
       \  'linter_checking': 'lightline#ale#checking',
-      \  'linter_infos': 'lightline#ale#infos',
-      \  'linter_warnings': 'lightline#ale#warnings',
       \  'linter_errors': 'lightline#ale#errors',
+      \  'linter_infos': 'lightline#ale#infos',
       \  'linter_ok': 'lightline#ale#ok',
+      \  'linter_warnings': 'lightline#ale#warnings',
       \ }
 
 let g:lightline.component_type = {
