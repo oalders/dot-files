@@ -31,7 +31,7 @@ function! LightlineFilename()
     return expand('%')
 endfunction
 
-let g:lightline#ale#indicator_checking = '👕👕👕'
+let g:lightline#ale#indicator_checking = '👕'
 let g:lightline#ale#indicator_errors = '🚨'
 let g:lightline#ale#indicator_infos = 'ℹ️'
 let g:lightline#ale#indicator_ok = '🆗'
