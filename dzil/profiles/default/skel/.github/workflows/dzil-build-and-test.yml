@@ -82,11 +82,11 @@ jobs:
         uses: perl-actions/install-with-cpm@v1
         with:
           cpanfile: "cpanfile"
-          args: "--with-suggests --with-recommends --with-test --with-develop"
-      - run: prove -lr t xt
+          args: "--with-suggests --with-recommends --with-test"
+      - run: prove -lr t
         env:
-          AUTHOR_TESTING: 1
-          RELEASE_TESTING: 1
+          AUTHOR_TESTING: 0
+          RELEASE_TESTING: 0
   macos-test-job:
     needs: ubuntu-test-job
     runs-on: "macos-latest"
@@ -123,11 +123,11 @@ jobs:
         uses: perl-actions/install-with-cpm@v1
         with:
           cpanfile: "cpanfile"
-          args: "--with-suggests --with-recommends --with-test --with-develop"
-      - run: prove -lr t xt
+          args: "--with-suggests --with-recommends --with-test"
+      - run: prove -lr t
         env:
-          AUTHOR_TESTING: 1
-          RELEASE_TESTING: 1
+          AUTHOR_TESTING: 0
+          RELEASE_TESTING: 0
   windows-test-job:
     needs: ubuntu-test-job
     runs-on: "windows-latest"
