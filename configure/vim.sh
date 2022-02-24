@@ -22,6 +22,7 @@ ln -sf "$LINK_FLAG" $PREFIX/vim/after/syntax/gitcommit.vim ~/.vim/after/syntax/g
 
 if [[ $HAS_GO = true ]]; then
     go version
+    unset GOPROXY
     echo "Installing shfmt"
     go install mvdan.cc/sh/v3/cmd/shfmt@latest
     go install mvdan.cc/gofumpt@latest
