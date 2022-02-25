@@ -9,6 +9,7 @@ Plug 'bronson/vim-trailing-whitespace' " highlight trailing whitespace
 Plug 'c9s/perlomni.vim'
 Plug 'chrisbra/unicode.vim'
 Plug 'ConradIrwin/vim-bracketed-paste'
+Plug 'dense-analysis/ale', { 'tag': 'v3.1.0' }
 Plug 'fatih/vim-go' ", { 'do': ':GoUpdateBinaries' } takes forever on GH builds
 Plug 'haya14busa/vim-auto-mkdir' " create directory path on save
 Plug 'itchyny/lightline.vim'
@@ -38,7 +39,6 @@ Plug 'tpope/vim-fugitive'
 Plug 'tpope/vim-surround'
 Plug 'vim-ruby/vim-ruby'
 Plug 'vim-scripts/vim-json-bundle'
-Plug 'dense-analysis/ale', { 'tag': 'v3.1.0' }
 Plug 'yko/mojo.vim'
 
 if has('nvim')
