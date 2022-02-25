@@ -379,6 +379,8 @@ sunmap b
 sunmap e
 sunmap ge
 
+nmap <leader>h :YankHistoryRgPaste
+
 " Format selected JSON via jq
 " The dot is not required for jq version >= 1.6
 vnoremap jq :!jq -S .<cr>

@@ -39,6 +39,7 @@ Plug 'tpope/vim-fugitive'
 Plug 'tpope/vim-surround'
 Plug 'vim-ruby/vim-ruby'
 Plug 'vim-scripts/vim-json-bundle'
+Plug 'yazgoo/yank-history'
 Plug 'yko/mojo.vim'
 
 if has('nvim')
