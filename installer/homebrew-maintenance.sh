@@ -15,9 +15,10 @@ brew remove fpp
 brew remove geoip
 brew remove hub
 brew remove lua@5.1
-brew remove pgcli
 brew remove mercurial
 brew remove mysql
+brew remove pgcli
+brew remove plenv
 brew remove postgresql
 rm -rf /usr/local/etc/luarocks
 rm -rf /usr/local/etc/luarocks51

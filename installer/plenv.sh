@@ -1,14 +1,16 @@
 #!/usr/bin/env bash
 
-# On OSX plenv will have been installed via homebrew
-
-if [ "$IS_DARWIN" != true ]; then
-    test -e ~/.plenv || git clone https://github.com/tokuhirom/plenv.git ~/.plenv
-
-    # shellcheck source=bash_functions.sh
-    source ~/.bash_profile
-    test -e ~/.plenv/plugins/perl-build || git clone https://github.com/tokuhirom/Perl-Build.git ~/.plenv/plugins/perl-build/
+if [[ -d "$HOME/.plenv" ]]; then
+    cd "$HOME/.plenv" || exit 1
+    git from
+    cd - || exit 1
+else
+    git clone https://github.com/tokuhirom/plenv.git ~/.plenv
 fi
+
+# shellcheck source=bash_functions.sh
+source ~/.bash_profile
+test -e ~/.plenv/plugins/perl-build || git clone https://github.com/tokuhirom/Perl-Build.git ~/.plenv/plugins/perl-build/
 
 PERL_VERSION=5.34.0
 

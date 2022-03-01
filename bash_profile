@@ -27,6 +27,7 @@ if type brew &>/dev/null; then
   fi
 fi
 
+add_path "$HOME/.plenv/bin"
 if which plenv > /dev/null; then eval "$(plenv init -)"; fi
 
 if [[ -d ~/.rbenv ]]; then
