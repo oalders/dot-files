@@ -31,7 +31,7 @@ add_path "$HOME/.plenv/bin"
 if which plenv > /dev/null; then eval "$(plenv init -)"; fi
 
 if [[ -d ~/.rbenv ]]; then
-    export PATH="$HOME/.rbenv/bin:$PATH"
+    add_path "$HOME/.rbenv/bin"
     eval "$(rbenv init -)"
 fi
 
