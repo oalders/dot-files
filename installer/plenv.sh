@@ -10,7 +10,14 @@ fi
 
 # shellcheck source=bash_functions.sh
 source ~/.bash_profile
-test -e ~/.plenv/plugins/perl-build || git clone https://github.com/tokuhirom/Perl-Build.git ~/.plenv/plugins/perl-build/
+
+MY_PERL_BUILD_DIR="$HOME/.plenv/plugins/perl-build"
+if [[ -d $MY_PERL_BUILD_DIR ]]; then
+    cd "$MY_PERL_BUILD_DIR" || exit 1
+    git from
+else
+    git clone https://github.com/tokuhirom/Perl-Build.git "$MY_PERL_BUILD_DIR"
+fi
 
 PERL_VERSION=5.34.0
 
