@@ -32,8 +32,13 @@ if [[ ! $(which cpm) ]]; then
 fi
 
 if [ "$IS_DARWIN" = true ]; then
+    OPENSSL_PREFIX="/usr/local/Cellar/openssl@1.1/1.1.1m"
+    if [[ ! -e $OPENSSL_PREFIX ]]; then
+        echo "$OPENSSL_PREFIX does not exist"
+        exit 1
+    fi
     # Install Net::SSLeay on MacOS
-    export OPENSSL_PREFIX="/usr/local/Cellar/openssl@1.1/1.1.1g"
+    export OPENSSL_PREFIX
 fi
 
 cpm install -g --verbose --show-build-log-on-failure --cpanfile cpan/cli.cpanfile
