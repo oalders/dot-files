@@ -27,10 +27,6 @@ git clone git@github.com:oalders/alfred-metacpan-workflow.git
 cd alfred-metacpan-workflow && mkdir -p dist && make && open dist/metacpan-0.0.5.alfredworkflow
 wait_for_input
 
-wget https://github.com/fniephaus/alfred-homebrew/releases/download/v5.0/Homebrew-for-Alfred.alfredworkflow
-open Homebrew-for-Alfred.alfredworkflow
-wait_for_input
-
 wget https://github.com/ruedap/alfred-font-awesome-workflow/releases/download/v5.15.3.1/Font-Awesome.alfredworkflow
 open Font-Awesome.alfredworkflow
 
