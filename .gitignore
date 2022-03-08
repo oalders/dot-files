@@ -1,5 +1,6 @@
 brew/*.lock.json
 .DS_Store
+hammerspoon/Spoons/
 .pnp.*
 src/
 .tidyall.d/
