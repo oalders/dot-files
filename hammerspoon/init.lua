@@ -127,6 +127,13 @@ function xpasswd()
     end
 end
 
+hs.loadSpoon('SpoonInstall')
+spoon.SpoonInstall.use_syncinstall = true
+Install=spoon.SpoonInstall
+
+spoon.SpoonInstall:andUse('BingDaily')
+spoon.SpoonInstall:andUse('CircleClock')
+
 hs.hotkey.bind(my_hotkeys, 'a', cpanAuthorLink)
 hs.hotkey.bind(my_hotkeys, 'b', cpanDocumentationLink)
 hs.hotkey.bind(my_hotkeys, 'c', nil, open_app_action('Google Chrome'))
