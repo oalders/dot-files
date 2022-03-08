@@ -1,33 +1,30 @@
 #!/usr/bin/env bash
 
+set -eux
+
+cd /tmp
+
 # Alfred won't let you add multiple workflows at once
 wait_for_input() {
+    URL=$1
+    FILE=$2
+    rm -f "$2"
+
+    curl --location -O "$URL/$FILE"
+    open "$FILE"
+
     read -n 1 -s -r -p "Press any key to continue"
 }
 
-cd /tmp || exit 1
+wait_for_input 'https://github.com/deanishe/alfred-vpn-manager/releases/download/v3.2.0' 'VPN-Manager-3.2.alfredworkflow'
+wait_for_input 'https://github.com/gharlan/alfred-github-workflow/releases/download/v1.7.1' 'github.alfredworkflow'
+wait_for_input 'https://github.com/alexchantastic/alfred-ip-address-workflow/releases/download/v1.0.3' 'alfred-ip-address-workflow.alfredworkflow'
+wait_for_input 'https://github.com/mrodalgaard/alfred-network-workflow/releases/download/v1.1' 'Network.alfredworkflow'
+wait_for_input 'https://github.com/ruedap/alfred-font-awesome-workflow/releases/download/v5.15.3.1' 'Font-Awesome.alfredworkflow'
 
-wget https://github.com/deanishe/alfred-vpn-manager/releases/download/v3.2.0/VPN-Manager-3.2.alfredworkflow
-open VPN-Manager-3.2.alfredworkflow
-wait_for_input
-
-wget https://github.com/gharlan/alfred-github-workflow/releases/download/v1.7.1/github.alfredworkflow
-open github.alfredworkflow
-wait_for_input
-
-wget https://github.com/alexchantastic/alfred-ip-address-workflow/releases/download/v1.0.3/alfred-ip-address-workflow.alfredworkflow
-open alfred-ip-address-workflow.alfredworkflow
-wait_for_input
-
-wget https://github.com/mrodalgaard/alfred-network-workflow/releases/download/v1.1/Network.alfredworkflow
-open Network.alfredworkflow
-wait_for_input
-
-git clone git@github.com:oalders/alfred-metacpan-workflow.git
-cd alfred-metacpan-workflow && mkdir -p dist && make && open dist/metacpan-0.0.5.alfredworkflow
-wait_for_input
-
-wget https://github.com/ruedap/alfred-font-awesome-workflow/releases/download/v5.15.3.1/Font-Awesome.alfredworkflow
-open Font-Awesome.alfredworkflow
+REPO=alfred-metacpan-workflow
+rm -rf $REPO
+git clone "git@github.com:oalders/$REPO.git"
+cd $REPO && mkdir -p dist && make && open dist/metacpan-0.0.5.alfredworkflow
 
 exit 0
