@@ -12,6 +12,7 @@ if [[ $IS_DARWIN = true ]]; then
     time ./installer/homebrew-maintenance.sh || true
     ./installer/fonts.sh
     ./configure/dock.sh
+    ./installer/lua.sh
 fi
 
 ./installer/linux.sh
