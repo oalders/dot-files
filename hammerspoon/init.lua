@@ -13,8 +13,9 @@ local applescript_action = function(script)
     end
 end
 
-local function chrome_tab_action( url_substring, url_to_visit_if_tab_not_found )
-    return applescript_action([[
+local function chrome_tab_action(url_substring, url_to_visit_if_tab_not_found)
+    return applescript_action(
+        [[
 
       tell application "Google Chrome"
           activate
@@ -26,7 +27,9 @@ local function chrome_tab_action( url_substring, url_to_visit_if_tab_not_found )
               set theTabIndex to 0
               repeat with theTab in every tab of theWindow
                   set theTabIndex to theTabIndex + 1
-                  if theTab's URL contains "]] .. url_substring .. [[" then
+                  if theTab's URL contains "]] ..
+            url_substring ..
+                [[" then
                       set foundWindow to theWindow
                       set foundTabIndex to theTabIndex
                   end if
@@ -37,31 +40,37 @@ local function chrome_tab_action( url_substring, url_to_visit_if_tab_not_found )
               set foundWindow's active tab index to foundTabIndex
               set index of foundWindow to 1
           else
-              open location "]] .. url_to_visit_if_tab_not_found .. [["
+              open location "]] ..
+                    url_to_visit_if_tab_not_found .. [["
           end if
 
       end tell
 
-    ]])
+    ]]
+    )
 end
 
-hs.hotkey.bind(my_hotkeys, "r", function()
-  hs.reload()
-  hs.notify.new({title="Hammerspoon", informativeText="config reloaded"}):send()
-end)
+hs.hotkey.bind(
+    my_hotkeys,
+    "r",
+    function()
+        hs.reload()
+        hs.notify.new({title = "Hammerspoon", informativeText = "config reloaded"}):send()
+    end
+)
 
 local function currentSelection()
-   local elem=hs.uielement.focusedElement()
-   local sel=nil
-   if elem then
-      sel=elem:selectedText()
-   end
-   if (not sel) or (sel == "") then
-      hs.eventtap.keyStroke({"cmd"}, "c")
-      hs.timer.usleep(20000)
-      sel=hs.pasteboard.getContents()
-   end
-   return (sel or "")
+    local elem = hs.uielement.focusedElement()
+    local sel = nil
+    if elem then
+        sel = elem:selectedText()
+    end
+    if (not sel) or (sel == "") then
+        hs.eventtap.keyStroke({"cmd"}, "c")
+        hs.timer.usleep(20000)
+        sel = hs.pasteboard.getContents()
+    end
+    return (sel or "")
 end
 
 local function replaceIt(thing)
@@ -98,7 +107,7 @@ local function slackifyName()
         ph = "φ",
         t = "τ",
         th = "θ",
-        v = "φ",
+        v = "φ"
     }
     for key, value in pairs(greek) do
         name = name:gsub(key, value)
@@ -124,37 +133,40 @@ local function xpasswd()
     if rc == 0 then
         replaceIt(output)
     else
-        hs.notify.new({title="Hammerspoon", informativeText="xpasswd failed"}):send()
+        hs.notify.new({title = "Hammerspoon", informativeText = "xpasswd failed"}):send()
     end
 end
 
-hs.loadSpoon('SpoonInstall')
+hs.loadSpoon("SpoonInstall")
 spoon.SpoonInstall.use_syncinstall = true
-local Install=spoon.SpoonInstall
+local Install = spoon.SpoonInstall
 
-Install:andUse('BingDaily')
-Install:andUse('CircleClock')
-Install:andUse('LookupSelection', { hotkeys = { lexicon = { hyper, "d" } } } )
-Install:andUse("MicMute", {
-    hotkeys = {
-        toggle = { hyper, "m" }
+Install:andUse("BingDaily")
+Install:andUse("CircleClock")
+Install:andUse("LookupSelection", {hotkeys = {lexicon = {hyper, "d"}}})
+Install:andUse(
+    "MicMute",
+    {
+        hotkeys = {
+            toggle = {hyper, "m"}
+        }
     }
-})
+)
 
-local github = 'https://github.com/notifications'
-local gmail = 'https://mail.google.com/mail/u/0/'
-local ircCloud = 'https://www.irccloud.com/irc/'
-local PT = 'https://www.pivotaltracker.com'
+local github = "https://github.com/notifications"
+local gmail = "https://mail.google.com/mail/u/0/"
+local ircCloud = "https://www.irccloud.com/irc/"
+local PT = "https://www.pivotaltracker.com"
 
-hs.hotkey.bind(my_hotkeys, 'a', cpanAuthorLink)
-hs.hotkey.bind(my_hotkeys, 'b', cpanDocumentationLink)
-hs.hotkey.bind(my_hotkeys, 'c', nil, open_app_action('Google Chrome'))
-hs.hotkey.bind(my_hotkeys, 'g', nil, chrome_tab_action(gmail,gmail .. '#inbox'))
-hs.hotkey.bind(my_hotkeys, 'i', nil, open_app_action('wezterm'))
-hs.hotkey.bind(my_hotkeys, 'k', xpasswd)
-hs.hotkey.bind(my_hotkeys, 'l', nil, open_app_action('Slack'))
-hs.hotkey.bind(my_hotkeys, 'm', nil, chrome_tab_action('https://meet.google.com/',''))
-hs.hotkey.bind(my_hotkeys, 'n', nil, chrome_tab_action(github,github))
-hs.hotkey.bind(my_hotkeys, 'o', nil, chrome_tab_action(ircCloud,ircCloud .. 'magnet/channel/metacpan'))
-hs.hotkey.bind(my_hotkeys, 'p', nil, chrome_tab_action(PT,PT))
-hs.hotkey.bind(my_hotkeys, 'q', slackifyName)
+hs.hotkey.bind(my_hotkeys, "a", cpanAuthorLink)
+hs.hotkey.bind(my_hotkeys, "b", cpanDocumentationLink)
+hs.hotkey.bind(my_hotkeys, "c", nil, open_app_action("Google Chrome"))
+hs.hotkey.bind(my_hotkeys, "g", nil, chrome_tab_action(gmail, gmail .. "#inbox"))
+hs.hotkey.bind(my_hotkeys, "i", nil, open_app_action("wezterm"))
+hs.hotkey.bind(my_hotkeys, "k", xpasswd)
+hs.hotkey.bind(my_hotkeys, "l", nil, open_app_action("Slack"))
+hs.hotkey.bind(my_hotkeys, "m", nil, chrome_tab_action("https://meet.google.com/", ""))
+hs.hotkey.bind(my_hotkeys, "n", nil, chrome_tab_action(github, github))
+hs.hotkey.bind(my_hotkeys, "o", nil, chrome_tab_action(ircCloud, ircCloud .. "magnet/channel/metacpan"))
+hs.hotkey.bind(my_hotkeys, "p", nil, chrome_tab_action(PT, PT))
+hs.hotkey.bind(my_hotkeys, "q", slackifyName)
