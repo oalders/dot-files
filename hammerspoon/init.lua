@@ -134,6 +134,7 @@ Install=spoon.SpoonInstall
 
 spoon.SpoonInstall:andUse('BingDaily')
 spoon.SpoonInstall:andUse('CircleClock')
+spoon.SpoonInstall:andUse('LookupSelection', { hotkeys = { lexicon = { hyper, "d" } } } )
 
 hs.hotkey.bind(my_hotkeys, 'a', cpanAuthorLink)
 hs.hotkey.bind(my_hotkeys, 'b', cpanDocumentationLink)
