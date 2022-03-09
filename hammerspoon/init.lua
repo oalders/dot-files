@@ -175,6 +175,17 @@ Install:andUse(
                             hs.alert.show("CPAN Repo lookup failed")
                         end
                     end
+                },
+                ["Dad Jokes"] = {
+                    keyword = "dj",
+                    fn = function()
+                        local content, _, _, rc = hs.execute("curl https://icanhazdadjoke.com", false)
+                        if rc ~= 0 then
+                            hs.alert.show("No dad joke for you")
+                        else
+                            hs.eventtap.keyStrokes(content)
+                        end
+                    end
                 }
             }
             s:refreshAllCommands()
