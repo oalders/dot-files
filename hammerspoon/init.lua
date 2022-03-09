@@ -152,6 +152,36 @@ Install:andUse(
         }
     }
 )
+Install:andUse(
+    "Seal",
+    {
+        hotkeys = {show = {hyper, "space"}},
+        fn = function(s)
+            s:loadPlugins(
+                {
+                    "apps",
+                    "calc",
+                    "safari_bookmarks",
+                    "screencapture",
+                    "useractions"
+                }
+            )
+            s.plugins.useractions.actions = {
+                ["CPAN Repo"] = {
+                    keyword = "cr",
+                    fn = function(str)
+                        local _, _, _, rc = hs.execute("cpan-repo " .. str, true)
+                        if rc ~= 0 then
+                            hs.alert.show("CPAN Repo lookup failed")
+                        end
+                    end
+                }
+            }
+            s:refreshAllCommands()
+        end,
+        start = true
+    }
+)
 
 local github = "https://github.com/notifications"
 local gmail = "https://mail.google.com/mail/u/0/"
