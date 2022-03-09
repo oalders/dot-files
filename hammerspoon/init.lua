@@ -1,19 +1,19 @@
 local my_hotkeys = {"shift", "cmd"}
-hyper = {"ctrl", "alt", "cmd", "shift"}
+local hyper = {"ctrl", "alt", "cmd", "shift"}
 
-open_app_action = function(name)
+local open_app_action = function(name)
     return function()
         hs.application.launchOrFocus(name)
     end
 end
 
-applescript_action = function(script)
+local applescript_action = function(script)
     return function()
         hs.osascript.applescript(script)
     end
 end
 
-function chrome_tab_action( url_substring, url_to_visit_if_tab_not_found )
+local function chrome_tab_action( url_substring, url_to_visit_if_tab_not_found )
     return applescript_action([[
 
       tell application "Google Chrome"
@@ -50,7 +50,7 @@ hs.hotkey.bind(my_hotkeys, "r", function()
   hs.notify.new({title="Hammerspoon", informativeText="config reloaded"}):send()
 end)
 
-function currentSelection()
+local function currentSelection()
    local elem=hs.uielement.focusedElement()
    local sel=nil
    if elem then
@@ -64,13 +64,19 @@ function currentSelection()
    return (sel or "")
 end
 
+local function replaceIt(thing)
+    hs.pasteboard.setContents(thing)
+    hs.timer.usleep(20000)
+    hs.eventtap.keyStroke({"cmd"}, "v")
+end
+
 -- Transform names via an inexact, but hopefully readable, substitution of
 -- Greek letters. This allows me to use names in Slack without highlighting the
 -- person in question.
 -- Borrowed from https://nikhilism.com/post/2021/useful-hammerspoon-tips/
-function slackifyName()
-    name = currentSelection()
-    greek = {
+local function slackifyName()
+    local name = currentSelection()
+    local greek = {
         a = "α",
         b = "β",
         d = "δ",
@@ -101,26 +107,20 @@ function slackifyName()
     replaceIt(name)
 end
 
-function cpanAuthorLink()
-    name = currentSelection()
+local function cpanAuthorLink()
+    local name = currentSelection()
     name = string.format("[%s](https://metacpan.org/author/%s)", name, name)
     replaceIt(name)
 end
 
-function cpanDocumentationLink()
-    name = currentSelection()
+local function cpanDocumentationLink()
+    local name = currentSelection()
     name = string.format("[%s](https://metacpan.org/pod/%s)", name, name)
     replaceIt(name)
 end
 
-function replaceIt(thing)
-    hs.pasteboard.setContents(thing)
-    hs.timer.usleep(20000)
-    hs.eventtap.keyStroke({"cmd"}, "v")
-end
-
-function xpasswd()
-    local output, status, type, rc = hs.execute("xpasswd", true)
+local function xpasswd()
+    local output, _, _, rc = hs.execute("xpasswd", true)
     if rc == 0 then
         replaceIt(output)
     else
@@ -130,26 +130,31 @@ end
 
 hs.loadSpoon('SpoonInstall')
 spoon.SpoonInstall.use_syncinstall = true
-Install=spoon.SpoonInstall
+local Install=spoon.SpoonInstall
 
-spoon.SpoonInstall:andUse('BingDaily')
-spoon.SpoonInstall:andUse('CircleClock')
-spoon.SpoonInstall:andUse('LookupSelection', { hotkeys = { lexicon = { hyper, "d" } } } )
+Install:andUse('BingDaily')
+Install:andUse('CircleClock')
+Install:andUse('LookupSelection', { hotkeys = { lexicon = { hyper, "d" } } } )
 Install:andUse("MicMute", {
     hotkeys = {
         toggle = { hyper, "m" }
     }
 })
 
+local github = 'https://github.com/notifications'
+local gmail = 'https://mail.google.com/mail/u/0/'
+local ircCloud = 'https://www.irccloud.com/irc/'
+local PT = 'https://www.pivotaltracker.com'
+
 hs.hotkey.bind(my_hotkeys, 'a', cpanAuthorLink)
 hs.hotkey.bind(my_hotkeys, 'b', cpanDocumentationLink)
 hs.hotkey.bind(my_hotkeys, 'c', nil, open_app_action('Google Chrome'))
-hs.hotkey.bind(my_hotkeys, 'g', nil, chrome_tab_action('mail.google.com/mail/u/0','https://mail.google.com/mail/u/0/#inbox'))
+hs.hotkey.bind(my_hotkeys, 'g', nil, chrome_tab_action(gmail,gmail .. '#inbox'))
 hs.hotkey.bind(my_hotkeys, 'i', nil, open_app_action('wezterm'))
 hs.hotkey.bind(my_hotkeys, 'k', xpasswd)
 hs.hotkey.bind(my_hotkeys, 'l', nil, open_app_action('Slack'))
 hs.hotkey.bind(my_hotkeys, 'm', nil, chrome_tab_action('https://meet.google.com/',''))
-hs.hotkey.bind(my_hotkeys, 'n', nil, chrome_tab_action('https://github.com/notifications','https://github.com/notifications'))
-hs.hotkey.bind(my_hotkeys, 'o', nil, chrome_tab_action('https://www.irccloud.com/irc/','https://www.irccloud.com/irc/magnet/channel/metacpan'))
-hs.hotkey.bind(my_hotkeys, 'p', nil, chrome_tab_action('https://www.pivotaltracker.com/','https://www.pivotaltracker.com/'))
+hs.hotkey.bind(my_hotkeys, 'n', nil, chrome_tab_action(github,github))
+hs.hotkey.bind(my_hotkeys, 'o', nil, chrome_tab_action(ircCloud,ircCloud .. 'magnet/channel/metacpan'))
+hs.hotkey.bind(my_hotkeys, 'p', nil, chrome_tab_action(PT,PT))
 hs.hotkey.bind(my_hotkeys, 'q', slackifyName)
