@@ -1,4 +1,5 @@
 local my_hotkeys = {"shift", "cmd"}
+hyper = {"ctrl", "alt", "cmd", "shift"}
 
 open_app_action = function(name)
     return function()
