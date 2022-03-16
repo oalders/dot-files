@@ -28,5 +28,5 @@ if (has("termguicolors"))
   set termguicolors
 endif
 
-nnoremap <silent>[b :BufferLineCycleNext<CR>
-nnoremap <silent>]b :BufferLineCyclePrev<CR>
+nnoremap <silent>]b :BufferLineCycleNext<CR>
+nnoremap <silent>[b :BufferLineCyclePrev<CR>
