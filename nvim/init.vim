@@ -18,9 +18,15 @@ require'nvim-treesitter.configs'.setup {
     additional_vim_regex_highlighting = false,
   },
 }
+
+vim.opt.termguicolors = true
+require("bufferline").setup{}
 EOF
 
 " https://github.com/mhartington/oceanic-next#installation
 if (has("termguicolors"))
   set termguicolors
 endif
+
+nnoremap <silent>[b :BufferLineCycleNext<CR>
+nnoremap <silent>]b :BufferLineCyclePrev<CR>

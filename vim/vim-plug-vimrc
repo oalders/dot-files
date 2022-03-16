@@ -46,6 +46,9 @@ Plug 'yko/mojo.vim'
 if has('nvim')
   Plug 'nvim-treesitter/nvim-treesitter', { 'do': ':TSUpdate'}  " We recommend updating the parsers on update
   Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
+
+  Plug 'akinsho/bufferline.nvim'
+  Plug 'kyazdani42/nvim-web-devicons' " Recommended (for coloured icons for bufferline.nvim)
 else
   Plug 'Shougo/deoplete.nvim'
   Plug 'roxma/nvim-yarp'
