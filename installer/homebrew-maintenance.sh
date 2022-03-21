@@ -7,6 +7,7 @@ source ~/dot-files/bash_functions.sh
 
 set -x
 
+brew remove ansible
 brew remove bats
 brew remove bison
 brew remove diff-so-fancy

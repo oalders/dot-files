@@ -23,4 +23,9 @@ pip_install() {
 
 pip_install "pip3" "pip/pip3-requirements.txt"
 
+if [ "$IS_DARWIN" = true ]; then
+    /usr/local/opt/python@3.9/bin/python3.9 -m pip install --upgrade pip
+    pip3 install ansible
+fi
+
 exit 0
