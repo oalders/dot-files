@@ -2,6 +2,8 @@
 # shellcheck shell=bash
 # shellcheck disable=SC1090
 
+alias python="python3"
+
 # Reset PATH to keep it from being clobbered in tmux
 # https://github.com/dmend/dotfiles/blob/master/.bash_profile#L3-L7
 if [ -x /usr/libexec/path_helper ]; then
