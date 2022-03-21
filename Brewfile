@@ -7,7 +7,6 @@ tap "nektos/tap"
 tap "neovim/neovim"
 tap "universal-ctags/universal-ctags"
 tap "wez/wezterm"
-brew "ansible", link: false
 brew "aria2"
 brew "asciinema"
 brew "aspell"
