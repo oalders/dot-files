@@ -32,7 +32,7 @@ if [[ ! $(which cpm) ]]; then
 fi
 
 if [ "$IS_DARWIN" = true ]; then
-    OPENSSL_PREFIX="/usr/local/Cellar/openssl@1.1/1.1.1m"
+    OPENSSL_PREFIX="/usr/local/Cellar/openssl@1.1/1.1.1n"
     if [[ ! -e $OPENSSL_PREFIX ]]; then
         echo "$OPENSSL_PREFIX does not exist"
         exit 1
