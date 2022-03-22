@@ -11,7 +11,9 @@ if [[ $IS_DARWIN = true ]]; then
     ./installer/wezterm.sh
     time ./installer/homebrew-maintenance.sh || true
     ./installer/fonts.sh
-    ./configure/dock.sh
+
+    # https://github.com/kcrawford/dockutil/issues/127
+    #./configure/dock.sh
     ./installer/lua.sh
 fi
 
