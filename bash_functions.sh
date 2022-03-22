@@ -60,7 +60,7 @@ fi
 
 # posh handling
 posh_me() {
-    eval "$(oh-my-posh --init --shell bash --config ~/.config/oh-my-posh/themes/"${MY_POSH_THEME}".omp.json)"
+    eval "$(oh-my-posh prompt init bash --config ~/.config/oh-my-posh/themes/"${MY_POSH_THEME}".omp.json)"
 }
 
 toggle_posh() {
