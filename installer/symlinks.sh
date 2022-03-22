@@ -29,6 +29,7 @@ ln -sf $PREFIX/dataprinter ~/.dataprinter
 ln -sf $PREFIX/digrc ~/.digrc
 ln -sf $PREFIX/gitignore_global ~/.gitignore_global
 ln -sf $PREFIX/golangci.yml ~/.golangci.yml
+ln -sf $PREFIX/inputrc ~/.inputrc
 ln -sf $PREFIX/minicpanrc ~/.minicpanrc
 ln -sf $PREFIX/nvim/init.vim ~/.config/nvim/init.vim
 ln -sf $PREFIX/oh-my-posh/themes/local.omp.json ~/.config/oh-my-posh/themes/local.omp.json
