@@ -1,0 +1,36 @@
+#!/bin/bash
+
+set -x
+
+if [ $# -ne 1 ]; then
+    echo "Usage: remove-worktree branch-name"
+    exit
+fi
+
+BRANCH_NAME=$1
+STRIP="oalders/"
+
+shift
+echo "$BRANCH_NAME"
+
+if [[ -n $TMUX ]]; then
+    echo "Detach from your tmux session before running this command"
+    exit
+fi
+
+# If we can't kill the tmux session, then that's ok. It may just not exist.
+if [[ -n $(pgrep tmux) ]]; then
+    # tmux session name will be the git branch name
+    TMUX_SESSION_NAME=${BRANCH_NAME/$STRIP/}
+    tmux kill-session -t "$TMUX_SESSION_NAME"
+fi
+
+# exit() on failures from this point forward
+set -e
+
+# We need to be inside the repository in order to remove the worktree.
+GIT_DIR=$(git rev-parse --git-common-dir)
+cd "$GIT_DIR/.." || exit 1
+
+git worktree remove "$@" "$BRANCH_NAME"
+git branch -D "$@" "$BRANCH_NAME"

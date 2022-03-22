@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
-# If a machine can't fetch from github, we can copy stuff over from an installed set of dot files
+# If a machine can't fetch from github, we can copy stuff over from an
+# installed set of dot files
 
 if [ $# -eq 0 ]; then
     echo "Usage: sync-files.sh example.com"

@@ -12,6 +12,7 @@ mkdir -p ~/.config/oh-my-posh/themes
 mkdir -p ~/.config/wezterm
 mkdir -p ~/.config/yamllint
 mkdir -p ~/.cpanreporter
+mkdir -p ~/local/bin
 mkdir -p ~/.npm-packages
 mkdir -p ~/.re.pl
 
@@ -62,5 +63,8 @@ fi
 if [ $IS_MM = false ]; then
     ln -sf $PREFIX/npmrc ~/.npmrc
 fi
+
+ln -sf $PREFIX/bin/add-worktree "$HOME/local/bin/add-worktree"
+ln -sf $PREFIX/bin/remove-worktree "$HOME/local/bin/remove-worktree"
 
 exit 0
