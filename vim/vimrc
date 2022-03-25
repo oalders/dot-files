@@ -410,6 +410,12 @@ highlight Comment cterm=italic gui=italic term=bold
 set t_ZH=[3m
 set t_ZR=[23m
 
+" Add spaces after comment delimiters by default
+let g:NERDSpaceDelims = 1
+
+" Allow commenting and inverting empty lines (useful when commenting a region)
+let g:NERDCommentEmptyLines = 1
+
 " 'luochen1990/rainbow'
 let g:rainbow_active = 1 "set to 0 if you want to enable it later via :RainbowToggle
 
