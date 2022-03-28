@@ -10,10 +10,10 @@
           "leading_diamond": "\ue0b6",
           "properties": {
             "display_host": true,
-            "display_user": false,
-            "template": " {{ if .SSHSession }}\uf817 {{ end }}{{ .HostName }} "
+            "display_user": false
           },
           "style": "diamond",
+          "template": " {{ if .SSHSession }}\uf817 {{ end }}{{ .HostName }} ",
           "trailing_diamond": "\ue0b0",
           "type": "session"
         },
@@ -24,10 +24,10 @@
           "properties": {
             "folder_separator_icon": " \ue0b1 ",
             "home_icon": "~",
-            "style": "folder",
-            "template": " \uf74a  {{ .Path }} "
+            "style": "folder"
           },
           "style": "powerline",
+          "template": " \uf74a  {{ .Path }} ",
           "type": "path"
         },
         {
@@ -44,10 +44,10 @@
             "fetch_stash_count": true,
             "fetch_status": true,
             "fetch_upstream_icon": true,
-            "fetch_worktree_count": false,
-            "template": " {{ .HEAD }} {{ .BranchStatus }}{{ if .Working.Changed }} \uf044 {{ .Working.String }}{{ end }}{{ if and (.Staging.Changed) (.Working.Changed) }} |{{ end }}{{ if .Staging.Changed }} \uf046 {{ .Staging.String }}{{ end }}{{ if gt .StashCount 0}}\uf692 {{ .StashCount }}{{ end }}{{ if gt .WorktreeCount 0}} \uf1bb {{ .WorktreeCount }}{{ end }} "
+            "fetch_worktree_count": false
           },
           "style": "powerline",
+          "template": " {{ .HEAD }} {{ .BranchStatus }}{{ if .Working.Changed }} \uf044 {{ .Working.String }}{{ end }}{{ if and (.Staging.Changed) (.Working.Changed) }} |{{ end }}{{ if .Staging.Changed }} \uf046 {{ .Staging.String }}{{ end }}{{ if gt .StashCount 0}}\uf692 {{ .StashCount }}{{ end }}{{ if gt .WorktreeCount 0}} \uf1bb {{ .WorktreeCount }}{{ end }} ",
           "type": "git"
         },
         {
@@ -55,10 +55,10 @@
           "foreground": "#111111",
           "powerline_symbol": "\ue0b0",
           "properties": {
-            "fetch_version": true,
-            "template": " \ue626 {{ if .Error }}{{ .Error }}{{ else }}{{ .Full }}{{ end }} "
+            "fetch_version": true
           },
           "style": "powerline",
+          "template": " \ue626 {{ if .Error }}{{ .Error }}{{ else }}{{ .Full }}{{ end }} ",
           "type": "go"
         },
         {
@@ -68,10 +68,10 @@
           "properties": {
             "display_mode": "files",
             "fetch_version": true,
-            "fetch_virtual_env": false,
-            "template": " \ue235 {{ if .Error }}{{ .Error }}{{ else }}{{ if .Venv }}{{ .Venv }} {{ end }}{{ .Full }}{{ end }} "
+            "fetch_virtual_env": false
           },
           "style": "powerline",
+          "template": " \ue235 {{ if .Error }}{{ .Error }}{{ else }}{{ if .Venv }}{{ .Venv }} {{ end }}{{ .Full }}{{ end }} ",
           "type": "python"
         },
         {
@@ -80,10 +80,10 @@
           "powerline_symbol": "\ue0b0",
           "properties": {
             "display_mode": "files",
-            "fetch_version": true,
-            "template": " \ue791 {{ if .Error }}{{ .Error }}{{ else }}{{ .Full }}{{ end }} "
+            "fetch_version": true
           },
           "style": "powerline",
+          "template": " \ue791 {{ if .Error }}{{ .Error }}{{ else }}{{ .Full }}{{ end }} ",
           "type": "ruby"
         },
         {
@@ -91,20 +91,20 @@
           "foreground": "#111111",
           "powerline_symbol": "\ue0b0",
           "properties": {
-            "root_icon": "\uf0ad",
-            "template": " \uf0e7 "
+            "root_icon": "\uf0ad"
           },
           "style": "powerline",
+          "template": " \uf0e7 ",
           "type": "root"
         },
         {
           "background": "#83769c",
           "foreground": "#193549",
           "properties": {
-            "always_enabled": true,
-            "template": "<transparent>\ue0b0</> \ufa1e{{ .FormattedMs }}\u2800"
+            "always_enabled": true
           },
           "style": "plain",
+          "template": "<transparent>\ue0b0</> \ufa1e{{ .FormattedMs }}\u2800",
           "type": "executiontime"
         },
         {
@@ -114,10 +114,10 @@
           ],
           "foreground": "#193549",
           "properties": {
-            "always_enabled": true,
-            "template": "<#83769c>\ue0b0</> \u2665 "
+            "always_enabled": true
           },
           "style": "diamond",
+          "template": "<#83769c>\ue0b0</> \u2665 ",
           "trailing_diamond": "\ue0b4",
           "type": "exit"
         }
@@ -126,5 +126,5 @@
     }
   ],
   "final_space": true,
-  "version": 1
+  "version": 2
 }
