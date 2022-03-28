@@ -43,6 +43,7 @@ rm -rf ~/.vim/Trashed-Bundles ~/.vim/bundle
 
 rm -f ~/.vimrc
 ln -sf $PREFIX/vim/vim-plug-vimrc ~/.vimrc
+vim +'PlugClean' +qa
 vim +'PlugInstall --sync' +qa
 vim +'PlugUpdate --sync' +qa
 rm ~/.vimrc
