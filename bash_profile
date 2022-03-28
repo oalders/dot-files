@@ -66,4 +66,6 @@ export NVM_DIR="$HOME/.nvm"
 
 if [ "$IS_DARWIN" = true ]; then
     export CLOUDSDK_PYTHON=python3
+    # Open command line in editor
+    bind "\C-e":edit-and-execute-command
 fi
