@@ -68,6 +68,8 @@ let g:lightline.active = {
 highlight clear LineNr
 highlight clear SignColumn
 
+:nnoremap <leader>sv :source $MYVIMRC<cr>
+
 " Display number of matches for a search, with index. eg: [2/5]
 set shortmess-=S
 
