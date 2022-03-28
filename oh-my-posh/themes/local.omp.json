@@ -7,10 +7,8 @@
         {
           "background": "#4C566A",
           "foreground": "#88C0D0",
-          "properties": {
-            "template": " {{ if .WSL }}WSL at {{ end }}{{.Icon}} "
-          },
           "style": "powerline",
+          "template": " {{ if .WSL }}WSL at {{ end }}{{.Icon}} ",
           "type": "os"
         },
         {
@@ -20,10 +18,10 @@
           "properties": {
             "folder_separator_icon": " \ue0b1 ",
             "home_icon": "~",
-            "style": "folder",
-            "template": " \uf74a  {{ .Path }} "
+            "style": "folder"
           },
           "style": "powerline",
+          "template": " \uf74a  {{ .Path }} ",
           "type": "path"
         },
         {
@@ -40,10 +38,10 @@
             "fetch_stash_count": true,
             "fetch_status": true,
             "fetch_upstream_icon": true,
-            "fetch_worktree_count": false,
-            "template": " {{ .HEAD }} {{ .BranchStatus }}{{ if .Working.Changed }} \uf044 {{ .Working.String }}{{ end }}{{ if and (.Staging.Changed) (.Working.Changed) }} |{{ end }}{{ if .Staging.Changed }} \uf046 {{ .Staging.String }}{{ end }}{{ if gt .StashCount 0}}\uf692 {{ .StashCount }}{{ end }}{{ if gt .WorktreeCount 0}} \uf1bb {{ .WorktreeCount }}{{ end }} "
+            "fetch_worktree_count": false
           },
           "style": "powerline",
+          "template": " {{ .HEAD }} {{ .BranchStatus }}{{ if .Working.Changed }} \uf044 {{ .Working.String }}{{ end }}{{ if and (.Staging.Changed) (.Working.Changed) }} |{{ end }}{{ if .Staging.Changed }} \uf046 {{ .Staging.String }}{{ end }}{{ if gt .StashCount 0}}\uf692 {{ .StashCount }}{{ end }}{{ if gt .WorktreeCount 0}} \uf1bb {{ .WorktreeCount }}{{ end }} ",
           "type": "git"
         },
         {
@@ -51,20 +49,20 @@
           "foreground": "#111111",
           "powerline_symbol": "\ue0b0",
           "properties": {
-            "root_icon": "\uf0ad",
-            "template": " \uf0e7 "
+            "root_icon": "\uf0ad"
           },
           "style": "powerline",
+          "template": " \uf0e7 ",
           "type": "root"
         },
         {
           "background": "#83769c",
           "foreground": "#193549",
           "properties": {
-            "always_enabled": true,
-            "template": "<transparent>\ue0b0</> \ufa1e{{ .FormattedMs }}\u2800"
+            "always_enabled": true
           },
           "style": "plain",
+          "template": "<transparent>\ue0b0</> \ufa1e{{ .FormattedMs }}\u2800",
           "type": "executiontime"
         },
         {
@@ -74,10 +72,10 @@
           ],
           "foreground": "#193549",
           "properties": {
-            "always_enabled": true,
-            "template": "<#83769c>\ue0b0</> \u2665 "
+            "always_enabled": true
           },
           "style": "diamond",
+          "template": "<#83769c>\ue0b0</> \u2665 ",
           "trailing_diamond": "\ue0b4",
           "type": "exit"
         }
@@ -86,5 +84,5 @@
     }
   ],
   "final_space": true,
-  "version": 1
+  "version": 2
 }
