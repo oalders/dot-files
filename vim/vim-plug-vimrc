@@ -32,7 +32,8 @@ Plug 'rodjek/vim-puppet', { 'for': 'puppet' } " Formatting, syntax highlighting 
 Plug 'rust-lang/rust.vim'
 Plug 'ryanpcmcquen/fix-vim-pasting' " Automatically set paste mode when inserting via insert mode
 Plug 'preservim/nerdcommenter'
-Plug 'sheerun/vim-polyglot'
+" Plug 'sheerun/vim-polyglot'
+Plug 'oalders/vim-polyglot'
 Plug 'skaji/syntax-check-perl'
 Plug 'tpope/vim-abolish'
 Plug 'tpope/vim-eunuch'
