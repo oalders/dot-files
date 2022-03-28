@@ -37,11 +37,15 @@ if [[ -d ~/.rbenv ]]; then
     eval "$(rbenv init -)"
 fi
 
+GCLOUD_COMPLETION="/usr/local/Caskroom/google-cloud-sdk/latest/google-cloud-sdk/completion.bash.inc"
+GCLOUD_BASH="/usr/local/Caskroom/google-cloud-sdk/latest/google-cloud-sdk/path.bash.inc"
+
 # The next line updates PATH for the Google Cloud SDK.
-if [ -f '/Users/olaf/maxmind/google-cloud-sdk/path.bash.inc' ]; then . '/Users/olaf/maxmind/google-cloud-sdk/path.bash.inc'; fi
+if [ -f $GCLOUD_BASH ]; then . $GCLOUD_BASH; fi
 
 # The next line enables shell command completion for gcloud.
-if [ -f '/Users/olaf/maxmind/google-cloud-sdk/completion.bash.inc' ]; then . '/Users/olaf/maxmind/google-cloud-sdk/completion.bash.inc'; fi
+if [ -f $GCLOUD_COMPLETION ]; then . $GCLOUD_COMPLETION; fi
+
 GPG_TTY=$(tty)
 export GPG_TTY
 
