@@ -2,8 +2,8 @@
 
 set -x
 
-if [ $# -ne 1 ]; then
-    echo "Usage: remove-worktree branch-name"
+if [[ $# -eq "0" || $# -gt "2" ]]; then
+    echo "Usage: remove-worktree [-f] branch-name"
     exit
 fi
 
