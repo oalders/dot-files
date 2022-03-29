@@ -36,6 +36,7 @@ fi
 
 if [[ $IS_GITHUB = false ]]; then
     nvim +'PlugInstall --sync' +qa
+    nvim +'PlugUpdate --sync' +qa
 fi
 
 echo "done nvim install"
