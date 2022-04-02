@@ -7,7 +7,7 @@ my $filename = $ENV{PERL_SYNTAX_CHECK_FILENAME} || q{};
 my $config = {
     compile => {
         inc => { libs => [ 'lib', 't/lib' ], replace_default_libs => 0, },
-        use_module => ['lazy'],
+        # use_module => ['lazy'],
     },
 };
 return $config;
