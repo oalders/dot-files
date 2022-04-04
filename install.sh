@@ -13,7 +13,8 @@ if [[ $IS_DARWIN = true ]]; then
     ./installer/fonts.sh
 
     # https://github.com/kcrawford/dockutil/issues/127
-    #./configure/dock.sh
+    ./installer/dockutil.sh
+    ./configure/dock.sh
     ./installer/lua.sh
 fi
 
