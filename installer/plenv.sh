@@ -1,10 +1,12 @@
 #!/usr/bin/env bash
 
-if [[ -d "$HOME/.plenv" ]]; then
+if [[ -d "$HOME/.plenv/.git" ]]; then
     cd "$HOME/.plenv" || exit 1
     git from
     cd - || exit 1
 else
+    # Might be an older install not using a Git checkout
+    rm -rf "$HOME/.plenv"
     git clone https://github.com/tokuhirom/plenv.git ~/.plenv
 fi
 
