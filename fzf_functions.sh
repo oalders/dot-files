@@ -1,9 +1,23 @@
+#!/bin/bash
+
 # Keep fzf config and functions together
 export FZF_DEFAULT_COMMAND='fd --type f --hidden --follow --exclude .git'
 export FZF_DEFAULT_OPTS='--multi --pointer ">>"'
 
 f() {
     fzf --bind='ctrl-/:toggle-preview' --preview "bat --style=numbers --color=always --line-range :500 {}" "$@"
+}
+
+gw() {
+    MY_XARGS_OPTIONS="--no-run-if-empty"
+    if [[ $IS_DARWIN = true ]]; then
+        MY_XARGS_OPTIONS=""
+    fi
+
+    # Get list of worktrees and strip it down to the branch name
+    # [oalders/branch-name], which should generally also correspond to the tmux
+    # session name.
+    git worktree list | fzf | sed -rn 's/.*\[(.*)\]/\1/gp' | xargs $MY_XARGS_OPTIONS remove-worktree
 }
 
 # Can't add this as a fzf completion for tmux as I need tmux itself to get a
