@@ -264,6 +264,7 @@ autocmd BufEnter .yath.rc         :setlocal filetype=dosini
 autocmd BufEnter .yath.user.rc    :setlocal filetype=dosini
 
 " Treat Perl Mojo templates (mostly) like HTML
+autocmd BufRead,BufNewFile *.gohtml   set filetype=html
 autocmd BufRead,BufNewFile *.html.ep  set filetype=html
 autocmd BufRead,BufNewFile *.html.epl set filetype=html
 autocmd BufRead,BufNewFile *.tmpl     set filetype=html
