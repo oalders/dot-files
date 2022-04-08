@@ -8,5 +8,5 @@ future
 neovim
 pynvim
 sqlparse
-vint
+vim-vint
 yamllint
