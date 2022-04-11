@@ -349,6 +349,9 @@ vnoremap <silent> uu :s/\%V\-/_/g<cr>
 " Change underscores to hyphens
 vnoremap <silent> hh :s/\%V_/-/g<cr>
 
+" Change double quotes to single quotes
+vnoremap <silent> '' :s/\%V"/'/g<cr>
+
 " https://github.com/roxma/vim-hug-neovim-rpc/issues/28
 set pyxversion=3
 let g:python_host_prog = "/usr/bin/python2"
