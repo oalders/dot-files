@@ -3,7 +3,7 @@ let g:polyglot_disabled = ['go', 'perl']
 
 source ~/.vim/vim-plug-vimrc
 
-let g:mapleader = ","
+let g:mapleader = ','
 
 syntax enable
 set background=dark
@@ -192,11 +192,11 @@ map <leader>t :call TidyAll()<cr>
 nnoremap <leader>ot :call OT(input("ot: ", "", "file"))<cr>
 
 function! OT(fname)
-    let res = system("ot --editor vim --print " . shellescape(a:fname))
+    let res = system('ot --editor vim --print ' . shellescape(a:fname))
     if v:shell_error
         echo "\n" . res
     else
-        execute "e " res
+        execute 'e ' res
     endif
     call histadd(':', printf('call OT("%s")', escape(a:fname, '"\')))
 endfunction
@@ -303,7 +303,7 @@ endfun
 " Set line markers to make indentation easier in Mojo templates
 " Enable via :call ShowLines()
 fun ShowLines()
-    if &ft ==# "html"
+    if &filetype ==# 'html'
         :set colorcolumn=5,9,13,17,21,25,29
     else
         :set colorcolumn=78
@@ -354,8 +354,8 @@ vnoremap <silent> '' :s/\%V"/'/g<cr>
 
 " https://github.com/roxma/vim-hug-neovim-rpc/issues/28
 set pyxversion=3
-let g:python_host_prog = "/usr/bin/python2"
-let g:python3_host_prog = "/usr/bin/python3"
+let g:python_host_prog = '/usr/bin/python2'
+let g:python3_host_prog = '/usr/bin/python3'
 let g:deoplete#enable_at_startup = 0
 let g:deoplete#auto_complete_start_length = 5
 
