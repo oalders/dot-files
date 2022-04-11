@@ -31,11 +31,11 @@ parser_config.perl = {
 }
 
 vim.opt.termguicolors = true
-require("bufferline").setup{}
+require('bufferline').setup{}
 EOF
 
 " https://github.com/mhartington/oceanic-next#installation
-if (has("termguicolors"))
+if (has('termguicolors'))
   set termguicolors
 endif
 
