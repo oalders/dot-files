@@ -255,34 +255,39 @@ let g:ale_writegood_options = '--no-passive'
 "highlight clear ALEErrorSign
 "highlight clear ALEWarningSign
 
+" define a group `vimrc` and initialize.
+augroup vimrc
+  autocmd!
+augroup END
+
 " ########### Set File Types ###########
 "
-autocmd BufEnter .vim-plug-vimrc  :setlocal filetype=vim
+autocmd vimrc BufEnter .vim-plug-vimrc  :setlocal filetype=vim
 
 " syntax highlighting for some Perl utility rc files
-autocmd BufEnter cpanfile         :setlocal filetype=perl
-autocmd BufEnter .perlcriticrc    :setlocal filetype=dosini
-autocmd BufEnter .tidyallrc       :setlocal filetype=dosini
-autocmd BufEnter .yath.rc         :setlocal filetype=dosini
-autocmd BufEnter .yath.user.rc    :setlocal filetype=dosini
+autocmd vimrc BufEnter cpanfile         :setlocal filetype=perl
+autocmd vimrc BufEnter .perlcriticrc    :setlocal filetype=dosini
+autocmd vimrc BufEnter .tidyallrc       :setlocal filetype=dosini
+autocmd vimrc BufEnter .yath.rc         :setlocal filetype=dosini
+autocmd vimrc BufEnter .yath.user.rc    :setlocal filetype=dosini
 
 " Treat Perl Mojo templates (mostly) like HTML
-autocmd BufRead,BufNewFile *.gohtml   set filetype=html
-autocmd BufRead,BufNewFile *.html.ep  set filetype=html
-autocmd BufRead,BufNewFile *.html.epl set filetype=html
-autocmd BufRead,BufNewFile *.tmpl     set filetype=html
+autocmd vimrc BufRead,BufNewFile *.gohtml   set filetype=html
+autocmd vimrc BufRead,BufNewFile *.html.ep  set filetype=html
+autocmd vimrc BufRead,BufNewFile *.html.epl set filetype=html
+autocmd vimrc BufRead,BufNewFile *.tmpl     set filetype=html
 
-autocmd BufRead,BufNewFile *.yml set filetype=yaml
-autocmd FileType yaml :setlocal sw=2 ts=2 sts=2
+autocmd vimrc BufRead,BufNewFile *.yml set filetype=yaml
+autocmd vimrc FileType yaml :setlocal sw=2 ts=2 sts=2
 
-au BufRead,BufNewFile bash_profile set filetype=sh
-au BufRead,BufNewFile bashrc set filetype=sh
-au BufRead,BufNewFile local_bashrc set filetype=sh
+autocmd vimrc BufRead,BufNewFile bash_profile set filetype=sh
+autocmd vimrc BufRead,BufNewFile bashrc set filetype=sh
+autocmd vimrc BufRead,BufNewFile local_bashrc set filetype=sh
 
-au BufRead,BufNewFile Changes set filetype=txt
-au BufRead,BufNewFile *.txt set filetype=txt
+autocmd vimrc BufRead,BufNewFile Changes set filetype=txt
+autocmd vimrc BufRead,BufNewFile *.txt set filetype=txt
 
-au BufRead,BufNewFile *.pm set filetype=perl
+autocmd vimrc BufRead,BufNewFile *.pm set filetype=perl
 
 " ########### SQL ###########
 
