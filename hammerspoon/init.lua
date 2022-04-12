@@ -52,7 +52,7 @@ end
 
 hs.hotkey.bind(
     my_hotkeys,
-    "r",
+    "h",
     function()
         hs.reload()
         hs.notify.new({title = "Hammerspoon", informativeText = "config reloaded"}):send()
