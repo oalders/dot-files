@@ -246,6 +246,16 @@ let g:ale_type_map = {
 \    'perlcritic': {'ES': 'WS', 'E': 'W'},
 \}
 
+" Keep this in its own block as en example of how to add a custom Ale fixer
+function! Perlimports(buffer) abort
+  return {
+  \   'command': 'perlimports --libs dev/lib,lab/lib,lib,t/lib --no-preserve-duplicates --no-preserve-unused --log-filename /tmp/perlimports.txt --log-level debug --read-stdin -f %s'
+  \}
+endfunction
+
+let ale_fixers.perl = ['perltidy', 'perlimports']
+execute ale#fix#registry#Add('perlimports', 'Perlimports', ['perl'], 'Tidy Perl imports')
+
 let g:ale_sh_shellcheck_change_directory = 0
 let g:ale_shellcheck_options = '-x'
 let g:ale_writegood_options = '--no-passive'
