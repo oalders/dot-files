@@ -30,6 +30,8 @@ else
 fi
 
 # tmux needs to be running in order to source a config file etc
+# Also clean up an old CI sessions
+tmux kill-session -t CI || true
 tmux new-session -d -s CI
 tmux ls
 
