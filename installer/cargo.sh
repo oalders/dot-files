@@ -27,6 +27,10 @@ set -x
 
 if [[ $(command -v cargo --version) ]]; then
     cargo install bat fd-find precious
+    if [[ "$IS_DARWIN" = true ]]; then
+        rustup update
+        cargo install cargo-edit
+    fi
 else
     echo "cargo not installed?"
 fi
