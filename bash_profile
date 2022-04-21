@@ -50,6 +50,7 @@ GPG_TTY=$(tty)
 export GPG_TTY
 
 # Make MacOS less annoying
+# Specifically don't run update_terminal_cwd()
 export BASH_SILENCE_DEPRECATION_WARNING=1
 
 [[ -s "$HOME/.rvm/scripts/rvm" ]] && source "$HOME/.rvm/scripts/rvm" # Load RVM into a shell session *as a function*
