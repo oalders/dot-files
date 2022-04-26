@@ -34,6 +34,7 @@ alias cdr='cd `git root`'
 alias d=docker
 alias delete-merged-branches='show-merged-branches | xargs -n 1 git branch -d'
 alias dangling-dockers='docker rmi -f $(docker images -f "dangling=true" -q)'
+alias dr='NO_JIGSAW=1 HARNESS_OPTIONS="j8:c" dzil release'
 alias dzil-prove='dzil run --nobuild prove -lv'
 alias dzil-prove-xs='dzil run prove -lv'
 alias dzil-stale='dzil stale --all | xargs cpm install --global'
