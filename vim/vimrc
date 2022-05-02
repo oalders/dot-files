@@ -166,6 +166,17 @@ nmap <s-tab> ^i<bs><esc>
 :set list!
 :set listchars=tab:\|.
 
+" https://stackoverflow.com/a/69099888/406224
+function! UseTabs()
+    :set noexpandtab
+    :set copyindent
+    :set preserveindent
+    :set softtabstop=0
+    :set shiftwidth=4
+    :set tabstop=4
+    :set list
+endfunction
+
 " ########### TidyAll ###########
 
 " https://github.com/jonswar/perl-code-tidyall/blob/master/etc/editors/tidyall.vim
