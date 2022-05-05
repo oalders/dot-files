@@ -9,6 +9,7 @@ PREFIX=~/dot-files
 
 mkdir -p ~/.config/nvim
 mkdir -p ~/.config/oh-my-posh/themes
+mkdir -p ~/.config/perlimports
 mkdir -p ~/.config/wezterm
 mkdir -p ~/.config/yamllint
 mkdir -p ~/.cpanreporter
@@ -47,6 +48,7 @@ ln -sf $PREFIX/re.pl/repl.rc ~/.re.pl/repl.rc
 ln -sf $PREFIX/sqliterc ~/.sqliterc
 ln -sf $PREFIX/tigrc ~/.tigrc
 ln -sf $PREFIX/wezterm/wezterm.lua ~/.config/wezterm/wezterm.lua
+ln -sf $PREFIX/perlimports/perlimports.toml ~/.config/perlimports/perlimports.toml
 ln -sf $PREFIX/yamllint.yml ~/.config/yamllint/config
 
 if [ "$IS_DARWIN" = true ]; then
