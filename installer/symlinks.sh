@@ -7,6 +7,7 @@ source bash_functions.sh
 
 PREFIX=~/dot-files
 
+mkdir -p ~/.config/bat
 mkdir -p ~/.config/nvim
 mkdir -p ~/.config/oh-my-posh/themes
 mkdir -p ~/.config/perlimports
@@ -26,6 +27,7 @@ ln -sf $LINK_FLAG $PREFIX/sqitch ~/.sqitch
 ln -sf $PREFIX/ackrc ~/.ackrc
 ln -sf $PREFIX/bash_profile ~/.bash_profile
 ln -sf $PREFIX/bashrc ~/.bashrc
+ln -sf $PREFIX/bat/config ~/.config/bat/config
 ln -sf $PREFIX/cpanreporter/config.ini ~/.cpanreporter/config.ini
 ln -sf $PREFIX/dataprinter ~/.dataprinter
 ln -sf $PREFIX/digrc ~/.digrc
