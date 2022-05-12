@@ -41,6 +41,7 @@ ln -sf $PREFIX/oh-my-posh/themes/local-tiny.omp.json ~/.config/oh-my-posh/themes
 ln -sf $PREFIX/oh-my-posh/themes/remote.omp.json ~/.config/oh-my-posh/themes/remote.omp.json
 ln -sf $PREFIX/oh-my-posh/themes/remote-tiny.omp.json ~/.config/oh-my-posh/themes/remote-tiny.omp.json
 ln -sf $PREFIX/perlcriticrc ~/.perlcriticrc
+ln -sf $PREFIX/perlimports/perlimports.toml ~/.config/perlimports/perlimports.toml
 ln -sf $PREFIX/perltidyrc ~/.perltidyrc
 ln -sf $PREFIX/prettierrc.yaml ~/.prettierrc.yaml
 ln -sf $PREFIX/profile ~/.profile
@@ -50,7 +51,6 @@ ln -sf $PREFIX/re.pl/repl.rc ~/.re.pl/repl.rc
 ln -sf $PREFIX/sqliterc ~/.sqliterc
 ln -sf $PREFIX/tigrc ~/.tigrc
 ln -sf $PREFIX/wezterm/wezterm.lua ~/.config/wezterm/wezterm.lua
-ln -sf $PREFIX/perlimports/perlimports.toml ~/.config/perlimports/perlimports.toml
 ln -sf $PREFIX/yamllint.yml ~/.config/yamllint/config
 
 if [ "$IS_DARWIN" = true ]; then
