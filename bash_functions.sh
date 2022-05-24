@@ -182,6 +182,11 @@ ll() {
     eval "$COMMAND"
 }
 
+format_json () {
+    FILE=$1
+    cat $FILE | jq | sed 's/\\n/\n/g' | sed 's/\\t/\t/g'
+}
+
 HARNESS_OPTIONS="j1:c"
 
 # Since ripgrep has no default config file location, we don't need to bother
