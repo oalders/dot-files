@@ -21,7 +21,7 @@ else
     git clone https://github.com/tokuhirom/Perl-Build.git "$MY_PERL_BUILD_DIR"
 fi
 
-PERL_VERSION=5.34.1
+PERL_VERSION=5.36.0
 
 plenv install $PERL_VERSION
 plenv global $PERL_VERSION
