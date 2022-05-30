@@ -10,6 +10,7 @@ requires 'Code::TidyAll::Plugin::UniqueLines';
 requires 'Code::TidyAll::Plugin::YAML';
 requires 'Data::Printer::Filter::JSON';
 requires 'Data::Printer::Filter::URI';
+requires 'Devel::Confess';
 requires 'Modern::Perl';
 requires 'Perl::Critic';
 requires 'Perl::Critic::TooMuchCode';
