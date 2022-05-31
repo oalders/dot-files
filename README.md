@@ -9,6 +9,7 @@
   * [Alfred](#alfred)
   * [Bash](#bash)
   * [macOS](#macos)
+  * [less](#less)
 * [Testing with Docker](#testing-with-docker)
 
 <!-- vim-markdown-toc -->
@@ -64,6 +65,14 @@ to begin the search.
 ## macOS
 
 * Eject disc from superdrive: `/usr/bin/drutil eject`
+
+## less
+
+When using `less` as a pager for `psql`, you can pass `less` directives while viewing outpt.
+
+* `-S` toggle horizontal scrolling
+* `-N` toggle line numbers
+* `10 + arrow key` will now advance horizontal scroll by 10 characters when arrow keys are pressed
 
 # Testing with Docker
 
