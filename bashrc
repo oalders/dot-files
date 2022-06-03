@@ -276,11 +276,6 @@ if [ -d $GOPATH ]; then
     add_path "$GOPATH/bin"
 fi
 
-# https://unix.stackexchange.com/questions/19317/can-less-retain-colored-output
-fancydiff() {
-    git "$1" --color=always "$2" | diff-so-fancy | less -R
-}
-
 SOCK=~/.ssh/ssh_auth_sock
 if test $SSH_AUTH_SOCK && test $TMUX && [ $SSH_AUTH_SOCK != $SOCK ]; then
     export SSH_AUTH_SOCK=$SOCK
