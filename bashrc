@@ -316,14 +316,17 @@ if [[ ("${BASH_VERSINFO[0]}" -gt 3) && -f /usr/local/bin/cz ]]; then
 fi
 
 reset_path
+
 [ -f "$HOME/.ghcup/env" ] && . "$HOME/.ghcup/env" # ghcup-env
 if [ -f "$HOME/.cargo/env" ]; then
     . "$HOME/.cargo/env"
 fi
 
-# nvim nightly build
 if [ "$IS_DARWIN" = true ]; then
+    # nvim nightly build
     add_path ~/local/nvim-osx64/bin
+    # homebrew's curl needs to come first
+    add_path "/usr/local/opt/curl/bin"
 fi
 
 posh_me
