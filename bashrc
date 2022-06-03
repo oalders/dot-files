@@ -77,7 +77,6 @@ fi
 add_path "$HOME/Library/Python/3.8/bin"
 add_path "$HOME/.local/bin"
 
-add_path "/usr/local/sbin"
 add_path "$HOME/local/bin"
 
 # node modules locally installing bin files
