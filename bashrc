@@ -273,7 +273,7 @@ fetch_pull_request() {
 export LANG=en_US.UTF-8
 
 if [ -d $GOPATH ]; then
-    export PATH="$GOPATH/bin:$PATH"
+    add_path "$GOPATH/bin"
 fi
 
 # https://unix.stackexchange.com/questions/19317/can-less-retain-colored-output
