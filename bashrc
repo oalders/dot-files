@@ -265,11 +265,8 @@ fpp() {
     fi
 }
 
-# http://www.somethingorothersoft.com/2012/05/22/pulling-github-pull-requests-with-git/
-# fetch-pull-request origin 1234
 fetch_pull_request() {
-    git fetch "$1" "refs/pull/$2/head:refs/remotes/pr/$2"
-    git co -b "pr/$2" "pr/$2"
+    gh pr checkout $1
 }
 
 # make sure NERDTree arrows work

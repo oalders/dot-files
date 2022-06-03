@@ -10,6 +10,7 @@
   * [Bash](#bash)
   * [macOS](#macos)
   * [less](#less)
+  * [gh -- GitHub CLI](#gh----github-cli)
 * [Testing with Docker](#testing-with-docker)
 
 <!-- vim-markdown-toc -->
@@ -73,6 +74,13 @@ When using `less` as a pager for `psql`, you can pass `less` directives while vi
 * `-S` toggle horizontal scrolling
 * `-N` toggle line numbers
 * `10 + arrow key` will now advance horizontal scroll by 10 characters when arrow keys are pressed
+
+## gh -- GitHub CLI
+
+* `gh pr status`: status of all pull requests in repo
+* `gh pr view 1234`: view a single pull request
+  * `gh pr view --comments 1234`: view pull request and comments
+* `gh pr checks`: get status of checks for a PR in current branch
 
 # Testing with Docker
 
