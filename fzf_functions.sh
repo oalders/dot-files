@@ -8,7 +8,7 @@ f() {
     fzf --bind='ctrl-/:toggle-preview' --preview "bat --style=numbers --color=always --line-range :500 {}" "$@"
 }
 
-gw() {
+rm_worktree() {
     MY_XARGS_OPTIONS="--no-run-if-empty"
     if [[ $IS_DARWIN = true ]]; then
         MY_XARGS_OPTIONS=""
