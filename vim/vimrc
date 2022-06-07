@@ -287,6 +287,8 @@ augroup END
 "
 autocmd vimrc BufEnter .vim-plug-vimrc  :setlocal filetype=vim
 
+autocmd vimrc BufEnter ansible/hosts :setlocal filetype=dosini
+
 " syntax highlighting for some Perl utility rc files
 autocmd vimrc BufEnter  cpanfile        :setlocal filetype=perl
 autocmd vimrc BufEnter  perlcriticrc    :setlocal filetype=dosini
