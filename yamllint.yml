@@ -9,5 +9,4 @@ rules:
     max: 80
     level: warning
   truthy:
-    enable: true
     allowed-values: ["true", "false", "on"]
