@@ -1,3 +1,4 @@
+---
 name: Build
 
 on: [push]
@@ -46,6 +47,9 @@ jobs:
 
       - name: Install nvim
         run: ./installer/nvim.sh
+
+      - name: Install tmux
+        run: sudo apt install libevent-dev && ./installer/tmux.sh
 
       - name: Configure tmux
         run: ./configure/tmux.sh
