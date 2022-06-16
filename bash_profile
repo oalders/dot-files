@@ -66,7 +66,7 @@ export NVM_DIR="$HOME/.nvm"
 . ~/dot-files/bash_functions.sh
 
 if [ "$IS_DARWIN" = true ]; then
-    export CLOUDSDK_PYTHON=python3
+    unset CLOUDSDK_PYTHON
     # Open command line in editor
     bind "\C-e":edit-and-execute-command
 fi

@@ -108,10 +108,6 @@ if [ "$(uname)" == "Darwin" ]; then
     IS_DARWIN=true
     LINK_FLAG="-hF"
 
-    # A homebrew update of Python to > 3.8 has broken Google Cloud tools.
-    CLOUDSDK_PYTHON=python2
-    export CLOUDSDK_PYTHON
-
     # Not sure if this is needed in the longer term
     export TERM=xterm-256color
 
