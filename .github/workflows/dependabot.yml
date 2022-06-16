@@ -23,4 +23,4 @@ jobs:
       - name: Enable auto merge
         uses: pascalgn/automerge-action@v0.15.3
         env:
-          github-token: "${{ secrets.GITHUB_TOKEN }}"
+          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
