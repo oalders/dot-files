@@ -20,6 +20,10 @@ jobs:
         env:
           PR_URL: ${{github.event.pull_request.html_url}}
           GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+      - name: Add automerge label
+      - uses: actions-ecosystem/action-add-labels@v1
+        with:
+          labels: automerge
       - name: Enable auto merge
         uses: pascalgn/automerge-action@v0.15.3
         env:
