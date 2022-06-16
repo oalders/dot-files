@@ -180,7 +180,7 @@ ll() {
 
 format_json () {
     FILE=$1
-    cat $FILE | jq | sed 's/\\n/\n/g' | sed 's/\\t/\t/g'
+    jq < "$FILE" | sed 's/\\n/\n/g' | sed 's/\\t/\t/g'
 }
 
 HARNESS_OPTIONS="j1:c"
