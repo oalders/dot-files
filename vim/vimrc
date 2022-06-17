@@ -336,18 +336,17 @@ fun ExecFile()
     :!"%:p"
 endfun
 
-" Set line markers to make indentation easier in Mojo templates
+" Set visual cue at column 78
+:set colorcolumn=78
+
+" Set line markers to make indentation easier to follow
 " Enable via :call ShowLines()
 fun ShowLines()
-    if &filetype ==# 'html'
-        :set colorcolumn=5,9,13,17,21,25,29
-    else
-        :set colorcolumn=78
-    endif
+    :set colorcolumn=5,9,13,17,21,25,29,78
 endfun
 
 fun HideLines()
-    :set colorcolumn=
+    :set colorcolumn=78
 endfun
 
 fun SudoWrite()
