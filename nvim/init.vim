@@ -32,6 +32,8 @@ parser_config.perl = {
 
 vim.opt.termguicolors = true
 require('bufferline').setup{}
+
+require('virt-column').setup()
 EOF
 
 " https://github.com/mhartington/oceanic-next#installation
