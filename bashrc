@@ -40,7 +40,7 @@ alias dzil-prove-xs='dzil run prove -lv'
 alias dzil-stale='dzil stale --all | xargs cpm install --global'
 alias fix-gpg='pkill -9 gpg-agent && export GPG_TTY=$(tty)'
 alias g=git
-alias gi=git # fix typos
+alias gi=git  # fix typos
 alias gti=git # fix typos
 alias gdf='git domo|fpp'
 alias grep='grep --color=auto --exclude-dir=.git'
@@ -304,7 +304,6 @@ add_path "/usr/local/go/bin"
 # Do this late so that any local additions to $PATH will come first
 # shellcheck disable=SC1090
 [ -f ~/local-dot-files/local_bashrc ] && . ~/local-dot-files/local_bashrc
-
 
 if [[ ("${BASH_VERSINFO[0]}" -gt 3) && -f /usr/local/bin/cz ]]; then
     add_path "/usr/local/bin/cz"
