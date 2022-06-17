@@ -28,4 +28,5 @@ if [ "$IS_DARWIN" = true ]; then
     pip3 install ansible
 fi
 
+pipx install dunk
 exit 0
