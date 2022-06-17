@@ -69,7 +69,8 @@ to begin the search.
 
 ## less
 
-When using `less` as a pager for `psql`, you can pass `less` directives while viewing outpt.
+When using `less` as a pager for `psql`, you can pass `less` directives while
+viewing outpt.
 
 * `-S` toggle horizontal scrolling
 * `-N` toggle line numbers
