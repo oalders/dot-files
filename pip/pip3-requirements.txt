@@ -6,6 +6,7 @@
 # ansible-lint segfaults on Linux
 future
 neovim
+pipx
 pynvim
 sqlparse
 vim-vint
