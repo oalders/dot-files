@@ -68,10 +68,12 @@ alias xpasswd='perl -MCrypt::XkcdPassword -E "say Crypt::XkcdPassword->make_pass
 
 if [ "$IS_DARWIN" = true ]; then
     alias updatedb="sudo /usr/libexec/locate.updatedb"
+
+    # python scripts via pip install --user
+    remove_path "$HOME/Library/Python/3.8/bin"
+    add_path "$HOME/Library/Python/3.9/bin"
 fi
 
-# python scripts via pip install --user
-add_path "$HOME/Library/Python/3.8/bin"
 add_path "$HOME/.local/bin"
 
 add_path "$HOME/local/bin"
