@@ -3,7 +3,9 @@ name: Build
 
 on:
   - pull_request
-  - push
+  - push:
+      branches:
+        - 'main'
 
 permissions:
   pull-requests: write
