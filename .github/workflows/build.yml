@@ -3,9 +3,7 @@ name: Build
 
 on:
   - pull_request
-  - push:
-      branches:
-        - 'main'
+  - push
 
 permissions:
   pull-requests: write
@@ -13,6 +11,13 @@ permissions:
 jobs:
   build:
     runs-on: ${{ matrix.os }}
+    if: >
+      ${{
+      ( github.actor == 'dependabot[bot]' &&
+        github.event_name == 'pull_request' ) ||
+      ( github.actor != 'dependabot[bot]' &&
+        github.event_name == 'push' )
+      }}
     strategy:
       fail-fast: false
       matrix:
@@ -89,7 +94,7 @@ jobs:
   dependabot:
     needs: build
     runs-on: ubuntu-latest
-    if: ${{ github.actor == 'dependabot[bot]' }}
+    if: ${{ github.actor == 'dependabot[bot]' && github.event_name == 'pull_request' }}
     steps:
       - name: Dependabot metadata
         id: metadata
