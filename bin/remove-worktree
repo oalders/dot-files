@@ -13,11 +13,6 @@ STRIP="oalders/"
 shift
 echo "$BRANCH_NAME"
 
-if [[ -n $TMUX ]]; then
-    echo "Detach from your tmux session before running this command"
-    exit
-fi
-
 # If we can't kill the tmux session, then that's ok. It may just not exist.
 if [[ -n $(pgrep tmux) ]]; then
     # tmux session name will be the git branch name
