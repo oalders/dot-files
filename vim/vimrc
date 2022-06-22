@@ -349,6 +349,10 @@ fun HideLines()
     :set colorcolumn=78
 endfun
 
+fun ClearLines()
+    :set colorcolumn=
+endfun
+
 fun SudoWrite()
     cmap w!! w !sudo tee % > /dev/null
 endfun
