@@ -25,7 +25,7 @@ wait_for_input 'https://github.com/rombarcz/alfred-vpn-manager/releases/download
 
 wait_for_input 'https://github.com/epilande/alfred-browser-tabs/releases/download/v1.0.5' 'Browser-Tabs.alfredworkflow'
 wait_for_input 'https://github.com/gharlan/alfred-github-workflow/releases/download/v1.7.1' 'github.alfredworkflow'
-wait_for_input 'https://github.com/jsumners/alfred-emoji/releases/download/v1.11.1' 'alfred-emoji.alfredworkflow'
+wait_for_input 'https://github.com/jsumners/alfred-emoji/releases/download/v1.12.0' 'alfred-emoji.alfredworkflow'
 wait_for_input 'https://github.com/mrodalgaard/alfred-network-workflow/releases/download/v1.1' 'Network.alfredworkflow'
 wait_for_input 'https://github.com/ruedap/alfred-font-awesome-workflow/releases/download/v5.15.3.1' 'Font-Awesome.alfredworkflow'
 
