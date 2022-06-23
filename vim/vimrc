@@ -301,6 +301,7 @@ autocmd vimrc BufEnter .yath.rc         :setlocal filetype=dosini
 autocmd vimrc BufEnter .yath.user.rc    :setlocal filetype=dosini
 
 autocmd vimrc BufRead,BufNewFile *.gohtml   set filetype=gohtmltmpl
+autocmd vimrc BufRead,BufNewFile *.html     set filetype=html
 autocmd vimrc BufRead,BufNewFile *.html.ep  set filetype=html
 autocmd vimrc BufRead,BufNewFile *.html.epl set filetype=html
 autocmd vimrc BufRead,BufNewFile *.tmpl     set filetype=html
