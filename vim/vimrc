@@ -362,12 +362,14 @@ fun HideGutter()
     :GitGutterDisable
     :set nonumber
     :set nolist
+    :set scl=no " sign column
 endfun
 
 fun! ShowGutter()
     :GitGutterEnable
     :set number
     :set list
+    :set scl=auto
 endfun
 
 fun Requote()
