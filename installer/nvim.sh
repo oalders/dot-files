@@ -26,13 +26,12 @@ curl -LO --fail -z $FILE "$URL$FILE"
 
 if [ "$IS_DARWIN" = true ]; then
     tar xzvf $FILE
-    rm -rf ~/local/$DIR
-    mv $DIR ~/local/
 else
     chmod u+x $FILE
-    mv $FILE "$HOME/local/bin/nvim"
-    add_path "$HOME/local/bin"
 fi
+
+mv $FILE "$HOME/local/bin/nvim"
+add_path "$HOME/local/bin"
 
 if [[ $IS_GITHUB = false ]]; then
     nvim +'PlugInstall --sync' +qa
