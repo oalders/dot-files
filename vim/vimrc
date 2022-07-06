@@ -247,7 +247,6 @@ let g:ale_fixers = {
 \   'json': ['prettier'],
 \   'lua': ['luafmt', 'remove_trailing_lines', 'trim_whitespace'],
 \   'markdown': ['prettier'],
-\   'perl': ['perltidy'],
 \   'ruby': ['rubocop'],
 \   'rust': ['remove_trailing_newlines', 'rustfmt', 'trim_whitespace'],
 \   'sh': ['shfmt'],
