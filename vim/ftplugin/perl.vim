@@ -25,8 +25,8 @@ command! -range=% -nargs=* PTidy <line1>,<line2>!perltidy -q
 "run :PTidy on entire buffer and return cursor to (approximate) original position"
 " Not sure why I'm getting warnings that it already exists
 fun! DoPerlTidy()
-    let l:line = line(".")
-    let l:column = col(".")
+    let l:line = line('.')
+    let l:column = col('.')
     :PTidy
     call cursor(l:line, l:column)
 endfun
