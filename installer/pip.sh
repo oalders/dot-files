@@ -28,5 +28,8 @@ if [ "$IS_DARWIN" = true ]; then
     pip3 install ansible
 fi
 
+# maybe add path if pipx has just been installed
+add_path "$HOME/Library/Python/3.9/bin"
+
 pipx install dunk
 exit 0
