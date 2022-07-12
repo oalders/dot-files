@@ -3,4 +3,4 @@ end_separator = 1
 filters = DB, DateTime, JSON, URI, Web
 hash_separator = ' => '
 index = 1
-scalar_quotes = '
+scalar_quotes = "'"
