@@ -1,6 +1,17 @@
 #!/bin/bash
 
+set -eu
+
 BRANCH=$(git symbolic-ref --short refs/remotes/origin/HEAD | cut -d'/' -f2)
+
+if [ "$BRANCH" = "" ]; then
+    if [ -f ".git/refs/remotes/origin/main" ]; then
+        BRANCH="main"
+    else
+        echo "cannot find main branch name"
+        exit 1
+    fi
+fi
 
 echo "Setting main branch in local Git aliases to \"$BRANCH\""
 
