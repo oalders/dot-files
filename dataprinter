@@ -1,6 +1,6 @@
 array_max = 5000
 end_separator = 1
-filters = DB, DateTime, JSON, URI
+filters = DB, DateTime, JSON, URI, Web
 hash_separator = ' => '
 index = 1
 scalar_quotes = '
