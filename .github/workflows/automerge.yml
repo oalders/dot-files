@@ -1,7 +1,9 @@
+---
 name: Maybe Enable Auto-Merge
 on:
   pull_request_target:
     types: [opened]
+  workflow_dispatch:
 
 jobs:
   enable-auto-merge:
