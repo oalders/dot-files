@@ -248,7 +248,7 @@ let g:ale_fixers = {
 \   'lua': ['luafmt', 'remove_trailing_lines', 'trim_whitespace'],
 \   'markdown': ['prettier'],
 \   'ruby': ['rubocop'],
-\   'rust': ['remove_trailing_newlines', 'rustfmt', 'trim_whitespace'],
+\   'rust': ['remove_trailing_lines', 'rustfmt', 'trim_whitespace'],
 \   'sh': ['shfmt'],
 \   'toml': ['prettier'],
 \   'yaml': ['prettier'],
