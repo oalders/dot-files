@@ -11,6 +11,7 @@ Plug 'chrisbra/unicode.vim'
 Plug 'ConradIrwin/vim-bracketed-paste'
 Plug 'dense-analysis/ale' " , { 'tag': 'v3.1.0' }
 Plug 'fatih/vim-go' ", { 'do': ':GoUpdateBinaries' } takes forever on GH builds
+Plug 'gregsexton/MatchTag'
 Plug 'haya14busa/vim-auto-mkdir' " create directory path on save
 Plug 'itchyny/lightline.vim'
 Plug 'itchyny/vim-cursorword'
