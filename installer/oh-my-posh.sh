@@ -22,7 +22,7 @@ if [ "$IS_DARWIN" = false ]; then
     DOWNLOAD_FILE=posh-linux-amd64
 fi
 
-if [[ $1 ]]; then
+if [[ ${1+x} ]]; then
     DOWNLOAD_URL=https://github.com/JanDeDobbeleer/oh-my-posh/releases/download/$1/$DOWNLOAD_FILE
 else
     DOWNLOAD_URL=https://github.com/JanDeDobbeleer/oh-my-posh/releases/latest/download/$DOWNLOAD_FILE
