@@ -32,8 +32,6 @@ fi
 
 ./installer/vim.sh
 
-./installer/oh-my-posh.sh
-
 ./configure/vim.sh
 
 ./installer/nvim.sh
@@ -51,5 +49,7 @@ fi
 ./installer/ubi.sh
 
 ./installer/omegasort.sh
+
+./installer/oh-my-posh.sh
 
 exit 0

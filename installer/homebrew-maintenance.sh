@@ -22,6 +22,7 @@ brew remove lua@5.1
 brew remove mercurial
 brew remove mysql
 brew remove node@10
+brew remove oh-my-posh
 brew remove pgcli
 brew remove php@5.6
 brew remove php56-mcrypt
