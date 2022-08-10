@@ -3,6 +3,8 @@
 set -eu
 
 if [ "$(which ubi)" ]; then
+    set -x
+    ubi --project houseabsolute/ubi --in ~/local/bin
     exit
 fi
 
