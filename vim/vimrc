@@ -240,6 +240,7 @@ let g:ale_linters = {
 
 let g:ale_fixers = {
 \   '*': ['remove_trailing_lines', 'trim_whitespace'],
+\   'css': ['prettier'],
 \   'go': ['gofumpt'],
 \   'html': ['remove_trailing_lines', 'trim_whitespace', 'prettier'],
 \   'java': ['remove_trailing_lines', 'trim_whitespace', 'google_java_format'],
