@@ -24,12 +24,14 @@ pip_install() {
 pip_install "pip3" "pip/pip3-requirements.txt"
 
 if [ "$IS_DARWIN" = true ]; then
-    /usr/local/opt/python@3.9/bin/python3.9 -m pip install --upgrade pip
-    pip3 install ansible
-fi
+    # maybe add path if pipx has just been installed
+    remove_path "$HOME/Library/Python/3.9/bin"
+    add_path "$HOME/Library/Python/3.10/bin"
 
-# maybe add path if pipx has just been installed
-add_path "$HOME/Library/Python/3.9/bin"
+    /usr/local/opt/python@3.10/bin/python3.10 -m pip install --upgrade pip
+    pip3 install ansible
+
+fi
 
 pipx install dunk
 exit 0
