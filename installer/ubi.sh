@@ -4,7 +4,11 @@ set -eu
 
 if [ "$(which ubi)" ]; then
     set -x
-    ubi --project houseabsolute/ubi --in ~/local/bin
+    INSTALL_DIR="$HOME/local/bin"
+    ubi --project houseabsolute/ubi --in $INSTALL_DIR
+    ubi --project houseabsolute/precious --in $INSTALL_DIR
+    ubi -d --project sharkdp/bat --in $INSTALL_DIR
+    # ubi -d --project sharkdp/fd --in $INSTALL_DIR
     exit
 fi
 

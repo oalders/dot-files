@@ -26,7 +26,7 @@ add_path "$HOME/.cargo/bin"
 set -x
 
 if [[ $(command -v cargo --version) ]]; then
-    cargo install bat difftastic fd-find precious
+    cargo install difftastic fd-find
     if [[ "$IS_DARWIN" = true ]]; then
         rustup update
         cargo install cargo-edit

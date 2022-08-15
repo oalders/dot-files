@@ -52,4 +52,6 @@ fi
 
 ./installer/oh-my-posh.sh
 
+./installer/maintenance.sh
+
 exit 0
