@@ -7,7 +7,7 @@ if [ "$(which ubi)" ]; then
     INSTALL_DIR="$HOME/local/bin"
     ubi --project houseabsolute/ubi --in $INSTALL_DIR
     ubi --project houseabsolute/precious --in $INSTALL_DIR
-    ubi -d --project sharkdp/bat --in $INSTALL_DIR
+    ubi --project sharkdp/bat --in $INSTALL_DIR
     # ubi -d --project sharkdp/fd --in $INSTALL_DIR
     exit
 fi
