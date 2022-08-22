@@ -478,3 +478,6 @@ endif
 " insert a new uuid at cursor
 let g:nuuid_no_mappings = 1
 nnoremap <Leader>u <Plug>Nuuid
+
+" Prevent a mouse selection from triggering visual mode
+set mouse=v
