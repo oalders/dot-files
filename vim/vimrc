@@ -316,6 +316,7 @@ augroup vimrc
     autocmd BufRead,BufNewFile *.txt set filetype=txt
 
     autocmd BufRead,BufNewFile *.pm set filetype=perl
+    autocmd vimrc BufRead,BufNewFile *.psgi set filetype=perl
 augroup END
 
 " ########### SQL ###########
