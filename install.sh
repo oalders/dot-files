@@ -30,11 +30,11 @@ fi
 
 ./installer/pip.sh
 
-./installer/vim.sh
-
-./configure/vim.sh
+# ./installer/vim.sh
 
 ./installer/nvim.sh
+
+ ./configure/vim.sh
 
 ./configure/tmux.sh
 
