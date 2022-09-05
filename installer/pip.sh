@@ -33,5 +33,8 @@ if [ "$IS_DARWIN" = true ]; then
 
 fi
 
-pipx install dunk
+if [ "$(which pipx)" ]; then
+    pipx install dunk
+fi
+
 exit 0
