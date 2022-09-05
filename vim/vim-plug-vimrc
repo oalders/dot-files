@@ -10,6 +10,7 @@ Plug 'c9s/perlomni.vim'
 Plug 'chrisbra/unicode.vim'
 Plug 'ConradIrwin/vim-bracketed-paste'
 Plug 'dense-analysis/ale' " , { 'tag': 'v3.1.0' }
+Plug 'ekalinin/dockerfile.vim'
 Plug 'fatih/vim-go' ", { 'do': ':GoUpdateBinaries' } takes forever on GH builds
 Plug 'gregsexton/MatchTag'
 Plug 'haya14busa/vim-auto-mkdir' " create directory path on save
