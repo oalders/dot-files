@@ -2,6 +2,7 @@
 extends: default
 
 rules:
+  comments-indentation: false
   indentation:
     spaces: 2
   # 80 chars should be enough, but don't fail if a line is longer
