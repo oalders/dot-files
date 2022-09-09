@@ -41,7 +41,7 @@ Plug 'ryanpcmcquen/fix-vim-pasting' " Automatically set paste mode when insertin
 Plug 'preservim/nerdcommenter'
 " Plug 'sheerun/vim-polyglot'
 Plug 'oalders/vim-polyglot'
-Plug 'skaji/syntax-check-perl'
+Plug 'skaji/syntax-check-perl', { 'branch': 'main' }
 Plug 'tpope/vim-abolish'
 Plug 'tpope/vim-eunuch'
 Plug 'tpope/vim-fugitive'
