@@ -59,6 +59,10 @@ if has('nvim')
 
   Plug 'akinsho/bufferline.nvim'
   Plug 'kyazdani42/nvim-web-devicons' " Recommended (for coloured icons for bufferline.nvim)
+
+  Plug 'williamboman/mason.nvim'
+  Plug 'williamboman/mason-lspconfig.nvim'
+  Plug 'neovim/nvim-lspconfig'
 else
   Plug 'Shougo/deoplete.nvim'
   Plug 'roxma/nvim-yarp'
