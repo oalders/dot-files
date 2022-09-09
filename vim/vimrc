@@ -260,7 +260,7 @@ let g:ale_type_map = {
 function! Perlimports(buffer) abort
   write
   return {
-  \   'command': 'perlimports --libs dev/lib,lab/lib,lib,t/lib --no-preserve-duplicates --no-preserve-unused --log-filename /tmp/perlimports.txt --log-level debug --read-stdin -f %s'
+  \   'command': 'perlimports --read-stdin -f %s'
   \}
 endfunction
 
