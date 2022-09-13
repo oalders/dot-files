@@ -339,7 +339,7 @@ fun ShowLines()
     :set colorcolumn=5,9,13,17,21,25,29,78
 endfun
 
-fun HideLines()
+fun ShowWidth()
     :set colorcolumn=78
 endfun
 
@@ -356,6 +356,7 @@ fun HideGutter()
     :set nonumber
     :set nolist
     :set scl=no " sign column
+    :call ClearLines()
 endfun
 
 fun! ShowGutter()
@@ -363,6 +364,7 @@ fun! ShowGutter()
     :set number
     :set list
     :set scl=auto
+    :call ShowWidth()
 endfun
 
 fun Requote()
