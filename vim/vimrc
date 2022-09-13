@@ -228,7 +228,7 @@ let g:ale_linters = {
 \   'dockerfile': ['hadolint'],
 \   'html': ['alex', 'fecs', 'htmlhint', 'stylelint', 'tidy',],
 \   'markdown': ['markdownlint', 'write-good'],
-\   'perl': ['syntax-check', 'perlcritic'],
+\   'perl': ['syntax-check', 'perlcritic', 'perlimports'],
 \   'rust': ['cargo', 'rls'],
 \   'sh': ['language_server','shell', 'shellcheck'],
 \   'vim': ['vint'],
@@ -245,6 +245,7 @@ let g:ale_fixers = {
 \   'json': ['prettier'],
 \   'lua': ['luafmt', 'remove_trailing_lines', 'trim_whitespace'],
 \   'markdown': ['prettier'],
+\   'perl': ['perltidy', 'perlimports'],
 \   'ruby': ['rubocop'],
 \   'rust': ['remove_trailing_lines', 'rustfmt', 'trim_whitespace'],
 \   'sh': ['shfmt'],
@@ -255,17 +256,6 @@ let g:ale_fixers = {
 let g:ale_type_map = {
 \    'perlcritic': {'ES': 'WS', 'E': 'W'},
 \}
-
-" Keep this in its own block as en example of how to add a custom Ale fixer
-function! Perlimports(buffer) abort
-  write
-  return {
-  \   'command': 'perlimports --read-stdin -f %s'
-  \}
-endfunction
-
-let ale_fixers.perl = ['perltidy', 'perlimports']
-execute ale#fix#registry#Add('perlimports', 'Perlimports', ['perl'], 'Tidy Perl imports')
 
 let g:ale_sh_shellcheck_change_directory = 0
 let g:ale_shellcheck_options = '-x'
