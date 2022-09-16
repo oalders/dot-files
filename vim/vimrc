@@ -287,6 +287,7 @@ augroup vimrc
     autocmd BufEnter .dataprinter     :setlocal filetype=dosini
     autocmd BufEnter  perlcriticrc    :setlocal filetype=dosini
     autocmd BufEnter .perlcriticrc    :setlocal filetype=dosini
+    autocmd BufEnter .prettierrc      :setlocal filetype=json
     autocmd BufEnter .tidyallrc       :setlocal filetype=dosini
     autocmd BufEnter .yath.rc         :setlocal filetype=dosini
     autocmd BufEnter .yath.user.rc    :setlocal filetype=dosini
