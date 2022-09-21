@@ -1,5 +1,5 @@
 ---
-name: dzil build and test
+name: test
 
 on:
   push:
@@ -17,7 +17,7 @@ jobs:
     name: Build distribution
     runs-on: ubuntu-20.04
     container:
-      image: perldocker/perl-tester:5.34
+      image: perldocker/perl-tester:5.36
     steps:
       - uses: actions/checkout@v3
       - name: Run Tests
@@ -28,16 +28,15 @@ jobs:
           RELEASE_TESTING: 1
           TEST_TIDYALL_VERBOSE: 1
         run: auto-build-and-test-dist
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         with:
           name: build_dir
           path: build_dir
-        if: ${{ github.actor != 'nektos/act' }}
   coverage-job:
     needs: build-job
     runs-on: ubuntu-20.04
     container:
-      image: perldocker/perl-tester:5.34
+      image: perldocker/perl-tester:5.36
     steps:
       - uses: actions/checkout@v3 # codecov wants to be inside a Git repository
       - uses: actions/download-artifact@v3
@@ -70,13 +69,14 @@ jobs:
           - "5.30"
           - "5.32"
           - "5.34"
+          - "5.36"
     name: perl ${{ matrix.perl-version }} on ${{ matrix.os }}
     steps:
       - name: set up perl
         uses: shogo82148/actions-setup-perl@v1
         with:
           perl-version: ${{ matrix.perl-version }}
-      - uses: actions/download-artifact@v2
+      - uses: actions/download-artifact@v3
         with:
           name: build_dir
           path: .
@@ -111,13 +111,14 @@ jobs:
           - "5.30"
           - "5.32"
           - "5.34"
+          - "5.36"
     name: perl ${{ matrix.perl-version }} on ${{ matrix.os }}
     steps:
       - name: set up perl
         uses: shogo82148/actions-setup-perl@v1
         with:
           perl-version: ${{ matrix.perl-version }}
-      - uses: actions/download-artifact@v2
+      - uses: actions/download-artifact@v3
         with:
           name: build_dir
           path: .
@@ -154,7 +155,7 @@ jobs:
         with:
           perl-version: ${{ matrix.perl-version }}
           distribution: strawberry # this option only used on windows
-      - uses: actions/download-artifact@v2
+      - uses: actions/download-artifact@v3
         with:
           name: build_dir
           path: .
