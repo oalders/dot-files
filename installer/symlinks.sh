@@ -48,6 +48,7 @@ ln -sf $PREFIX/profile ~/.profile
 ln -sf $PREFIX/proverc ~/.proverc
 ln -sf $PREFIX/psqlrc ~/.psqlrc
 ln -sf $PREFIX/re.pl/repl.rc ~/.re.pl/repl.rc
+ln -sf $PREFIX/shellcheckrc ~/.shellcheckrc
 ln -sf $PREFIX/sqliterc ~/.sqliterc
 ln -sf $PREFIX/tigrc ~/.tigrc
 ln -sf $PREFIX/wezterm/wezterm.lua ~/.config/wezterm/wezterm.lua
