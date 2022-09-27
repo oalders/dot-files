@@ -18,7 +18,7 @@ fi
 
 if type brew &>/dev/null; then
     HOMEBREW_PREFIX="$(brew --prefix)"
-    # shellcheck disable=SC1090
+    # shellcheck disable=SC1090,SC1091
     if [[ -r "${HOMEBREW_PREFIX}/etc/profile.d/bash_completion.sh" ]]; then
         source "${HOMEBREW_PREFIX}/etc/profile.d/bash_completion.sh"
     else
@@ -52,8 +52,10 @@ export GPG_TTY
 # Specifically don't run update_terminal_cwd()
 export BASH_SILENCE_DEPRECATION_WARNING=1
 
+# shellcheck disable=SC1091
 [[ -s "$HOME/.rvm/scripts/rvm" ]] && source "$HOME/.rvm/scripts/rvm" # Load RVM into a shell session *as a function*
 if [ -f "$HOME/.cargo/env" ]; then
+    # shellcheck disable=SC1091
     . "$HOME/.cargo/env"
 fi
 
