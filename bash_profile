@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
-# shellcheck shell=bash
-# shellcheck disable=SC1090
+# shellcheck disable=SC1090,SC1091
 
 alias python="python3"
 
