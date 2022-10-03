@@ -71,7 +71,7 @@ if [ "$IS_DARWIN" = true ]; then
     # Open command line in editor
     bind "\C-e":edit-and-execute-command
 
-    SQLITE_PATH=/usr/local/Cellar/sqlite/3.39.3/bin
+    SQLITE_PATH=/usr/local/Cellar/sqlite/3.39.4/bin
     add_path $SQLITE_PATH
     if ! test -d $SQLITE_PATH; then
         echo "$SQLITE_PATH needs to be updated"
