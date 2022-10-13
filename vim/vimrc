@@ -367,14 +367,13 @@ fun! ShowGutter()
     :call ShowWidth()
 endfun
 
-fun Requote()
-    :%s/[“”]/"/g
-endfun
-
-" Remove last character from each line
-fun Truncate()
-    :%s/.$//
-endfun
+function! Requote()
+    let l = 1
+    for line in getline(1,'$')
+        call setline(l, substitute(line, '[“”]', '"', 'g'))
+        let l = l + 1
+    endfor
+endfunction
 
 " ########### Mappings ###########
 "
