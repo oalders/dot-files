@@ -50,6 +50,7 @@ Remind myself of vim shortcuts etc.
 * `:Lines` - fzf lines in loaded buffers
 * `:GenTocGFM` - generate GitHub flavoured markdown table of contents
 * `[c` and `]c` - navigate to next changed hunk
+* `gwip` - reflow a block of text and maintain cursor position
 
 ## Alfred
 
