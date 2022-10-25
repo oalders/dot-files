@@ -18,7 +18,7 @@
   "homepage": "https://github.com/oalders/dot-files#readme",
   "dependencies": {
     "@xmldom/xmldom": ">=0.8.3",
-    "acorn": "^8.8.0",
+    "acorn": "^8.8.1",
     "ansi-regex": ">=5.0.1",
     "bash-language-server": "^3.1.0",
     "eslint": "^8.26.0",
