@@ -208,7 +208,6 @@ hs.hotkey.bind(my_hotkeys, "l", nil, open_app_action("Slack"))
 hs.hotkey.bind(my_hotkeys, "m", nil, chrome_tab_action("https://meet.google.com/", ""))
 hs.hotkey.bind(my_hotkeys, "n", nil, chrome_tab_action(github, github))
 hs.hotkey.bind(my_hotkeys, "o", nil, chrome_tab_action(ircCloud, ircCloud .. "magnet/channel/metacpan"))
-hs.hotkey.bind(my_hotkeys, "p", nil, chrome_tab_action(PT, PT))
 hs.hotkey.bind(my_hotkeys, "q", slackifyName)
 
 hs.hotkey.bind(hyper, "a", cpanAuthorLink)
