@@ -98,9 +98,7 @@ if [[ $IS_MM = false && ! -d ~/.plenv && -d $LOCALPERLBIN ]]; then
     # adds $HOME/perl5/bin to PATH
     [ "$SHLVL" -eq 1 ] && eval "$(perl -I$HOME/perl5/lib/perl5 -Mlocal::lib)"
 
-    if [ -d $LOCALPERLBIN ]; then
-        add_path $LOCALPERLBIN
-    fi
+    add_path $LOCALPERLBIN
 fi
 
 # path used to be an alias, but that keeps a copy of $PATH in it, which is
@@ -272,9 +270,7 @@ fetch_pull_request() {
 # make sure NERDTree arrows work
 export LANG=en_US.UTF-8
 
-if [ -d $GOPATH ]; then
-    add_path "$GOPATH/bin"
-fi
+add_path "$GOPATH/bin"
 
 SOCK=~/.ssh/ssh_auth_sock
 if test $SSH_AUTH_SOCK && test $TMUX && [ $SSH_AUTH_SOCK != $SOCK ]; then
