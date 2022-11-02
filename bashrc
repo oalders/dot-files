@@ -101,16 +101,6 @@ if [[ $IS_MM = false && ! -d ~/.plenv && -d $LOCALPERLBIN ]]; then
     add_path $LOCALPERLBIN
 fi
 
-# path used to be an alias, but that keeps a copy of $PATH in it, which is
-# really confusing
-alias | grep path && unalias path
-
-# remove some aliases that override real binaries
-alias | grep " df=" && unalias df
-alias | grep " du=" && unalias du
-alias | grep " ls=" && unalias ls
-alias | grep " ps=" && unalias ps
-
 whosonport() {
     sudo lsof +c 0 -i :"$1"
 }
