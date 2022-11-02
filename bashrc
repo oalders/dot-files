@@ -96,7 +96,7 @@ LOCALPERLBIN=~/perl5/bin
 if [[ $IS_MM = false && ! -d ~/.plenv && -d $LOCALPERLBIN ]]; then
     export PERL_CPANM_OPT="--local-lib=~/perl5"
     # adds $HOME/perl5/bin to PATH
-    [ "$SHLVL" -eq 1 ] && eval "$(perl -I$HOME/perl5/lib/perl5 -Mlocal::lib)"
+    [ "$SHLVL" -eq 1 ] && eval "$(perl -I "$HOME/perl5/lib/perl5" -Mlocal::lib)"
 
     add_path $LOCALPERLBIN
 fi
@@ -259,7 +259,7 @@ export LANG=en_US.UTF-8
 add_path "$GOPATH/bin"
 
 SOCK=~/.ssh/ssh_auth_sock
-if test $SSH_AUTH_SOCK && test $TMUX && [ $SSH_AUTH_SOCK != $SOCK ]; then
+if test "$SSH_AUTH_SOCK" && test "$TMUX" && [ "$SSH_AUTH_SOCK" != "$SOCK" ]; then
     export SSH_AUTH_SOCK=$SOCK
 fi
 
