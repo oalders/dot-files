@@ -253,10 +253,6 @@ fpp() {
     fi
 }
 
-fetch_pull_request() {
-    gh pr checkout $1
-}
-
 # make sure NERDTree arrows work
 export LANG=en_US.UTF-8
 
