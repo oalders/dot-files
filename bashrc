@@ -128,8 +128,9 @@ md() {
 if [ -f /etc/bash_completion.d/git ]; then
     . /etc/bash_completion.d/git
 elif [ -f /usr/local/bin/brew ]; then
-    if [ -f $(brew --prefix)/etc/bash_completion ]; then
-        . $(brew --prefix)/etc/bash_completion
+    BREW_PREFIX=$(brew --prefix)
+    if [ -f "$BREW_PREFIX/etc/bash_completion" ]; then
+        . "$BREW_PREFIX/etc/bash_completion"
     fi
 fi
 
