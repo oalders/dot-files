@@ -26,10 +26,11 @@ add_path "$HOME/.cargo/bin"
 set -x
 
 if [[ $(command -v cargo --version) ]]; then
-    cargo install fd-find
     if [[ "$IS_DARWIN" = true ]]; then
         rustup update
         cargo install cargo-edit
+    else
+        cargo install fd-find
     fi
 else
     echo "cargo not installed?"
