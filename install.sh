@@ -5,53 +5,54 @@ set -eu -o pipefail
 # shellcheck source=bash_functions.sh
 source ~/dot-files/bash_functions.sh
 
-if [[ $IS_DARWIN = true ]]; then
-    ./installer/xcode.sh
-    time ./installer/homebrew.sh
-    ./installer/wezterm.sh
-    # time ./installer/homebrew-maintenance.sh || true
-    ./installer/fonts.sh
+run_installer() {
+    echo "running $1"
+    echo ""
+    time bash "$1"
+    echo ""
+}
 
-    # https://github.com/kcrawford/dockutil/issues/127
-    # ./installer/dockutil.sh
-    #./configure/dock.sh
-    ./installer/lua.sh
+if [[ $IS_DARWIN = true ]]; then
+    MAC_INSTALLERS=(
+        ./installer/xcode.sh
+        ./installer/homebrew.sh
+        ./installer/wezterm.sh
+        # time ./installer/homebrew-maintenance.sh || true
+        ./installer/fonts.sh
+
+        # https://github.com/kcrawford/dockutil/issues/127
+        # ./installer/dockutil.sh
+        #./configure/dock.sh
+        ./installer/lua.sh
+    )
+
+    for f in "${MAC_INSTALLERS[@]}"; do
+        run_installer "$f"
+    done
 fi
 
-./installer/linux.sh
+INSTALLERS=(
+    ./installer/linux.sh
+    ./installer/symlinks.sh
+    ./configure/git.sh
+    ./installer/fpp.sh
+    ./configure/ssh.sh
+    ./installer/pip.sh
+    ./installer/nvim.sh
+    ./configure/vim.sh
+    ./configure/tmux.sh
+    ./installer/npm.sh
+    ./installer/cpan.sh
+    ./installer/cargo.sh
+    ./installer/cz.sh
+    ./installer/ubi.sh
+    ./installer/omegasort.sh
+    ./installer/oh-my-posh.sh
+    ./installer/maintenance.sh
+)
 
-./installer/symlinks.sh
-
-./configure/git.sh
-
-./installer/fpp.sh
-
-./configure/ssh.sh
-
-./installer/pip.sh
-
-# ./installer/vim.sh
-
-./installer/nvim.sh
-
- ./configure/vim.sh
-
-./configure/tmux.sh
-
-./installer/npm.sh
-
-./installer/cpan.sh
-
-./installer/cargo.sh
-
-./installer/cz.sh
-
-./installer/ubi.sh
-
-./installer/omegasort.sh
-
-./installer/oh-my-posh.sh
-
-./installer/maintenance.sh
+for f in "${INSTALLERS[@]}"; do
+    run_installer "$f"
+done
 
 exit 0
