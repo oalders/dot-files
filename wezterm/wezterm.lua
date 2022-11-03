@@ -11,16 +11,16 @@ return {
   colors = {
     tab_bar = {
       active_tab = {
-        bg_color = "#0328fc",
-        fg_color = "#c0c0c0",
+        bg_color = "#78c1d2",
+        fg_color = "#404d5f",
       },
       inactive_tab = {
-        bg_color = "#010d54",
-        fg_color = "#808080",
+        bg_color = "#54748c",
+        fg_color = "#ddd",
       },
       new_tab = {
-        bg_color = "#010d54",
-        fg_color = "#808080",
+        bg_color = "#54748c",
+        fg_color = "#ddd",
       },
     }
   }
