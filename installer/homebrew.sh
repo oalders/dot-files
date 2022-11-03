@@ -4,9 +4,6 @@ set -eu -o pipefail
 
 # shellcheck source=bash_functions.sh
 source ~/dot-files/bash_functions.sh
-pushd ~/dot-files >/dev/null
-
-set -x
 
 if [ "$IS_DARWIN" = false ]; then
     exit 0
@@ -16,6 +13,7 @@ if [ ! "$(which brew)" ]; then
     /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
 fi
 
+set -x
 brew config
 brew update -v
 
@@ -42,7 +40,5 @@ fi
 if [[ -e ~/local-dot-files/Brewfile ]]; then
     brew bundle install --file=~/local-dot-files/Brewfile
 fi
-
-popd >/dev/null
 
 exit 0
