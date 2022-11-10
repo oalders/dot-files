@@ -85,6 +85,10 @@ add_path "$HOME/dot-files/node_modules/.bin"
 add_path "/usr/local/sbin"
 add_path "/usr/local/bin"
 
+# More modern homebrew uses
+add_path "/opt/homebrew/bin"
+add_path "/opt/homebrew/sbin"
+
 # Rust binaries installed via cargo
 add_path "$HOME/.cargo/bin"
 
