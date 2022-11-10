@@ -9,8 +9,9 @@ if [ "$IS_DARWIN" = false ]; then
     exit 0
 fi
 
-if [ ! "$(which brew)" ]; then
-    /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+if [ ! "$(command -v brew)" ]; then
+    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+    add_path "/opt/homebrew/bin"
 fi
 
 set -x
