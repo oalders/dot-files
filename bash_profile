@@ -77,3 +77,7 @@ if [ "$IS_DARWIN" = true ]; then
         echo "$SQLITE_PATH needs to be updated"
     fi
 fi
+
+if [[ "$IS_DARWIN" = false && $(command -v fdfind) ]]; then
+    alias fd="fdfind"
+fi
