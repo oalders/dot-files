@@ -31,7 +31,7 @@ if [[ ! $(which cpm) ]]; then
     curl -fsSL --compressed https://git.io/cpm | perl - install --global App::cpm
 fi
 
-if [ "$IS_DARWIN" = true ]; then
+if [ "$IS_DARWIN" = true && ! -d /opt/homebrew ]]; then
     OPENSSL_PREFIX="/usr/local/Cellar/openssl@1.1/1.1.1q"
     if [[ ! -e $OPENSSL_PREFIX ]]; then
         echo "$OPENSSL_PREFIX does not exist"
