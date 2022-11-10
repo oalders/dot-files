@@ -66,6 +66,7 @@ to begin the search.
 
 ## macOS
 
+* Set default shell to bash: `chsh -s /bin/bash`
 * Eject disc from superdrive: `/usr/bin/drutil eject`
 
 ## less
