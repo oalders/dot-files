@@ -19,7 +19,7 @@ mkdir -p ~/.npm-packages
 mkdir -p ~/.re.pl
 
 if [ "$IS_DARWIN" = true ]; then
-    mkdir -p $PREFIX/.config/karabiner
+    mkdir -p $HOME/.config/karabiner
 fi
 
 ln -sf $LINK_FLAG $PREFIX/dzil ~/.dzil
@@ -55,11 +55,6 @@ ln -sf $PREFIX/wezterm/wezterm.lua ~/.config/wezterm/wezterm.lua
 ln -sf $PREFIX/yamllint.yml ~/.config/yamllint/config
 
 if [ "$IS_DARWIN" = true ]; then
-
-    # Remove this after all machines have been updated
-    if [[ ! -L "$HOME/.config/karabiner/karabiner.json" ]]; then
-        rm -f "$HOME/.config/karabiner/karabiner.json"
-    fi
     ln -sf $PREFIX/gnupg/gpg-agent.conf ~/.gnupg/gpg-agent.conf
     ln -sf $PREFIX/karabiner/karabiner.json ~/.config/karabiner/karabiner.json
     ln -sf "$LINK_FLAG" $PREFIX/hammerspoon ~/.hammerspoon
