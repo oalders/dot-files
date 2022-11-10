@@ -189,7 +189,10 @@ HARNESS_OPTIONS="j1:c"
 # with symlinks.
 RIPGREP_CONFIG_PATH=~/dot-files/ripgreprc
 
-MY_PROCS="$(nproc)"
+if [[ $(command -v nproc) ]];then
+    MY_PROCS="$(nproc)"
+    export MY_PROCS
+fi
 
 export GO111MODULE
 export GOPATH
@@ -202,6 +205,5 @@ export IS_MM
 export IS_SUDOER
 export LINK_FLAG
 export MY_POSH_THEME
-export MY_PROCS
 export PATH_ALIASES
 export RIPGREP_CONFIG_PATH
