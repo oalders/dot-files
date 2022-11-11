@@ -33,10 +33,5 @@ fi
 mv $FILE "$HOME/local/bin/nvim"
 add_path "$HOME/local/bin"
 
-if [[ $IS_GITHUB = false ]]; then
-    nvim +'PlugInstall --sync' +qa
-    nvim +'PlugUpdate --sync' +qa
-fi
-
 echo "done nvim install"
 exit 0
