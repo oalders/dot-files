@@ -2,6 +2,8 @@
 
 <!-- vim-markdown-toc GFM -->
 
+    * [Fresh macOS Installs](#fresh-macos-installs)
+    * [All Fresh Installs](#all-fresh-installs)
     * [tmux Prefix](#tmux-prefix)
     * [tmux Plugins](#tmux-plugins)
     * [tmux-resurrect](#tmux-resurrect)
@@ -16,6 +18,35 @@
 <!-- vim-markdown-toc -->
 
 [![Actions Status](https://github.com/oalders/dot-files/workflows/Build/badge.svg)](https://github.com/oalders/dot-files/actions)
+
+## Fresh macOS Installs
+
+Some of these scripts will need to be run manually on a fresh install. They may
+require manual intervention or be impractical to run regularly.
+
+```
+./installer/spoon-installer.sh
+```
+
+This fixes the following error:
+
+> Unable to load Spoon: SpoonInstall
+
+```
+installer/alfred-workflows.sh
+```
+
+Run after Alfred has been installed. Confirm each install individually.
+
+[Install Alfred Nord Theme](https://www.alfredapp.com/extras/theme/5Y8E7URIWQ/)
+
+## All Fresh Installs
+
+```
+./installer/plenv.sh
+```
+
+Install `plenv` as well as the latest Perl version.
 
 ## tmux Prefix
 
