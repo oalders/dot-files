@@ -36,6 +36,7 @@ else
     brew doctor || true
     brew bundle install --file=brew/defaults
     brew bundle install --file=brew/local-only
+    brew bundle install --file=brew/mas
 fi
 
 if [[ -e ~/local-dot-files/Brewfile ]]; then
