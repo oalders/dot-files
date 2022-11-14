@@ -2,15 +2,15 @@
 
 <!-- vim-markdown-toc GFM -->
 
-  * [tmux Prefix](#tmux-prefix)
-  * [tmux Plugins](#tmux-plugins)
-  * [tmux-resurrect](#tmux-resurrect)
-  * [vim](#vim)
-  * [Alfred](#alfred)
-  * [Bash](#bash)
-  * [macOS](#macos)
-  * [less](#less)
-  * [gh -- GitHub CLI](#gh----github-cli)
+    * [tmux Prefix](#tmux-prefix)
+    * [tmux Plugins](#tmux-plugins)
+    * [tmux-resurrect](#tmux-resurrect)
+    * [vim](#vim)
+    * [Alfred](#alfred)
+    * [Bash](#bash)
+    * [macOS](#macos)
+    * [less](#less)
+    * [gh -- GitHub CLI](#gh----github-cli)
 * [Testing with Docker](#testing-with-docker)
 
 <!-- vim-markdown-toc -->
@@ -24,7 +24,6 @@ Ctrl-a
 ## tmux Plugins
 
 * prefix + r # reload config
-* prefix + I # fetch and source plugins
 
 ## tmux-resurrect
 
