@@ -3,7 +3,12 @@
 <!-- vim-markdown-toc GFM -->
 
     * [Fresh macOS Installs](#fresh-macos-installs)
+        * [Trackpad and Dock defaults](#trackpad-and-dock-defaults)
+        * [Hammerspoon Spoon Installer](#hammerspoon-spoon-installer)
+        * [Alfred Workflows](#alfred-workflows)
+        * [Alfred Nord Theme](#alfred-nord-theme)
     * [All Fresh Installs](#all-fresh-installs)
+        * [Plenv](#plenv)
     * [tmux Prefix](#tmux-prefix)
     * [tmux Plugins](#tmux-plugins)
     * [tmux-resurrect](#tmux-resurrect)
@@ -24,6 +29,14 @@
 Some of these scripts will need to be run manually on a fresh install. They may
 require manual intervention or be impractical to run regularly.
 
+### Trackpad and Dock defaults
+
+```
+./configure/macos.sh
+```
+
+### Hammerspoon Spoon Installer
+
 ```
 ./installer/spoon-installer.sh
 ```
@@ -32,15 +45,21 @@ This fixes the following error:
 
 > Unable to load Spoon: SpoonInstall
 
+### Alfred Workflows
+
 ```
 installer/alfred-workflows.sh
 ```
 
 Run after Alfred has been installed. Confirm each install individually.
 
+### Alfred Nord Theme
+
 [Install Alfred Nord Theme](https://www.alfredapp.com/extras/theme/5Y8E7URIWQ/)
 
 ## All Fresh Installs
+
+### Plenv
 
 ```
 ./installer/plenv.sh
