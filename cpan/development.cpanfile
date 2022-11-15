@@ -1,6 +1,4 @@
 # cpm install -g --cpanfile cpan/development.cpanfile
-requires 'App::CISetup';
-requires 'App::GitGot';
 requires 'App::perlimports';
 requires 'autodie';
 requires 'Carton';
