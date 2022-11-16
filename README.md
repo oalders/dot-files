@@ -30,6 +30,12 @@
 Some of these scripts will need to be run manually on a fresh install. They may
 require manual intervention or be impractical to run regularly.
 
+### Change Default shell
+
+```
+chsh -s /bin/bash
+```
+
 ### Trackpad and Dock defaults
 
 ```
