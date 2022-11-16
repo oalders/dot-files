@@ -31,7 +31,6 @@ else
 fi
 
 mv $FILE "$HOME/local/bin/nvim"
-add_path "$HOME/local/bin"
 
 echo "done nvim install"
 exit 0
