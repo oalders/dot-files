@@ -66,7 +66,7 @@ brew bundle install --file=brew/mas
 ./installer/spoon-installer.sh
 ```
 
-This fixes the following error:
+Then double-click the `SpoonInstall.spoon` file. This fixes the following error:
 
 > Unable to load Spoon: SpoonInstall
 
