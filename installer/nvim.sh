@@ -13,6 +13,7 @@ URL=https://github.com/neovim/neovim/releases/download/nightly/
 if [ "$IS_DARWIN" = true ]; then
     # Enable if nightly tarballs go missing again
     brew install --head neovim
+    rm -f "$HOME/local/bin/nvim"
     exit 0
 
     DIR=nvim-osx64
