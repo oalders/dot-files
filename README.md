@@ -3,6 +3,8 @@
 <!-- vim-markdown-toc GFM -->
 
     * [Fresh macOS Installs](#fresh-macos-installs)
+        * [Clone Repo and Change Remote](#clone-repo-and-change-remote)
+        * [Change Default shell](#change-default-shell)
         * [Trackpad and Dock defaults](#trackpad-and-dock-defaults)
         * [Install App Store Apps](#install-app-store-apps)
         * [Hammerspoon Spoon Installer](#hammerspoon-spoon-installer)
@@ -29,6 +31,14 @@
 
 Some of these scripts will need to be run manually on a fresh install. They may
 require manual intervention or be impractical to run regularly.
+
+### Clone Repo and Change Remote
+
+```
+git clone https://github.com/oalders/dot-files.git
+cd dot-files
+./bin/change-dot-files-origin.sh
+```
 
 ### Change Default shell
 
