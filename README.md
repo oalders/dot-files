@@ -4,6 +4,7 @@
 
     * [Fresh macOS Installs](#fresh-macos-installs)
         * [Trackpad and Dock defaults](#trackpad-and-dock-defaults)
+        * [Install App Store Apps](#install-app-store-apps)
         * [Hammerspoon Spoon Installer](#hammerspoon-spoon-installer)
         * [Alfred Workflows](#alfred-workflows)
         * [Alfred Nord Theme](#alfred-nord-theme)
@@ -33,6 +34,14 @@ require manual intervention or be impractical to run regularly.
 
 ```
 ./configure/macos.sh
+```
+
+### Install App Store Apps
+
+On my personal machines after I'm logged in to the app store:
+
+```
+brew bundle install --file=brew/mas
 ```
 
 ### Hammerspoon Spoon Installer
