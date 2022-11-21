@@ -9,6 +9,7 @@ return {
   color_scheme = "nord",
 
   colors = {
+    cursor_bg = '#B48EAD',
     tab_bar = {
       active_tab = {
         bg_color = "#78c1d2",
