@@ -3,7 +3,7 @@ VisualHostKey=yes
 
 Host *
 ControlMaster auto
-ControlPath  ~/.ssh/sockets/%r@%h-%p
+ControlPath  ~/.ssh/sockets/%C
 ControlPersist 600
 PreferredAuthentications=publickey,password
 
