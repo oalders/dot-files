@@ -38,6 +38,9 @@ defaults write com.apple.driver.AppleBluetoothMultitouch.trackpad Dragging -bool
 # Finder > View > Show Path Bar
 defaults write com.apple.finder ShowPathbar -bool true
 
+# Bouncing apps in the dock are distracting
+defaults write com.apple.dock no-bouncing -bool TRUE
+
 # Kill affected apps
 for app in "Dock" "Finder"; do
   killall "${app}" > /dev/null 2>&1
