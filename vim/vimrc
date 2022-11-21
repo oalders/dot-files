@@ -302,13 +302,14 @@ augroup vimrc
     autocmd FileType yaml :setlocal sw=2 ts=2 sts=2
 
     autocmd BufRead,BufNewFile bash_profile set filetype=sh
-    autocmd BufRead,BufNewFile bashrc set filetype=sh
+    autocmd BufRead,BufNewFile bashrc       set filetype=sh
     autocmd BufRead,BufNewFile local_bashrc set filetype=sh
 
-    autocmd BufRead,BufNewFile Changes set filetype=txt
-    autocmd BufRead,BufNewFile *.txt set filetype=txt
+    autocmd BufRead,BufNewFile Changes      set filetype=txt
+    autocmd BufRead,BufNewFile *.txt        set filetype=txt
 
-    autocmd BufRead,BufNewFile *.pm set filetype=perl
+    autocmd BufRead,BufNewFile *.pm         set filetype=perl
+    autocmd BufRead,BufNewFile *.pod        set filetype=pod
     autocmd vimrc BufRead,BufNewFile *.psgi set filetype=perl
 augroup END
 
