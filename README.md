@@ -109,8 +109,8 @@ Ctrl-a
 
 Remind myself of vim shortcuts etc.
 
-* `:bp` - previous buffer
-* `:bn` - next buffer
+* `:bn` or `]b` - next buffer
+* `:bp` or `[b` - previous buffer
 * `ctrl-w =` - equalize width and height of all windows
 * `ctrl-w m` - toggle zooming of splits
 * `ctrl-w r` - swap splits
@@ -125,6 +125,8 @@ Remind myself of vim shortcuts etc.
 * `:GenTocGFM` - generate GitHub flavoured markdown table of contents
 * `[c` and `]c` - navigate to next changed hunk
 * `gwip` - reflow a block of text and maintain cursor position
+
+See `akinsho/bufferline.nvim` for buffer config.
 
 ## Alfred
 
