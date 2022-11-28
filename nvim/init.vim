@@ -31,6 +31,7 @@ parser_config.perl = {
 }
 
 vim.opt.termguicolors = true
+vim.opt.mouse = "v"
 require('bufferline').setup{}
 
 require('virt-column').setup()
