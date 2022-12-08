@@ -29,7 +29,7 @@
     "normalize-url": "^8.0.0",
     "npm": "^9.2.0",
     "prettier": "^2.8.0",
-    "typescript": "^4.9.3",
+    "typescript": "^4.9.4",
     "underscore": "^1.13.6",
     "urijs": ">=1.19.11",
     "write-good": "^1.0.8",
