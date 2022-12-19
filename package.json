@@ -21,7 +21,7 @@
     "acorn": "^8.8.1",
     "ansi-regex": ">=5.0.1",
     "bash-language-server": "^4.1.2",
-    "eslint": "^8.29.0",
+    "eslint": "^8.30.0",
     "jsonlint": "^1.6.3",
     "lua-fmt": "^2.6.0",
     "markdownlint": "^0.26.2",
