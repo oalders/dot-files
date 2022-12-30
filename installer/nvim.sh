@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# May need to sudo apt install libfuse2 on Ubuntu >= 22.04
+# https://docs.appimage.org/user-guide/troubleshooting/fuse.html
+
 set -eu
 cd /tmp || exit
 
