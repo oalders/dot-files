@@ -12,7 +12,7 @@ fi
 set -x
 
 if [[ $IS_DARWIN = false ]]; then
-    sudo apt-get install -y -q --no-install-recommends cpanminus curl jq libnet-ssleay-perl nodejs pandoc python3-setuptools shellcheck tig
+    sudo apt-get install -y -q --no-install-recommends cpanminus curl jq libnet-ssleay-perl pandoc python3-setuptools shellcheck tig
     if [[ $HAS_GO = false ]]; then
         bash installer/golang.sh
     fi

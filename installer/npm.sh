@@ -8,7 +8,7 @@ source ~/dot-files/bash_functions.sh
 set -x
 
 if [[ $IS_DARWIN = false ]] && [[ $IS_SUDOER = true ]]; then
-    curl -sL https://deb.nodesource.com/setup_14.x | sudo -E bash -
+    curl -sL https://deb.nodesource.com/setup_18.x | sudo -E bash -
     sudo apt-get install -y nodejs
 fi
 
