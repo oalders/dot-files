@@ -31,9 +31,11 @@ fi
 add_path "$HOME/.plenv/bin"
 if which plenv >/dev/null; then eval "$(plenv init -)"; fi
 
-if [[ -d ~/.rbenv ]]; then
-    add_path "$HOME/.rbenv/bin"
-    eval "$(rbenv init -)"
+if which plenv >/dev/null; then
+    if [[ -d ~/.rbenv ]]; then
+        add_path "$HOME/.rbenv/bin"
+        eval "$(rbenv init -)"
+    fi
 fi
 
 GCLOUD_COMPLETION="/usr/local/Caskroom/google-cloud-sdk/latest/google-cloud-sdk/completion.bash.inc"
