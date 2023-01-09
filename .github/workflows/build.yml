@@ -92,3 +92,5 @@ jobs:
 
       - name: Install omegasort
         run: ./installer/omegasort.sh
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
