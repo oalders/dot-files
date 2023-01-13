@@ -7,6 +7,8 @@ equivalent_modules = Modern::Perl Moose operl Test2::V0
 
 [TooMuchCode::ProhibitUnusedInclude]
 
+[Variables::ProhibitUnusedVarsStricter]
+
 [-Perl::Critic::Policy::Subroutines::RequireArgUnpacking]
 
 [-Perl::Critic::Policy::ValuesAndExpressions::ProhibitAccessOfPrivateData]
