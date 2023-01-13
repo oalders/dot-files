@@ -1,4 +1,4 @@
-verbose = 11
+verbose = 4
 
 [TestingAndDebugging::RequireUseStrict]
 equivalent_modules = Modern::Perl Moose operl Test2::V0
