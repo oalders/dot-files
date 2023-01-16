@@ -243,7 +243,7 @@ let g:ale_fixers = {
 \   'html': ['remove_trailing_lines', 'trim_whitespace', 'prettier'],
 \   'java': ['remove_trailing_lines', 'trim_whitespace', 'google_java_format'],
 \   'javascript': ['eslint','prettier_eslint', 'remove_trailing_lines'],
-\   'json': ['prettier'],
+\   'json': ['fixjson', 'prettier'],
 \   'lua': ['luafmt', 'remove_trailing_lines', 'trim_whitespace'],
 \   'markdown': ['prettier'],
 \   'perl': ['perltidy', 'perlimports'],
