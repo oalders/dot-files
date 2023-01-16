@@ -77,9 +77,13 @@ if [ "$IS_DARWIN" = true ]; then
     # Open command line in editor
     bind "\C-e":edit-and-execute-command
 
-    SQLITE_PATH=/opt/homebrew/Cellar/sqlite/3.40.0/bin
-    add_path $SQLITE_PATH
-    if test -d /opt/homebrew/Cellar/sqlite; then
+    # Apple silicon
+    SQLITE_PATH=/opt/homebrew/opt/sqlite3/bin
+    if test -d /opt/homebrew/opt/sqlite3/bin; then
+        add_path $SQLITE_PATH
+    else
+        # Intel Macs
+        SQLITE_PATH=/usr/local/Cellar/sqlite/3.40.1/bin
         if ! test -d $SQLITE_PATH; then
             echo "$SQLITE_PATH needs to be updated"
         fi
