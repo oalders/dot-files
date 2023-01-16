@@ -227,6 +227,7 @@ let g:ale_linters = {
 \   'go': ['gofmt', 'golangci-lint', 'gopls', 'revive'],
 \   'dockerfile': ['hadolint'],
 \   'html': ['alex', 'fecs', 'htmlhint', 'stylelint', 'tidy',],
+\   'json': ['jq',],
 \   'markdown': ['markdownlint', 'write-good'],
 \   'perl': ['syntax-check', 'perlcritic', 'perlimports'],
 \   'rust': ['cargo', 'rls'],
