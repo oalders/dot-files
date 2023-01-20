@@ -164,13 +164,12 @@ viewing outpt.
 # Testing with Docker
 
 ```
-docker build -t dotfiles .
-docker run -it --volume $PWD:/root/dot-files dotfiles:latest /bin/bash
+docker run -it --volume $PWD:/root/dot-files ubuntu:latest /bin/bash
 ```
 
 In the Docker container:
 
 ```
 cd /root/dot-files
-USER=root ./install.sh
+USER=root ./installer/inside-docker.sh && ./install.sh
 ```
