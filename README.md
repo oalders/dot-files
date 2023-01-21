@@ -18,7 +18,6 @@
     * [vim](#vim)
     * [Alfred](#alfred)
     * [Bash](#bash)
-    * [macOS](#macos)
     * [less](#less)
     * [gh -- GitHub CLI](#gh----github-cli)
 * [Testing with Docker](#testing-with-docker)
@@ -139,11 +138,6 @@ to begin the search.
 
 * `fc` - open previous command in `$EDITOR`
 * `fc 2009` - open line 2009 of `history` in `$EDITOR`
-
-## macOS
-
-* Set default shell to bash: `chsh -s /bin/bash`
-* Eject disc from superdrive: `/usr/bin/drutil eject`
 
 ## less
 
