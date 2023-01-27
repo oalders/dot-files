@@ -65,7 +65,7 @@ ln -sf "$LINK_FLAG" $PREFIX/vim/after/plugin/abolish.vim ~/.vim/after/plugin/abo
 # This takes forever to run in CI, so we'll just do it here so that we can skip the step on GH
 if [[ $IS_GITHUB = false ]]; then
     add_path ~/local/bin
-    nvim +':GoUpdateBinaries' +qa
+    nvim +':GoUpdateBinaries' +qa || true
     nvim +'PlugInstall --sync' +qa
     nvim +'PlugUpdate --sync' +qa
 fi
