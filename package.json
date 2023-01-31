@@ -3,9 +3,7 @@
   "version": "1.0.0",
   "description": "https://github.com/Homebrew/homebrew-bundle",
   "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
+  "scripts": {},
   "repository": {
     "type": "git",
     "url": "git+https://github.com/oalders/dot-files.git"
@@ -35,5 +33,8 @@
     "urijs": ">=1.19.11",
     "write-good": "^1.0.8",
     "ws": "^8.12.0"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.30.0"
   }
 }
