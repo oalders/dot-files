@@ -15,7 +15,7 @@ pushd $src_dir > /dev/null
 
 rm -rf PathPicker && git clone https://github.com/facebook/PathPicker.git
 pushd PathPicker/ > /dev/null
-git checkout 0.9.2
+git checkout 0.9.5
 rm -rf $bin_dir/fpp
 ln -s "$(pwd)/fpp" $bin_dir/fpp
 
