@@ -35,7 +35,6 @@ INSTALLERS=(
     ./installer/linux.sh
     ./installer/symlinks.sh
     ./configure/git.sh
-    ./installer/fpp.sh
     ./configure/ssh.sh
     ./installer/pip.sh
     ./installer/nvim.sh
