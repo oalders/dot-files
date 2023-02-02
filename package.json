@@ -27,7 +27,7 @@
     "markdownlint": "^0.27.0",
     "markdownlint-cli": "^0.33.0",
     "normalize-url": "^8.0.0",
-    "npm": "^9.4.0",
+    "npm": "^9.4.1",
     "prettier": "^2.8.3",
     "tree-sitter-cli": "^0.20.7",
     "typescript": "^4.9.5",
