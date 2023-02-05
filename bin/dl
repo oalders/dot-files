@@ -1,0 +1,5 @@
+#!/bin/bash
+
+set -eux
+
+until yt-dlp --write-subs -N 2 "$1"; do :; done
