@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/env bash
 
 # Keep fzf config and functions together
 export FZF_DEFAULT_COMMAND='fd --type f --hidden --follow --exclude .git'

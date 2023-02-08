@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # See https://github.com/kcrawford/dockutil/issues/127#issuecomment-1086442131
 

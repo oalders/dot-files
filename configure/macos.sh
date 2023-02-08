@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 if [ "$IS_DARWIN" = false ]; then
     exit 0

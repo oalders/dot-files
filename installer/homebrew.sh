@@ -10,7 +10,7 @@ if [ "$IS_DARWIN" = false ]; then
 fi
 
 if [ ! "$(command -v brew)" ]; then
-    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+    /usr/bin/env bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
     add_path "/opt/homebrew/bin"
 fi
 

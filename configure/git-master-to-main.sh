@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Converting master => main
 # via https://www.kiloloco.com/articles/003-From-Master-To-Main/
