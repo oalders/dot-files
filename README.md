@@ -41,8 +41,35 @@ cd dot-files
 
 ### Change Default shell
 
+
+See https://apple.stackexchange.com/a/232983
+
+On macOS:
+
+`sudo vi /etc/shells`
+
+Afterwards it should look something like:
+
+```text
+# List of acceptable shells for chpass(1).
+# Ftpd will not allow users to connect who are not using
+# one of these shells.
+
+/bin/bash
+/bin/csh
+/bin/dash
+/bin/ksh
+/bin/sh
+/bin/tcsh
+/bin/zsh
+/opt/homebrew/bin/bash
 ```
-chsh -s /bin/bash
+
+Then:
+
+
+```
+chsh -s /opt/homebrew/bin/bash $USER
 ```
 
 ### Trackpad and Dock defaults
@@ -158,7 +185,7 @@ viewing outpt.
 # Testing with Docker
 
 ```
-docker run -it --volume $PWD:/root/dot-files ubuntu:latest /bin/bash
+docker run -it --volume $PWD:/root/dot-files ubuntu:latest /bin/env bash
 ```
 
 In the Docker container:
