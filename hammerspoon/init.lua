@@ -161,7 +161,6 @@ Install:andUse(
                 {
                     "apps",
                     "calc",
-                    "safari_bookmarks",
                     "screencapture",
                     "useractions"
                 }
