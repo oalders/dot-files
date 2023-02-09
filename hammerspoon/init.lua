@@ -185,6 +185,12 @@ Install:andUse(
                             hs.eventtap.keyStrokes(content)
                         end
                     end
+                },
+                ["Slackify Name"] = {
+                    keyword = "sl",
+                    fn = function(str)
+                        slackifyName(str)
+                    end
                 }
             }
             s:refreshAllCommands()
