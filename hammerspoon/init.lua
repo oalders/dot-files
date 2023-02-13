@@ -51,7 +51,7 @@ local function chrome_tab_action(url_substring, url_to_visit_if_tab_not_found)
 end
 
 hs.hotkey.bind(
-    my_hotkeys,
+    hyper,
     "h",
     function()
         hs.reload()
@@ -190,6 +190,17 @@ Install:andUse(
                     keyword = "sl",
                     fn = function(str)
                         slackifyName(str)
+                    end
+                },
+                ["xpasswd"] = {
+                    keyword = "xp",
+                    fn = function()
+                        local content, _, _, rc = hs.execute("xpasswd", true)
+                        if rc ~= 0 then
+                            hs.alert.show("xpasswd failed")
+                        else
+                            hs.eventtap.keyStrokes(content)
+                        end
                     end
                 }
             }
