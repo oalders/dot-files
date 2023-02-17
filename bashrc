@@ -155,6 +155,11 @@ tmux_session_name() {
         CURRENT_DIR=$(printf "%-30s" "$CURRENT_DIR")
 
         SESSION_NAME="$CURRENT_DIR  $BRANCH"
+        if [[ -f "dist.ini" ]] || [[ -f "cpanfile" ]]; then
+            SESSION_NAME="🐪 $SESSION_NAME"
+        elif [[ -f "Dockerfile" ]] || [[ -f "docker-compose.yml" ]]; then
+            SESSION_NAME="🐳 $SESSION_NAME"
+        fi
     else
         SESSION_NAME=$(pwd)
         STRIP="$HOME/"
