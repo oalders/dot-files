@@ -157,6 +157,10 @@ tmux_session_name() {
         SESSION_NAME="$CURRENT_DIR  $BRANCH"
         if [[ -f "dist.ini" ]] || [[ -f "cpanfile" ]]; then
             SESSION_NAME="🐪 $SESSION_NAME"
+        elif [[ -f "Cargo.toml" ]]; then
+            SESSION_NAME="🦀 $SESSION_NAME"
+        elif [[ -f "go.mod" ]]; then
+            SESSION_NAME="🚦 $SESSION_NAME"
         elif [[ -f "Dockerfile" ]] || [[ -f "docker-compose.yml" ]]; then
             SESSION_NAME="🐳 $SESSION_NAME"
         fi
