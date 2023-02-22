@@ -154,16 +154,23 @@ tmux_session_name() {
         CURRENT_DIR=${PWD##*/}
         CURRENT_DIR=$(printf "%-30s" "$CURRENT_DIR")
 
-        SESSION_NAME="$CURRENT_DIR  $BRANCH"
-        if [[ -f "dist.ini" ]] || [[ -f "cpanfile" ]]; then
-            SESSION_NAME="🐪 $SESSION_NAME"
-        elif [[ -f "Cargo.toml" ]]; then
-            SESSION_NAME="🦀 $SESSION_NAME"
-        elif [[ -f "go.mod" ]]; then
-            SESSION_NAME="🚦 $SESSION_NAME"
-        elif [[ -f "Dockerfile" ]] || [[ -f "docker-compose.yml" ]]; then
-            SESSION_NAME="🐳 $SESSION_NAME"
+        PREFIX='⁉️ '
+        if [[ ${PWD##*/} = 'dot-files' ]] || [[ ${PWD##*/} = 'local-dot-files' ]]; then
+            PREFIX='📂'
+        elif [[ -f 'dist.ini' ]] || [[ -f 'cpanfile' ]] || [[ -f 'app.psgi' ]]; then
+            PREFIX='🐪'
+        elif [[ -f 'Cargo.toml' ]]; then
+            PREFIX='🦀'
+        elif [[ -f 'go.mod' ]]; then
+            PREFIX='🚦'
+        elif [[ -f 'tsconfig.json' ]]; then
+            PREFIX='☕'
+        elif [[ -d 'ftplugin' ]]; then
+            PREFIX='🔌'
+        elif [[ -f 'Dockerfile' ]] || [[ -f 'docker-compose.yml' ]]; then
+            PREFIX='🐳'
         fi
+        SESSION_NAME="$PREFIX $CURRENT_DIR  $BRANCH"
     else
         SESSION_NAME=$(pwd)
         STRIP="$HOME/"
