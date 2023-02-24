@@ -42,7 +42,6 @@ alias fix-gpg='pkill -9 gpg-agent && export GPG_TTY=$(tty)'
 alias g=git
 alias gi=git  # fix typos
 alias gti=git # fix typos
-alias gdf='git domo|fpp'
 alias grep='grep --color=auto --exclude-dir=.git'
 alias heavy-cpu='ps --sort=-pcpu -aux|head -10'
 alias l='ls -lAtr'
@@ -53,13 +52,11 @@ alias octal_perms='stat -c "%a %n"'
 alias penv='perl -MDDP -e "p(%ENV)"'
 alias pine=alpine
 alias prune-local-branches='git remote prune origin && git branch -vv | grep -v origin'
-alias redo='fpp --redo'
 alias s='source ~/.bash_profile && source ~/.bashrc && source ~/dot-files/fzf_functions.sh'
 # http://stackoverflow.com/questions/13064613/how-to-prune-local-tracking-branches-that-do-not-exist-on-remote-anymore
 alias show-local-only-branches="git branch -r | awk '{print \$1}' | egrep -v -f /dev/fd/0 <(git branch -vv | grep origin) | awk '{print \$1}'"
 alias show-merged-branches='git branch --no-color --merged | grep -v "\*" | grep -v master'
 alias ssh-fingerprints='ls ~/.ssh/*.pub | xargs -L 1 ssh-keygen -l -f'
-alias stp='git status | fpp --no-file-checks'
 # https://stackoverflow.com/a/19280187/406224
 alias takeover="tmux detach -a"
 alias tg='tidyall -g && git add -p'
@@ -218,59 +215,6 @@ tmux() {
     else
         tmux_session_name
         $tmux new -s "$SESSION_NAME"
-    fi
-}
-
-export FPP_DIR="$HOME/.fpp"
-fpp() {
-    local fpp=$(type -fp fpp)
-
-    HISTORY_FILE="$FPP_DIR/.fpp_history"
-    FPP_CACHE="$FPP_DIR/.fpp.sh"
-
-    touch "$HISTORY_FILE"
-
-    # fpp --history just displays entire history prefixed by line numbers
-    # fpp --redo will re-exec the last entry in the history file
-    # fpp --redo -1 will also re-exec the last entry in the history file
-    # fpp --redo -2 will re-exec the second last line in the history file
-    # fpp --redo 11 will re-exec entry number 11 in the history file
-    case "$1" in
-    --history)
-        cat -n "$HISTORY_FILE"
-        return 1
-        ;;
-    --redo)
-        if [ "$2" ]; then
-            if [ "$2" -gt 0 ]; then
-                LAST_HISTORY_LINE=$(head -n "$2" "$HISTORY_FILE" | tail -n 1)
-            else
-                LINE_NUMBER=$(($2 * -1))
-                LAST_HISTORY_LINE=$(tail -n "$LINE_NUMBER" "$HISTORY_FILE" | head -n 1)
-            fi
-        else
-            LAST_HISTORY_LINE=$(tail -n 1 "$HISTORY_FILE")
-        fi
-
-        eval "$LAST_HISTORY_LINE"
-        return 1
-        ;;
-    esac
-
-    LAST_HISTORY_LINE=$(tail -n 1 "$HISTORY_FILE")
-    $fpp "$@"
-    LAST_COMMAND=$(tail -n 2 "$FPP_CACHE" | head -n 1)
-
-    # Don't keep adding the same command to the history file.
-    # Also, don't log a message about a no-op.
-
-    if [[ ("$LAST_COMMAND" != '') && ("$LAST_COMMAND" != "$LAST_HISTORY_LINE") ]]; then
-        echo "$LAST_COMMAND" >>"$HISTORY_FILE"
-
-        # This doesn't work yet.
-        #HISTFILE=~/.bash_history
-        #set -o history
-        #history -s "$LAST_COMMAND"
     fi
 }
 
