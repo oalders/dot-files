@@ -14,5 +14,6 @@ fi
 
 npm install npm@latest
 npm install
+npx --yes npm-merge-driver install --global
 
 exit 0
