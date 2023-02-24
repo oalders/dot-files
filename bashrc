@@ -280,6 +280,8 @@ export LANG=en_US.UTF-8
 add_path "$GOPATH/bin"
 
 SOCK=~/.ssh/ssh_auth_sock
+
+# shellcheck disable=SC2153
 if test "$SSH_AUTH_SOCK" && test "$TMUX" && [ "$SSH_AUTH_SOCK" != "$SOCK" ]; then
     export SSH_AUTH_SOCK=$SOCK
 fi
