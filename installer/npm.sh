@@ -15,7 +15,8 @@ fi
 npm install npm@latest
 npm install
 
-if [[ $IS_GITHUB == false ]]; then
+if [[ $IS_GITHUB == false ]] && [[ $IS_DARWIN == true ]]; then
+    mkdir -p "$HOME/.npm-packages/lib"
     npx --yes npm-merge-driver install --global
 fi
 
