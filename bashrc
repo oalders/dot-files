@@ -196,7 +196,7 @@ tmux() {
             while read -r v; do
                 if [[ $v == -* ]]; then
                     echo "unset $v"
-                    unset ${v/#-/}
+                    unset "${v/#-/}"
                 else
                     # Add quotes around the argument
                     v=${v/=/=\"}
