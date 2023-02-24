@@ -193,7 +193,7 @@ tmux() {
         case "$1" in
         update-environment | update-env | ue)
             local v
-            while read v; do
+            while read -r v; do
                 if [[ $v == -* ]]; then
                     echo "unset $v"
                     unset ${v/#-/}
