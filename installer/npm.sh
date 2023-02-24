@@ -14,6 +14,9 @@ fi
 
 npm install npm@latest
 npm install
-npx --yes npm-merge-driver install --global
+
+if [[ $IS_GITHUB = false ]]; then
+    npx --yes npm-merge-driver install --global
+fi
 
 exit 0
