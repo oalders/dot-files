@@ -62,6 +62,12 @@ if has('nvim')
   Plug 'williamboman/mason.nvim'
   Plug 'williamboman/mason-lspconfig.nvim'
   Plug 'neovim/nvim-lspconfig'
+
+  " noice
+  Plug 'folke/noice.nvim'
+  Plug 'MunifTanjim/nui.nvim'
+  Plug 'rcarriga/nvim-notify'
+
 else
   Plug 'Shougo/deoplete.nvim'
   Plug 'roxma/nvim-yarp'
