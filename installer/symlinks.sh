@@ -31,6 +31,7 @@ ln -sf $PREFIX/bat/config ~/.config/bat/config
 ln -sf $PREFIX/cpanreporter/config.ini ~/.cpanreporter/config.ini
 ln -sf $PREFIX/dataprinter ~/.dataprinter
 ln -sf $PREFIX/digrc ~/.digrc
+ln -sf $PREFIX/editorconfig ~/.editorconfig
 ln -sf $PREFIX/gitignore_global ~/.gitignore_global
 ln -sf $PREFIX/golangci.yml ~/.golangci.yml
 ln -sf $PREFIX/inputrc ~/.inputrc
