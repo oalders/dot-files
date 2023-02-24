@@ -12,7 +12,7 @@ run_installer() {
     echo ""
 }
 
-if [[ $IS_DARWIN = true ]]; then
+if [[ $IS_DARWIN == true ]]; then
     MAC_INSTALLERS=(
         ./installer/xcode.sh
         ./installer/homebrew.sh

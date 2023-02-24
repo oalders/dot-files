@@ -20,7 +20,7 @@ mkdir -p ~/.vim/after/plugin
 ln -sf "$LINK_FLAG" $PREFIX/vim/after/syntax/perl/heredoc-sql.vim ~/.vim/after/syntax/perl/heredoc-sql.vim
 ln -sf "$LINK_FLAG" $PREFIX/vim/after/syntax/gitcommit.vim ~/.vim/after/syntax/gitcommit.vim
 
-if [[ $HAS_GO = true ]]; then
+if [[ $HAS_GO == true ]]; then
     go version
     unset GOPROXY
     echo "Installing shfmt"
@@ -63,7 +63,7 @@ fi
 ln -sf "$LINK_FLAG" $PREFIX/vim/after/plugin/abolish.vim ~/.vim/after/plugin/abolish.vim
 
 # This takes forever to run in CI, so we'll just do it here so that we can skip the step on GH
-if [[ $IS_GITHUB = false ]]; then
+if [[ $IS_GITHUB == false ]]; then
     add_path ~/local/bin
     nvim +':GoUpdateBinaries' +qa || true
     nvim +'PlugInstall --sync' +qa

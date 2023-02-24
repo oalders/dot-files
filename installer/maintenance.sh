@@ -5,7 +5,7 @@ set -eux
 rm -f ~/.cargo/bin/bat
 rm -f ~/.cargo/bin/precious
 
-if [[ "$IS_DARWIN" = true ]]; then
+if [[ $IS_DARWIN == true ]]; then
     rm -f ~/.cargo/bin/fd
     brew remove tunnelblick || true
     brew remove vim || true

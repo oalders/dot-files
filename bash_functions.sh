@@ -42,17 +42,17 @@ detect_posh_settings() {
     export MY_INSIDE_TMUX
 }
 
-if [[ ! "${MY_POSH_THEME:-}" || ! "${FORCE_POSH_THEME:-}" ]]; then
+if [[ ! ${MY_POSH_THEME-} || ! ${FORCE_POSH_THEME-} ]]; then
     detect_posh_settings
     MY_POSH_THEME="remote"
 
-    if [[ $MY_INSIDE_SSH = true ]]; then
-        if [[ $MY_INSIDE_TMUX = true && ! "${FORCE_POSH_THEME:-}" ]]; then
+    if [[ $MY_INSIDE_SSH == true ]]; then
+        if [[ $MY_INSIDE_TMUX == true && ! ${FORCE_POSH_THEME-} ]]; then
             MY_POSH_THEME="remote-tiny"
         fi
     else
         MY_POSH_THEME="local"
-        if [[ $MY_INSIDE_TMUX = true && ! "${FORCE_POSH_THEME:-}" ]]; then
+        if [[ $MY_INSIDE_TMUX == true && ! ${FORCE_POSH_THEME-} ]]; then
             MY_POSH_THEME="local-tiny"
         fi
     fi
@@ -88,14 +88,14 @@ GOPATH=~/go
 HAS_GO=false
 add_path "/usr/local/go/bin"
 
-if [[ (-n "${GOPATH+set}") && ($(command -v go version)) ]]; then
+if [[ (-n ${GOPATH+set}) && ($(command -v go version)) ]]; then
     HAS_GO=true
 fi
 
 HAS_PLENV=false
 
 # should probably also ensure that Plenv version is not the system Perl
-if [[ (-n "${PLENV_SHELL+set}") ]]; then
+if [[ -n ${PLENV_SHELL+set} ]]; then
     HAS_PLENV=true
 fi
 
@@ -121,8 +121,8 @@ fi
 
 IS_GITHUB=false
 
-LOOKS_LIKE_GITHUB=${GITHUB_WORKSPACE:-}
-if [[ -n "$LOOKS_LIKE_GITHUB" ]]; then
+LOOKS_LIKE_GITHUB=${GITHUB_WORKSPACE-}
+if [[ -n $LOOKS_LIKE_GITHUB ]]; then
     IS_GITHUB=true
 fi
 
@@ -135,7 +135,7 @@ if [[ -z ${IS_MM+x} ]]; then
 fi
 
 if [[ -z ${IS_SUDOER+x} ]]; then
-    if [[ $IS_MM = true ]]; then
+    if [[ $IS_MM == true ]]; then
         # Don't try to sudo on MM machines
         IS_SUDOER="${IS_SUDOER:=false}"
 

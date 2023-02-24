@@ -27,7 +27,7 @@ declare -a fonts=(
 version='2.2.2'
 fonts_dir="${HOME}/.local/share/fonts"
 
-if [[ ! -d "$fonts_dir" ]]; then
+if [[ ! -d $fonts_dir ]]; then
     mkdir -p "$fonts_dir"
 fi
 

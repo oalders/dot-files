@@ -10,7 +10,7 @@ echo "version $LATEST"
 
 ARCHITECTURE="amd"
 
-if [[ $(uname -m) = "aarch64" ]]; then
+if [[ $(uname -m) == "aarch64" ]]; then
     ARCHITECTURE="arm"
 fi
 
