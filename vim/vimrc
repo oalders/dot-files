@@ -404,8 +404,8 @@ let g:fzf_preview_window = ['down:50%', 'ctrl-/', ]
 nnoremap <leader>b :Buffers<cr>
 
 "remove all trailing whitespace
-:nnoremap <silent> - :FixWhitespace<CR>
-:vnoremap <silent> - :FixWhitespace<CR>
+:nnoremap <silent> - :StripWhitespace<CR>
+:vnoremap <silent> - :StripWhitespace<CR>
 
 "dictionary sort
 :vnoremap <silent> so :!sort -d --ignore-case<CR>
