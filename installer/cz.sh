@@ -2,7 +2,7 @@
 
 set -eu -o pipefail
 
-if [[ ("${BASH_VERSINFO[0]}" -lt 4 ) ]]; then
+if [[ ("${BASH_VERSINFO[0]}" -lt 4) ]]; then
     echo "Need bash version >= 4 to install cz"
     exit 0
 fi

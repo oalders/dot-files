@@ -2,7 +2,7 @@
 
 set -eux
 
-remove_wezterm () {
+remove_wezterm() {
     rm -rf /Applications/WezTerm.app \
         /usr/local/bin/strip-ansi-escapes \
         /usr/local/bin/wezterm \

@@ -178,9 +178,9 @@ ll() {
     eval "$COMMAND"
 }
 
-format_json () {
+format_json() {
     FILE=$1
-    jq < "$FILE" | sed 's/\\n/\n/g' | sed 's/\\t/\t/g'
+    jq <"$FILE" | sed 's/\\n/\n/g' | sed 's/\\t/\t/g'
 }
 
 HARNESS_OPTIONS="j1:c"
@@ -189,7 +189,7 @@ HARNESS_OPTIONS="j1:c"
 # with symlinks.
 RIPGREP_CONFIG_PATH=~/dot-files/ripgreprc
 
-if [[ $(command -v nproc) ]];then
+if [[ $(command -v nproc) ]]; then
     MY_PROCS="$(nproc)"
     export MY_PROCS
 fi

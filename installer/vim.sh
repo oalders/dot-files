@@ -23,7 +23,7 @@ set -x
 sudo apt-get install -y --no-install-recommends software-properties-common
 
 if [[ $USER != "pi" ]]; then
-  sudo add-apt-repository -y ppa:jonathonf/vim
+    sudo add-apt-repository -y ppa:jonathonf/vim
 fi
 
 sudo apt update

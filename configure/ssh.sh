@@ -15,9 +15,9 @@ if [ "$IS_DARWIN" = true ]; then
     ln -sf $PREFIX/ssh/config ~/.ssh/config
     mkdir -p ~/.ssh/config.d/
     if [[ -d ~/local-dot-files/ssh/config.d ]]; then
-        pushd ~/.ssh/config.d/ > /dev/null
+        pushd ~/.ssh/config.d/ >/dev/null
         ln -sf ~/local-dot-files/ssh/config.d/* .
-        popd > /dev/null
+        popd >/dev/null
     fi
 else
     rm -f ~/.ssh/config

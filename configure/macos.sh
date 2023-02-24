@@ -21,10 +21,8 @@ defaults write com.apple.dock autohide-delay -float 0
 # System Preferences > Dock > Show indicators for open applications
 defaults write com.apple.dock show-process-indicators -bool true
 
-
 # System Preferences > Trackpad > Tap to click
 defaults write com.apple.driver.AppleBluetoothMultitouch.trackpad Clicking -bool true
-
 
 # System Preferences > Accessibility > Mouse & Trackpad > Trackpad Potions
 defaults write com.apple.AppleMultitouchTrackpad TrackpadThreeFingerDrag -bool true
@@ -43,7 +41,7 @@ defaults write com.apple.dock no-bouncing -bool TRUE
 
 # Kill affected apps
 for app in "Dock" "Finder"; do
-  killall "${app}" > /dev/null 2>&1
+    killall "${app}" >/dev/null 2>&1
 done
 
 # Done
