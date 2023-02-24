@@ -186,8 +186,8 @@ tmux_session_name() {
 
 # https://raim.codingfarm.de/blog/2013/01/30/tmux-update-environment/
 tmux() {
-    #set -eux
-    local tmux=$(type -fp tmux)
+    local tmux
+    tmux=$(type -fp tmux)
 
     if [ $# -ge 1 ] && [ -n "$1" ]; then
         case "$1" in
