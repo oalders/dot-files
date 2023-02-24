@@ -6,7 +6,7 @@ source ~/.vimrc
 " See :TSInstall perl
 lua <<EOF
 require'nvim-treesitter.configs'.setup {
-    ensure_installed = { 'bash', 'dockerfile', 'go', 'html', 'javascript', 'lua', 'python', 'ruby', 'rust', 'sql', 'typescript', 'yaml' },
+  ensure_installed = { 'bash', 'dockerfile', 'go', 'html', 'javascript', 'lua', 'markdown', 'markdown_inline', 'python', 'regex', 'ruby', 'rust', 'sql', 'typescript', 'vim', 'yaml' },
     -- ensure_installed = 'all',
   highlight = {
     enable = true,              -- false will disable the whole extension
