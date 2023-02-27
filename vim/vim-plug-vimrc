@@ -77,6 +77,9 @@ if has('nvim')
   Plug 'hrsh7th/cmp-vsnip'
   Plug 'hrsh7th/vim-vsnip'
 
+  Plug 'williamboman/mason.nvim'
+  Plug 'williamboman/mason-lspconfig.nvim'
+
 else
   Plug 'Shougo/deoplete.nvim'
   Plug 'roxma/nvim-yarp'
