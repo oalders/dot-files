@@ -53,7 +53,6 @@ Plug 'yko/mojo.vim'
 if has('nvim')
   Plug 'lukas-reineke/virt-column.nvim'
   Plug 'nvim-treesitter/nvim-treesitter', { 'do': ':TSUpdate'}  " We recommend updating the parsers on update
-  Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
 
   Plug 'akinsho/bufferline.nvim'
   Plug 'kyazdani42/nvim-web-devicons' " Recommended (for coloured icons for bufferline.nvim)
@@ -81,7 +80,6 @@ if has('nvim')
   Plug 'williamboman/mason-lspconfig.nvim'
 
 else
-  Plug 'Shougo/deoplete.nvim'
   Plug 'roxma/nvim-yarp'
   Plug 'roxma/vim-hug-neovim-rpc'
 endif

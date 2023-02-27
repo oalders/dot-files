@@ -152,7 +152,7 @@ set expandtab
 vnoremap < <gv
 vnoremap > >gv
 
-" make tab in v mode ident code
+" make tab in v mode indent code
 vmap <tab> >gv
 vmap <s-tab> <gv
 
@@ -395,8 +395,6 @@ vnoremap <silent> '' :s/\%V"/'/g<cr>
 set pyxversion=3
 let g:python_host_prog = '/usr/bin/python2'
 let g:python3_host_prog = '/usr/bin/python3'
-let g:deoplete#enable_at_startup = 0
-let g:deoplete#auto_complete_start_length = 5
 
 " fzf
 nnoremap <leader>f : <C-u>FZF<CR>

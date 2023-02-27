@@ -1,5 +1,4 @@
 # future: fix "ImportError: No module named builtins"
-# pynvim: required by deoplete
 # sqlparse: required by mbra/prettysql
 # vint: required by ALE
 # yamllint: required by ALE
@@ -7,7 +6,6 @@
 future
 neovim
 pipx
-pynvim
 sqlparse
 vim-vint
 yamllint
