@@ -6,6 +6,12 @@ require("noice").setup({
       ["vim.lsp.util.stylize_markdown"] = true,
       ["cmp.entry.get_documentation"] = true,
     },
+    progress = {
+      enabled = true,
+      format = 'lsp_progress',
+      format_done = 'lsp_progress_done',
+      view = 'mini',
+    },
   },
   -- you can enable a preset for easier configuration
   presets = {
