@@ -8,7 +8,6 @@ source bash_functions.sh
 PREFIX=~/dot-files
 
 mkdir -p ~/.config/bat
-mkdir -p ~/.config/nvim
 mkdir -p ~/.config/oh-my-posh/themes
 mkdir -p ~/.config/perlimports
 mkdir -p ~/.config/wezterm
@@ -19,7 +18,13 @@ mkdir -p ~/.npm-packages
 mkdir -p ~/.re.pl
 
 if [ "$IS_DARWIN" = true ]; then
-    mkdir -p $HOME/.config/karabiner
+    mkdir -p "$HOME/.config/karabiner"
+fi
+
+# Remove after deployed to all environments
+if [[ -d "$HOME/.config/nvim" ]]; then
+    unlink "$HOME/.config/nvim/init.vim"
+    rmdir "$HOME/.config/nvim"
 fi
 
 ln -sf $LINK_FLAG $PREFIX/dzil ~/.dzil
@@ -36,7 +41,7 @@ ln -sf $PREFIX/gitignore_global ~/.gitignore_global
 ln -sf $PREFIX/golangci.yml ~/.golangci.yml
 ln -sf $PREFIX/inputrc ~/.inputrc
 ln -sf $PREFIX/minicpanrc ~/.minicpanrc
-ln -sf $PREFIX/nvim/init.vim ~/.config/nvim/init.vim
+ln -sf $PREFIX/nvim ~/.config/nvim
 ln -sf $PREFIX/oh-my-posh/themes/local.omp.json ~/.config/oh-my-posh/themes/local.omp.json
 ln -sf $PREFIX/oh-my-posh/themes/local-tiny.omp.json ~/.config/oh-my-posh/themes/local-tiny.omp.json
 ln -sf $PREFIX/oh-my-posh/themes/remote.omp.json ~/.config/oh-my-posh/themes/remote.omp.json
