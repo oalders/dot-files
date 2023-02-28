@@ -21,10 +21,14 @@ if [ "$IS_DARWIN" = true ]; then
     mkdir -p "$HOME/.config/karabiner"
 fi
 
-# Remove after deployed to all environments
-if [[ -d "$HOME/.config/nvim" ]]; then
-    unlink "$HOME/.config/nvim/init.vim"
-    rmdir "$HOME/.config/nvim"
+nvim_conf_dir="$HOME/.config/nvim"
+# Simplify after deployed to all environments
+if [[ -d $nvim_conf_dir && ! -L $nvim_conf_dir ]]; then
+    unlink "$nvim_conf_dir/init.vim"
+    rmdir "$nvim_conf_dir"
+elif [[ ! -L $nvim_conf_dir ]]; then
+    echo "$nvim_conf_dir should create symlink"
+    ln -sf $PREFIX/nvim "$nvim_conf_dir"
 fi
 
 ln -sf $LINK_FLAG $PREFIX/dzil ~/.dzil
@@ -41,7 +45,6 @@ ln -sf $PREFIX/gitignore_global ~/.gitignore_global
 ln -sf $PREFIX/golangci.yml ~/.golangci.yml
 ln -sf $PREFIX/inputrc ~/.inputrc
 ln -sf $PREFIX/minicpanrc ~/.minicpanrc
-ln -sf $PREFIX/nvim ~/.config/nvim
 ln -sf $PREFIX/oh-my-posh/themes/local.omp.json ~/.config/oh-my-posh/themes/local.omp.json
 ln -sf $PREFIX/oh-my-posh/themes/local-tiny.omp.json ~/.config/oh-my-posh/themes/local-tiny.omp.json
 ln -sf $PREFIX/oh-my-posh/themes/remote.omp.json ~/.config/oh-my-posh/themes/remote.omp.json
