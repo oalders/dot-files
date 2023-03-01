@@ -190,19 +190,29 @@ require("mason-lspconfig").setup {
 }
 
 -- After setting up mason-lspconfig you may set up servers via lspconfig
+-- See server/src/server.ts in PerlNavigator for a list of available settings
 require("lspconfig").perlnavigator.setup {
   -- capabilities = capabilities,
   settings = {
     perlnavigator = {
-      -- perlPath = 'perl',
       enableWarnings = true,
       -- perltidyProfile = '',
       -- perlcriticProfile = '',
+      includePaths = {'lib', 'dev/lib', 't/lib'},
       perlcriticEnabled = false,
       perlimportsLintEnabled = true,
       perlimportsTidyEnabled = true,
+      perlPath = 'perl',
     }
-  }
+  },
+  on_new_config = function(new_config, new_root)
+    local m = string.match(new_root, '^(.teamcity)')
+    if m then
+      new_config.settings.perlnavigator.perlPath = 'mm-perl'
+      new_config.settings.perlnavigator.perlcriticProfile = table.concat({ m, 'mm_website/.perlcriticrc' }, '/')
+      new_config.settings.perlnavigator.perltidyProfile = table.concat({ m, 'mm_website/.perltidyallrc' }, '/')
+    end
+  end,
 }
 
 wildchar = "<tab>"
