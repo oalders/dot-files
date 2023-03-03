@@ -186,7 +186,7 @@ local capabilities = require('cmp_nvim_lsp').default_capabilities()
 
 require("mason").setup()
 require("mason-lspconfig").setup {
-  ensure_installed = { "perlnavigator" }
+  ensure_installed = { "perlnavigator", "rust_analyzer" }
 }
 
 -- After setting up mason-lspconfig you may set up servers via lspconfig
@@ -214,6 +214,28 @@ require("lspconfig").perlnavigator.setup {
     end
   end,
 }
+
+require('lspconfig').rust_analyzer.setup({
+    on_attach=on_attach,
+    settings = {
+        ["rust-analyzer"] = {
+            imports = {
+                granularity = {
+                    group = "module",
+                },
+                prefix = "self",
+            },
+            cargo = {
+                buildScripts = {
+                    enable = true,
+                },
+            },
+            procMacro = {
+                enable = true
+            },
+        }
+    }
+})
 
 wildchar = "<tab>"
 -- require("lspconfig").rust_analyzer.setup {}
