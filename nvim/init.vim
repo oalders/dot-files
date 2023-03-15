@@ -239,7 +239,7 @@ require('lspconfig').rust_analyzer.setup({
 
 require('lspconfig').tsserver.setup{
   on_attach = on_attach,
-  filetypes = { "typescript", "typescriptreact" },
+  filetypes = { "javascript", "typescript", "typescriptreact" },
   cmd = { "typescript-language-server", "--stdio" },
 }
 
