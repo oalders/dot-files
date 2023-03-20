@@ -1,4 +1,3 @@
-tap "caskroom/cask"
 tap "homebrew/bundle"
 tap "homebrew/cask"
 tap "homebrew/cask-fonts"
@@ -15,14 +14,11 @@ brew "automake"
 brew "bash"
 brew "bash-completion"
 brew "bat"
-brew "berkeley-db"
-brew "berkeley-db@4"
 brew "brew-cask-completion"
 brew "cabal-install"
 brew "cloog"
 brew "cmake"
 brew "cmatrix"
-brew "cpanminus"
 brew "ctags"
 brew "curl"
 brew "docker-completion"
@@ -168,6 +164,4 @@ mas "Silicio", id: 933627574
 mas "Skitch", id: 425955336
 mas "Slack", id: 803453959
 mas "Space Gremlin", id: 414515628
-mas "Spark", id: 1176895641
 mas "Telegram", id: 747648890
-mas "Todoist", id: 585829637
