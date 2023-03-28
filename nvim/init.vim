@@ -23,8 +23,8 @@ local parser_config = require('nvim-treesitter.parsers').get_parser_configs()
 parser_config.perl = {
   install_info = {
     url = 'https://github.com/tree-sitter-perl/tree-sitter-perl',
-    files = { 'src/parser.c', 'src/scanner.cc' },
-    generate_requires_npm = true,
+    revision = 'release',
+    files = { 'src/parser.c', 'src/scanner.c' },
   },
   maintainers = { '@leonerd' },
   filetype = 'perl',
