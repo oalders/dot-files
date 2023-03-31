@@ -4,7 +4,7 @@
 # https://docs.appimage.org/user-guide/troubleshooting/fuse.html
 
 set -eu
-cd /tmp || exit
+pushd /tmp || exit
 
 # shellcheck source=bash_functions.sh
 source ~/dot-files/bash_functions.sh
@@ -35,6 +35,9 @@ else
 fi
 
 mv $FILE "$HOME/local/bin/nvim"
+
+popd
+./installer/tree-sitter-perl.sh
 
 echo "done nvim install"
 exit 0
