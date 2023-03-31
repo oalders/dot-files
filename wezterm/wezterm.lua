@@ -1,28 +1,33 @@
 local wezterm = require 'wezterm';
+local config = {}
 
-return {
-  font_size = 14.0,
-  font = wezterm.font_with_fallback({
+if wezterm.config_builder then
+  config = wezterm.config_builder()
+end
+
+config.font_size = 14.0
+config.font = wezterm.font_with_fallback({
     "JetBrainsMono Nerd Font",
-}),
-  allow_square_glyphs_to_overflow_width = "WhenFollowedBySpace",
-  color_scheme = "nord",
+})
+config.allow_square_glyphs_to_overflow_width = "WhenFollowedBySpace"
+config.color_scheme = "nord"
 
-  colors = {
-    cursor_bg = '#B48EAD',
-    tab_bar = {
-      active_tab = {
-        bg_color = "#78c1d2",
-        fg_color = "#404d5f",
-      },
-      inactive_tab = {
-        bg_color = "#54748c",
-        fg_color = "#ddd",
-      },
-      new_tab = {
-        bg_color = "#54748c",
-        fg_color = "#ddd",
-      },
-    }
+config.colors = {
+  cursor_bg = '#B48EAD',
+  tab_bar = {
+    active_tab = {
+      bg_color = "#78c1d2",
+      fg_color = "#404d5f",
+    },
+    inactive_tab = {
+      bg_color = "#54748c",
+      fg_color = "#ddd",
+    },
+    new_tab = {
+      bg_color = "#54748c",
+      fg_color = "#ddd",
+    },
   }
 }
+
+return config;
