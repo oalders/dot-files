@@ -30,4 +30,7 @@ config.colors = {
   }
 }
 
+-- config.window_background_opacity = .65
+-- config.macos_window_background_blur = 20
+
 return config;
