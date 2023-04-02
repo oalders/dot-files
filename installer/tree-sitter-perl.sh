@@ -3,7 +3,7 @@
 set -eux
 
 DIR=tree-sitter-perl
-REPO=git@github.com:tree-sitter-perl/tree-sitter-perl.git
+REPO=https://github.com/tree-sitter-perl/tree-sitter-perl.git
 SRC="$HOME/dot-files/src"
 
 mkdir -p "$SRC"
