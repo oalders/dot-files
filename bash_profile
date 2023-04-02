@@ -83,7 +83,7 @@ if [ "$IS_DARWIN" = true ]; then
         add_path $SQLITE_PATH
     else
         # Intel Macs
-        SQLITE_PATH=/usr/local/Cellar/sqlite/3.41.1/bin
+        SQLITE_PATH=/usr/local/Cellar/sqlite/3.41.2/bin
         if ! test -d $SQLITE_PATH; then
             echo "$SQLITE_PATH needs to be updated"
         fi
