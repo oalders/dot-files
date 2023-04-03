@@ -21,6 +21,7 @@
     * [less](#less)
     * [gh -- GitHub CLI](#gh----github-cli)
 * [Testing with Docker](#testing-with-docker)
+* [Docker bashrc](#docker-bashrc)
 
 <!-- vim-markdown-toc -->
 
@@ -193,4 +194,10 @@ In the Docker container:
 ```
 cd /root/dot-files
 USER=root ./installer/inside-docker.sh && ./install.sh
+```
+
+# Docker bashrc
+
+```
+docker run --rm -it -p 5000:5000 -v "$HOME/dot-files/bashrc-docker:/root/.bashrc"  --volume $PWD:/sandbox python:latest bashrc
 ```
