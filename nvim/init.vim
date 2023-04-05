@@ -2,12 +2,10 @@ set runtimepath^=~/.vim,~/.vim/after
 set packpath^=~/.vim
 source ~/.vimrc
 
-" The branch of treesitter I'm using doesn't yet support Perl
-" See :TSInstall perl
 lua <<EOF
-if vim.fn.has 'nvim-0.9.0' == 1 then
-  vim.loader.enable()
-end
+-- if vim.fn.has 'nvim-0.9.0' == 1 then
+--  vim.loader.enable()
+-- end
 
 require'nvim-treesitter.configs'.setup {
   ensure_installed = { 'bash', 'dockerfile', 'go', 'html', 'javascript', 'lua', 'markdown', 'markdown_inline', 'python', 'regex', 'ruby', 'rust', 'sql', 'typescript', 'vim', 'yaml' },
