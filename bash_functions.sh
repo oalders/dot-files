@@ -194,6 +194,13 @@ if [[ $(command -v nproc) ]]; then
     export MY_PROCS
 fi
 
+ghrc() {
+    REPO=$1
+    CLONE_TO=$(trurl "$REPO" --get '{path}' | sed 's/^\///' | sed 's/\.git$//' )
+    gh repo clone "$REPO" "$CLONE_TO"
+    cd "$CLONE_TO" || exit 1
+}
+
 export GO111MODULE
 export GOPATH
 export HARNESS_OPTIONS
