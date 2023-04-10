@@ -29,7 +29,7 @@
     "normalize-url": "^8.0.0",
     "npm": "^9.6.4",
     "prettier": "^2.8.7",
-    "tree-sitter-cli": "^0.20.7",
+    "tree-sitter-cli": "^0.20.8",
     "typescript": "^5.0.3",
     "underscore": "^1.13.6",
     "urijs": ">=1.19.11",
