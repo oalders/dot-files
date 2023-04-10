@@ -30,7 +30,7 @@
     "npm": "^9.6.4",
     "prettier": "^2.8.7",
     "tree-sitter-cli": "^0.20.8",
-    "typescript": "^5.0.3",
+    "typescript": "^5.0.4",
     "underscore": "^1.13.6",
     "urijs": ">=1.19.11",
     "write-good": "^1.0.8",
