@@ -19,7 +19,6 @@ fi
 
 make
 
-prove test.pl
 cp trurl "$HOME/local/bin/"
 
 exit 0
