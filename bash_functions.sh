@@ -201,6 +201,20 @@ ghrc() {
     cd "$CLONE_TO" || exit 1
 }
 
+change_git_origin() {
+    # https://github.com/metacpan/metacpan-api.git
+    # git@github.com:metacpan/metacpan-api.git
+
+    REPO=$(git config --get remote.origin.url)
+
+    TO=$(trurl "$REPO" --get '{path}' | sed 's/^\///' | sed 's/\.git$//')
+
+    GIT="git@github.com:${TO}.git"
+
+    git remote remove origin
+    git remote add origin "$GIT"
+}
+
 export GO111MODULE
 export GOPATH
 export HARNESS_OPTIONS
