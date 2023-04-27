@@ -3,6 +3,11 @@
 # Taken from https://docs.docker.com/engine/install/ubuntu/
 set -x
 
+if [ "$IS_DARWIN" = true ]; then
+    echo "Linux only"
+    exit 1
+fi
+
 sudo apt-get update
 sudo apt-get install \
     ca-certificates \
