@@ -28,7 +28,7 @@ if [ "$HAS_PLENV" = false ]; then
 fi
 
 if [[ ! $(which cpm) ]]; then
-    curl -fsSL --compressed https://git.io/cpm | perl - install --global App::cpm
+    curl -fsSL --compressed https://raw.githubusercontent.com/skaji/cpm/master/cpm | perl - install --global App::cpm
 fi
 
 if [[ $IS_DARWIN == true && ! -d /opt/homebrew ]]; then
