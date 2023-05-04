@@ -67,8 +67,8 @@ if [ "$IS_DARWIN" = true ]; then
     alias updatedb="sudo /usr/libexec/locate.updatedb"
 
     # python scripts via pip install --user
-    remove_path "$HOME/Library/Python/3.8/bin"
-    add_path "$HOME/Library/Python/3.9/bin"
+    remove_path "$HOME/Library/Python/3.9/bin"
+    add_path "$HOME/Library/Python/3.11/bin"
 fi
 
 add_path "$HOME/.local/bin"
