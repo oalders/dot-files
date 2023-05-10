@@ -41,7 +41,9 @@ alias dzil-stale='dzil stale --all | xargs cpm install --global'
 alias fix-gpg='pkill -9 gpg-agent && export GPG_TTY=$(tty)'
 alias g=git
 alias gi=git  # fix typos
+alias git-clean="git gc && git-lfs prune"
 alias gti=git # fix typos
+alias go-clean="go clean -modcache"
 alias grep='grep --color=auto --exclude-dir=.git'
 alias heavy-cpu='ps --sort=-pcpu -aux|head -10'
 alias l='ls -lAtr'
