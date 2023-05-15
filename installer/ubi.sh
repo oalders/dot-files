@@ -15,6 +15,7 @@ if [ ! "$(command -v ubi)" ]; then
 fi
 
 ubi --project houseabsolute/ubi --in "$INSTALL_DIR"
+ubi --project houseabsolute/omegasort --in "$HOME/local/bin"
 ubi --project houseabsolute/precious --in "$INSTALL_DIR"
 # ubi --project sharkdp/bat --in "$INSTALL_DIR"
 # ubi --project sharkdp/fd --in $INSTALL_DIR
