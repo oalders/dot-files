@@ -20,7 +20,7 @@
     "@xmldom/xmldom": ">=0.8.7",
     "acorn": "^8.8.2",
     "ansi-regex": ">=5.0.1",
-    "bash-language-server": "^4.9.1",
+    "bash-language-server": "^4.9.2",
     "eslint": "^8.40.0",
     "fixjson": "^1.1.2",
     "lua-fmt": "^2.6.0",
