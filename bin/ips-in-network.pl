@@ -8,7 +8,7 @@ use strict;
 use warnings;
 use 5.010;
 
-use Net::Works::Network;
+use Net::Works::Network ();
 
 my $arg = shift @ARGV || die 'no network supplied';
 
