@@ -196,9 +196,14 @@ fi
 
 ghrc() {
     REPO=$1
-    CLONE_TO=$(trurl "$REPO" --get '{path}' | sed 's/^\///' | sed 's/\.git$//' )
-    gh repo clone "$REPO" "$CLONE_TO"
-    cd "$CLONE_TO" || exit 1
+    if [[ $(trurl --verify "$REPO") ]]; then
+        URL=$(trurl --verify "$REPO" --get '{path}')
+
+        CLONE_TO=$(echo "$URL" | sed 's/^\///' | sed 's/\.git$//')
+
+        gh repo clone "$REPO" "$CLONE_TO"
+        cd "$CLONE_TO" || echo "Could not chdir to $CLONE_TO"
+    fi
 }
 
 change_git_origin() {
