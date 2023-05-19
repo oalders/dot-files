@@ -25,7 +25,6 @@ INSTALLERS=(
 #    ./installer/cpan.sh
 #    ./installer/cargo.sh
     ./installer/ubi.sh
-    ./installer/omegasort.sh
     ./installer/oh-my-posh.sh
 )
 

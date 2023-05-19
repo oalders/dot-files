@@ -45,7 +45,6 @@ INSTALLERS=(
     ./installer/cargo.sh
     ./installer/cz.sh
     ./installer/ubi.sh
-    ./installer/omegasort.sh
     ./installer/oh-my-posh.sh
     ./installer/maintenance.sh
 )

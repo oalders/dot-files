@@ -89,8 +89,3 @@ jobs:
         run: ./installer/ubi.sh
         env:
           GITHUB_TOKEN: ${{ github.token }}
-
-      - name: Install omegasort
-        run: ./installer/omegasort.sh
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
