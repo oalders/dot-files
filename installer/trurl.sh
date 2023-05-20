@@ -17,6 +17,7 @@ else
     cd $DIR
 fi
 
+sudo apt-get install libcurl4-gnutls-dev
 make
 
 cp trurl "$HOME/local/bin/"
