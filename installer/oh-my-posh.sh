@@ -19,3 +19,5 @@ if [[ ${1+x} ]]; then
 fi
 
 eval "$CMD"
+
+oh-my-posh font install JetBrainsMono
