@@ -213,13 +213,13 @@ require("mason-lspconfig").setup {
   ensure_installed = { "perlnavigator", "pylsp", "rust_analyzer", "tsserver" }
 }
 
-local navbuddy = require("nvim-navbuddy")
-navbuddy.setup {
-  lsp = {
-    auto_attach = true,
-    preference = nil,
-  },
-}
+-- local navbuddy = require("nvim-navbuddy")
+-- navbuddy.setup {
+--  lsp = {
+--    auto_attach = true,
+--    preference = nil,
+--  },
+-- }
 
 -- After setting up mason-lspconfig you may set up servers via lspconfig
 -- See server/src/server.ts in PerlNavigator for a list of available settings
