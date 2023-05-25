@@ -7,7 +7,7 @@ source ~/dot-files/bash_functions.sh
 
 set -x
 
-if [ "$IS_DARWIN" = false ]; then
+if eval is os name eq linux; then
     if [ "$IS_SUDOER" = true ]; then
         if [[ -n ${PREFER_PKGS+set} ]]; then
             # https://askubuntu.com/questions/1290262/unable-to-install-bat-error-trying-to-overwrite-usr-crates2-json-which
@@ -18,22 +18,12 @@ if [ "$IS_DARWIN" = false ]; then
     fi
 fi
 
-set +x
-
 # Maybe add to $PATH just to be safe
 add_path "$HOME/.cargo/bin"
 
-set -x
-
-if [[ $(command -v cargo --version) ]]; then
-    if [[ $IS_DARWIN == true ]]; then
-        rustup update
-        cargo install cargo-edit
-    else
-        cargo install fd-find
-    fi
-else
-    echo "cargo not installed?"
+if eval is there cargo; then
+    rustup update
+    cargo install cargo-edit
 fi
 
 exit 0

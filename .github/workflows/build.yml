@@ -33,14 +33,19 @@ jobs:
       - name: Set up symlink to ~/dot-files
         run: cd && ln -s $GITHUB_WORKSPACE .
 
+      - name: Install symlinks
+        run: ./installer/symlinks.sh
+
+      - name: Install ubi
+        run: ./installer/ubi.sh
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+
       - name: Maybe install MacOS deps
         run: ./installer/homebrew.sh
 
       - name: Maybe install Linux deps
         run: ./installer/linux.sh
-
-      - name: Install symlinks
-        run: ./installer/symlinks.sh
 
       - name: Configure Git
         run: ./configure/git.sh
@@ -85,7 +90,3 @@ jobs:
       - name: Maybe install cz
         run: ./installer/cpan.sh
 
-      - name: Install ubi
-        run: ./installer/ubi.sh
-        env:
-          GITHUB_TOKEN: ${{ github.token }}

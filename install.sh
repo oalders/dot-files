@@ -2,10 +2,11 @@
 
 set -eu -o pipefail
 
-./installer/ubi.sh
-
 # shellcheck source=bash_functions.sh
 source ~/dot-files/bash_functions.sh
+
+./installer/symlinks.sh
+./installer/ubi.sh
 
 run_installer() {
     echo "running $1"
@@ -35,7 +36,6 @@ fi
 
 INSTALLERS=(
     ./installer/linux.sh
-    ./installer/symlinks.sh
     ./configure/git.sh
     ./configure/ssh.sh
     ./installer/pip.sh

@@ -8,6 +8,9 @@ if [ ! "$(command -v ubi)" ]; then
     curl --silent --location \
         https://raw.githubusercontent.com/houseabsolute/ubi/master/bootstrap/bootstrap-ubi.sh |
         TARGET=$INSTALL_DIR sh
+
+    # shellcheck source=bash_functions.sh
+    source ~/dot-files/bash_functions.sh
     add_path "$INSTALL_DIR"
 else
     ubi --project houseabsolute/ubi --in "$INSTALL_DIR"
