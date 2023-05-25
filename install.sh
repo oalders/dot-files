@@ -2,6 +2,8 @@
 
 set -eu -o pipefail
 
+./installer/ubi.sh
+
 # shellcheck source=bash_functions.sh
 source ~/dot-files/bash_functions.sh
 
@@ -44,7 +46,6 @@ INSTALLERS=(
     ./installer/cpan.sh
     ./installer/cargo.sh
     ./installer/cz.sh
-    ./installer/ubi.sh
     ./installer/oh-my-posh.sh
     ./installer/maintenance.sh
 )
