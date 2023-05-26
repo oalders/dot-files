@@ -28,6 +28,9 @@ reset_path() {
     export PATH
 }
 
+add_path "/usr/local/go/bin"
+add_path "$HOME/local/bin"
+
 detect_posh_settings() {
     MY_INSIDE_SSH=false
     MY_INSIDE_TMUX=false
@@ -85,9 +88,6 @@ toggle_posh() {
 
 GO111MODULE=on
 GOPATH=~/go
-add_path "/usr/local/go/bin"
-add_path "$HOME/local/bin"
-
 HAS_PLENV=false
 
 # should probably also ensure that Plenv version is not the system Perl
