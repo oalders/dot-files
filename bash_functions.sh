@@ -85,13 +85,8 @@ toggle_posh() {
 
 GO111MODULE=on
 GOPATH=~/go
-HAS_GO=false
 add_path "/usr/local/go/bin"
 add_path "$HOME/local/bin"
-
-if [[ (-n ${GOPATH+set}) && ($(command -v go version)) ]]; then
-    HAS_GO=true
-fi
 
 HAS_PLENV=false
 
@@ -217,7 +212,6 @@ change_git_origin() {
 export GO111MODULE
 export GOPATH
 export HARNESS_OPTIONS
-export HAS_GO
 export HAS_PLENV
 export IS_DARWIN
 export IS_GITHUB
