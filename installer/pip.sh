@@ -10,12 +10,12 @@ pip_install() {
     REQUIREMENTS=$2
 
     # make explicit cases for Travis, MacOS and Linux
-    if [ "$(which "$PIP")" ]; then
+    if eval is there pip; then
         "$PIP" install --user --upgrade -r "$REQUIREMENTS"
     else
         # We want to install recommended packages here
         if [[ $IS_SUDOER == true ]]; then
-            which apt-get && sudo apt-get install -y python3-pip
+            is there apt-get && sudo apt-get install -y python3-pip
         fi
         "$PIP" install --user -v --upgrade -r "$REQUIREMENTS"
     fi
@@ -23,7 +23,7 @@ pip_install() {
 
 pip_install "pip3" "pip/pip3-requirements.txt"
 
-if [ "$IS_DARWIN" = true ]; then
+if eval is os name eq darwin; then
     python3 -m pip install --upgrade pip
     pip3 install ansible
 fi

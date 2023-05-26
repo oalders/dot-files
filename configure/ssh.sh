@@ -11,7 +11,7 @@ mkdir -p ~/.ssh/sockets
 
 ln -sf $PREFIX/ssh/rc ~/.ssh/rc
 
-if [ "$IS_DARWIN" = true ]; then
+if eval is os name eq darwin; then
     ln -sf $PREFIX/ssh/config ~/.ssh/config
     mkdir -p ~/.ssh/config.d/
     if [[ -d ~/local-dot-files/ssh/config.d ]]; then

@@ -7,12 +7,12 @@ if [[ ${BASH_VERSINFO[0]} -lt 4 ]]; then
     exit 0
 fi
 
-if [ "$(which cz)" ]; then
-    exit
-fi
-
 # shellcheck source=bash_functions.sh
 source ~/dot-files/bash_functions.sh
+
+if eval is there cz; then
+    exit
+fi
 
 set -x
 

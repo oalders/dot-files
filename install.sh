@@ -15,7 +15,9 @@ run_installer() {
     echo ""
 }
 
-if [[ $IS_DARWIN == true ]]; then
+add_path "$HOME/local/bin"
+
+if eval is os name eq darwin; then
     MAC_INSTALLERS=(
         ./installer/xcode.sh
         ./installer/homebrew.sh

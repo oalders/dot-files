@@ -10,12 +10,6 @@ source ~/dot-files/bash_functions.sh
 
 set -x
 
-# There are SSL issues on the GitHub macOS install that will cause some module
-# installs to fail.
-if [[ $IS_DARWIN == true ]] && [[ $IS_GITHUB == true ]]; then
-    exit 0
-fi
-
 if [ "$IS_MM" = true ]; then
     exit 0
 fi
@@ -24,14 +18,14 @@ perl --version
 
 # Set up some ENV vars so that global installs go to ~/perl5
 if [ "$HAS_PLENV" = false ]; then
-    cpanm --local-lib=~/perl5 local::lib && eval "$(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)"
+    cpanm --notest --local-lib=~/perl5 local::lib && eval "$(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)"
 fi
 
-if [[ ! $(which cpm) ]]; then
+if ! eval is there cpm; then
     curl -fsSL --compressed https://raw.githubusercontent.com/skaji/cpm/master/cpm | perl - install --global App::cpm
 fi
 
-if [[ $IS_DARWIN == true && ! -d /opt/homebrew ]]; then
+if eval is os name eq darwin && [[ ! -d /opt/homebrew ]]; then
     OPENSSL_PREFIX="/usr/local/Cellar/openssl@1.1/1.1.1t"
     if [[ ! -e $OPENSSL_PREFIX ]]; then
         echo "$OPENSSL_PREFIX does not exist"

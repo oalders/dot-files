@@ -5,7 +5,7 @@ set -eux
 rm -f ~/.cargo/bin/bat
 rm -f ~/.cargo/bin/precious
 
-if [[ $IS_DARWIN == true ]]; then
+if eval is os name eq darwin; then
     rm -f ~/.cargo/bin/fd
     brew remove tunnelblick || true
     brew remove vim || true
@@ -20,3 +20,5 @@ alias | grep " df=" && unalias df
 alias | grep " du=" && unalias du
 alias | grep " ls=" && unalias ls
 alias | grep " ps=" && unalias ps
+
+exit 0

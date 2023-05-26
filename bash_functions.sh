@@ -87,6 +87,7 @@ GO111MODULE=on
 GOPATH=~/go
 HAS_GO=false
 add_path "/usr/local/go/bin"
+add_path "$HOME/local/bin"
 
 if [[ (-n ${GOPATH+set}) && ($(command -v go version)) ]]; then
     HAS_GO=true

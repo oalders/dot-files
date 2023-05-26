@@ -33,60 +33,11 @@ jobs:
       - name: Set up symlink to ~/dot-files
         run: cd && ln -s $GITHUB_WORKSPACE .
 
-      - name: Install symlinks
-        run: ./installer/symlinks.sh
+      - name: Install tmux deps
+        run: sudo apt install libevent-dev
 
-      - name: Install ubi
-        run: ./installer/ubi.sh
+      - name: Install
+        run: ./install.sh
         env:
           GITHUB_TOKEN: ${{ github.token }}
-
-      - name: Maybe install MacOS deps
-        run: ./installer/homebrew.sh
-
-      - name: Maybe install Linux deps
-        run: ./installer/linux.sh
-
-      - name: Configure Git
-        run: ./configure/git.sh
-
-      - name: Install fpp
-        run: ./installer/fpp.sh
-
-      - name: Configure SSH
-        run: ./configure/ssh.sh
-
-      - name: Install pip
-        run: ./installer/pip.sh
-
-      - name: Configure vim
-        run: ./configure/vim.sh
-
-      - name: Install nvim
-        run: ./installer/nvim.sh
-
-      - name: Install tmux
-        run: sudo apt install libevent-dev && ./installer/tmux.sh
-
-      - name: Configure tmux
-        run: ./configure/tmux.sh
-
-      - name: Install npm deps
-        run: ./installer/npm.sh
-
-      - name: Install CPAN deps
-        run: ./installer/cpan.sh
-
-      - name: Install Cargo
-        run: ./installer/cargo.sh
-        if: ${{ matrix.os == 'ubuntu-18.04' }}
-
-      - name: Install Rust deps via pkgs
-        run: ./installer/cargo.sh
-        env:
           PREFER_PKGS: 1
-        if: ${{ matrix.os != 'ubuntu-18.04' }}
-
-      - name: Maybe install cz
-        run: ./installer/cpan.sh
-

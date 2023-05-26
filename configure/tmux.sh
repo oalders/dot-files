@@ -6,10 +6,13 @@ PREFIX=~/dot-files
 
 # shellcheck source=bash_functions.sh
 source $PREFIX/bash_functions.sh
+add_path "$HOME/local/bin"
 
 set -x
 
-tmux -V
+if ! eval is there tmux || eval is command tmux lt 3.2; then
+    ./installer/tmux.sh
+fi
 
 ln -sf $PREFIX/tmux.conf ~/.tmux.conf
 

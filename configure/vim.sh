@@ -20,7 +20,7 @@ mkdir -p ~/.vim/after/plugin
 ln -sf "$LINK_FLAG" $PREFIX/vim/after/syntax/perl/heredoc-sql.vim ~/.vim/after/syntax/perl/heredoc-sql.vim
 ln -sf "$LINK_FLAG" $PREFIX/vim/after/syntax/gitcommit.vim ~/.vim/after/syntax/gitcommit.vim
 
-if [[ $HAS_GO == true ]]; then
+if eval is there go; then
     go version
     unset GOPROXY
     echo "Installing shfmt"

@@ -20,6 +20,14 @@ fi
 
 eval "$CMD"
 
+if [[ $IS_GITHUB == true ]]; then
+    exit 0
+fi
+
+if ! is there fc-list; then
+    sudo apt-get install -y fontconfig
+fi
+
 if ! eval fc-list : family | grep "JetBrainsMono Nerd Font" &>/dev/null; then
     oh-my-posh font install JetBrainsMono
 fi

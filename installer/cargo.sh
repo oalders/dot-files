@@ -18,12 +18,14 @@ if eval is os name eq linux; then
     fi
 fi
 
+exit 0
+
 # Maybe add to $PATH just to be safe
 add_path "$HOME/.cargo/bin"
 
 if eval is there cargo; then
-    rustup update
     cargo install cargo-edit
 fi
-
-exit 0
+if eval is there rustup; then
+    rustup update
+fi

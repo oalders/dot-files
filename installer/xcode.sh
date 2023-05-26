@@ -2,10 +2,7 @@
 
 set -eu -o pipefail
 
-# shellcheck source=bash_functions.sh
-source ~/dot-files/bash_functions.sh
-
-if [ "$IS_DARWIN" = true ]; then
+if eval is os name eq darwin; then
     xcode-select --install &>/dev/null || true
 fi
 

@@ -10,7 +10,7 @@ remove_wezterm() {
         /usr/local/bin/wezterm-mux-server
 }
 
-if [[ $(command -v wezterm --version) ]]; then
+if eval is there wezterm; then
     brew upgrade homebrew/cask/wezterm
 else
     # remove_wezterm
