@@ -29,16 +29,18 @@ if type brew &>/dev/null; then
 fi
 
 add_path "$HOME/.plenv/bin"
-if which plenv >/dev/null; then eval "$(plenv init -)"; fi
+if eval is there plenv; then
+    eval "$(plenv init -)";
+fi
 
-if which plenv >/dev/null; then
+if eval is there rbenv; then
     if [[ -d ~/.rbenv ]]; then
         add_path "$HOME/.rbenv/bin"
         eval "$(rbenv init -)"
     fi
 fi
 
-if [[ $(command -v fdfind) ]];then
+if eval is there fdfind; then
     alias fd=fdfind
 fi
 
