@@ -151,13 +151,6 @@ if [[ -z ${IS_SUDOER+x} ]]; then
     fi
 fi
 
-tmux_version() {
-    if [[ $(which tmux) ]]; then
-        TMUX_VERSION=$(tmux -V | sed -En "s/^tmux[^0-9]*([.0-9]+).*/\1/p")
-        export TMUX_VERSION
-    fi
-}
-
 rename_tab() {
     if test "${TMUX_PANE+x}"; then
         echo -en "\033Ptmux;\033\033]0;$1\a\033\\"
