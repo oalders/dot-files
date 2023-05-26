@@ -20,4 +20,6 @@ fi
 
 eval "$CMD"
 
-oh-my-posh font install JetBrainsMono
+if ! eval fc-list : family | grep "JetBrainsMono Nerd Font" &>/dev/null; then
+    oh-my-posh font install JetBrainsMono
+fi
