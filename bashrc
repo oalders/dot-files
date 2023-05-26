@@ -65,7 +65,7 @@ alias tg='tidyall -g && git add -p'
 alias wat='ps --sort=-pcpu -aux|head -10'
 alias xpasswd='perl -MCrypt::XkcdPassword -E "say Crypt::XkcdPassword->make_password"'
 
-if [ "$IS_DARWIN" = true ]; then
+if eval is os name eq darwin; then
     alias updatedb="sudo /usr/libexec/locate.updatedb"
 
     # python scripts via pip install --user
@@ -276,7 +276,7 @@ if [ -f "$HOME/.cargo/env" ]; then
     . "$HOME/.cargo/env"
 fi
 
-if [ "$IS_DARWIN" = true ]; then
+if eval is os name eq darwin; then
     # nvim nightly build
     add_path ~/local/nvim-osx64/bin
     # homebrew's curl needs to come first

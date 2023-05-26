@@ -5,11 +5,11 @@ set -eu -o pipefail
 # shellcheck source=bash_functions.sh
 source ~/dot-files/bash_functions.sh
 
-if [ "$IS_DARWIN" = true ]; then
+if eval is os name eq darwin; then
     exit 0
 fi
 
-if [[ $(which vim) ]]; then
+if eval is there vim; then
     exit 0
 fi
 

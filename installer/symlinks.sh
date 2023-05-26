@@ -17,7 +17,7 @@ mkdir -p ~/local/bin
 mkdir -p ~/.npm-packages
 mkdir -p ~/.re.pl
 
-if [ "$IS_DARWIN" = true ]; then
+if eval is os name eq darwin; then
     mkdir -p "$HOME/.config/karabiner"
 fi
 
@@ -63,7 +63,7 @@ ln -sf $PREFIX/tigrc ~/.tigrc
 ln -sf $PREFIX/wezterm/wezterm.lua ~/.config/wezterm/wezterm.lua
 ln -sf $PREFIX/yamllint.yml ~/.config/yamllint/config
 
-if [ "$IS_DARWIN" = true ]; then
+if eval is os name eq darwin; then
     ln -sf $PREFIX/gnupg/gpg-agent.conf ~/.gnupg/gpg-agent.conf
     ln -sf $PREFIX/karabiner/karabiner.json ~/.config/karabiner/karabiner.json
     ln -sf "$LINK_FLAG" $PREFIX/hammerspoon ~/.hammerspoon

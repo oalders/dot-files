@@ -3,7 +3,7 @@
 # Taken from https://docs.docker.com/engine/install/ubuntu/
 set -x
 
-if [ "$IS_DARWIN" = true ]; then
+if eval is os name ne linux; then
     echo "Linux only"
     exit 1
 fi

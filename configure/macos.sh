@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-if [ "$IS_DARWIN" = false ]; then
+if eval os name ne darwin; then
     exit 0
 fi
 

@@ -16,7 +16,7 @@ fi
 
 ln -sf $PREFIX/tmux.conf ~/.tmux.conf
 
-if [[ $IS_DARWIN == true ]]; then
+if eval is os name eq darwin; then
     echo "Symlinking MacOS source file"
     ln -sf $PREFIX/tmux/macos ~/.tmux-this-os
 else

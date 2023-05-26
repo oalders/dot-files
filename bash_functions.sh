@@ -95,13 +95,10 @@ if [[ -n ${PLENV_SHELL+set} ]]; then
     HAS_PLENV=true
 fi
 
-IS_DARWIN=false
 LINK_FLAG=""
 PATH_ALIASES=\~/dot-files=@dots
 
-# https://stackoverflow.com/a/17072017/406224
-if [ "$(uname)" == "Darwin" ]; then
-    IS_DARWIN=true
+if eval is os name eq darwin; then
     LINK_FLAG="-hF"
 
     # Not sure if this is needed in the longer term
@@ -111,7 +108,7 @@ if [ "$(uname)" == "Darwin" ]; then
     alias vim="nvim"
 
     PATH_ALIASES=\~/dot-files=@dots,\~/Documents/github=@gh,\~/Documents/github/oalders=@gho
-elif [ "$(uname -s)" == "Linux" ]; then
+elif eval is os name eq linux; then
     LINK_FLAG="-T"
 fi
 
@@ -213,7 +210,6 @@ export GO111MODULE
 export GOPATH
 export HARNESS_OPTIONS
 export HAS_PLENV
-export IS_DARWIN
 export IS_GITHUB
 export IS_MM
 export IS_SUDOER

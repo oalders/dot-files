@@ -10,7 +10,7 @@ f() {
 
 rm_worktree() {
     MY_XARGS_OPTIONS="--no-run-if-empty"
-    if [[ $IS_DARWIN == true ]]; then
+    if eval is os name eq darwin; then
         MY_XARGS_OPTIONS=""
     fi
 

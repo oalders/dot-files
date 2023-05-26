@@ -7,7 +7,7 @@ source ~/dot-files/bash_functions.sh
 
 set -x
 
-if [[ $IS_DARWIN == false ]] && [[ $IS_SUDOER == true ]]; then
+if eval is os name eq linux && [[ $IS_SUDOER == true ]]; then
     sudo apt-get install -y libevent-dev libncurses5-dev
     RELEASE=tmux-3.3a
     ARCHIVE="$RELEASE.tar.gz"

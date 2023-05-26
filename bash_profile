@@ -74,7 +74,7 @@ export NVM_DIR="$HOME/.nvm"
 
 . ~/dot-files/bash_functions.sh
 
-if [ "$IS_DARWIN" = true ]; then
+if eval is os name eq darwin; then
     unset CLOUDSDK_PYTHON
     # Open command line in editor
     bind "\C-e":edit-and-execute-command
@@ -92,6 +92,6 @@ if [ "$IS_DARWIN" = true ]; then
     fi
 fi
 
-if [[ "$IS_DARWIN" = false && $(command -v fdfind) ]]; then
+if eval is os name ne darwin && eval is there fdfind; then
     alias fd="fdfind"
 fi

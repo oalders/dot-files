@@ -2,7 +2,7 @@
 
 set -eux -o pipefail
 
-if [ "$IS_DARWIN" = false ]; then
+if eval is os name ne darwin; then
     exit 0
 fi
 
