@@ -24,10 +24,10 @@ fi
 
 cd "$GIT_DIR/.." || exit 1
 
-REPO_NAME=$(basename $(pwd))
+REPO_NAME="$(basename "$(pwd)")"
 
 ALL_WORKTREES="$HOME/.worktree"
-mkdir -p $ALL_WORKTREES
+mkdir -p "$ALL_WORKTREES"
 
 WORKTREE_DIR="$ALL_WORKTREES/$REPO_NAME/$BRANCH_NAME"
 
@@ -36,8 +36,8 @@ git worktree add "$WORKTREE_DIR" -b "$BRANCH_NAME"
 cd "$WORKTREE_DIR" || exit 1
 
 if [[ -n $(pgrep tmux) ]]; then
-    # shellcheck source=/home/oalders/.bashrc
-    source ~/.bashrc
+    # shellcheck source=bashrc
+    source "$HOME/.bashrc"
     tmux_session_name
     tmux new -s "$SESSION_NAME"
 fi
