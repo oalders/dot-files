@@ -26,11 +26,6 @@ if eval is there go; then
     echo "Installing shfmt"
     go install mvdan.cc/sh/v3/cmd/shfmt@latest
     go install mvdan.cc/gofumpt@latest
-    go install golang.org/x/tools/gopls@latest
-
-    # https://github.com/golangci/golangci-lint#binary
-    echo "Installing golangci-lint"
-    curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b "$(go env GOPATH)"/bin v1.44.2
 else
     echo "Go not found. Not installing shfmt or golangci-lint"
 fi
