@@ -9,16 +9,18 @@ set -x
 
 if eval is os name eq linux; then
     if [ "$IS_SUDOER" = true ]; then
-        if [[ -n ${PREFER_PKGS+set} ]]; then
-            # https://askubuntu.com/questions/1290262/unable-to-install-bat-error-trying-to-overwrite-usr-crates2-json-which
-            sudo apt-get install -o Dpkg::Options::="--force-overwrite" -y bat fd-find ripgrep
-            exit 0
-        fi
-        sudo apt-get -y install rustc cargo
+        # https://askubuntu.com/questions/1290262/unable-to-install-bat-error-trying-to-overwrite-usr-crates2-json-which
+        sudo apt-get install -o Dpkg::Options::="--force-overwrite" -y bat fd-find ripgrep
     fi
 fi
 
 exit 0
+
+# Re-enable this when I need a Rust dev env
+
+if eval is os name eq linux; then
+    sudo apt-get -y install rustc cargo
+fi
 
 # Maybe add to $PATH just to be safe
 add_path "$HOME/.cargo/bin"
