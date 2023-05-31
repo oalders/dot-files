@@ -36,14 +36,12 @@ curl -fLo ~/.vim/autoload/plug.vim --create-dirs \
 
 rm -rf ~/.vim/Trashed-Bundles ~/.vim/bundle
 
-rm -f ~/.vimrc
-ln -sf $PREFIX/vim/vim-plug-vimrc ~/.vimrc
-
 # Not currently using vim as an editor
+# rm -f ~/.vimrc
+# ln -sf $PREFIX/vim/vim-plug-vimrc ~/.vimrc
 # vim +'PlugInstall --sync' +qa
 
 rm ~/.vimrc
-
 ln -sf $PREFIX/vim/vimrc ~/.vimrc
 ln -sf $PREFIX/vim/vim-plug-vimrc ~/.vim/vim-plug-vimrc
 
