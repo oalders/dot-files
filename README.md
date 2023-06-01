@@ -126,6 +126,7 @@ Ctrl-a
 ## tmux Plugins
 
 * prefix + r # reload config
+* prefix + I # install plugins
 
 ## tmux-resurrect
 
