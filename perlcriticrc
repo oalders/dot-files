@@ -9,10 +9,7 @@ equivalent_modules = Modern::Perl Moose operl Test2::V0
 
 [Variables::ProhibitUnusedVarsStricter]
 
-[-Perl::Critic::Policy::Subroutines::RequireArgUnpacking]
-
-[-Perl::Critic::Policy::ValuesAndExpressions::ProhibitAccessOfPrivateData]
-
 [-Subroutines::ProhibitExplicitReturnUndef]
-
 [-Subroutines::ProhibitSubroutinePrototypes]
+[-Subroutines::RequireArgUnpacking]
+[-ValuesAndExpressions::ProhibitAccessOfPrivateData]
