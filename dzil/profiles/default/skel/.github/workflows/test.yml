@@ -4,12 +4,10 @@ name: test
 on:
   push:
     branches:
-      - "*"
+      - 'main'
   pull_request:
     branches:
-      - "*"
-  schedule:
-    - cron: "15 4 * * 0" # Every Sunday morning
+      - '*'
   workflow_dispatch:
 
 jobs:
@@ -49,27 +47,27 @@ jobs:
           CODECOV_TOKEN: ${{secrets.CODECOV_TOKEN}}
   ubuntu-test-job:
     needs: build-job
-    runs-on: "ubuntu-latest"
+    runs-on: 'ubuntu-latest'
     strategy:
       fail-fast: true
       matrix:
         os: [ubuntu-20.04]
         perl-version:
-          - "5.8"
-          - "5.10"
-          - "5.12"
-          - "5.14"
-          - "5.16"
-          - "5.18"
-          - "5.20"
-          - "5.22"
-          - "5.24"
-          - "5.26"
-          - "5.28"
-          - "5.30"
-          - "5.32"
-          - "5.34"
-          - "5.36"
+          - '5.8'
+          - '5.10'
+          - '5.12'
+          - '5.14'
+          - '5.16'
+          - '5.18'
+          - '5.20'
+          - '5.22'
+          - '5.24'
+          - '5.26'
+          - '5.28'
+          - '5.30'
+          - '5.32'
+          - '5.34'
+          - '5.36'
     name: perl ${{ matrix.perl-version }} on ${{ matrix.os }}
     steps:
       - name: set up perl
@@ -83,35 +81,35 @@ jobs:
       - name: install deps using cpm
         uses: perl-actions/install-with-cpm@v1
         with:
-          cpanfile: "cpanfile"
-          args: "--with-suggests --with-recommends --with-test"
+          cpanfile: 'cpanfile'
+          args: '--with-suggests --with-recommends --with-test'
       - run: prove -lr t
         env:
           AUTHOR_TESTING: 0
           RELEASE_TESTING: 0
   macos-test-job:
     needs: ubuntu-test-job
-    runs-on: "macos-latest"
+    runs-on: 'macos-latest'
     strategy:
       fail-fast: true
       matrix:
         os: [macos-latest]
         perl-version:
-          - "5.8"
-          - "5.10"
-          - "5.12"
-          - "5.14"
-          - "5.16"
-          - "5.18"
-          - "5.20"
-          - "5.22"
-          - "5.24"
-          - "5.26"
-          - "5.28"
-          - "5.30"
-          - "5.32"
-          - "5.34"
-          - "5.36"
+          - '5.8'
+          - '5.10'
+          - '5.12'
+          - '5.14'
+          - '5.16'
+          - '5.18'
+          - '5.20'
+          - '5.22'
+          - '5.24'
+          - '5.26'
+          - '5.28'
+          - '5.30'
+          - '5.32'
+          - '5.34'
+          - '5.36'
     name: perl ${{ matrix.perl-version }} on ${{ matrix.os }}
     steps:
       - name: set up perl
@@ -125,29 +123,29 @@ jobs:
       - name: install deps using cpm
         uses: perl-actions/install-with-cpm@v1
         with:
-          cpanfile: "cpanfile"
-          args: "--with-suggests --with-recommends --with-test"
+          cpanfile: 'cpanfile'
+          args: '--with-suggests --with-recommends --with-test'
       - run: prove -lr t
         env:
           AUTHOR_TESTING: 0
           RELEASE_TESTING: 0
   windows-test-job:
     needs: ubuntu-test-job
-    runs-on: "windows-latest"
+    runs-on: 'windows-latest'
     strategy:
       fail-fast: true
       matrix:
         os: [windows-latest]
         perl-version:
-          - "5.14"
-          - "5.16"
-          - "5.18"
-          - "5.20"
-          - "5.22"
-          - "5.24"
-          - "5.26"
-          - "5.28"
-          - "5.30"
+          - '5.14'
+          - '5.16'
+          - '5.18'
+          - '5.20'
+          - '5.22'
+          - '5.24'
+          - '5.26'
+          - '5.28'
+          - '5.30'
     name: perl ${{ matrix.perl-version }} on ${{ matrix.os }}
     steps:
       - name: set up perl
@@ -162,8 +160,8 @@ jobs:
       - name: install deps using cpm
         uses: perl-actions/install-with-cpm@v1
         with:
-          cpanfile: "cpanfile"
-          args: "--with-suggests --with-recommends --with-test"
+          cpanfile: 'cpanfile'
+          args: '--with-suggests --with-recommends --with-test'
       - run: prove -lr t
         env:
           AUTHOR_TESTING: 0
