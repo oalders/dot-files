@@ -24,7 +24,7 @@ require("noice").setup({
 })
 
 require('project_nvim').setup {
-  detection_methods = { 'lsp', 'pattern' },
+  detection_methods = { 'pattern', 'lsp' },
   patterns = { '.git', 'Makefile', },
   silent_chdir = false,
   -- ignore_lsp = { 'null-ls' },
