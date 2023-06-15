@@ -130,7 +130,7 @@ md() {
 
 if [ -f /etc/bash_completion.d/git ]; then
     . /etc/bash_completion.d/git
-elif [ -f /usr/local/bin/brew ]; then
+elif eval is there brew; then
     BREW_PREFIX=$(brew --prefix)
     if [ -f "$BREW_PREFIX/etc/bash_completion" ]; then
         . "$BREW_PREFIX/etc/bash_completion"
