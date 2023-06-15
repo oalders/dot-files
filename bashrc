@@ -54,7 +54,7 @@ alias octal_perms='stat -c "%a %n"'
 alias penv='perl -MDDP -e "p(%ENV)"'
 alias pine=alpine
 alias prune-local-branches='git remote prune origin && git branch -vv | grep -v origin'
-alias s='source ~/.bash_profile && source ~/.bashrc && source ~/dot-files/fzf_functions.sh'
+alias s='source ~/.bash_profile && source ~/dot-files/fzf_functions.sh'
 # http://stackoverflow.com/questions/13064613/how-to-prune-local-tracking-branches-that-do-not-exist-on-remote-anymore
 alias show-local-only-branches="git branch -r | awk '{print \$1}' | egrep -v -f /dev/fd/0 <(git branch -vv | grep origin) | awk '{print \$1}'"
 alias show-merged-branches='git branch --no-color --merged | grep -v "\*" | grep -v master'
