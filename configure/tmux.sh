@@ -10,7 +10,7 @@ add_path "$HOME/local/bin"
 
 set -x
 
-if ! eval is there tmux || eval is command tmux lt 3.2; then
+if ! eval is there tmux || eval is cli version tmux lt 3.2; then
     ./installer/tmux.sh
 fi
 
