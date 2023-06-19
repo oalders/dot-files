@@ -8,13 +8,13 @@ set -eux
 LATEST=$(curl https://go.dev/VERSION?m=text)
 echo "version $LATEST"
 
-ARCHITECTURE="amd"
+ARCHITECTURE="amd64"
 
-if [[ $(uname -m) == "aarch64" ]]; then
-    ARCHITECTURE="arm"
+if [[ $(uname -m) == "armv7l" ]]; then # raspberry pi
+    ARCHITECTURE="armv6l"
 fi
 
-FILENAME="$LATEST".linux-"$ARCHITECTURE"64.tar.gz
+FILENAME="$LATEST".linux-"$ARCHITECTURE".tar.gz
 
 curl --location -O "https://go.dev/dl/$FILENAME"
 sudo rm -rf /usr/local/go/
