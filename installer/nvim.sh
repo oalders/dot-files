@@ -22,6 +22,11 @@ if eval is os name eq darwin; then
     DIR=nvim-osx64
     FILE=nvim-macos.tar.gz
     rm -rf $DIR
+elif is os id eq raspbian; then
+    exit 0
+    # Won't run on buster
+    # sudo apt install snapd
+    # sudo snap install nvim --classic
 else
     FILE=nvim.appimage
 fi

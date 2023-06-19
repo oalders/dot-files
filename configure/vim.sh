@@ -55,6 +55,11 @@ fi
 # Add abolish config *after* we know the plugin has been installed
 ln -sf "$LINK_FLAG" $PREFIX/vim/after/plugin/abolish.vim ~/.vim/after/plugin/abolish.vim
 
+# appimage isn't running on rpi
+if eval is os id eq raspbian; then
+    exit 0
+fi
+
 # This takes forever to run in CI, so we'll just do it here so that we can skip the step on GH
 if [[ $IS_GITHUB == false ]]; then
     add_path ~/local/bin

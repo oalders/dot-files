@@ -2,6 +2,10 @@
 
 set -eu -o pipefail
 
+if eval is os id eq raspbian; then
+    exit 0
+fi
+
 # shellcheck source=bash_functions.sh
 source ~/dot-files/bash_functions.sh
 
