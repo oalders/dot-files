@@ -10,7 +10,11 @@ Plug 'ConradIrwin/vim-bracketed-paste'
 " Plug 'dense-analysis/ale' " , { 'tag': 'v3.1.0' }
 Plug 'oalders/ale', { 'branch': 'perlimports' }
 Plug 'ekalinin/dockerfile.vim'
-Plug 'fatih/vim-go' ", { 'do': ':GoUpdateBinaries' } takes forever on GH builds
+
+if v:version > 802
+  Plug 'fatih/vim-go' ", { 'do': ':GoUpdateBinaries' } takes forever on GH builds
+endif
+
 Plug 'gregsexton/MatchTag'
 Plug 'haya14busa/vim-auto-mkdir' " create directory path on save
 Plug 'itchyny/lightline.vim'
