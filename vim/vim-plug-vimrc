@@ -11,7 +11,7 @@ Plug 'ConradIrwin/vim-bracketed-paste'
 Plug 'oalders/ale', { 'branch': 'perlimports' }
 Plug 'ekalinin/dockerfile.vim'
 
-if v:version > 802
+if has('nvim') || v:version > 802
   Plug 'fatih/vim-go' ", { 'do': ':GoUpdateBinaries' } takes forever on GH builds
 endif
 
