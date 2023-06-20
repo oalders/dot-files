@@ -62,6 +62,7 @@ alias ssh-fingerprints='ls ~/.ssh/*.pub | xargs -L 1 ssh-keygen -l -f'
 # https://stackoverflow.com/a/19280187/406224
 alias takeover="tmux detach -a"
 alias tg='tidyall -g && git add -p'
+alias vi=nvim
 alias wat='ps --sort=-pcpu -aux|head -10'
 alias xpasswd='perl -MCrypt::XkcdPassword -E "say Crypt::XkcdPassword->make_password"'
 
