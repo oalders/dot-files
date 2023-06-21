@@ -62,9 +62,13 @@ alias ssh-fingerprints='ls ~/.ssh/*.pub | xargs -L 1 ssh-keygen -l -f'
 # https://stackoverflow.com/a/19280187/406224
 alias takeover="tmux detach -a"
 alias tg='tidyall -g && git add -p'
-alias vi=nvim
 alias wat='ps --sort=-pcpu -aux|head -10'
 alias xpasswd='perl -MCrypt::XkcdPassword -E "say Crypt::XkcdPassword->make_password"'
+
+if is there nvim; then
+    alias vi=nvim
+    alias vim=nvim
+fi
 
 if eval is os name eq darwin; then
     alias updatedb="sudo /usr/libexec/locate.updatedb"
