@@ -31,7 +31,6 @@ let g:go_highlight_types = 1
 let g:go_fmt_fail_silently = 1 " Ale handles this already
 
 nmap <leader>t  <Plug>(go-test)
-nmap <leader>b  <Plug>(go-build)
 
 let g:go_def_mode='gopls'
 let g:go_info_mode='gopls'
