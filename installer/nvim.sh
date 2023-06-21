@@ -6,6 +6,10 @@
 set -eu
 pushd /tmp || exit
 
+if is os id eq ubuntu && is os version gte 22.04; then
+    sudo apt install libfuse2
+fi
+
 # shellcheck source=bash_functions.sh
 source ~/dot-files/bash_functions.sh
 
