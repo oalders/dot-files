@@ -1,6 +1,22 @@
 # shellcheck shell=bash
 
+export CLICOLOR=1
 export EDITOR=vim
+
+# don't put duplicate lines in the history. See bash(1) for more options
+# http://www.linuxjournal.com/content/using-bash-history-more-efficiently-histcontrol
+export HISTCONTROL=ignoreboth
+
+# for setting history length see HISTSIZE and HISTFILESIZE in bash(1)
+export HISTFILESIZE=500000000
+export HISTSIZE=50000000
+export HISTTIMEFORMAT="%Y-%m-%d %H:%M:%S  "
+
+export LANG=en_US.UTF-8
+export LSCOLORS=exfxcxdxbxegedabagacad
+
+# http://askubuntu.com/questions/80371/bash-history-handling-with-multiple-terminals
+export PROMPT_COMMAND='history -a'
 
 # shellcheck source=bash_functions.sh
 . ~/dot-files/bash_functions.sh
@@ -10,21 +26,6 @@ export EDITOR=vim
 
 # use vim mappings to move around the command line
 set -o vi
-
-# don't put duplicate lines in the history. See bash(1) for more options
-# http://www.linuxjournal.com/content/using-bash-history-more-efficiently-histcontrol
-export HISTCONTROL=ignoreboth
-
-# http://askubuntu.com/questions/80371/bash-history-handling-with-multiple-terminals
-export PROMPT_COMMAND='history -a'
-
-# for setting history length see HISTSIZE and HISTFILESIZE in bash(1)
-export HISTSIZE=50000000
-export HISTFILESIZE=500000000
-export HISTTIMEFORMAT="%Y-%m-%d %H:%M:%S  "
-
-export CLICOLOR=1
-export LSCOLORS=exfxcxdxbxegedabagacad
 
 # https://superuser.com/a/975878/120685
 alias brewski='brew update -v && brew upgrade && brew cleanup; brew doctor'
@@ -224,9 +225,6 @@ tmux() {
         $tmux new -s "$SESSION_NAME"
     fi
 }
-
-# make sure NERDTree arrows work
-export LANG=en_US.UTF-8
 
 add_path "$GOPATH/bin"
 
