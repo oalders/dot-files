@@ -233,7 +233,7 @@ let g:ale_linters = {
 \   'sh': ['language_server','shell', 'shellcheck'],
 \   'typescript': ['prettier'],
 \   'vim': ['vint'],
-\   'yaml': ['yamllint'],
+\   'yaml': [],
 \}
 
 let g:ale_fixers = {
@@ -251,7 +251,7 @@ let g:ale_fixers = {
 \   'sh': ['shfmt'],
 \   'typescript': ['prettier'],
 \   'toml': ['prettier'],
-\   'yaml': ['prettier'],
+\   'yaml': [],
 \}
 
 let g:ale_type_map = {

@@ -210,8 +210,11 @@ local capabilities = require('cmp_nvim_lsp').default_capabilities()
 
 require("mason").setup()
 require("mason-lspconfig").setup {
-  ensure_installed = { "perlnavigator", "rust_analyzer", "tsserver" }
+  ensure_installed = { "docker_compose_language_service", "perlnavigator", "rust_analyzer", "tsserver", "yamlls" }
 }
+
+require'lspconfig'.docker_compose_language_service.setup{}
+require'lspconfig'.yamlls.setup{}
 
 local navbuddy = require("nvim-navbuddy")
 navbuddy.setup {
