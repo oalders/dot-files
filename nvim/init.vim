@@ -210,7 +210,7 @@ local capabilities = require('cmp_nvim_lsp').default_capabilities()
 
 require("mason").setup()
 require("mason-lspconfig").setup {
-  ensure_installed = { "perlnavigator", "pylsp", "rust_analyzer", "tsserver" }
+  ensure_installed = { "perlnavigator", "rust_analyzer", "tsserver" }
 }
 
 local navbuddy = require("nvim-navbuddy")
