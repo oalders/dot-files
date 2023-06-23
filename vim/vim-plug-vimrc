@@ -55,6 +55,7 @@ Plug 'yko/mojo.vim'
 
 if has('nvim')
   Plug 'ahmedkhalf/project.nvim'
+  Plug 'github/copilot.vim'
   Plug 'lukas-reineke/virt-column.nvim'
   Plug 'nvim-treesitter/nvim-treesitter', { 'do': ':TSUpdate'}  " We recommend updating the parsers on update
 
