@@ -26,7 +26,9 @@ if ! eval is there cpm; then
 fi
 
 if eval is os name eq darwin && [[ ! -d /opt/homebrew ]]; then
-    OPENSSL_PREFIX="/usr/local/Cellar/openssl@1.1/1.1.1t"
+    dir=/usr/local/Cellar/openssl@1.1
+    prefix=$(ls $dir)
+    OPENSSL_PREFIX="${dir}/${prefix}"
     if [[ ! -e $OPENSSL_PREFIX ]]; then
         echo "$OPENSSL_PREFIX does not exist"
         exit 1
