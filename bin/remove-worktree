@@ -15,9 +15,9 @@ echo "$BRANCH_NAME"
 
 # If we can't kill the tmux session, then that's ok. It may just not exist.
 if [[ -n $(pgrep tmux) ]]; then
-    # tmux session name will be the git branch name
-    TMUX_SESSION_NAME=${BRANCH_NAME/$STRIP/}
-    tmux kill-session -t "$TMUX_SESSION_NAME"
+    # tmux session name will contain the git branch name
+    session=$(tmux list-session | grep oalders/update-schedule | awk -v FS=':' '{print $1}')
+    tmux kill-session -t "$session"
 fi
 
 # exit() on failures from this point forward
