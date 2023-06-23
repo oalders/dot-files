@@ -68,6 +68,7 @@ if [[ $IS_GITHUB == false ]]; then
     fi
     nvim +'PlugInstall --sync' +qa
     nvim +'PlugUpdate --sync' +qa
+    nvim +'MasonUpdate --sync' +qa
 fi
 
 exit 0
