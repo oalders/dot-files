@@ -81,15 +81,15 @@ if eval is os name eq darwin; then
 
     # Apple silicon
     SQLITE_PATH=/opt/homebrew/opt/sqlite3/bin
-    if test -d /opt/homebrew/opt/sqlite3/bin; then
-        add_path $SQLITE_PATH
-    else
+    if ! test -d $SQLITE_PATH; then
         # Intel Macs
-        SQLITE_PATH=/usr/local/Cellar/sqlite/3.41.2/bin
-        if ! test -d $SQLITE_PATH; then
+        version=$(ls /usr/local/Cellar/sqlite)
+        SQLITE_PATH="/usr/local/Cellar/sqlite/${version}/bin"
+        if ! test -d "$SQLITE_PATH"; then
             echo "$SQLITE_PATH needs to be updated"
         fi
     fi
+    add_path "$SQLITE_PATH"
 fi
 
 if eval is os name ne darwin && eval is there fdfind; then
