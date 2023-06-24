@@ -29,18 +29,18 @@ if type brew &>/dev/null; then
 fi
 
 add_path "$HOME/.plenv/bin"
-if eval is there plenv; then
+if is there plenv; then
     eval "$(plenv init -)";
 fi
 
-if eval is there rbenv; then
+if is there rbenv; then
     if [[ -d ~/.rbenv ]]; then
         add_path "$HOME/.rbenv/bin"
         eval "$(rbenv init -)"
     fi
 fi
 
-if eval is there fdfind; then
+if is there fdfind; then
     alias fd=fdfind
 fi
 
@@ -74,7 +74,7 @@ export NVM_DIR="$HOME/.nvm"
 
 . ~/dot-files/bash_functions.sh
 
-if eval is os name eq darwin; then
+if is os name eq darwin; then
     unset CLOUDSDK_PYTHON
     # Open command line in editor
     bind "\C-e":edit-and-execute-command
@@ -92,6 +92,6 @@ if eval is os name eq darwin; then
     add_path "$SQLITE_PATH"
 fi
 
-if eval is os name ne darwin && eval is there fdfind; then
+if is os name ne darwin && is there fdfind; then
     alias fd="fdfind"
 fi

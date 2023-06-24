@@ -98,7 +98,7 @@ fi
 LINK_FLAG=""
 PATH_ALIASES=\~/dot-files=@dots
 
-if eval is os name eq darwin; then
+if is os name eq darwin; then
     LINK_FLAG="-hF"
 
     # Not sure if this is needed in the longer term
@@ -108,7 +108,7 @@ if eval is os name eq darwin; then
     alias vim="nvim"
 
     PATH_ALIASES=\~/dot-files=@dots,\~/Documents/github=@gh,\~/Documents/github/oalders=@gho
-elif eval is os name eq linux; then
+elif is os name eq linux; then
     LINK_FLAG="-T"
 fi
 

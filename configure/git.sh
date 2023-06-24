@@ -98,8 +98,8 @@ git config --global --unset branch.master.merge
 # shellcheck source=bash_functions.sh
 source ~/dot-files/bash_functions.sh
 # Requires git-lfs to have been installed
-if ! eval is there git-lfs; then
-    if eval is os name eq linux; then
+if ! is there git-lfs; then
+    if is os name eq linux; then
         sudo apt-get install git-lfs || git lfs update --force
     fi
     git lfs install

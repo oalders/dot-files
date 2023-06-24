@@ -10,7 +10,7 @@ fi
 # shellcheck source=bash_functions.sh
 source ~/dot-files/bash_functions.sh
 
-if eval is there cz; then
+if is there cz; then
     exit
 fi
 

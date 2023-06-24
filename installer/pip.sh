@@ -10,7 +10,7 @@ pip_install() {
     REQUIREMENTS=$2
 
     # make explicit cases for Travis, MacOS and Linux
-    if eval is there pip; then
+    if is there pip; then
         "$PIP" install --user --upgrade -r "$REQUIREMENTS"
     else
         # We want to install recommended packages here
@@ -23,7 +23,7 @@ pip_install() {
 
 pip_install "pip3" "pip/pip3-requirements.txt"
 
-if eval is os name eq darwin; then
+if is os name eq darwin; then
     python3 -m pip install --upgrade pip
     pip3 install ansible
 fi

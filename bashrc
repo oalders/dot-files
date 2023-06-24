@@ -71,7 +71,7 @@ if is there nvim; then
     alias vim=nvim
 fi
 
-if eval is os name eq darwin; then
+if is os name eq darwin; then
     alias updatedb="sudo /usr/libexec/locate.updatedb"
 
     # python scripts via pip install --user
@@ -136,7 +136,7 @@ md() {
 
 if [ -f /etc/bash_completion.d/git ]; then
     . /etc/bash_completion.d/git
-elif eval is there brew; then
+elif is there brew; then
     BREW_PREFIX=$(brew --prefix)
     if [ -f "$BREW_PREFIX/etc/bash_completion" ]; then
         . "$BREW_PREFIX/etc/bash_completion"
@@ -279,7 +279,7 @@ if [ -f "$HOME/.cargo/env" ]; then
     . "$HOME/.cargo/env"
 fi
 
-if eval is os name eq darwin; then
+if is os name eq darwin; then
     # nvim nightly build
     add_path ~/local/nvim-osx64/bin
     # homebrew's curl needs to come first

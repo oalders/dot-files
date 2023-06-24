@@ -10,13 +10,13 @@ add_path "$HOME/local/bin"
 
 set -x
 
-if ! eval is there tmux || eval is cli version tmux lt 3.2; then
+if ! is there tmux || is cli version tmux lt 3.2; then
     ./installer/tmux.sh
 fi
 
 ln -sf $PREFIX/tmux.conf ~/.tmux.conf
 
-if eval is os name eq darwin; then
+if is os name eq darwin; then
     echo "Symlinking MacOS source file"
     ln -sf $PREFIX/tmux/macos ~/.tmux-this-os
 else

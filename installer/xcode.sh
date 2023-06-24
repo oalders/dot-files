@@ -2,7 +2,7 @@
 
 set -eu -o pipefail
 
-if eval is os name eq darwin; then
+if is os name eq darwin; then
     xcode-select --install &>/dev/null || true
 fi
 

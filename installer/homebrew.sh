@@ -7,11 +7,11 @@ source ~/dot-files/bash_functions.sh
 
 add_path "$HOME/local/bin"
 
-if eval is os name ne darwin; then
+if is os name ne darwin; then
     exit 0
 fi
 
-if ! eval is there brew; then
+if ! is there brew; then
     /usr/bin/env bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
     add_path "/opt/homebrew/bin"
 fi

@@ -5,7 +5,7 @@ set -eux
 rm -f ~/.cargo/bin/bat
 rm -f ~/.cargo/bin/precious
 
-if eval is os name eq darwin; then
+if is os name eq darwin; then
     rm -f ~/.cargo/bin/fd
     brew remove tunnelblick || true
     brew remove vim || true

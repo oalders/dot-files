@@ -17,7 +17,7 @@ set -x
 
 URL=https://github.com/neovim/neovim/releases/download/nightly/
 
-if eval is os name eq darwin; then
+if is os name eq darwin; then
     # Enable if nightly tarballs go missing again
     brew install --head neovim
     rm -f "$HOME/local/bin/nvim"
@@ -37,7 +37,7 @@ fi
 
 curl -LO --fail -z $FILE "$URL$FILE"
 
-if eval is os name eq darwin; then
+if is os name eq darwin; then
     tar xzvf $FILE
 else
     chmod u+x $FILE

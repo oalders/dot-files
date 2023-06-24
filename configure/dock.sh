@@ -5,7 +5,7 @@ set -eu -o pipefail
 # shellcheck source=bash_functions.sh
 source ~/dot-files/bash_functions.sh
 
-if eval is os name eq darwin; then
+if is os name eq darwin; then
     # Requires brew "dockutil" to have been run
 
     dockutil --remove 'App Store'

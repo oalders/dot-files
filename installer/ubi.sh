@@ -27,11 +27,11 @@ fi
 source ~/dot-files/bash_functions.sh
 add_path "$INSTALL_DIR"
 
-if ! eval is there omegasort; then
+if ! is there omegasort; then
     ubi --project houseabsolute/omegasort --in "$INSTALL_DIR"
 fi
 
-if ! eval is there precious; then
+if ! is there precious; then
     ubi --project houseabsolute/precious --in "$INSTALL_DIR"
 fi
 

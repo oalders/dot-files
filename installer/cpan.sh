@@ -21,11 +21,11 @@ if [ "$HAS_PLENV" = false ]; then
     cpanm --notest --local-lib=~/perl5 local::lib && eval "$(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)"
 fi
 
-if ! eval is there cpm; then
+if ! is there cpm; then
     curl -fsSL --compressed https://raw.githubusercontent.com/skaji/cpm/master/cpm | perl - install --global App::cpm
 fi
 
-if eval is os name eq darwin && [[ ! -d /opt/homebrew ]]; then
+if is os name eq darwin && [[ ! -d /opt/homebrew ]]; then
     dir=/usr/local/Cellar/openssl@1.1
     prefix=$(ls $dir)
     OPENSSL_PREFIX="${dir}/${prefix}"
