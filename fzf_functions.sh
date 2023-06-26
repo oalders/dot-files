@@ -9,15 +9,15 @@ f() {
 }
 
 rm_worktree() {
-    MY_XARGS_OPTIONS="--no-run-if-empty"
+    local my_xargs_options="--no-run-if-empty"
     if is os name eq darwin; then
-        MY_XARGS_OPTIONS=""
+        my_xargs_options=''
     fi
 
     # Get list of worktrees and strip it down to the branch name
     # [oalders/branch-name], which should generally also correspond to the tmux
     # session name.
-    git worktree list | fzf | sed -rn 's/.*\[(.*)\]/\1/gp' | xargs "$MY_XARGS_OPTIONS" remove-worktree "$@"
+    git worktree list | fzf | sed -rn 's/.*\[(.*)\]/\1/gp' | xargs "$my_xargs_options" remove-worktree "$@"
 }
 
 # Can't add this as a fzf completion for tmux as I need tmux itself to get a
