@@ -22,7 +22,6 @@ if is os name eq darwin; then
     MAC_INSTALLERS=(
         ./installer/xcode.sh
         ./installer/homebrew.sh
-        ./installer/wezterm.sh
         # time ./installer/homebrew-maintenance.sh || true
         # ./installer/fonts.sh
 
@@ -39,6 +38,7 @@ fi
 
 INSTALLERS=(
     ./installer/linux.sh
+    ./installer/wezterm.sh
     ./configure/git.sh
     ./configure/ssh.sh
     ./installer/pip.sh
