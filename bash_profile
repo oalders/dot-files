@@ -40,10 +40,6 @@ if is there rbenv; then
     fi
 fi
 
-if is there fdfind; then
-    alias fd=fdfind
-fi
-
 GCLOUD_COMPLETION="/usr/local/Caskroom/google-cloud-sdk/latest/google-cloud-sdk/completion.bash.inc"
 GCLOUD_BASH="/usr/local/Caskroom/google-cloud-sdk/latest/google-cloud-sdk/path.bash.inc"
 

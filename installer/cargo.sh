@@ -15,7 +15,14 @@ if is os name eq linux; then
     if [ "$IS_SUDOER" = true ]; then
         # https://askubuntu.com/questions/1290262/unable-to-install-bat-error-trying-to-overwrite-usr-crates2-json-which
         sudo apt-get install -o Dpkg::Options::="--force-overwrite" -y bat fd-find ripgrep
+
     fi
+fi
+
+if is there fdfind && ! is there fd; then
+    pushd "$HOME/local/bin"
+    ln -s "$(which fdfind)" fd
+    popd
 fi
 
 exit 0
