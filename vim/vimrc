@@ -228,7 +228,7 @@ let g:ale_linters = {
 \   'dockerfile': ['hadolint'],
 \   'html': ['alex', 'fecs', 'htmlhint', 'stylelint', 'tidy',],
 \   'json': ['jq',],
-\   'markdown': ['markdownlint', 'write-good'],
+\   'markdown': ['markdownlint'],
 \   'rust': ['cargo', 'rls'],
 \   'sh': ['language_server','shell', 'shellcheck'],
 \   'typescript': ['prettier'],
@@ -260,7 +260,6 @@ let g:ale_type_map = {
 
 let g:ale_sh_shellcheck_change_directory = 0
 let g:ale_shellcheck_options = '-x'
-let g:ale_writegood_options = '--no-passive'
 let g:ale_hover_to_floating_preview = 1
 let g:ale_floating_preview = 1
 let g:ale_floating_window_border = ['│', '─', '╭', '╮', '╯', '╰']
