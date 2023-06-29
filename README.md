@@ -15,6 +15,7 @@
     * [tmux Prefix](#tmux-prefix)
     * [tmux Plugins](#tmux-plugins)
     * [tmux-resurrect](#tmux-resurrect)
+    * [tmux-sessionist](#tmux-sessionist)
     * [vim](#vim)
     * [Alfred](#alfred)
     * [Bash](#bash)
@@ -132,6 +133,10 @@ Ctrl-a
 
 * prefix + Ctrl-s - save
 * prefix + Ctrl-r - restore
+
+## tmux-sessionist
+
+* prefix + S -- switch back to previous session
 
 ## vim
 
