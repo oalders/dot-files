@@ -56,7 +56,7 @@ fi
 ln -sf "$LINK_FLAG" $PREFIX/vim/after/plugin/abolish.vim ~/.vim/after/plugin/abolish.vim
 
 # appimage isn't running on rpi
-if eval is os id eq raspbian; then
+if is os id eq raspbian; then
     exit 0
 fi
 

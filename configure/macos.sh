@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-if eval os name ne darwin; then
+if os name ne darwin; then
     exit 0
 fi
 

@@ -2,7 +2,7 @@
 
 set -eu -o pipefail
 
-if eval is os id eq raspbian; then
+if is os id eq raspbian; then
     exit 0
 fi
 
