@@ -75,5 +75,6 @@ fi
 
 ln -sf $PREFIX/bin/add-worktree "$HOME/local/bin/add-worktree"
 ln -sf $PREFIX/bin/remove-worktree "$HOME/local/bin/remove-worktree"
+ln -sf $PREFIX/bin/tm "$HOME/local/bin/tm"
 
 exit 0

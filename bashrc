@@ -189,6 +189,7 @@ tmux_session_name() {
     export SESSION_NAME
 }
 
+unset -f tm
 # https://raim.codingfarm.de/blog/2013/01/30/tmux-update-environment/
 tmux() {
     local tmux
