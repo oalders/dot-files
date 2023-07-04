@@ -69,7 +69,7 @@ if is os name eq darwin; then
     ln -sf "$LINK_FLAG" $PREFIX/hammerspoon ~/.hammerspoon
 fi
 
-if [ $IS_MM = false ]; then
+if [ "$IS_MM" = false ]; then
     ln -sf $PREFIX/npmrc ~/.npmrc
 fi
 
