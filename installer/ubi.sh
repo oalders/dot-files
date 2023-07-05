@@ -35,7 +35,11 @@ if ! is there precious; then
     ubi --project houseabsolute/precious --in "$INSTALL_DIR"
 fi
 
-# ubi --project sharkdp/bat --in "$INSTALL_DIR"
+if is os name eq linux; then
+    ubi --project sharkdp/bat --in "$INSTALL_DIR"
+else
+    brew install bat
+fi
 # ubi --project sharkdp/fd --in $INSTALL_DIR
 # ubi --project Wilfred/difftastic --exe difft --in "$INSTALL_DIR"
 
