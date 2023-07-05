@@ -30,3 +30,11 @@ require('project_nvim').setup {
   -- ignore_lsp = { 'null-ls' },
   scope_chdir = 'global',
 }
+
+local null_ls = require("null-ls")
+
+null_ls.setup({
+    sources = {
+        null_ls.builtins.formatting.shfmt,
+    },
+})

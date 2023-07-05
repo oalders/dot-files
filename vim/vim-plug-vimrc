@@ -59,6 +59,9 @@ if has('nvim')
   Plug 'lukas-reineke/virt-column.nvim'
   Plug 'nvim-treesitter/nvim-treesitter', { 'do': ':TSUpdate'}  " We recommend updating the parsers on update
 
+  Plug 'nvim-lua/plenary.nvim'
+  Plug 'jose-elias-alvarez/null-ls.nvim'
+
   Plug 'akinsho/bufferline.nvim'
   Plug 'kyazdani42/nvim-web-devicons' " Recommended (for coloured icons for bufferline.nvim)
 
