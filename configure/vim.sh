@@ -23,9 +23,10 @@ ln -sf "$LINK_FLAG" $PREFIX/vim/after/syntax/gitcommit.vim ~/.vim/after/syntax/g
 if is there go; then
     go version
     unset GOPROXY
-    echo "Installing shfmt"
-    go install mvdan.cc/sh/v3/cmd/shfmt@latest
-    go install mvdan.cc/gofumpt@latest
+    if is cli age shfmt gt 18 hours; then
+        go install mvdan.cc/sh/v3/cmd/shfmt@latest
+        go install mvdan.cc/gofumpt@latest
+    fi
 else
     echo "Go not found. Not installing shfmt or gofumpt"
 fi
@@ -60,15 +61,17 @@ if is os id eq raspbian; then
     exit 0
 fi
 
-# This takes forever to run in CI, so we'll just do it here so that we can skip the step on GH
-if [[ $IS_GITHUB == false ]]; then
-    add_path ~/local/bin
-    if is there go; then
-        nvim +':GoUpdateBinaries' +qa || true
+if is cli age godef gt 18 hours; then
+    # This takes forever to run in CI, so we'll just do it here so that we can skip the step on GH
+    if [[ $IS_GITHUB == false ]]; then
+        add_path ~/local/bin
+        if is there go; then
+            nvim +':GoUpdateBinaries' +qa || true
+        fi
+        nvim +'PlugInstall --sync' +qa
+        nvim +'PlugUpdate --sync' +qa
+        nvim +'MasonUpdate --sync' +qa
     fi
-    nvim +'PlugInstall --sync' +qa
-    nvim +'PlugUpdate --sync' +qa
-    nvim +'MasonUpdate --sync' +qa
 fi
 
 exit 0
