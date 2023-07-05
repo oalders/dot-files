@@ -195,6 +195,7 @@ require("mason-lspconfig").setup {
   ensure_installed = {
       "bashls",
       "docker_compose_language_service",
+      "lua_ls",
       "perlnavigator",
       "rust_analyzer",
       "tsserver",
@@ -206,6 +207,7 @@ require("lsp-format").setup {}
 
 require'lspconfig'.bashls.setup {}
 require'lspconfig'.docker_compose_language_service.setup{}
+require'lspconfig'.luals.setup {}
 require'lspconfig'.yamlls.setup{}
 
 local navbuddy = require("nvim-navbuddy")
