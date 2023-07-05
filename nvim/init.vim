@@ -220,7 +220,9 @@ require("mason-lspconfig").setup {
     }
 }
 
-require'lspconfig'.bashls.setup{}
+require("lsp-format").setup {}
+
+require'lspconfig'.bashls.setup {}
 require'lspconfig'.docker_compose_language_service.setup{}
 require'lspconfig'.yamlls.setup{}
 
@@ -280,6 +282,7 @@ require('lspconfig').rust_analyzer.setup({
 })
 
 require('lspconfig').tsserver.setup{
+  on_attach = require("lsp-format").on_attach,
   filetypes = { "javascript", "typescript", "typescriptreact" },
   cmd = { "typescript-language-server", "--stdio" },
 }
