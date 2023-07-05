@@ -1,0 +1,22 @@
+#!/bin/bash
+
+# From the command line, to get a tmux session picker:
+# tm<cr>
+#
+# to get a tmux kill-session picker:
+# tm kill-session<cr>
+
+fzf_command="fzf-tmux -p --delimiter=: --with-nth 1 --color=hl:2"
+
+# select pane
+line=$(tmux list-session -F "#{session_name}:" | $fzf_command) || exit 0
+
+subcommand=attach
+
+if [ $# -gt 0 ]; then
+    subcommand="$1"
+elif test "${TMUX+x}"; then
+    subcommand="switch"
+fi
+
+tmux "$subcommand" -t "$line"
