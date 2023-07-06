@@ -7,8 +7,6 @@ rm -f ~/.cargo/bin/precious
 
 if is os name eq darwin; then
     rm -f ~/.cargo/bin/fd
-    brew remove tunnelblick || true
-    brew remove vim || true
 fi
 
 # path used to be an alias, but that keeps a copy of $PATH in it, which is
