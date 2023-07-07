@@ -287,7 +287,4 @@ if is os name eq darwin; then
     add_path "/usr/local/opt/curl/bin"
 fi
 
-# Remove this once the GH_HOST var has been removed from all environments
-unset GH_HOST
-
 posh_me
