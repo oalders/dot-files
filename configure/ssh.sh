@@ -11,7 +11,7 @@ mkdir -p ~/.ssh/sockets
 
 ln -sf $PREFIX/ssh/rc ~/.ssh/rc
 
-if is os name eq darwin; then
+if is os name eq darwin || is os id eq debian; then
     ln -sf $PREFIX/ssh/config ~/.ssh/config
     mkdir -p ~/.ssh/config.d/
     if [[ -d ~/local-dot-files/ssh/config.d ]]; then
