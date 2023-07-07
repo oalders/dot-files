@@ -4,7 +4,13 @@
 # https://docs.appimage.org/user-guide/troubleshooting/fuse.html
 
 set -eu
+
+if is cli age nvim lt 18 hours; then
+    exit
+fi
+
 pushd /tmp || exit
+
 
 if is os id eq ubuntu && is os version gte 22.04; then
     sudo apt install libfuse2

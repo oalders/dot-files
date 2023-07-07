@@ -30,6 +30,9 @@ if is os name eq darwin; then
         brew install --cask wezterm --no-quarantine
     fi
 elif is os name eq linux; then
+    if is cli age wezterm lt 18 hours; then
+        exit
+    fi
     if [[ $IS_SUDOER == false ]]; then
         exit 0
     fi
