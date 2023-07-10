@@ -207,7 +207,7 @@ require("lsp-format").setup {}
 
 require'lspconfig'.bashls.setup {}
 require'lspconfig'.docker_compose_language_service.setup{}
-require'lspconfig'.luals.setup {}
+require'lspconfig'.lua_ls.setup {}
 require'lspconfig'.yamlls.setup{}
 
 local navbuddy = require("nvim-navbuddy")
