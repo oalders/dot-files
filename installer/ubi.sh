@@ -37,6 +37,7 @@ fi
 
 if is os name eq linux; then
     ubi --project sharkdp/bat --in "$INSTALL_DIR"
+    ubi --project cli/cli --in "$INSTALL_DIR" --exe gh
 else
     brew install bat
 fi
