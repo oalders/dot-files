@@ -216,7 +216,7 @@ require'lspconfig'.lua_ls.setup {
       },
       diagnostics = {
         -- Get the language server to recognize the `vim` global
-        globals = {'vim'},
+        globals = {'hs', 'vim'},
       },
       workspace = {
         -- Make the server aware of Neovim runtime files
