@@ -30,3 +30,7 @@ git clone "git@github.com:oalders/$REPO.git"
 cd $REPO && mkdir -p dist && make && open dist/metacpan-0.0.5.alfredworkflow
 
 exit 0
+
+# See also:
+# https://alfred.app/workflows/benziahamed/menu-bar-search/
+# https://alfred.app/workflows/alfredapp/system-settings/
