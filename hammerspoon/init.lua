@@ -1,5 +1,5 @@
-local my_hotkeys = {"shift", "cmd"}
-local hyper = {"ctrl", "alt", "cmd", "shift"}
+local my_hotkeys = { "shift", "cmd" }
+local hyper = { "ctrl", "alt", "cmd", "shift" }
 
 local open_app_action = function(name)
     return function()
@@ -28,8 +28,8 @@ local function chrome_tab_action(url_substring, url_to_visit_if_tab_not_found)
               repeat with theTab in every tab of theWindow
                   set theTabIndex to theTabIndex + 1
                   if theTab's URL contains "]] ..
-            url_substring ..
-                [[" then
+        url_substring ..
+        [[" then
                       set foundWindow to theWindow
                       set foundTabIndex to theTabIndex
                   end if
@@ -41,7 +41,7 @@ local function chrome_tab_action(url_substring, url_to_visit_if_tab_not_found)
               set index of foundWindow to 1
           else
               open location "]] ..
-                    url_to_visit_if_tab_not_found .. [["
+        url_to_visit_if_tab_not_found .. [["
           end if
 
       end tell
@@ -99,7 +99,7 @@ hs.hotkey.bind(
     "h",
     function()
         hs.reload()
-        hs.notify.new({title = "Hammerspoon", informativeText = "config reloaded"}):send()
+        hs.notify.new({ title = "Hammerspoon", informativeText = "config reloaded" }):send()
     end
 )
 
@@ -110,7 +110,7 @@ local function currentSelection()
         sel = elem:selectedText()
     end
     if (not sel) or (sel == "") then
-        hs.eventtap.keyStroke({"cmd"}, "c")
+        hs.eventtap.keyStroke({ "cmd" }, "c")
         hs.timer.usleep(20000)
         sel = hs.pasteboard.getContents()
     end
@@ -120,7 +120,7 @@ end
 local function replaceIt(thing)
     hs.pasteboard.setContents(thing)
     hs.timer.usleep(20000)
-    hs.eventtap.keyStroke({"cmd"}, "v")
+    hs.eventtap.keyStroke({ "cmd" }, "v")
 end
 
 -- Transform names via an inexact, but hopefully readable, substitution of
@@ -177,7 +177,7 @@ local function xpasswd()
     if rc == 0 then
         replaceIt(output)
     else
-        hs.notify.new({title = "Hammerspoon", informativeText = "xpasswd failed"}):send()
+        hs.notify.new({ title = "Hammerspoon", informativeText = "xpasswd failed" }):send()
     end
 end
 
@@ -188,19 +188,19 @@ local Install = spoon.SpoonInstall
 Install:andUse("BingDaily")
 Install:andUse("CircleClock")
 Install:andUse("EmmyLua")
-Install:andUse("LookupSelection", {hotkeys = {lexicon = {hyper, "d"}}})
+Install:andUse("LookupSelection", { hotkeys = { lexicon = { hyper, "d" } } })
 Install:andUse(
     "MicMute",
     {
         hotkeys = {
-            toggle = {hyper, "m"}
+            toggle = { hyper, "m" }
         }
     }
 )
 Install:andUse(
     "Seal",
     {
-        hotkeys = {show = {hyper, "space"}},
+        hotkeys = { show = { hyper, "space" } },
         fn = function(s)
             s:loadPlugins(
                 {
@@ -285,7 +285,7 @@ hs.hotkey.bind(hyper, "m", nil, chrome_tab_action("https://meet.google.com/", ""
 hs.hotkey.bind(hyper, "o", nil, chrome_tab_action(ircCloud, ircCloud .. "magnet/channel/metacpan"))
 hs.hotkey.bind(hyper, "p", nil, chrome_tab_action(PT, PT))
 hs.hotkey.bind(hyper, "q", slackifyName)
-hs.hotkey.bind(hyper, "w", chrome_tab_action(remoteDesktop,remoteDesktop))
+hs.hotkey.bind(hyper, "w", chrome_tab_action(remoteDesktop, remoteDesktop))
 
 local open_slack_threads = function(name)
     return function()
@@ -302,11 +302,11 @@ hs.hotkey.bind(hyper, "t", nil, open_slack_threads("Slack"))
 
 -- Stolen from Lukas https://stackoverflow.com/a/58662204/406224
 hs.hotkey.bind(hyper, 'n', function()
-  -- get the focused window
-  local win = hs.window.focusedWindow()
-  -- get the screen where the focused window is displayed, a.k.a. current screen
-  local screen = win:screen()
-  -- compute the unitRect of the focused window relative to the current screen
-  -- and move the window to the next screen setting the same unitRect
-  win:move(win:frame():toUnitRect(screen:frame()), screen:next(), true, 0)
+    -- get the focused window
+    local win = hs.window.focusedWindow()
+    -- get the screen where the focused window is displayed, a.k.a. current screen
+    local screen = win:screen()
+    -- compute the unitRect of the focused window relative to the current screen
+    -- and move the window to the next screen setting the same unitRect
+    win:move(win:frame():toUnitRect(screen:frame()), screen:next(), true, 0)
 end)
