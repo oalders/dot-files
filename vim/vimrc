@@ -319,8 +319,6 @@ augroup END
 " editing SQL files
 let g:omni_sql_no_default_maps = 1
 
-highlight ColorColumn ctermbg=0 guibg=lightgrey
-
 " ########### Functions ###########
 "
 " Exec current file
@@ -332,21 +330,10 @@ fun ExecFile()
     :!"%:p"
 endfun
 
-" Set visual cue at column 78
-:set colorcolumn=78
-
 " Set line markers to make indentation easier to follow
 " Enable via :call ShowLines()
 fun ShowLines()
     :set colorcolumn=5,9,13,17,21,25,29,78
-endfun
-
-fun ShowWidth()
-    :set colorcolumn=78
-endfun
-
-fun ClearLines()
-    :set colorcolumn=
 endfun
 
 fun SudoWrite()
@@ -358,7 +345,7 @@ fun HideGutter()
     :set nonumber
     :set nolist
     :set scl=no " sign column
-    :call ClearLines()
+    :ToggleNeoColumn
 endfun
 
 fun! ShowGutter()
@@ -366,7 +353,7 @@ fun! ShowGutter()
     :set number
     :set list
     :set scl=auto
-    :call ShowWidth()
+    :ToggleNeoColumn
 endfun
 
 function! Requote()

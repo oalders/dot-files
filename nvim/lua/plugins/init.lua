@@ -348,3 +348,14 @@ null_ls.setup({
         null_ls.builtins.formatting.shfmt,
     },
 })
+
+require('NeoColumn').setup(
+    {
+        fg_color = "",
+        bg_color = "",
+        NeoColumn = "78",
+        always_on = true,
+        custom_NeoColumn = {},
+        excluded_ft = { "text", "markdown" },
+    }
+)
