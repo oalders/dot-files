@@ -11,7 +11,7 @@ let g:mapleader = ','
 syntax enable
 set background=dark
 
-colorscheme nord
+colorscheme iceberg
 
 let g:lightline = {
       \ 'active': {

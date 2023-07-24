@@ -6,6 +6,7 @@ Plug 'arcticicestudio/nord-vim'
 Plug 'bkad/CamelCaseMotion' " provide CamelCase motion through words
 Plug 'c9s/perlomni.vim'
 Plug 'chrisbra/unicode.vim'
+Plug 'cocopon/iceberg.vim'
 Plug 'ConradIrwin/vim-bracketed-paste'
 " Plug 'dense-analysis/ale' " , { 'tag': 'v3.1.0' }
 Plug 'oalders/ale', { 'branch': 'perlimports' }

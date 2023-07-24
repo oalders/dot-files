@@ -10,7 +10,7 @@ config.font = wezterm.font_with_fallback({
     "JetBrainsMono Nerd Font",
 })
 config.allow_square_glyphs_to_overflow_width = "WhenFollowedBySpace"
-config.color_scheme = "nord"
+config.color_scheme = "iceberg-dark"
 
 config.colors = {
     cursor_bg = '#B48EAD',
