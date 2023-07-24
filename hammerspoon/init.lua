@@ -53,43 +53,40 @@ end
 local function close_duplicate_chrome_tabs()
     return applescript_action(
         [[
+        say "starting tab cleanup"
         set urls to {}
 
         tell application "Google Chrome"
             activate
 
             repeat with theWindow in every window
-                say "starting window"
-
-                set numberOfTabs to 0
-                repeat with theTab in every tab of theWindow
-                    set numberOfTabs to numberOfTabs + 1
-                end repeat
-
+                set toClose to {}
                 set tabIndex to 1
                 repeat with theTab in every tab of theWindow
-                    if (tabIndex > numberOfTabs) then
-                        exit repeat
-                    end if
-                    set tabIndex to tabIndex + 1
-
+                   set tabIsDuplicate to false
                     repeat with URL in urls
                         if (((URL as string) starts with "http") and (URL as string) = (URL of theTab as string)) then
-                            log (URL of theTab as string)
-                            say "closing one tab"
-                            close theTab
-                            set numberOfTabs to numberOfTabs - 1
-
+                            copy tabIndex to the end of toClose
+                            set tabIsDuplicate to true
                             exit repeat
                         end if
                     end repeat
+                    set tabIndex to tabIndex + 1
 
-                    copy URL of theTab as string to the end of urls
+                    if tabIsDuplicate is not true then
+                        copy URL of theTab as string to the end of urls
+                    end if
 
                 end repeat
+
+                set closing to reverse of toClose
+
+                repeat with closeIndex in closing
+                    close tab closeIndex of theWindow
+                end repeat
             end repeat
-            say "finished"
         end tell
+        say "finished tab cleanup"
         ]]
     )
 end
