@@ -1,31 +1,36 @@
 {
   "$schema": "https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/schema.json",
+  "version": 2,
+  "final_space": true,
   "blocks": [
     {
+      "type": "prompt",
       "alignment": "left",
       "segments": [
         {
-          "background": "#4C566A",
-          "foreground": "#88C0D0",
+          "type": "os",
           "style": "powerline",
-          "template": " {{ if .WSL }}WSL at {{ end }}{{.Icon}} ",
-          "type": "os"
+          "foreground": "#88C0D0",
+          "background": "#4C566A",
+          "template": " {{ if .WSL }}WSL at {{ end }}{{.Icon}} "
         },
         {
-          "background": "#5f819d",
-          "foreground": "#193549",
+          "type": "path",
+          "style": "powerline",
           "powerline_symbol": "\ue0b0",
+          "foreground": "#193549",
+          "background": "#5f819d",
+          "template": " \udb80\ude4b  {{ .Path }} ",
           "properties": {
             "folder_separator_icon": " \ue0b1 ",
             "home_icon": "~",
             "style": "folder"
-          },
-          "style": "powerline",
-          "template": " \uf74a  {{ .Path }} ",
-          "type": "path"
+          }
         },
         {
-          "background": "#5e8d87",
+          "type": "git",
+          "style": "powerline",
+          "powerline_symbol": "\ue0b0",
           "foreground": "#193549",
           "foreground_templates": [
             "{{ if or (.Working.Changed) (.Staging.Changed) }}#EBCB8B{{ end }}",
@@ -33,56 +38,51 @@
             "{{ if gt .Ahead 0 }}#f17c37{{ end }}",
             "{{ if gt .Behind 0 }}#89d1dc{{ end }}"
           ],
-          "powerline_symbol": "\ue0b0",
+          "background": "#5e8d87",
+          "template": " {{ .HEAD }} {{ .BranchStatus }}{{ if .Working.Changed }} \uf044 {{ .Working.String }}{{ end }}{{ if and (.Staging.Changed) (.Working.Changed) }} |{{ end }}{{ if .Staging.Changed }} \uf046 {{ .Staging.String }}{{ end }}{{ if gt .StashCount 0}}\udb80\udd93 {{ .StashCount }}{{ end }}{{ if gt .WorktreeCount 0}} \uf1bb {{ .WorktreeCount }}{{ end }} ",
           "properties": {
             "fetch_stash_count": true,
             "fetch_status": true,
             "fetch_upstream_icon": true,
             "fetch_worktree_count": false
-          },
-          "style": "powerline",
-          "template": " {{ .HEAD }} {{ .BranchStatus }}{{ if .Working.Changed }} \uf044 {{ .Working.String }}{{ end }}{{ if and (.Staging.Changed) (.Working.Changed) }} |{{ end }}{{ if .Staging.Changed }} \uf046 {{ .Staging.String }}{{ end }}{{ if gt .StashCount 0}}\uf692 {{ .StashCount }}{{ end }}{{ if gt .WorktreeCount 0}} \uf1bb {{ .WorktreeCount }}{{ end }} ",
-          "type": "git"
+          }
         },
         {
-          "background": "#ffff66",
-          "foreground": "#111111",
+          "type": "root",
+          "style": "powerline",
           "powerline_symbol": "\ue0b0",
+          "foreground": "#111111",
+          "background": "#ffff66",
+          "template": " \uf0e7 ",
           "properties": {
             "root_icon": "\uf0ad"
-          },
-          "style": "powerline",
-          "template": " \uf0e7 ",
-          "type": "root"
+          }
         },
         {
-          "background": "#83769c",
+          "type": "executiontime",
+          "style": "plain",
           "foreground": "#193549",
+          "background": "#83769c",
+          "template": "<transparent>\ue0b0</> \udb81\udd1f{{ .FormattedMs }}\u2800",
           "properties": {
             "always_enabled": true
-          },
-          "style": "plain",
-          "template": "<transparent>\ue0b0</> \ufa1e{{ .FormattedMs }}\u2800",
-          "type": "executiontime"
+          }
         },
         {
+          "type": "exit",
+          "style": "diamond",
+          "foreground": "#193549",
           "background": "#8abeb7",
           "background_templates": [
             "{{ if gt .Code 0 }}#BF616A{{ end }}"
           ],
-          "foreground": "#193549",
+          "trailing_diamond": "\ue0b4",
+          "template": "<#83769c>\ue0b0</> ♥ ",
           "properties": {
             "always_enabled": true
-          },
-          "style": "diamond",
-          "template": "<#83769c>\ue0b0</> \u2665 ",
-          "trailing_diamond": "\ue0b4",
-          "type": "exit"
+          }
         }
-      ],
-      "type": "prompt"
+      ]
     }
-  ],
-  "final_space": true,
-  "version": 2
+  ]
 }

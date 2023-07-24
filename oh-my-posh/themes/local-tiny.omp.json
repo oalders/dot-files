@@ -1,57 +1,57 @@
 {
   "$schema": "https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/schema.json",
+  "version": 2,
+  "final_space": true,
   "blocks": [
     {
+      "type": "prompt",
       "alignment": "left",
       "segments": [
         {
-          "background": "#4C566A",
-          "foreground": "#88C0D0",
+          "type": "os",
           "style": "powerline",
-          "template": " {{ if .WSL }}WSL at {{ end }}{{.Icon}} ",
-          "type": "os"
+          "foreground": "#88C0D0",
+          "background": "#4C566A",
+          "template": " {{ if .WSL }}WSL at {{ end }}{{.Icon}} "
         },
         {
-          "background": "#5f819d",
-          "foreground": "#193549",
+          "type": "path",
+          "style": "powerline",
           "powerline_symbol": "\ue0b0",
+          "foreground": "#193549",
+          "background": "#5f819d",
+          "template": " \udb80\ude4b  {{ .Path }} ",
           "properties": {
             "folder_separator_icon": " \ue0b1 ",
             "home_icon": "~",
             "style": "folder"
-          },
-          "style": "powerline",
-          "template": " \uf74a  {{ .Path }} ",
-          "type": "path"
+          }
         },
         {
-          "background": "#83769c",
+          "type": "executiontime",
+          "style": "plain",
           "foreground": "#193549",
+          "background": "#83769c",
+          "template": "<transparent>\ue0b0</> \udb81\udd1f{{ .FormattedMs }}\u2800",
           "properties": {
             "always_enabled": true
-          },
-          "style": "plain",
-          "template": "<transparent>\ue0b0</> \ufa1e{{ .FormattedMs }}\u2800",
-          "type": "executiontime"
+          }
         },
         {
+          "type": "exit",
+          "style": "diamond",
+          "foreground": "#193549",
           "background": "#8abeb7",
           "background_templates": [
             "{{ if gt .Code 0 }}#BF616A{{ end }}"
           ],
-          "foreground": "#193549",
+          "trailing_diamond": "\ue0b4",
+          "template": "<#83769c>\ue0b0</> ♥ ",
           "properties": {
             "always_enabled": true
-          },
-          "style": "diamond",
-          "template": "<#83769c>\ue0b0</> \u2665 ",
-          "trailing_diamond": "\ue0b4",
-          "type": "exit"
+          }
         }
-      ],
-      "type": "prompt"
+      ]
     }
-  ],
-  "final_space": true,
-  "version": 2
+  ]
 }
