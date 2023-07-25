@@ -35,14 +35,13 @@ require manual intervention or be impractical to run regularly.
 
 ### Clone Repo and Change Remote
 
-```
+```text
 git clone https://github.com/oalders/dot-files.git
 cd dot-files
 ./bin/change-dot-files-origin.sh
 ```
 
 ### Change Default shell
-
 
 See https://apple.stackexchange.com/a/232983
 
@@ -69,14 +68,13 @@ Afterwards it should look something like:
 
 Then:
 
-
 ```
 chsh -s /opt/homebrew/bin/bash $USER
 ```
 
 ### Trackpad and Dock defaults
 
-```
+```text
 ./configure/macos.sh
 ```
 
