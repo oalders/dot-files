@@ -360,3 +360,5 @@ require('NeoColumn').setup(
         excluded_ft = { "text", "markdown" },
     }
 )
+
+require('glow').setup()
