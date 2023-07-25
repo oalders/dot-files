@@ -36,6 +36,7 @@ require('bufferline').setup {}
 
 local cmp = require 'cmp'
 
+---@diagnostic disable-next-line:redundant-parameter
 cmp.setup({
     experimental = {
         ghost_text = true,
