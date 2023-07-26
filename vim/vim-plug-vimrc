@@ -8,8 +8,8 @@ Plug 'c9s/perlomni.vim'
 Plug 'chrisbra/unicode.vim'
 Plug 'cocopon/iceberg.vim'
 Plug 'ConradIrwin/vim-bracketed-paste'
-" Plug 'dense-analysis/ale' " , { 'tag': 'v3.1.0' }
-Plug 'oalders/ale', { 'branch': 'perlimports' }
+Plug 'dense-analysis/ale' " , { 'tag': 'v3.3.0' }
+" Plug 'oalders/ale', { 'branch': 'perlimports' }
 Plug 'ekalinin/dockerfile.vim'
 
 if has('nvim') || v:version > 802
