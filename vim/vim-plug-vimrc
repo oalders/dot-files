@@ -16,6 +16,7 @@ if has('nvim') || v:version > 802
   Plug 'fatih/vim-go' ", { 'do': ':GoUpdateBinaries' } takes forever on GH builds
 endif
 
+Plug 'folke/trouble.nvim'
 Plug 'gregsexton/MatchTag'
 Plug 'haya14busa/vim-auto-mkdir' " create directory path on save
 Plug 'itchyny/lightline.vim'
