@@ -370,3 +370,13 @@ vim.keymap.set("n", "<leader>xd", function() require("trouble").open("document_d
 vim.keymap.set("n", "<leader>xq", function() require("trouble").open("quickfix") end)
 vim.keymap.set("n", "<leader>xl", function() require("trouble").open("loclist") end)
 vim.keymap.set("n", "gR", function() require("trouble").open("lsp_references") end)
+
+require('hlchunk').setup({
+    indent = {
+        chars = { "│", "¦", "┆", "┊", }, -- more code can be found in https://unicodeplus.com/
+        style = { "#5E81AC" },
+    },
+    blank = {
+        enable = false,
+    }
+})
