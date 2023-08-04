@@ -16,7 +16,6 @@ if has('nvim') || v:version > 802
   Plug 'fatih/vim-go' ", { 'do': ':GoUpdateBinaries' } takes forever on GH builds
 endif
 
-Plug 'folke/trouble.nvim'
 Plug 'gregsexton/MatchTag'
 Plug 'haya14busa/vim-auto-mkdir' " create directory path on save
 Plug 'itchyny/lightline.vim'
@@ -59,6 +58,7 @@ if has('nvim')
   Plug 'ahmedkhalf/project.nvim'
   Plug 'ecthelionvi/NeoColumn.nvim'
   Plug 'ellisonleao/glow.nvim'
+  Plug 'folke/trouble.nvim'
   Plug 'github/copilot.vim'
   Plug 'nvim-treesitter/nvim-treesitter', { 'do': ':TSUpdate'}  " We recommend updating the parsers on update
 
