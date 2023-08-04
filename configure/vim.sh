@@ -66,7 +66,7 @@ if is cli age godef gt 18 hours; then
     if [[ $IS_GITHUB == false ]]; then
         add_path ~/local/bin
         if is there go; then
-            nvim +':GoUpdateBinaries' +qa || true
+            nvim +:GoUpdateBinaries +qa || true
         fi
         nvim +'PlugInstall --sync' +qa
         nvim +'PlugUpdate --sync' +qa
