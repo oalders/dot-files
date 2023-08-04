@@ -59,8 +59,10 @@ if has('nvim')
   Plug 'ecthelionvi/NeoColumn.nvim'
   Plug 'ellisonleao/glow.nvim'
   Plug 'folke/trouble.nvim'
+  Plug 'folke/which-key.nvim'
   Plug 'github/copilot.vim'
   Plug 'nvim-treesitter/nvim-treesitter', { 'do': ':TSUpdate'}  " We recommend updating the parsers on update
+  Plug 'shellRaining/hlchunk.nvim', {'on': 'EnableHL'}
 
   Plug 'nvim-lua/plenary.nvim'
   Plug 'jose-elias-alvarez/null-ls.nvim'
