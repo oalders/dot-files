@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
-set -eux
+set -e -u -o pipefail
+set -x
 
 install_for_linux() (
     sudo apt install -y libxcb-image0 libxkbcommon-x11-0
