@@ -2,16 +2,16 @@
 
 set -eux
 
-install_for_linux() {
+install_for_linux() (
     sudo apt install -y libxcb-image0 libxkbcommon-x11-0
     version=$(is known os version)
-    local file="wezterm-nightly.${1}${version}.deb"
+    file=wezterm-nightly.${1}${version}.deb
 
-    pushd /tmp || exit 1
-    local url="https://github.com/wez/wezterm/releases/download/nightly/$file"
+    cd /tmp || exit 1
+    url=https://github.com/wez/wezterm/releases/download/nightly/$file
     curl --location --output "$file" "$url"
     sudo dpkg -i "$file"
-}
+)
 
 remove_wezterm() {
     rm -rf /Applications/WezTerm.app \
@@ -30,9 +30,7 @@ if is os name eq darwin; then
         brew install --cask wezterm --no-quarantine
     fi
 elif is os name eq linux; then
-    if is cli age wezterm lt 18 hours; then
-        exit
-    fi
+    is cli age wezterm gt 18 hours || exit
     if [[ $IS_SUDOER == false ]]; then
         exit 0
     fi
