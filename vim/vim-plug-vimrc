@@ -3,6 +3,7 @@ call plug#begin('~/.vim/plugged')
 Plug 'airblade/vim-gitgutter' " show git diff markers in the sign colum
 Plug 'AndrewRadev/splitjoin.vim'
 " Plug 'arcticicestudio/nord-vim'
+Plug 'ap/vim-css-color'
 Plug 'bkad/CamelCaseMotion' " provide CamelCase motion through words
 Plug 'c9s/perlomni.vim'
 Plug 'chrisbra/unicode.vim'
