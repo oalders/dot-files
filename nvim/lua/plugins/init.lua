@@ -378,7 +378,7 @@ wk.register({
                 }
             })
         end, "hlchunk" },
-        h = { "<cmd>DisableHLChunk<cr>", "Disable HLChunk" }
+        h = { "<cmd>DisableHL<cr>", "Disable HL" }
     },
 }, { prefix = "<leader>" })
 
