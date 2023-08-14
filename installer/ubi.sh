@@ -36,8 +36,10 @@ if ! is there precious; then
 fi
 
 if is os name eq darwin; then
-    ubi --in "$in" \
-        --url https://github.com/sharkdp/bat/releases/download/v0.23.0/bat-v0.23.0-x86_64-apple-darwin.tar.gz
+    if is cli version bat ne 0.23 || true; then
+        ubi --in "$in" \
+            --url https://github.com/sharkdp/bat/releases/download/v0.23.0/bat-v0.23.0-x86_64-apple-darwin.tar.gz
+    fi
 else
     ubi --project sharkdp/bat --in "$in"
 fi
