@@ -256,11 +256,12 @@ require("lspconfig").perlnavigator.setup {
     -- capabilities = capabilities,
     settings = {
         perlnavigator = {
-            enableWarnings = true,
             -- perltidyProfile = '',
             -- perlcriticProfile = '',
+            enableWarnings = true,
+            perlimportsProfile = 'perlimports.toml',
             includePaths = { 'lib', 'dev/lib', 't/lib' },
-            perlcriticEnabled = false,
+            perlcriticEnabled = true,
             perlimportsLintEnabled = true,
             perlimportsTidyEnabled = true,
             perlPath = 'perl',
