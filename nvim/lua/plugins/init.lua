@@ -92,7 +92,16 @@ cmp.setup({
         end,
     },
     sources = cmp.config.sources({
-        { name = 'buffer',   priority = 7, keyword_length = 4 },
+        {
+            name = 'buffer',
+            priority = 10,
+            keyword_length = 4,
+            option = {
+                get_bufnrs = function()
+                    return vim.api.nvim_list_bufs()
+                end
+            }
+        },
         { name = 'emoji',    priority = 3 },
         { name = 'path',     priority = 5 },
         { name = 'calc',     priority = 4 },
