@@ -19,4 +19,6 @@ alias | grep " du=" && unalias du
 alias | grep " ls=" && unalias ls
 alias | grep " ps=" && unalias ps
 
+brew remove gh || true
+
 exit 0
