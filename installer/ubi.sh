@@ -35,7 +35,13 @@ if ! is there precious; then
     ubi --project houseabsolute/precious --in "$INSTALL_DIR"
 fi
 
-ubi --project sharkdp/bat --in "$INSTALL_DIR"
+if is os name eq darwin; then
+    ubi --in "$INSTALL_DIR" \
+        --url https://github.com/sharkdp/bat/releases/download/v0.23.0/bat-v0.23.0-x86_64-apple-darwin.tar.gz
+else
+    ubi --project sharkdp/bat --in "$INSTALL_DIR"
+fi
+
 ubi --project cli/cli --in "$INSTALL_DIR" --exe gh
 # ubi --project sharkdp/fd --in $INSTALL_DIR
 # ubi --project Wilfred/difftastic --exe difft --in "$INSTALL_DIR"
