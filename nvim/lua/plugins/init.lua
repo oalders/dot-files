@@ -267,11 +267,13 @@ require("lspconfig").perlnavigator.setup {
         }
     },
     on_new_config = function(new_config, new_root)
-        local m = string.match(new_root, '^(.teamcity)')
-        if m then
-            new_config.settings.perlnavigator.perlPath = 'mm-perl'
-            new_config.settings.perlnavigator.perlcriticProfile = table.concat({ m, 'mm_website/.perlcriticrc' }, '/')
-            new_config.settings.perlnavigator.perltidyProfile = table.concat({ m, 'mm_website/.perltidyallrc' }, '/')
+        local f = new_root .. '/.teamcity/pom.xml'
+        local pn = new_config.settings.perlnavigator
+        if vim.fn.filereadable(f) == 1 then
+            pn.perlPath = 'mm-perl'
+            pn.perlcriticProfile = table.concat({ new_root, '.perlcriticrc' }, '/')
+            pn.perltidyProfile = table.concat({ new_root, '.perltidyallrc' }, '/')
+            pn.perlnavigator.perlimportsProfile = table.concat({ new_root, '.perlimports.toml' }, '/')
         end
     end,
 }
