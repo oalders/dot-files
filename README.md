@@ -2,25 +2,26 @@
 
 <!-- vim-markdown-toc GFM -->
 
-    * [Fresh macOS Installs](#fresh-macos-installs)
-        * [Clone Repo and Change Remote](#clone-repo-and-change-remote)
-        * [Change Default shell](#change-default-shell)
-        * [Trackpad and Dock defaults](#trackpad-and-dock-defaults)
-        * [Install App Store Apps](#install-app-store-apps)
-        * [Hammerspoon Spoon Installer](#hammerspoon-spoon-installer)
-        * [Alfred Workflows](#alfred-workflows)
-        * [Alfred Nord Theme](#alfred-nord-theme)
-    * [All Fresh Installs](#all-fresh-installs)
-        * [Plenv](#plenv)
-    * [tmux Prefix](#tmux-prefix)
-    * [tmux Plugins](#tmux-plugins)
-    * [tmux-resurrect](#tmux-resurrect)
-    * [tmux-sessionist](#tmux-sessionist)
-    * [vim](#vim)
-    * [Alfred](#alfred)
-    * [Bash](#bash)
-    * [less](#less)
-    * [gh -- GitHub CLI](#gh----github-cli)
+* [Fresh macOS Installs](#fresh-macos-installs)
+    * [Clone Repo and Change Remote](#clone-repo-and-change-remote)
+    * [Change Default shell](#change-default-shell)
+    * [Trackpad and Dock defaults](#trackpad-and-dock-defaults)
+    * [Install App Store Apps](#install-app-store-apps)
+    * [Hammerspoon Spoon Installer](#hammerspoon-spoon-installer)
+    * [Alfred Workflows](#alfred-workflows)
+    * [Alfred Nord Theme](#alfred-nord-theme)
+* [All Fresh Installs](#all-fresh-installs)
+    * [Plenv](#plenv)
+* [tmux](#tmux)
+    * [Prefix](#prefix)
+    * [Shortcuts](#shortcuts)
+    * [Plugins](#plugins)
+        * [tmux-resurrect](#tmux-resurrect)
+* [vim](#vim)
+* [Alfred](#alfred)
+* [Bash](#bash)
+* [less](#less)
+* [gh -- GitHub CLI](#gh----github-cli)
 * [Testing with Docker](#testing-with-docker)
 * [Docker bashrc](#docker-bashrc)
 
@@ -43,7 +44,7 @@ cd dot-files
 
 ### Change Default shell
 
-See https://apple.stackexchange.com/a/232983
+See <https://apple.stackexchange.com/a/232983>
 
 On macOS:
 
@@ -68,13 +69,13 @@ Afterwards it should look something like:
 
 Then:
 
-```
+```bash
 chsh -s /opt/homebrew/bin/bash $USER
 ```
 
 ### Trackpad and Dock defaults
 
-```text
+```bash
 ./configure/macos.sh
 ```
 
@@ -82,13 +83,13 @@ chsh -s /opt/homebrew/bin/bash $USER
 
 On my personal machines after I'm logged in to the app store:
 
-```
+```bash
 brew bundle install --file=brew/mas
 ```
 
 ### Hammerspoon Spoon Installer
 
-```
+```bash
 ./installer/spoon-installer.sh
 ```
 
@@ -98,7 +99,7 @@ Then double-click the `SpoonInstall.spoon` file. This fixes the following error:
 
 ### Alfred Workflows
 
-```
+```bash
 installer/alfred-workflows.sh
 ```
 
@@ -112,29 +113,31 @@ Run after Alfred has been installed. Confirm each install individually.
 
 ### Plenv
 
-```
+```bash
 ./installer/plenv.sh
 ```
 
 Install `plenv` as well as the latest Perl version.
 
-## tmux Prefix
+## tmux
 
-Ctrl-a
+### Prefix
 
-## tmux Plugins
+`ctrl-a`
+
+### Shortcuts
+
+`ctrl-a + L`: toggle session
+
+### Plugins
 
 * prefix + r # reload config
 * prefix + I # install plugins
 
-## tmux-resurrect
+#### tmux-resurrect
 
 * prefix + Ctrl-s - save
 * prefix + Ctrl-r - restore
-
-## tmux-sessionist
-
-* prefix + S -- switch back to previous session
 
 ## vim
 
@@ -146,7 +149,7 @@ Remind myself of vim shortcuts etc.
 * `ctrl-w m` - toggle zooming of splits
 * `ctrl-w r` - swap splits
 * `ctrl-o` - return to previous position in file
-* `ý¿¿»šº:vertical terminal` - vertical split into a terminal buffer
+* `ý¿¿»šºvertical terminal` - vertical split into a terminal buffer
 * `:GFiles` - `git ls-files | fzf`
 * `:GFiles?` - `git status | fzf` with preview pane
 * `:BCommits` - git commits for the current buffer
@@ -187,21 +190,24 @@ viewing outpt.
   * `gh pr view --comments 1234`: view pull request and comments
 * `gh pr checks`: get status of checks for a PR in current branch
 
-# Testing with Docker
+## Testing with Docker
 
-```
+```bash
 docker run -it --volume $PWD:/root/dot-files ubuntu:latest /bin/env bash
 ```
 
 In the Docker container:
 
-```
+```bash
 cd /root/dot-files
 USER=root ./installer/inside-docker.sh && ./install.sh
 ```
 
-# Docker bashrc
+## Docker bashrc
 
-```
-docker run --rm -it -p 5000:5000 -v "$HOME/dot-files/bashrc-docker:/root/.bashrc"  --volume $PWD:/sandbox python:latest bashrc
+```text
+docker run --rm -it -p 5000:5000                  \
+-v "$HOME/dot-files/bashrc-docker:/root/.bashrc"  \
+--volume $PWD:/sandbox                            \
+python:latest bashrc
 ```
