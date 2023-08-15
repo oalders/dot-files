@@ -359,6 +359,7 @@ local null_ls = require("null-ls")
 
 null_ls.setup({
     sources = {
+        null_ls.builtins.formatting.perlimports,
         null_ls.builtins.formatting.shfmt,
     },
 })
