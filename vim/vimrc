@@ -224,7 +224,7 @@ nmap <silent> <C-j> <Plug>(ale_next_wrap)
 " gometalinter currently not enabled
 let g:ale_linters = {
 \   'ansible' : ['ansible-lint'],
-\   'go': ['gofmt', 'golangci-lint', 'gopls', 'revive'],
+\   'go': [],
 \   'dockerfile': ['hadolint'],
 \   'html': ['alex', 'fecs', 'htmlhint', 'stylelint', 'tidy',],
 \   'json': ['jq',],
@@ -240,7 +240,7 @@ let g:ale_linters = {
 let g:ale_fixers = {
 \   '*': ['remove_trailing_lines', 'trim_whitespace'],
 \   'css': ['prettier'],
-\   'go': ['gofumpt'],
+\   'go': [],
 \   'html': ['remove_trailing_lines', 'trim_whitespace', 'prettier'],
 \   'java': ['remove_trailing_lines', 'trim_whitespace', 'google_java_format'],
 \   'javascript': ['eslint','prettier_eslint', 'remove_trailing_lines'],

@@ -206,6 +206,8 @@ require("mason-lspconfig").setup {
     ensure_installed = {
         "bashls",
         "docker_compose_language_service",
+        "golangci_lint_ls",
+        "gopls",
         "lua_ls",
         "perlnavigator",
         "rust_analyzer",
@@ -249,6 +251,9 @@ navbuddy.setup {
         preference = nil,
     },
 }
+
+require'lspconfig'.gopls.setup{}
+require'lspconfig'.golangci_lint_ls.setup{}
 
 -- After setting up mason-lspconfig you may set up servers via lspconfig
 -- See server/src/server.ts in PerlNavigator for a list of available settings
@@ -362,6 +367,7 @@ local null_ls = require("null-ls")
 
 null_ls.setup({
     sources = {
+        null_ls.builtins.formatting.gofumpt,
         null_ls.builtins.formatting.perlimports,
         null_ls.builtins.formatting.shfmt,
     },
