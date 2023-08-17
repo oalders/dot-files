@@ -199,7 +199,7 @@ vim.api.nvim_create_autocmd('LspAttach', {
 -- end copied from https://github.com/neovim/nvim-lspconfig
 
 
-local capabilities = require('cmp_nvim_lsp').default_capabilities()
+require('cmp_nvim_lsp')
 
 require("mason").setup()
 require("mason-lspconfig").setup {
@@ -258,7 +258,6 @@ require'lspconfig'.golangci_lint_ls.setup{}
 -- After setting up mason-lspconfig you may set up servers via lspconfig
 -- See server/src/server.ts in PerlNavigator for a list of available settings
 require("lspconfig").perlnavigator.setup {
-    -- capabilities = capabilities,
     settings = {
         perlnavigator = {
             -- perltidyProfile = '',
