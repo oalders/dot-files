@@ -12,7 +12,7 @@ fi
 pushd /tmp || exit
 
 
-if is os id eq ubuntu && is os version gte 22.04; then
+if (is os id eq ubuntu && is os version gte 22.04) || (is os id eq debian); then
     sudo apt install libfuse2
 fi
 

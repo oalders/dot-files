@@ -30,6 +30,8 @@ config.colors = {
     }
 }
 
+config.enable_wayland = false
+config.front_end = "OpenGL"
 -- config.window_background_opacity = .65
 -- config.macos_window_background_blur = 20
 
