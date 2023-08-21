@@ -18,10 +18,6 @@ fi
 
 set -x
 brew config
-arch=$(uname -m)
-if [[ $arch != 'arm64' ]];then
-   brew tap homebrew/core
-fi
 brew update -v
 brew upgrade
 
