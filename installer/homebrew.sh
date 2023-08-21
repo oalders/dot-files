@@ -34,8 +34,4 @@ brew bundle install --file=brew/defaults
 brew bundle install --file=brew/local-only
 # brew bundle install --file=brew/mas
 
-if [[ -e ~/local-dot-files/Brewfile ]]; then
-    brew bundle install --file=~/local-dot-files/Brewfile
-fi
-
 exit 0
