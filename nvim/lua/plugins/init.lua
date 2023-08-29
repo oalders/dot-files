@@ -252,8 +252,8 @@ navbuddy.setup {
     },
 }
 
-require'lspconfig'.gopls.setup{}
-require'lspconfig'.golangci_lint_ls.setup{}
+require 'lspconfig'.gopls.setup {}
+require 'lspconfig'.golangci_lint_ls.setup {}
 
 -- After setting up mason-lspconfig you may set up servers via lspconfig
 -- See server/src/server.ts in PerlNavigator for a list of available settings
@@ -387,6 +387,14 @@ require('glow').setup()
 
 local wk = require("which-key")
 wk.register({
+    g = {
+        j = { function()
+            require 'splitjoin'.join()
+        end, 'join the object under cursor' },
+        s = { function()
+            require 'splitjoin'.split()
+        end, 'split the object under cursor' },
+    },
     l = {
         l = { function()
             require('hlchunk').setup({
