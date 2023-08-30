@@ -35,4 +35,6 @@ config.front_end = "OpenGL"
 -- config.window_background_opacity = .65
 -- config.macos_window_background_blur = 20
 
+config.warn_about_missing_glyphs = true
+
 return config;
