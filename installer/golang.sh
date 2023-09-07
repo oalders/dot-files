@@ -5,17 +5,17 @@
 cd /tmp || exit 1
 set -eux
 
-LATEST=$(curl https://go.dev/VERSION?m=text)
-echo "version $LATEST"
+latest=$(curl https://go.dev/VERSION?m=text)
+echo "version $latest"
 
-ARCHITECTURE="amd64"
+arch="amd64"
 
 if [[ $(uname -m) == "armv7l" ]]; then # raspberry pi
-    ARCHITECTURE="armv6l"
+    arch="armv6l"
 fi
 
-FILENAME="$LATEST".linux-"$ARCHITECTURE".tar.gz
+filename="$latest".linux-"$arch".tar.gz
 
-curl --location -O "https://go.dev/dl/$FILENAME"
+curl --location -O "https://go.dev/dl/$filename"
 sudo rm -rf /usr/local/go/
-sudo tar -C /usr/local -xzf "$FILENAME"
+sudo tar -C /usr/local -xzf "$filename"

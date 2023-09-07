@@ -2,24 +2,22 @@
 
 set -eux
 
-DIR=trurl
-REPO=https://github.com/curl/trurl.git
-SRC="$HOME/dot-files/src"
+dir=trurl
+repo=https://github.com/curl/trurl.git
+src="$HOME/dot-files/src"
 
-mkdir -p "$SRC"
-cd "$SRC" || exit 1
+mkdir -p "$src"
+cd "$src" || exit 1
 
-if [[ -d $DIR ]]; then
-    cd $DIR
+if [[ -d $dir ]]; then
+    cd $dir
     git from
 else
-    git clone $REPO $DIR
-    cd $DIR
+    git clone $repo $dir
+    cd $dir
 fi
 
 sudo apt-get install libcurl4-gnutls-dev
 make
 
 cp trurl "$HOME/local/bin/"
-
-exit 0

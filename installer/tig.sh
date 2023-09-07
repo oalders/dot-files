@@ -2,13 +2,13 @@
 
 cd /tmp || exit
 
-VERSION=tig-2.5.3
-rm $VERSION.tar.gz
-rm -rf $VERSION
+version=tig-2.5.3
+rm $version.tar.gz
+rm -rf $version
 
-wget https://github.com/jonas/tig/releases/download/$VERSION/$VERSION.tar.gz
-tar xzf $VERSION.tar.gz
-cd $VERSION
+wget https://github.com/jonas/tig/releases/download/$version/$version.tar.gz
+tar xzf $version.tar.gz
+cd $version || exit 1
 
 ./configure
 make prefix=~/local/bin

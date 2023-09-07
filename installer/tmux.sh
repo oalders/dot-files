@@ -9,13 +9,13 @@ set -x
 
 if is os name eq linux && [[ $IS_SUDOER == true ]]; then
     sudo apt-get install -y libevent-dev libncurses5-dev
-    RELEASE=tmux-3.3a
-    ARCHIVE="$RELEASE.tar.gz"
+    release=tmux-3.3a
+    archive="$release.tar.gz"
     cd /tmp || exit
-    rm -rf $ARCHIVE $RELEASE
-    curl --fail --location "https://github.com/tmux/tmux/releases/download/3.3a/$ARCHIVE" -o $ARCHIVE
-    tar xzvf $ARCHIVE
-    cd $RELEASE
+    rm -rf $archive $release
+    curl --fail --location "https://github.com/tmux/tmux/releases/download/3.3a/$archive" -o $archive
+    tar xzvf $archive
+    cd $release
     ./configure && make
     sudo make install
 

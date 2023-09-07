@@ -5,7 +5,7 @@ set -eu -o pipefail
 # shellcheck source=bash_functions.sh
 source bash_functions.sh
 
-PREFIX=~/dot-files
+prefix=~/dot-files
 
 mkdir -p ~/.config/bat
 mkdir -p ~/.config/oh-my-posh/themes
@@ -28,53 +28,53 @@ if [[ -d $nvim_conf_dir && ! -L $nvim_conf_dir ]]; then
     rmdir "$nvim_conf_dir"
 elif [[ ! -L $nvim_conf_dir ]]; then
     echo "$nvim_conf_dir should create symlink"
-    ln -sf $PREFIX/nvim "$nvim_conf_dir"
+    ln -sf $prefix/nvim "$nvim_conf_dir"
 fi
 
-ln -sf $LINK_FLAG $PREFIX/dzil ~/.dzil
-ln -sf $LINK_FLAG $PREFIX/sqitch ~/.sqitch
-ln -sf $PREFIX/ackrc ~/.ackrc
-ln -sf $PREFIX/bash_profile ~/.bash_profile
-ln -sf $PREFIX/bashrc ~/.bashrc
-ln -sf $PREFIX/bat/config ~/.config/bat/config
-ln -sf $PREFIX/cpanreporter/config.ini ~/.cpanreporter/config.ini
-ln -sf $PREFIX/dataprinter ~/.dataprinter
-ln -sf $PREFIX/digrc ~/.digrc
-ln -sf $PREFIX/editorconfig ~/.editorconfig
-ln -sf $PREFIX/gitignore_global ~/.gitignore_global
-ln -sf $PREFIX/golangci.yml ~/.golangci.yml
-ln -sf $PREFIX/inputrc ~/.inputrc
-ln -sf $PREFIX/minicpanrc ~/.minicpanrc
-ln -sf $PREFIX/oh-my-posh/themes/local.omp.json ~/.config/oh-my-posh/themes/local.omp.json
-ln -sf $PREFIX/oh-my-posh/themes/local-tiny.omp.json ~/.config/oh-my-posh/themes/local-tiny.omp.json
-ln -sf $PREFIX/oh-my-posh/themes/remote.omp.json ~/.config/oh-my-posh/themes/remote.omp.json
-ln -sf $PREFIX/oh-my-posh/themes/remote-tiny.omp.json ~/.config/oh-my-posh/themes/remote-tiny.omp.json
-ln -sf $PREFIX/perlcriticrc ~/.perlcriticrc
-ln -sf $PREFIX/perlimports/perlimports.toml ~/.config/perlimports/perlimports.toml
-ln -sf $PREFIX/perltidyrc ~/.perltidyrc
-ln -sf $PREFIX/prettierrc.yaml ~/.prettierrc.yaml
-ln -sf $PREFIX/profile ~/.profile
-ln -sf $PREFIX/proverc ~/.proverc
-ln -sf $PREFIX/psqlrc ~/.psqlrc
-ln -sf $PREFIX/re.pl/repl.rc ~/.re.pl/repl.rc
-ln -sf $PREFIX/shellcheckrc ~/.shellcheckrc
-ln -sf $PREFIX/sqliterc ~/.sqliterc
-ln -sf $PREFIX/tigrc ~/.tigrc
-ln -sf $PREFIX/wezterm/wezterm.lua ~/.config/wezterm/wezterm.lua
-ln -sf $PREFIX/yamllint.yml ~/.config/yamllint/config
+ln -sf $LINK_FLAG $prefix/dzil ~/.dzil
+ln -sf $LINK_FLAG $prefix/sqitch ~/.sqitch
+ln -sf $prefix/ackrc ~/.ackrc
+ln -sf $prefix/bash_profile ~/.bash_profile
+ln -sf $prefix/bashrc ~/.bashrc
+ln -sf $prefix/bat/config ~/.config/bat/config
+ln -sf $prefix/cpanreporter/config.ini ~/.cpanreporter/config.ini
+ln -sf $prefix/dataprinter ~/.dataprinter
+ln -sf $prefix/digrc ~/.digrc
+ln -sf $prefix/editorconfig ~/.editorconfig
+ln -sf $prefix/gitignore_global ~/.gitignore_global
+ln -sf $prefix/golangci.yml ~/.golangci.yml
+ln -sf $prefix/inputrc ~/.inputrc
+ln -sf $prefix/minicpanrc ~/.minicpanrc
+ln -sf $prefix/oh-my-posh/themes/local.omp.json ~/.config/oh-my-posh/themes/local.omp.json
+ln -sf $prefix/oh-my-posh/themes/local-tiny.omp.json ~/.config/oh-my-posh/themes/local-tiny.omp.json
+ln -sf $prefix/oh-my-posh/themes/remote.omp.json ~/.config/oh-my-posh/themes/remote.omp.json
+ln -sf $prefix/oh-my-posh/themes/remote-tiny.omp.json ~/.config/oh-my-posh/themes/remote-tiny.omp.json
+ln -sf $prefix/perlcriticrc ~/.perlcriticrc
+ln -sf $prefix/perlimports/perlimports.toml ~/.config/perlimports/perlimports.toml
+ln -sf $prefix/perltidyrc ~/.perltidyrc
+ln -sf $prefix/prettierrc.yaml ~/.prettierrc.yaml
+ln -sf $prefix/profile ~/.profile
+ln -sf $prefix/proverc ~/.proverc
+ln -sf $prefix/psqlrc ~/.psqlrc
+ln -sf $prefix/re.pl/repl.rc ~/.re.pl/repl.rc
+ln -sf $prefix/shellcheckrc ~/.shellcheckrc
+ln -sf $prefix/sqliterc ~/.sqliterc
+ln -sf $prefix/tigrc ~/.tigrc
+ln -sf $prefix/wezterm/wezterm.lua ~/.config/wezterm/wezterm.lua
+ln -sf $prefix/yamllint.yml ~/.config/yamllint/config
 
 if is os name eq darwin; then
-    ln -sf $PREFIX/gnupg/gpg-agent.conf ~/.gnupg/gpg-agent.conf
-    ln -sf $PREFIX/karabiner/karabiner.json ~/.config/karabiner/karabiner.json
-    ln -sf "$LINK_FLAG" $PREFIX/hammerspoon ~/.hammerspoon
+    ln -sf $prefix/gnupg/gpg-agent.conf ~/.gnupg/gpg-agent.conf
+    ln -sf $prefix/karabiner/karabiner.json ~/.config/karabiner/karabiner.json
+    ln -sf "$LINK_FLAG" $prefix/hammerspoon ~/.hammerspoon
 fi
 
 if [ "$IS_MM" = false ]; then
-    ln -sf $PREFIX/npmrc ~/.npmrc
+    ln -sf $prefix/npmrc ~/.npmrc
 fi
 
-ln -sf $PREFIX/bin/add-worktree "$HOME/local/bin/add-worktree"
-ln -sf $PREFIX/bin/remove-worktree "$HOME/local/bin/remove-worktree"
-ln -sf $PREFIX/bin/tm "$HOME/local/bin/tm"
+ln -sf $prefix/bin/add-worktree "$HOME/local/bin/add-worktree"
+ln -sf $prefix/bin/remove-worktree "$HOME/local/bin/remove-worktree"
+ln -sf $prefix/bin/tm "$HOME/local/bin/tm"
 
 exit 0

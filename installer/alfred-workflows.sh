@@ -6,12 +6,12 @@ cd /tmp
 
 # Alfred won't let you add multiple workflows at once
 wait_for_input() {
-    URL=$1
-    FILE=$2
+    url=$1
+    file=$2
     rm -f "$2"
 
-    curl --location -O "$URL/$FILE"
-    open "$FILE"
+    curl --location -O "$url/$file"
+    open "$file"
 
     read -n 1 -s -r -p "Press any key to continue"
 }
@@ -24,10 +24,10 @@ wait_for_input 'https://github.com/mrodalgaard/alfred-network-workflow/releases/
 wait_for_input 'https://github.com/packal/repository/raw/master/com.pawelgrzybek.div' 'div.alfredworkflow'
 wait_for_input 'https://github.com/ruedap/alfred-font-awesome-workflow/releases/download/v5.15.3.1' 'Font-Awesome.alfredworkflow'
 
-REPO=alfred-metacpan-workflow
-rm -rf $REPO
-git clone "git@github.com:oalders/$REPO.git"
-cd $REPO && mkdir -p dist && make && open dist/metacpan-0.0.5.alfredworkflow
+repo=alfred-metacpan-workflow
+rm -rf $repo
+git clone "git@github.com:oalders/$repo.git"
+cd $repo && mkdir -p dist && make && open dist/metacpan-0.0.5.alfredworkflow
 
 exit 0
 

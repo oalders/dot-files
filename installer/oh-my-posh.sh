@@ -2,23 +2,23 @@
 
 set -eu
 
-INSTALL_DIR="$HOME/local/bin"
+install_dir="$HOME/local/bin"
 # shellcheck source=bash_functions.sh
 source ~/dot-files/bash_functions.sh
-add_path "$INSTALL_DIR"
+add_path "$install_dir"
 
 # Pass a version arg if you want to install oh-my-posh on macOS"
 # e.g. ./installer/oh-my-posh.sh v8.27.0"
 
 set -x
 
-CMD="ubi -p JanDeDobbeleer/oh-my-posh --in $INSTALL_DIR"
+cmd="ubi -p JanDeDobbeleer/oh-my-posh --in $install_dir"
 
 if [[ ${1+x} ]]; then
-    CMD="$CMD --tag $1"
+    cmd="$cmd --tag $1"
 fi
 
-$CMD
+$cmd
 
 if [[ $IS_GITHUB == true ]]; then
     exit 0

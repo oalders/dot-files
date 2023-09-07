@@ -2,25 +2,25 @@
 
 set -eux
 
-DIR=tree-sitter-perl
-REPO=https://github.com/tree-sitter-perl/tree-sitter-perl.git
-SRC="$HOME/dot-files/src"
+dir=tree-sitter-perl
+repo=https://github.com/tree-sitter-perl/tree-sitter-perl.git
+src="$HOME/dot-files/src"
 
-mkdir -p "$SRC"
-cd "$SRC" || exit 1
+mkdir -p "$src"
+cd "$src" || exit 1
 
-if [[ -d $DIR ]]; then
-    cd $DIR
+if [[ -d $dir ]]; then
+    cd $dir
     git from
 else
-    git clone $REPO $DIR
-    cd $DIR
+    git clone $repo $dir
+    cd $dir
 fi
 
-QUERIES="$HOME/.vim/queries/perl"
-mkdir -p "$QUERIES"
+queries="$HOME/.vim/queries/perl"
+mkdir -p "$queries"
 
-cp queries/* "$QUERIES/"
+cp queries/* "$queries/"
 
 # If queriers are out of sync
 # nvim +'TSUninstall perl' +qa

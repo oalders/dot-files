@@ -94,14 +94,14 @@ add_path "$HOME/.cargo/bin"
 # Haskell binaries installed via cabal
 add_path "$HOME/.cabal/bin"
 
-LOCALPERLBIN=~/perl5/bin
+localperlbin=~/perl5/bin
 
-if [[ $IS_MM = false && ! -d ~/.plenv && -d $LOCALPERLBIN ]]; then
+if [[ $IS_MM = false && ! -d ~/.plenv && -d $localperlbin ]]; then
     export PERL_CPANM_OPT="--local-lib=~/perl5"
     # adds $HOME/perl5/bin to PATH
     [ "$SHLVL" -eq 1 ] && eval "$(perl -I "$HOME/perl5/lib/perl5" -Mlocal::lib)"
 
-    add_path $LOCALPERLBIN
+    add_path $localperlbin
 fi
 
 whosonport() {
@@ -144,10 +144,10 @@ if ! type "ack" >/dev/null 2>&1; then
 fi
 
 tmux_session_name() {
-    INSIDE_GIT_REPO="$(git rev-parse --is-inside-work-tree 2>/dev/null)"
-    PADDING=60
+    inside_git_repo="$(git rev-parse --is-inside-work-tree 2>/dev/null)"
+    padding=60
 
-    if [ "$INSIDE_GIT_REPO" ]; then
+    if [ "$inside_git_repo" ]; then
 
         BRANCH=$(git rev-parse --abbrev-ref HEAD)
         CURRENT_DIR=${PWD##*/}
@@ -169,18 +169,18 @@ tmux_session_name() {
         elif [[ -f 'Dockerfile' ]] || [[ -f 'docker-compose.yml' ]]; then
             PREFIX='🐳'
         fi
-        SESSION_NAME="$PREFIX $CURRENT_DIR  $BRANCH"
+        session_name="$PREFIX $CURRENT_DIR  $BRANCH"
     else
-        SESSION_NAME=$(pwd)
+        session_name=$(pwd)
         STRIP="$HOME/"
-        SESSION_NAME=${SESSION_NAME/$STRIP/}
-        PADDING=58
+        session_name=${session_name/$STRIP/}
+        padding=58
     fi
 
     # A "." will produce a "bad session name" error
-    SESSION_NAME=${SESSION_NAME//./-}
-    SESSION_NAME=$(printf "%-${PADDING}s" "$SESSION_NAME")
-    export SESSION_NAME
+    session_name=${session_name//./-}
+    session_name=$(printf "%-${padding}s" "$session_name")
+    export session_name
 }
 
 unset -f tm
@@ -209,7 +209,7 @@ tmux() {
         # https://gist.github.com/marczych/10524654
         ns)
             tmux_session_name
-            tmux rename-session "$SESSION_NAME"
+            tmux rename-session "$session_name"
             ;;
         *)
             $tmux "$@"
@@ -217,16 +217,14 @@ tmux() {
         esac
     else
         tmux_session_name
-        $tmux new -s "$SESSION_NAME"
+        $tmux new -s "$session_name"
     fi
 }
 
 add_path "$GOPATH/bin"
 
-SOCK=~/.ssh/ssh_auth_sock
-
 # shellcheck disable=SC2153
-if test "$SSH_AUTH_SOCK" && test "$TMUX" && [ "$SSH_AUTH_SOCK" != "$SOCK" ]; then
+if test "$SSH_AUTH_SOCK" && test "$TMUX" && [ "$SSH_AUTH_SOCK" != "$HOME/.ssh/ssh_auth_sock" ]; then
     export SSH_AUTH_SOCK=$SOCK
 fi
 

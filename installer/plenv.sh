@@ -13,22 +13,22 @@ fi
 # shellcheck source=bash_functions.sh
 source ~/.bash_profile
 
-MY_PERL_BUILD_DIR="$HOME/.plenv/plugins/perl-build"
-if [[ -d $MY_PERL_BUILD_DIR ]]; then
-    cd "$MY_PERL_BUILD_DIR" || exit 1
+my_perl_build_dir="$HOME/.plenv/plugins/perl-build"
+if [[ -d $my_perl_build_dir ]]; then
+    cd "$my_perl_build_dir" || exit 1
     git from
 else
-    git clone https://github.com/tokuhirom/Perl-Build.git "$MY_PERL_BUILD_DIR"
+    git clone https://github.com/tokuhirom/Perl-Build.git "$my_perl_build_dir"
 fi
 
-PERL_VERSION=5.38.0
+perl_version=5.38.0
 
-plenv install $PERL_VERSION
-plenv global $PERL_VERSION
+plenv install $perl_version
+plenv global $perl_version
 plenv install-cpanm
 plenv rehash
 
-export PATH="$HOME/.plenv/bin:$PATH"
+add_path "$HOME/.plenv/bin"
 eval "$(plenv init -)"
 
 cpanm --notest App::cpm

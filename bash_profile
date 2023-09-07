@@ -22,8 +22,8 @@ if type brew &>/dev/null; then
     if [[ -r "${HOMEBREW_PREFIX}/etc/profile.d/bash_completion.sh" ]]; then
         source "${HOMEBREW_PREFIX}/etc/profile.d/bash_completion.sh"
     else
-        for COMPLETION in "${HOMEBREW_PREFIX}/etc/bash_completion.d/"*; do
-            [[ -r "$COMPLETION" ]] && source "$COMPLETION"
+        for completion in "${HOMEBREW_PREFIX}/etc/bash_completion.d/"*; do
+            [[ -r "$completion" ]] && source "$completion"
         done
     fi
 fi
@@ -40,14 +40,14 @@ if is there rbenv; then
     fi
 fi
 
-GCLOUD_COMPLETION="/usr/local/Caskroom/google-cloud-sdk/latest/google-cloud-sdk/completion.bash.inc"
-GCLOUD_BASH="/usr/local/Caskroom/google-cloud-sdk/latest/google-cloud-sdk/path.bash.inc"
+gcloud_completion="/usr/local/Caskroom/google-cloud-sdk/latest/google-cloud-sdk/completion.bash.inc"
+gcloud_bash="/usr/local/Caskroom/google-cloud-sdk/latest/google-cloud-sdk/path.bash.inc"
 
 # The next line updates PATH for the Google Cloud SDK.
-if [ -f $GCLOUD_BASH ]; then . $GCLOUD_BASH; fi
+if [ -f $gcloud_bash ]; then . $gcloud_bash; fi
 
 # The next line enables shell command completion for gcloud.
-if [ -f $GCLOUD_COMPLETION ]; then . $GCLOUD_COMPLETION; fi
+if [ -f $gcloud_completion ]; then . $gcloud_completion; fi
 
 GPG_TTY=$(tty)
 export GPG_TTY
@@ -76,16 +76,16 @@ if is os name eq darwin; then
     bind "\C-e":edit-and-execute-command
 
     # Apple silicon
-    SQLITE_PATH=/opt/homebrew/opt/sqlite3/bin
-    if ! test -d $SQLITE_PATH; then
+    sqlite_path=/opt/homebrew/opt/sqlite3/bin
+    if ! test -d $sqlite_path; then
         # Intel Macs
         version=$(ls /usr/local/Cellar/sqlite)
-        SQLITE_PATH="/usr/local/Cellar/sqlite/${version}/bin"
-        if ! test -d "$SQLITE_PATH"; then
-            echo "$SQLITE_PATH needs to be updated"
+        sqlite_path="/usr/local/Cellar/sqlite/${version}/bin"
+        if ! test -d "$sqlite_path"; then
+            echo "$sqlite_path needs to be updated"
         fi
     fi
-    add_path "$SQLITE_PATH"
+    add_path "$sqlite_path"
 fi
 
 if is os name ne darwin && is there fdfind; then
