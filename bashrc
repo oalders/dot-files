@@ -161,7 +161,7 @@ tmux_session_name() {
 
         PREFIX='⁉️ '
         if [[ ${PWD##*/} = 'dot-files' ]] || [[ ${PWD##*/} = 'local-dot-files' ]]; then
-            PREFIX='📂'
+            PREFIX='🔵'
         elif [[ -f 'dist.ini' ]] || [[ -f 'cpanfile' ]] || [[ -f 'app.psgi' ]]; then
             PREFIX='🐪'
         elif [[ -f 'Cargo.toml' ]]; then
