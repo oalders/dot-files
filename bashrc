@@ -46,23 +46,18 @@ alias git-clean="git gc && git-lfs prune"
 alias gti=git # fix typos
 alias go-clean="go clean -modcache"
 alias grep='grep --color=auto --exclude-dir=.git'
-alias heavy-cpu='ps --sort=-pcpu -aux|head -10'
 alias l='ls -lAtr'
 alias l.='ls -ldF .[a-zA-Z0-9]* --color=tty' #only show dotfiles
 alias linebreaks="perl -pi -e 's/\r/\n/g'"
 alias lsd='ls --group-directories-first'
 alias octal_perms='stat -c "%a %n"'
-alias penv='perl -MDDP -e "p(%ENV)"'
 alias pine=alpine
-alias prune-local-branches='git remote prune origin && git branch -vv | grep -v origin'
 alias s='source ~/.bash_profile && source ~/dot-files/fzf_functions.sh'
 # http://stackoverflow.com/questions/13064613/how-to-prune-local-tracking-branches-that-do-not-exist-on-remote-anymore
-alias show-local-only-branches="git branch -r | awk '{print \$1}' | egrep -v -f /dev/fd/0 <(git branch -vv | grep origin) | awk '{print \$1}'"
 alias show-merged-branches='git branch --no-color --merged | grep -v "\*" | grep -v master'
 alias ssh-fingerprints='ls ~/.ssh/*.pub | xargs -L 1 ssh-keygen -l -f'
 # https://stackoverflow.com/a/19280187/406224
 alias takeover="tmux detach -a"
-alias tg='tidyall -g && git add -p'
 alias wat='ps --sort=-pcpu -aux|head -10'
 alias xpasswd='perl -MCrypt::XkcdPassword -E "say Crypt::XkcdPassword->make_password"'
 
@@ -80,7 +75,6 @@ if is os name eq darwin; then
 fi
 
 add_path "$HOME/.local/bin"
-
 add_path "$HOME/local/bin"
 
 # node modules locally installing bin files
