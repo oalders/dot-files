@@ -168,7 +168,7 @@ tmux_session_name() {
             PREFIX='🦀'
         elif [[ -f 'go.mod' ]]; then
             PREFIX='🚦'
-        elif [[ -f 'tsconfig.json' ]]; then
+        elif [[ -f 'tsconfig.json' ]] || [[ -f '.npmignore' ]]; then
             PREFIX='☕'
         elif [[ -d 'ftplugin' ]]; then
             PREFIX='🔌'
