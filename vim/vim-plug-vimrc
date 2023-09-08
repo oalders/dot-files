@@ -56,7 +56,6 @@ Plug 'yko/mojo.vim'
 
 if has('nvim')
   Plug 'ahmedkhalf/project.nvim'
-  Plug 'bennypowers/splitjoin.nvim'
   Plug 'ecthelionvi/NeoColumn.nvim'
   Plug 'ellisonleao/glow.nvim'
   Plug 'folke/trouble.nvim'
@@ -72,6 +71,8 @@ if has('nvim')
 
   Plug 'akinsho/bufferline.nvim'
   Plug 'kyazdani42/nvim-web-devicons' " Recommended (for coloured icons for bufferline.nvim)
+
+  Plug 'Wansmer/treesj'
 
   Plug 'williamboman/mason.nvim'
   Plug 'williamboman/mason-lspconfig.nvim'

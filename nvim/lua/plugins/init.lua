@@ -389,10 +389,10 @@ local wk = require("which-key")
 wk.register({
     g = {
         j = { function()
-            require 'splitjoin'.join()
+            require('treesj').join()
         end, 'join the object under cursor' },
         s = { function()
-            require 'splitjoin'.split()
+            require('treesj').split()
         end, 'split the object under cursor' },
     },
     l = {
