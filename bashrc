@@ -1,7 +1,7 @@
 # shellcheck shell=bash
 
 export CLICOLOR=1
-export EDITOR=vim
+export EDITOR=nvim
 
 # don't put duplicate lines in the history. See bash(1) for more options
 # http://www.linuxjournal.com/content/using-bash-history-more-efficiently-histcontrol
