@@ -28,7 +28,7 @@
     "markdownlint": "^0.31.0",
     "markdownlint-cli": "^0.36.0",
     "normalize-url": "^8.0.0",
-    "npm": "^10.0.0",
+    "npm": "^10.1.0",
     "prettier": "^3.0.3",
     "typescript": "^5.2.2",
     "underscore": "^1.13.6",
