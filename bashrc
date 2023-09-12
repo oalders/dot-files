@@ -143,46 +143,6 @@ if ! type "ack" >/dev/null 2>&1; then
     fi
 fi
 
-tmux_session_name() {
-    inside_git_repo="$(git rev-parse --is-inside-work-tree 2>/dev/null)"
-    padding=60
-
-    if [ "$inside_git_repo" ]; then
-
-        BRANCH=$(git rev-parse --abbrev-ref HEAD)
-        CURRENT_DIR=${PWD##*/}
-        CURRENT_DIR=$(printf "%-30s" "$CURRENT_DIR")
-
-        PREFIX='⁉️ '
-        if [[ ${PWD##*/} = 'dot-files' ]] || [[ ${PWD##*/} = 'local-dot-files' ]]; then
-            PREFIX='🔵'
-        elif [[ -f 'dist.ini' ]] || [[ -f 'cpanfile' ]] || [[ -f 'app.psgi' ]]; then
-            PREFIX='🐪'
-        elif [[ -f 'Cargo.toml' ]]; then
-            PREFIX='🦀'
-        elif [[ -f 'go.mod' ]]; then
-            PREFIX='🚦'
-        elif [[ -f 'tsconfig.json' ]] || [[ -f '.npmignore' ]]; then
-            PREFIX='☕'
-        elif [[ -d 'ftplugin' ]]; then
-            PREFIX='🔌'
-        elif [[ -f 'Dockerfile' ]] || [[ -f 'docker-compose.yml' ]]; then
-            PREFIX='🐳'
-        fi
-        session_name="$PREFIX $CURRENT_DIR  $BRANCH"
-    else
-        session_name=$(pwd)
-        STRIP="$HOME/"
-        session_name=${session_name/$STRIP/}
-        padding=58
-    fi
-
-    # A "." will produce a "bad session name" error
-    session_name=${session_name//./-}
-    session_name=$(printf "%-${padding}s" "$session_name")
-    export session_name
-}
-
 unset -f tm
 # https://raim.codingfarm.de/blog/2013/01/30/tmux-update-environment/
 tmux() {
@@ -209,7 +169,7 @@ tmux() {
         # https://gist.github.com/marczych/10524654
         ns)
             tmux_session_name
-            tmux rename-session "$session_name"
+            tmux rename-session "$SESSION_NAME"
             ;;
         *)
             $tmux "$@"
@@ -217,7 +177,7 @@ tmux() {
         esac
     else
         tmux_session_name
-        $tmux new -s "$session_name"
+        $tmux new -s "$SESSION_NAME"
     fi
 }
 

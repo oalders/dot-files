@@ -206,6 +206,47 @@ change_git_origin() {
     git remote add origin "$GIT"
 }
 
+tmux_session_name() {
+    inside_git_repo="$(git rev-parse --is-inside-work-tree 2>/dev/null)"
+    padding=60
+
+    if [ "$inside_git_repo" ]; then
+
+        BRANCH=$(git rev-parse --abbrev-ref HEAD)
+        CURRENT_DIR=${PWD##*/}
+        CURRENT_DIR=$(printf "%-30s" "$CURRENT_DIR")
+
+        PREFIX='⁉️ '
+        if [[ ${PWD##*/} = 'dot-files' ]] || [[ ${PWD##*/} = 'local-dot-files' ]]; then
+            PREFIX='🔵'
+        elif [[ -f 'dist.ini' ]] || [[ -f 'cpanfile' ]] || [[ -f 'app.psgi' ]]; then
+            PREFIX='🐪'
+        elif [[ -f 'Cargo.toml' ]]; then
+            PREFIX='🦀'
+        elif [[ -f 'go.mod' ]]; then
+            PREFIX='🚦'
+        elif [[ -f 'tsconfig.json' ]] || [[ -f '.npmignore' ]]; then
+            PREFIX='☕'
+        elif [[ -d 'ftplugin' ]]; then
+            PREFIX='🔌'
+        elif [[ -f 'Dockerfile' ]] || [[ -f 'docker-compose.yml' ]]; then
+            PREFIX='🐳'
+        fi
+        SESSION_NAME="$PREFIX $CURRENT_DIR  $BRANCH"
+    else
+        SESSION_NAME=$(pwd)
+        STRIP="$HOME/"
+        SESSION_NAME=${SESSION_NAME/$STRIP/}
+        padding=58
+    fi
+
+    # A "." will produce a "bad session name" error
+    SESSION_NAME=${SESSION_NAME//./-}
+    SESSION_NAME=$(printf "%-${padding}s" "$SESSION_NAME")
+    export SESSION_NAME
+}
+
+
 export GO111MODULE
 export GOPATH
 export HARNESS_OPTIONS

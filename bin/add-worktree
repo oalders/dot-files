@@ -1,43 +1,44 @@
 #!/usr/bin/env bash
 
+set -e -u -o pipefail
+
 if [ $# -ne 1 ]; then
     echo "Usage: add-worktree branch-name"
     exit
 fi
 
-BRANCH_NAME="$1"
+branch_name="$1"
 
 set -x
 
-GIT_DIR=$(git rev-parse --git-common-dir)
+git_dir=$(git rev-parse --git-common-dir)
 
-if [[ -z $GIT_DIR ]]; then
+if [[ -z $git_dir ]]; then
     echo "This command must be run from inside a git repository"
     exit
 fi
 
 # shellcheck disable=SC2153
-if [[ -n $TMUX ]]; then
+if [[ $MY_INSIDE_TMUX == true ]]; then
     echo "Detach from tmux before running this command"
     exit
 fi
 
-cd "$GIT_DIR/.." || exit 1
+cd "$git_dir/.." || exit 1
 
-REPO_NAME="$(basename "$(pwd)")"
+repo_name="$(basename "$(pwd)")"
 
-ALL_WORKTREES="$HOME/.worktree"
-mkdir -p "$ALL_WORKTREES"
+all_worktrees="$HOME/.worktree"
+mkdir -p "$all_worktrees"
 
-WORKTREE_DIR="$ALL_WORKTREES/$REPO_NAME/$BRANCH_NAME"
+worktree_dir="$all_worktrees/$repo_name/$branch_name"
 
-git worktree add "$WORKTREE_DIR" -b "$BRANCH_NAME"
+git worktree add "$worktree_dir" -b "$branch_name"
 
-cd "$WORKTREE_DIR" || exit 1
+cd "$worktree_dir" || exit 1
 
 if [[ -n $(pgrep tmux) ]]; then
-    # shellcheck source=bashrc
-    source "$HOME/.bashrc"
-    tmux_session_name
+    . ~/dot-files/bash_functions.sh
+    tmux_session_name # exports $SESSION_NAME
     tmux new -s "$SESSION_NAME"
 fi
