@@ -218,7 +218,7 @@ require("mason-lspconfig").setup {
 
 require("lsp-format").setup {}
 
-require 'lspconfig'.bashls.setup {}
+require 'lspconfig'.bashls.setup { filetypes = { "sh" } }
 require 'lspconfig'.docker_compose_language_service.setup {}
 require 'lspconfig'.lua_ls.setup {
     settings = {
