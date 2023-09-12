@@ -3,14 +3,13 @@
 # May need to sudo apt install libfuse2 on Ubuntu >= 22.04
 # https://docs.appimage.org/user-guide/troubleshooting/fuse.html
 
-set -eu
+set -eux
 
 if is cli age nvim lt 18 hours; then
     exit
 fi
 
-pushd /tmp || exit
-
+cd /tmp || exit
 
 if (is os id eq ubuntu && is os version gte 22.04) || (is os id eq debian); then
     sudo apt install libfuse2
@@ -29,29 +28,33 @@ if is os name eq darwin; then
     # rm -f "$HOME/local/bin/nvim"
     # exit 0
 
-    DIR=nvim-osx64
-    FILE=nvim-macos.tar.gz
-    rm -rf $DIR
+    dir=nvim-osx64
+    download_file=nvim-macos.tar.gz
+    rm -rf $dir
 elif is os id eq raspbian; then
     exit 0
     # Won't run on buster
     # sudo apt install snapd
     # sudo snap install nvim --classic
 else
-    FILE=nvim.appimage
+    download_file=nvim.appimage
 fi
 
-curl -LO --fail -z $FILE "$URL$FILE"
+curl -LO --fail -z $download_file "$URL$download_file"
 
 if is os name eq darwin; then
-    tar xzvf $FILE
+    tar xzvf $download_file
+    dest="$HOME/local/bin/nvim-macos"
+    rm -rf "$dest"
+    mv nvim-macos "$dest"
+    rm -f "$HOME/local/bin/nvim"
+    add_path "$HOME/local/bin/nvim-macos/bin"
 else
-    chmod u+x $FILE
+    chmod u+x $download_file
+    mv $download_file "$HOME/local/bin/nvim"
 fi
 
-mv $FILE "$HOME/local/bin/nvim"
-
-popd
+cd -
 ./installer/tree-sitter-perl.sh
 
 echo "done nvim install"
