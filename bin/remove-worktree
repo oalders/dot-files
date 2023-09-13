@@ -1,31 +1,31 @@
 #!/usr/bin/env bash
 
-set -x
+set -u -o pipefail
 
 if [[ $# -eq "0" || $# -gt "2" ]]; then
     echo "Usage: remove-worktree [-f] branch-name"
     exit
 fi
 
-BRANCH_NAME=$1
+branch_name=$1
 STRIP="oalders/"
 
 shift
-echo "$BRANCH_NAME"
+echo "looking for branch: $branch_name"
 
 # If we can't kill the tmux session, then that's ok. It may just not exist.
 if [[ -n $(pgrep tmux) ]]; then
     # tmux session name will contain the git branch name
-    session=$(tmux list-session | grep "$BRANCH_NAME" | awk -v FS=':' '{print $1}')
-    tmux kill-session -t "$session"
+    session=$(tmux list-session | grep "$branch_name" | awk -v FS=':' '{print $1}')
+    if [[ ${session-} ]]; then
+        echo "Trying to kill tmux session $session"
+        tmux kill-session -t "$session"
+    fi
 fi
 
-# exit() on failures from this point forward
-set -e
-
 # We need to be inside the repository in order to remove the worktree.
-GIT_DIR=$(git rev-parse --git-common-dir)
-cd "$GIT_DIR/.." || exit 1
+git_dir=$(git rev-parse --git-common-dir) || ( echo "cannot find --git-common-dir. are we inside a git repository?" && exit 1)
+cd "$git_dir/.." || ( echo "cannot chdir to $git_dir/.." && exit 1)
 
-git worktree remove "$@" "$BRANCH_NAME"
-git branch -D "$@" "$BRANCH_NAME"
+git worktree remove "$@" "$branch_name"
+git branch -D "$@" "$branch_name"
