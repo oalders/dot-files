@@ -237,6 +237,8 @@ if is os name eq darwin; then
     add_path ~/local/nvim-osx64/bin
     # homebrew's curl needs to come first
     add_path "/usr/local/opt/curl/bin"
+
+    add_path ~/local/bin/nvim-macos/bin
 fi
 
 posh_me
