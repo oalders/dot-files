@@ -282,7 +282,7 @@ augroup vimrc
     autocmd BufEnter *Dockerfile :setlocal filetype=dockerfile
 
     " syntax highlighting for some Perl utility rc files
-    autocmd BufEnter  cpanfile        :setlocal filetype=perl
+    " autocmd BufEnter  cpanfile        :setlocal filetype=perl
     autocmd BufEnter  dataprinter     :setlocal filetype=dosini
     autocmd BufEnter .dataprinter     :setlocal filetype=dosini
     autocmd BufEnter  perlcriticrc    :setlocal filetype=dosini
