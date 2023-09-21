@@ -385,15 +385,14 @@ require('NeoColumn').setup(
 
 require('glow').setup()
 
+local tsj = require('treesj')
+tsj.setup({ max_join_length = 200 })
+
 local wk = require("which-key")
 wk.register({
     g = {
-        j = { function()
-            require('treesj').join()
-        end, 'join the object under cursor' },
-        s = { function()
-            require('treesj').split()
-        end, 'split the object under cursor' },
+        j = { function() tsj.join() end, 'join the object under cursor' },
+        s = { function() tsj.split() end, 'split the object under cursor' },
     },
     l = {
         l = { function()
