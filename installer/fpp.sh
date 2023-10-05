@@ -11,10 +11,10 @@ mkdir -p $bin_dir
 mkdir -p $src_dir
 mkdir -p ~/.fpp
 
-pushd $src_dir >/dev/null
+cd $src_dir
 
 rm -rf PathPicker && git clone https://github.com/facebook/PathPicker.git
-pushd PathPicker/ >/dev/null
+cd PathPicker/
 git checkout 0.9.5
 rm -rf $bin_dir/fpp
 ln -s "$(pwd)/fpp" $bin_dir/fpp

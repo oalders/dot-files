@@ -20,9 +20,8 @@ if is os name eq linux; then
 fi
 
 if is there fdfind && ! is there fd; then
-    pushd "$HOME/local/bin"
+    cd "$HOME/local/bin"
     ln -s "$(which fdfind)" fd
-    popd
 fi
 
 exit 0

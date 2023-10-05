@@ -15,9 +15,7 @@ if is os name eq darwin || is os id eq debian; then
     ln -sf $PREFIX/ssh/config ~/.ssh/config
     mkdir -p ~/.ssh/config.d/
     if [[ -d ~/local-dot-files/ssh/config.d ]]; then
-        pushd ~/.ssh/config.d/ >/dev/null
-        ln -sf ~/local-dot-files/ssh/config.d/* .
-        popd >/dev/null
+        (cd ~/.ssh/config.d/ && ln -sf ~/local-dot-files/ssh/config.d/* .)
     fi
 else
     rm -f ~/.ssh/config
