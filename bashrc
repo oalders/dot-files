@@ -137,12 +137,6 @@ elif is there brew; then
     fi
 fi
 
-if ! type "ack" >/dev/null 2>&1; then
-    if type 'ack-grep' >/dev/null 2>&1; then
-        alias ack='ack-grep'
-    fi
-fi
-
 unset -f tm
 # https://raim.codingfarm.de/blog/2013/01/30/tmux-update-environment/
 tmux() {
