@@ -12,10 +12,6 @@ Plug 'dense-analysis/ale' " , { 'tag': 'v3.3.0' }
 " Plug 'oalders/ale', { 'branch': 'perlimports' }
 Plug 'ekalinin/dockerfile.vim'
 
-if has('nvim') || v:version > 802
-  Plug 'fatih/vim-go' ", { 'do': ':GoUpdateBinaries' } takes forever on GH builds
-endif
-
 Plug 'gregsexton/MatchTag'
 Plug 'haya14busa/vim-auto-mkdir' " create directory path on save
 Plug 'itchyny/lightline.vim'
