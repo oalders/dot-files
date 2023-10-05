@@ -22,8 +22,7 @@ mkdir -p "$queries"
 
 cp queries/* "$queries/"
 
-# If queriers are out of sync
-# nvim +'TSUninstall perl' +qa
-# nvim +'TSInstall perl' +qa
+nvim +'TSUninstall perl' +qa
+nvim +'TSInstall perl' +qa
 
 exit 0
