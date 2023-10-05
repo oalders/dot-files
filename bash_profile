@@ -16,21 +16,9 @@ if [ -f ~/.bashrc ]; then
     . ~/.bashrc
 fi
 
-if type brew &>/dev/null; then
-    HOMEBREW_PREFIX="$(brew --prefix)"
-    # shellcheck disable=SC1090,SC1091
-    if [[ -r "${HOMEBREW_PREFIX}/etc/profile.d/bash_completion.sh" ]]; then
-        source "${HOMEBREW_PREFIX}/etc/profile.d/bash_completion.sh"
-    else
-        for completion in "${HOMEBREW_PREFIX}/etc/bash_completion.d/"*; do
-            [[ -r "$completion" ]] && source "$completion"
-        done
-    fi
-fi
-
 add_path "$HOME/.plenv/bin"
 if is there plenv; then
-    eval "$(plenv init -)";
+    eval "$(plenv init -)"
 fi
 
 if is there rbenv; then
@@ -71,6 +59,18 @@ export NVM_DIR="$HOME/.nvm"
 . ~/dot-files/bash_functions.sh
 
 if is os name eq darwin; then
+    if is there brew; then
+        HOMEBREW_PREFIX="$(brew --prefix)"
+        # shellcheck disable=SC1090,SC1091
+        if [[ -r "${HOMEBREW_PREFIX}/etc/profile.d/bash_completion.sh" ]]; then
+            source "${HOMEBREW_PREFIX}/etc/profile.d/bash_completion.sh"
+        else
+            for completion in "${HOMEBREW_PREFIX}/etc/bash_completion.d/"*; do
+                [[ -r "$completion" ]] && source "$completion"
+            done
+        fi
+    fi
+
     unset CLOUDSDK_PYTHON
     # Open command line in editor
     bind "\C-e":edit-and-execute-command
