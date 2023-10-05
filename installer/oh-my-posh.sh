@@ -28,6 +28,7 @@ if ! is there fc-list; then
     sudo apt-get install -y fontconfig
 fi
 
-if ! fc-list : family | grep "JetBrainsMono Nerd Font" &>/dev/null; then
-    oh-my-posh font install JetBrainsMono
+font='JetBrainsMono'
+if ! is cli output stdout fc-list --arg=': family' like "$font Nerd Font"; then
+    oh-my-posh font install $font
 fi
