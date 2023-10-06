@@ -66,6 +66,8 @@ if has('nvim')
   Plug 'akinsho/bufferline.nvim'
   Plug 'kyazdani42/nvim-web-devicons' " Recommended (for coloured icons for bufferline.nvim)
 
+  Plug 'rgroli/other.nvim'
+
   Plug 'Wansmer/treesj'
 
   Plug 'williamboman/mason.nvim'

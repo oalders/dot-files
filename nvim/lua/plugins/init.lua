@@ -354,6 +354,10 @@ require("noice").setup({
     },
 })
 
+require('other-nvim').setup {
+    mappings = { 'golang' }
+}
+
 require('project_nvim').setup {
     detection_methods = { 'pattern', 'lsp' },
     patterns = { '.git', 'Makefile', },
