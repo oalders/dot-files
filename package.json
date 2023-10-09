@@ -22,7 +22,7 @@
     "ansi-regex": ">=5.0.1",
     "bash-language-server": "^5.0.0",
     "diff-lockfiles": "^1.0.2",
-    "eslint": "^8.50.0",
+    "eslint": "^8.51.0",
     "fixjson": "^1.1.2",
     "lua-fmt": "^2.6.0",
     "markdownlint": "^0.31.1",
