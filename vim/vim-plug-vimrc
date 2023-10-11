@@ -54,7 +54,6 @@ if has('nvim')
   Plug 'ellisonleao/glow.nvim'
   Plug 'folke/trouble.nvim'
   Plug 'folke/which-key.nvim'
-  " Plug 'github/copilot.vim'
   Plug 'nvim-treesitter/nvim-treesitter', { 'do': ':TSUpdate'}  " We recommend updating the parsers on update
   Plug 'shellRaining/hlchunk.nvim', {'on': 'EnableHL'}
 
@@ -102,6 +101,8 @@ if has('nvim')
   Plug 'SmiteshP/nvim-navic'
   Plug 'SmiteshP/nvim-navbuddy'
 
+  Plug 'zbirenbaum/copilot.lua'
+  Plug 'zbirenbaum/copilot-cmp'
 else
   Plug 'roxma/nvim-yarp'
   Plug 'roxma/vim-hug-neovim-rpc'

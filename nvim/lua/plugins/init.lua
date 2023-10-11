@@ -54,6 +54,7 @@ cmp.setup({
                 vsnip = 'vsnip',
                 nvim_lua = 'lua',
                 nvim_lsp_signature_help = 'LSP Signature',
+                Copilot = "",
             }
 
             if entry.source.name == 'nvim_lsp' then
@@ -92,6 +93,7 @@ cmp.setup({
         end,
     },
     sources = cmp.config.sources({
+        { name = 'copilot',  group_index = 2 },
         {
             name = 'buffer',
             priority = 10,
@@ -346,7 +348,7 @@ require("noice").setup({
     },
     -- you can enable a preset for easier configuration
     presets = {
-        bottom_search = false,         -- use a classic bottom cmdline for search
+        bottom_search = false,        -- use a classic bottom cmdline for search
         command_palette = true,       -- position the cmdline and popupmenu together
         long_message_to_split = true, -- long messages will be sent to a split
         inc_rename = false,           -- enables an input dialog for inc-rename.nvim
@@ -395,8 +397,40 @@ tsj.setup({ max_join_length = 200 })
 local wk = require("which-key")
 wk.register({
     g = {
+        c = { function()
+            require('copilot').setup({
+                filetypes = {
+                    cvs = false,
+                    ["."] = false,
+                    gitcommit = true,
+                    gitrebase = false,
+                    go = true,
+                    help = false,
+                    markdown = true,
+                    perl = true,
+                    yaml = false,
+                },
+                panel = { enabled = false },
+                suggestion = {
+                    enabled = false,
+                    auto_trigger = true,
+                    debounce = 75,
+                    keymap = {
+                        accept = "<M-l>",
+                        accept_word = false,
+                        accept_line = false,
+                        next = "<M-]>",
+                        prev = "<M-[>",
+                        dismiss = "<C-]>",
+                    },
+                },
+            });
+            require('copilot_cmp').setup();
+        end, 'set up and start GH copilot' },
+        e = { '<cmd>Copilot enable<cr>', 'enable GH copilot' },
         j = { function() tsj.join() end, 'join the object under cursor' },
         s = { function() tsj.split() end, 'split the object under cursor' },
+        x = { '<cmd>Copilot disable<cr>', 'stop GH copilot' },
     },
     l = {
         l = { function()
