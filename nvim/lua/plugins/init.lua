@@ -42,8 +42,8 @@ cmp.setup({
         ghost_text = true,
     },
     formatting = {
-        format = function(entry, vim_item)
-            vim_item = require('lspkind').cmp_format()(entry, vim_item)
+        format = function(entry, item)
+            item = require('lspkind').cmp_format()(entry, item)
             local alias = {
                 buffer = 'buffer',
                 path = 'path',
@@ -58,11 +58,25 @@ cmp.setup({
             }
 
             if entry.source.name == 'nvim_lsp' then
-                vim_item.menu = entry.source.source.client.name
+                item.menu = entry.source.source.client.name
             else
-                vim_item.menu = alias[entry.source.name] or entry.source.name
+                item.menu = alias[entry.source.name] or entry.source.name
             end
-            return vim_item
+
+            -- width logic taken from https://github.com/hrsh7th/nvim-cmp/discussions/609
+            local fixed_width = false
+            if fixed_width then
+                vim.o.pumwidth = fixed_width
+            end
+            local win_width = vim.api.nvim_win_get_width(0)
+            local max_content_width = fixed_width and fixed_width - 10 or math.floor(win_width * 0.1)
+            local content = item.abbr
+            if #content > max_content_width then
+                item.abbr = vim.fn.strcharpart(content, 0, max_content_width - 3) .. "..."
+            else
+                item.abbr = content .. (" "):rep(max_content_width - #content)
+            end
+            return item
         end,
     },
     mapping = cmp.mapping.preset.insert({
