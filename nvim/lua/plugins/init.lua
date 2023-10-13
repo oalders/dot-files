@@ -268,7 +268,17 @@ navbuddy.setup {
     },
 }
 
-require 'lspconfig'.gopls.setup {}
+require 'lspconfig'.gopls.setup({
+  settings = {
+    gopls = {
+      analyses = {
+        unusedparams = true,
+      },
+      staticcheck = true,
+      gofumpt = true,
+    },
+  },
+})
 require 'lspconfig'.golangci_lint_ls.setup {}
 
 -- After setting up mason-lspconfig you may set up servers via lspconfig
