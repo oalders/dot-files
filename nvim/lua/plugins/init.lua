@@ -408,6 +408,7 @@ wk.register({
                     help = false,
                     markdown = true,
                     perl = true,
+                    typescript = true,
                     yaml = false,
                 },
                 panel = { enabled = false },
