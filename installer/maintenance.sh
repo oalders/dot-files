@@ -13,6 +13,7 @@ if is os name eq darwin; then
         brew remove gh || true
         brew remove go || true
         brew remove nvim || true
+        brew remove prettier || true
         brew untap homebrew/core || true
     fi
 fi
