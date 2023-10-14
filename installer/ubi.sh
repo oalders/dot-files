@@ -45,6 +45,7 @@ else
 fi
 
 ubi --project cli/cli --in "$in" --exe gh
+ubi --project jqlang/jq --in "$in"
 # ubi --project sharkdp/fd --in $in
 # ubi --project Wilfred/difftastic --exe difft --in "$in"
 
