@@ -7,7 +7,14 @@ rm -f ~/.cargo/bin/precious
 
 if is os name eq darwin; then
     rm -f ~/.cargo/bin/fd
-    (is there brew && brew remove bat gh nvim) || true
+    if is there brew; then
+        brew remove bat || true
+        brew remove exa || true
+        brew remove gh || true
+        brew remove go || true
+        brew remove nvim || true
+        brew untap homebrew/core || true
+    fi
 fi
 
 # path used to be an alias, but that keeps a copy of $PATH in it, which is
