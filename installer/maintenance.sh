@@ -9,6 +9,7 @@ if is os name eq darwin; then
     rm -f ~/.cargo/bin/fd
     if is there brew; then
         brew remove bat || true
+        brew remove bats-core || true
         brew remove exa || true
         brew remove gh || true
         brew remove go || true
