@@ -1,6 +1,5 @@
 tap "buo/cask-upgrade"
 tap "homebrew/bundle"
-tap "homebrew/cask-fonts"
 brew "asciinema"
 brew "aspell"
 brew "bash"
@@ -35,7 +34,3 @@ brew "tree"
 brew "watch"
 brew "wget"
 brew "zlib"
-cask "font-jetbrains-mono-nerd-font"
-
-# Needed for Alfred's gh workflow
-brew "php"
