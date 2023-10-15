@@ -27,11 +27,11 @@ fi
 source ~/dot-files/bash_functions.sh
 add_path "$in"
 
-if ! is there omegasort; then
+if ! is there omegasort || is cli age omegasort gt 7 days; then
     ubi --project houseabsolute/omegasort --in "$in"
 fi
 
-if ! is there precious; then
+if ! is there precious || is cli age precious gt 7 days; then
     ubi --project houseabsolute/precious --in "$in"
 fi
 
