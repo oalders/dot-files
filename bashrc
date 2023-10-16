@@ -76,6 +76,7 @@ fi
 
 add_path "$HOME/.local/bin"
 add_path "$HOME/local/bin"
+add_path "$HOME/local/bin/go/bin"
 
 # node modules locally installing bin files
 add_path "$HOME/dot-files/node_modules/.bin"

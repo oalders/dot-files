@@ -5,17 +5,25 @@
 cd /tmp || exit 1
 set -eu -o pipefail
 
-version=1.21.1
+version=1.21.3
+
+if is cli version go gte $version; then
+    echo "version $version satisfied"
+    exit
+fi
 
 arch="$(is known arch)"
+os="$(is known os name)"
 
 if [[ $(uname -m) == "armv7l" ]]; then # raspberry pi
     arch="armv6l"
 fi
 
-filename="go$version.linux-$arch.tar.gz"
+filename="go$version.$os-$arch.tar.gz"
 url="https://go.dev/dl/$filename"
 
-curl --location -O $url
-sudo rm -rf /usr/local/go/
-sudo tar -C /usr/local -xzf "$filename"
+curl --location -O "$url"
+
+target=~/local/bin
+rm -rf "$target/go"
+tar -C "$target" -xzf "$filename"
