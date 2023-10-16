@@ -38,6 +38,7 @@ fi
 
 INSTALLERS=(
     ./installer/linux.sh
+    ./installer/maintenance.sh
     ./installer/wezterm.sh
     ./configure/git.sh
     ./configure/ssh.sh
@@ -50,7 +51,6 @@ INSTALLERS=(
     ./installer/cargo.sh
     ./installer/cz.sh
     ./installer/oh-my-posh.sh
-    ./installer/maintenance.sh
 )
 
 for f in "${INSTALLERS[@]}"; do
