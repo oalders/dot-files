@@ -1,6 +1,15 @@
 #!/usr/bin/osascript
 
-say "starting tab cleanup"
+set userLocale to (do shell script "defaults read -g AppleLocale")
+
+set lang to text 1 thru 2 of userLocale
+
+if lang is "de" then
+    say "Jetzt wird aufgeräumt"
+else
+    say "starting tab cleanup"
+end if
+
 set urls to {}
 
 tell application "Google Chrome"
@@ -34,8 +43,17 @@ tell application "Google Chrome"
         set numberOfClosed to count of closing
         if numberOfClosed > 0 then
             say numberOfClosed
-            say "tabs closed"
+            if lang is "de" then
+                say "Tabs geschlossen"
+            else
+                say "tabs closed"
+            end if
         end if
     end repeat
 end tell
-say "finished tab cleanup"
+
+if lang is "de" then
+    say "Aufräumen beendet"
+else
+    say "finished tab cleanup"
+end if
