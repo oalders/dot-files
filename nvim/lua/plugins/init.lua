@@ -425,6 +425,7 @@ wk.register({
         c = { function()
             require('copilot').setup({
                 filetypes = {
+                    applescript = true,
                     cvs = false,
                     ["."] = false,
                     gitcommit = true,
