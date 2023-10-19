@@ -431,6 +431,7 @@ wk.register({
                     gitcommit = true,
                     gitrebase = false,
                     go = true,
+                    gohtmltmpl = true,
                     help = false,
                     lua = true,
                     markdown = true,
