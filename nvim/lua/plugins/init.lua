@@ -432,6 +432,7 @@ wk.register({
                     gitrebase = false,
                     go = true,
                     help = false,
+                    lua = true,
                     markdown = true,
                     perl = true,
                     typescript = true,
