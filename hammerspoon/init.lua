@@ -50,68 +50,10 @@ local function chrome_tab_action(url_substring, url_to_visit_if_tab_not_found)
     )
 end
 
-local function close_duplicate_chrome_tabs()
-    return applescript_action(
-        [[
-set userLocale to (do shell script "defaults read -g AppleLocale")
-
-set lang to text 1 thru 2 of userLocale
-
-if lang is "de" then
-    say "Jetzt wird aufgeräumt"
-else
-    say "starting tab cleanup"
-end if
-
-set urls to {}
-
-tell application "Google Chrome"
-    activate
-
-    repeat with theWindow in every window
-        set toClose to {}
-        set tabIndex to 1
-        repeat with theTab in every tab of theWindow
-            set tabIsDuplicate to false
-            repeat with seen in urls
-                if (seen as string = URL of theTab as string) then
-                    copy tabIndex to the end of toClose
-                    set tabIsDuplicate to true
-                    exit repeat
-                end if
-            end repeat
-            set tabIndex to tabIndex + 1
-
-            if tabIsDuplicate is not true then
-                copy URL of theTab as string to the end of urls
-            end if
-
-        end repeat
-
-        set closing to reverse of toClose
-
-        repeat with closeIndex in closing
-            close tab closeIndex of theWindow
-        end repeat
-        set numberOfClosed to count of closing
-        if numberOfClosed > 0 then
-            say numberOfClosed
-            if lang is "de" then
-                say "Tabs geschlossen"
-            else
-                say "tabs closed"
-            end if
-        end if
-    end repeat
-end tell
-
-if lang is "de" then
-    say "Aufräumen beendet"
-else
-    say "finished tab cleanup"
-end if
-        ]]
-    )
+local function clean_up_tabs()
+    return function()
+        return hs.osascript.applescriptFromFile(os.getenv('HOME')..'/dot-files/bin/chrome-tab-cleanup.scpt')
+    end
 end
 
 hs.hotkey.bind(
@@ -293,7 +235,7 @@ hs.hotkey.bind(my_hotkeys, "n", nil, chrome_tab_action(github, github))
 hs.hotkey.bind(my_hotkeys, "o", nil, chrome_tab_action(ircCloud, ircCloud .. "magnet/channel/metacpan"))
 hs.hotkey.bind(my_hotkeys, "q", slackifyName)
 
-hs.hotkey.bind(hyper, "a", close_duplicate_chrome_tabs())
+hs.hotkey.bind(hyper, "a", clean_up_tabs())
 hs.hotkey.bind(hyper, "b", chrome_tab_action(bellTV, bellTV))
 hs.hotkey.bind(hyper, "c", nil, open_app_action("Google Chrome"))
 hs.hotkey.bind(hyper, "g", nil, chrome_tab_action(gmail, gmail .. "#all"))
