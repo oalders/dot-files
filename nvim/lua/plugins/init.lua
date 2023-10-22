@@ -445,7 +445,7 @@ wk.register({
                     markdown = true,
                     perl = true,
                     typescript = true,
-                    yaml = false,
+                    yaml = true,
                 },
                 panel = { enabled = false },
                 suggestion = {
