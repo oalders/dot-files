@@ -42,7 +42,7 @@ linters:
     - gofumpt
     - goheader
     - goimports
-    - gomnd
+    # - gomnd
     - gomoddirectives
     - gomodguard
     - goprintffuncname
