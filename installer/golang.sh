@@ -7,7 +7,7 @@ set -eu -o pipefail
 
 version=1.21.3
 
-if is cli version go gte $version; then
+if is there go && is cli version go gte $version; then
     echo "version $version satisfied"
     exit
 fi
