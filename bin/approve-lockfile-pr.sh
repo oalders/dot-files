@@ -10,15 +10,15 @@ file=/tmp/diff.txt
 
 echo '```' > $file
 
-script=~/Documents/github/oalders/diff-lockfiles/bin/diff-lockfiles.js
+script=diff-lockfiles
 
-node $script \
+$script \
     --format table \
     "$remote"/main "$remote/$branch" >> /tmp/diff.txt
 
 echo '```' >> $file
 
-node $script \
+$script \
     --format table \
     --color \
     "$remote"/main "$remote/$branch"
