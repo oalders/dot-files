@@ -8,15 +8,15 @@ branch=$2
 git fetch "$remote"
 file=/tmp/diff.txt
 
-echo '```' > $file
+echo '```' >$file
 
 script=diff-lockfiles
 
 $script \
     --format table \
-    "$remote"/main "$remote/$branch" >> /tmp/diff.txt
+    "$remote"/main "$remote/$branch" >>/tmp/diff.txt
 
-echo '```' >> $file
+echo '```' >>$file
 
 $script \
     --format table \

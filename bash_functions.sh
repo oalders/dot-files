@@ -217,7 +217,7 @@ tmux_session_name() {
         CURRENT_DIR=$(printf "%-30s" "$CURRENT_DIR")
 
         PREFIX='⁉️ '
-        if [[ ${PWD##*/} = 'dot-files' ]] || [[ ${PWD##*/} = 'local-dot-files' ]]; then
+        if [[ ${PWD##*/} == 'dot-files' ]] || [[ ${PWD##*/} == 'local-dot-files' ]]; then
             PREFIX='🔵'
         elif [[ -f 'dist.ini' ]] || [[ -f 'cpanfile' ]] || [[ -f 'app.psgi' ]]; then
             PREFIX='🐪'
@@ -245,7 +245,6 @@ tmux_session_name() {
     SESSION_NAME=$(printf "%-${padding}s" "$SESSION_NAME")
     export SESSION_NAME
 }
-
 
 export GO111MODULE
 export GOPATH
