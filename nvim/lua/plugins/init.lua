@@ -470,6 +470,13 @@ wk.register({
             require('copilot_cmp').setup();
         end, 'set up and start GH copilot' },
         e = { '<cmd>Copilot enable<cr>', 'enable GH copilot' },
+        t = { function()
+            if vim.opt.number:get() == false then
+                vim.fn.ShowGutter()
+            else
+                vim.fn.HideGutter()
+            end
+        end, 'toggle gutter' },
         j = { function() tsj.join() end, 'join the object under cursor' },
         s = { function() tsj.split() end, 'split the object under cursor' },
         x = { '<cmd>Copilot disable<cr>', 'stop GH copilot' },
