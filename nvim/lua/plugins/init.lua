@@ -429,6 +429,11 @@ tsj.setup({ max_join_length = 200 })
 
 local wk = require("which-key")
 wk.register({
+    f = {
+        f = { '<cmd>Files<cr>', 'open FZF file finder' },
+        c = { function() require('ufo').closeAllFolds() end, 'close all folds' },
+        o = { function() require('ufo').openAllFolds() end, 'open all folds' },
+    },
     g = {
         c = { function()
             require('copilot').setup({
@@ -500,7 +505,7 @@ vim.keymap.set("n", "gR", function() require("trouble").open("lsp_references") e
 -- zc - close current fold
 -- zo - open current fold
 
-vim.o.foldcolumn = '1' -- '0' is not bad
+vim.o.foldcolumn = '0' -- hide column by default
 vim.o.foldlevel = 99 -- Using ufo provider need a large value, feel free to decrease the value
 vim.o.foldlevelstart = 99
 vim.o.foldenable = true

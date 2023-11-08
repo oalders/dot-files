@@ -345,6 +345,7 @@ fun HideGutter()
     :set nonumber
     :set nolist
     :set scl=no " sign column
+    :set foldcolumn=0
     :ToggleNeoColumn
 endfun
 
@@ -383,7 +384,6 @@ let g:python_host_prog = '/usr/bin/python2'
 let g:python3_host_prog = '/usr/bin/python3'
 
 " fzf
-nnoremap <leader>f : <C-u>FZF<CR>
 let g:fzf_preview_window = ['down:50%', 'ctrl-/', ]
 nnoremap <leader>b :Buffers<cr>
 
