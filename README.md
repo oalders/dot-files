@@ -138,6 +138,7 @@ Install `plenv` as well as the latest Perl version.
 
 * prefix + Ctrl-s - save
 * prefix + Ctrl-r - restore
+* `rm -rf ~/.cache/tmux/resurrect` - clear saved sessions
 
 ## vim
 
