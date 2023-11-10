@@ -35,6 +35,8 @@ if is os name eq darwin && [[ ! -d /opt/homebrew ]]; then
     fi
     # Install Net::SSLeay on MacOS
     export OPENSSL_PREFIX
+elif ! test -d /usr/include/openssl && is os id eq debian && is user sudoer; then
+    sudo apt-get -y install libssl-dev
 fi
 
 cpm install -g --verbose --show-build-log-on-failure --cpanfile cpan/cli.cpanfile
