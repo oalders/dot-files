@@ -242,6 +242,7 @@ tmux_session_name() {
 
     # A "." will produce a "bad session name" error
     SESSION_NAME=${SESSION_NAME//./-}
+    SESSION_NAME=${SESSION_NAME//oalders/OA}
     SESSION_NAME=$(printf "%-${padding}s" "$SESSION_NAME")
     export SESSION_NAME
 }
