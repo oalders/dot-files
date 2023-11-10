@@ -214,7 +214,7 @@ tmux_session_name() {
 
         BRANCH=$(git rev-parse --abbrev-ref HEAD)
         CURRENT_DIR=${PWD##*/}
-        CURRENT_DIR=$(printf "%-30s" "$CURRENT_DIR")
+        CURRENT_DIR=$(printf "%-20s" "$CURRENT_DIR")
 
         PREFIX='⁉️ '
         if [[ ${PWD##*/} == 'dot-files' ]] || [[ ${PWD##*/} == 'local-dot-files' ]]; then
