@@ -5,6 +5,8 @@ set -e -u -o pipefail -x
 remote=$1
 branch=$2
 
+gh pr checks "$branch"
+
 git fetch "$remote"
 file=/tmp/diff.txt
 
