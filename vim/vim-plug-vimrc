@@ -1,6 +1,6 @@
 call plug#begin('~/.vim/plugged')
 
-Plug 'airblade/vim-gitgutter' " show git diff markers in the sign colum
+Plug 'airblade/vim-gitgutter' " show git diff markers in the sign column
 " Plug 'arcticicestudio/nord-vim'
 Plug 'ap/vim-css-color'
 Plug 'bkad/CamelCaseMotion' " provide CamelCase motion through words
