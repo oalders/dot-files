@@ -48,6 +48,7 @@ ubi --project cli/cli --in "$in" --exe gh
 ubi --project jqlang/jq --in "$in"
 ubi --project dandavison/delta --in "$in"
 ubi --project crate-ci/typos --in "$in"
+ubi --project dandavison/delta --in "$in"
 # ubi --project Wilfred/difftastic --exe difft --in "$in"
 
 exit
