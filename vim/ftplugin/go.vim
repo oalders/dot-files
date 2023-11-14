@@ -13,3 +13,8 @@ function! ShowTabs()
     :set list
     :set listchars=tab:>-
 endfunction
+
+fun! HideTabs()
+    :setlocal nolist
+    :set number
+endfunction
