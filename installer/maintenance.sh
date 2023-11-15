@@ -2,6 +2,7 @@
 
 set -eux
 
+rm -f ~/.vimtmp
 rm -f ~/.cargo/bin/bat
 rm -f ~/.cargo/bin/precious
 

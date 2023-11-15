@@ -87,8 +87,7 @@ set laststatus=2
 set backspace=2
 filetype on
 
-" Prevent vim swap files from being included with important files
-set directory=$HOME/.vimtmp
+set noswapfile
 
 augroup fileops
     " reload files which have changed
