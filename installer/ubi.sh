@@ -44,11 +44,20 @@ else
     ubi --project sharkdp/bat --in "$in"
 fi
 
-ubi --project cli/cli --in "$in" --exe gh
-ubi --project jqlang/jq --in "$in"
-ubi --project dandavison/delta --in "$in"
-ubi --project crate-ci/typos --in "$in"
-ubi --project dandavison/delta --in "$in"
-# ubi --project Wilfred/difftastic --exe difft --in "$in"
+if ! is there gh || is cli age gh gt 7 days; then
+    ubi --project cli/cli --in "$in" --exe gh
+fi
+
+if ! is there jq || is cli age jq gt 7 days; then
+    ubi --project jqlang/jq --in "$in"
+fi
+
+if ! is there delta || is cli age delta gt 7 days; then
+    ubi --project dandavison/delta --in "$in"
+fi
+
+if ! is there typos || is cli age typos gt 7 days; then
+    ubi --project crate-ci/typos --in "$in"
+fi
 
 exit
