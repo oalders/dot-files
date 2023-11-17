@@ -5,6 +5,10 @@ set -eux
 in="$HOME/local/bin"
 mkdir -p "$in"
 
+# shellcheck source=bash_functions.sh
+source ~/dot-files/bash_functions.sh
+add_path "$in"
+
 if [[ ! "$(command -v curl)" && "$(command -v apt-get)" ]]; then
     if [[ ! "$(command -v sudo)" ]]; then
         apt-get update && apt-get install sudo --autoremove -y
@@ -38,10 +42,6 @@ maybe_install houseabsolute/omegasort
 maybe_install houseabsolute/precious
 maybe_install jqlang/jql
 maybe_install oalders/is
-
-# shellcheck source=bash_functions.sh
-source ~/dot-files/bash_functions.sh
-add_path "$in"
 
 if is os name eq darwin; then
     if is cli version bat ne 0.24.0 || true; then
