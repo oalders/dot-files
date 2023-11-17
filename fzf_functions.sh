@@ -32,3 +32,7 @@ _fzf_complete_prove_post() {
 }
 
 [ -n "$BASH" ] && complete -F _fzf_complete_prove -o default -o bashdefault prove
+
+cd_worktree() {
+    cd "$(git worktree list | fzf | awk '{print $1}')" || exit
+}
