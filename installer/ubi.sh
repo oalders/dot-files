@@ -18,25 +18,33 @@ if [ ! "$(command -v "$in/ubi")" ]; then
         TARGET=$in sh
 
 else
-    "$in/ubi" --self-upgrade
+    if is cli age "$in/ubi" gt 7 days; then
+        "$in/ubi" --self-upgrade
+    fi
 fi
 
-"$in/ubi" --project oalders/is --in "$in"
+maybe_install() {
+    local project
+    local repo
+    IFS='/' read -r project repo <<<"$1"
+    if ! is there "$repo" || is cli age "$repo" gt 7 days; then
+        ubi --project "$project/$repo" --in "$in"
+    fi
+}
+
+maybe_install crate-ci/typos
+maybe_install dandavison/delta
+maybe_install houseabsolute/omegasort 
+maybe_install houseabsolute/precious
+maybe_install jqlang/jql
+maybe_install oalders/is
 
 # shellcheck source=bash_functions.sh
 source ~/dot-files/bash_functions.sh
 add_path "$in"
 
-if ! is there omegasort || is cli age omegasort gt 7 days; then
-    ubi --project houseabsolute/omegasort --in "$in"
-fi
-
-if ! is there precious || is cli age precious gt 7 days; then
-    ubi --project houseabsolute/precious --in "$in"
-fi
-
 if is os name eq darwin; then
-    if is cli version bat ne 0.23 || true; then
+    if is cli version bat ne 0.24.0 || true; then
         ubi --in "$in" \
             --url https://github.com/sharkdp/bat/releases/download/v0.23.0/bat-v0.23.0-x86_64-apple-darwin.tar.gz
     fi
@@ -46,18 +54,6 @@ fi
 
 if ! is there gh || is cli age gh gt 7 days; then
     ubi --project cli/cli --in "$in" --exe gh
-fi
-
-if ! is there jq || is cli age jq gt 7 days; then
-    ubi --project jqlang/jq --in "$in"
-fi
-
-if ! is there delta || is cli age delta gt 7 days; then
-    ubi --project dandavison/delta --in "$in"
-fi
-
-if ! is there typos || is cli age typos gt 7 days; then
-    ubi --project crate-ci/typos --in "$in"
 fi
 
 exit
