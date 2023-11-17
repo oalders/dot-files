@@ -40,7 +40,7 @@ maybe_install crate-ci/typos
 maybe_install dandavison/delta
 maybe_install houseabsolute/omegasort 
 maybe_install houseabsolute/precious
-maybe_install jqlang/jql
+maybe_install jqlang/jq
 maybe_install oalders/is
 
 if is os name eq darwin; then
