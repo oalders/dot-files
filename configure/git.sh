@@ -65,13 +65,15 @@ git config --global alias.view-stash 'stash show -p stash@{0}'
 git config --global color.ui auto
 git config --global core.excludesfile ~/.gitignore_global
 
-# configure delta as git's pager
-git config --global core.pager 'delta'
-git config --global delta.light false
-git config --global delta.navigate true
-git config --global diff.colorMoved default
-git config --global interactive.diffFilter 'delta --color-only'
-git config --global merge.conflictStyle diff3
+if is os name ne debian; then
+    # configure delta as git's pager
+    git config --global core.pager 'delta'
+    git config --global delta.light false
+    git config --global delta.navigate true
+    git config --global diff.colorMoved default
+    git config --global interactive.diffFilter 'delta --color-only'
+    git config --global merge.conflictStyle diff3
+fi
 
 # takes a commit name as sole arg
 git config --global alias.whatis "show -s --pretty='tformat:%h (%s, %ad)' --date=short"
