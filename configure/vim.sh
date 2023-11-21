@@ -65,9 +65,9 @@ if ! is there godef || is cli age godef gt 18 hours; then
     # This takes forever to run in CI, so we'll just do it here so that we can skip the step on GH
     if [[ $IS_GITHUB == false ]]; then
         add_path ~/local/bin
-        nvim +'PlugInstall --sync' +qa
-        nvim +'PlugUpdate --sync' +qa
-        nvim +'MasonUpdate --sync' +qa
+        nvim +'PlugInstall --sync' +qa || true
+        nvim +'PlugUpdate --sync' +qa || true
+        nvim +'MasonUpdate --sync' +qa || true
     fi
 fi
 
