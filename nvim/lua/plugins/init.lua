@@ -1,7 +1,7 @@
 ---@diagnostic disable-next-line missing-fields      
 require 'nvim-treesitter.configs'.setup {
     ensure_installed = { 'bash', 'dockerfile', 'go', 'html', 'javascript', 'lua', 'markdown', 'markdown_inline',
-        'python', 'regex', 'ruby', 'rust', 'sql', 'typescript', 'vim', 'yaml' },
+        'perl', 'python', 'regex', 'ruby', 'rust', 'sql', 'typescript', 'vim', 'yaml' },
     -- ensure_installed = 'all',
     highlight = {
         enable = true, -- false will disable the whole extension
@@ -12,17 +12,6 @@ require 'nvim-treesitter.configs'.setup {
         -- Instead of true it can also be a list of languages
         additional_vim_regex_highlighting = false,
     },
-}
-
-local parser_config = require('nvim-treesitter.parsers').get_parser_configs()
-parser_config.perl = {
-    install_info = {
-        url = 'https://github.com/tree-sitter-perl/tree-sitter-perl',
-        revision = 'release',
-        files = { 'src/parser.c', 'src/scanner.c' },
-    },
-    maintainers = { '@leonerd' },
-    filetype = 'perl',
 }
 
 vim.opt.termguicolors = true
