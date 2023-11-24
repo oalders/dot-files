@@ -14,7 +14,6 @@ Plug 'ekalinin/dockerfile.vim'
 
 Plug 'gregsexton/MatchTag'
 Plug 'haya14busa/vim-auto-mkdir' " create directory path on save
-Plug 'itchyny/lightline.vim'
 Plug 'itchyny/vim-cursorword'
 Plug 'jason0x43/vim-js-indent' " recommended by Quramy/tsuquyomi
 Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
@@ -25,7 +24,6 @@ Plug 'junegunn/vim-slash'
 Plug 'kburdett/vim-nuuid'
 Plug 'luochen1990/rainbow'
 Plug 'mannih/vim-perl-variable-highlighter'
-Plug 'maximbaz/lightline-ale'
 Plug 'motemen/xslate-vim'
 Plug 'mzlogin/vim-markdown-toc'
 Plug 'ntpeters/vim-better-whitespace'
@@ -101,6 +99,7 @@ if has('nvim')
   Plug 'SmiteshP/nvim-navic'
   Plug 'SmiteshP/nvim-navbuddy'
 
+  Plug 'nvim-lualine/lualine.nvim'
   Plug 'zbirenbaum/copilot.lua'
   Plug 'zbirenbaum/copilot-cmp'
 
@@ -108,6 +107,8 @@ if has('nvim')
   Plug 'kevinhwang91/promise-async'
   Plug 'kevinhwang91/nvim-ufo'
 else
+  Plug 'itchyny/lightline.vim'
+  Plug 'maximbaz/lightline-ale'
   Plug 'roxma/nvim-yarp'
   Plug 'roxma/vim-hug-neovim-rpc'
 endif
