@@ -221,21 +221,6 @@ vim.api.nvim_create_autocmd('LspAttach', {
 
 require('cmp_nvim_lsp')
 
-require("mason").setup()
-require("mason-lspconfig").setup {
-    ensure_installed = {
-        "bashls",
-        "docker_compose_language_service",
-        "golangci_lint_ls",
-        "gopls",
-        "lua_ls",
-        "perlnavigator",
-        "rust_analyzer",
-        "tsserver",
-        "yamlls",
-    }
-}
-
 require("lsp-format").setup {}
 
 require 'lspconfig'.bashls.setup { filetypes = { "sh" } }
@@ -541,3 +526,4 @@ require('ufo').setup({
 })
 
 require('conf/lualine')
+require('conf/mason')
