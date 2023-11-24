@@ -6,9 +6,6 @@ if wezterm.config_builder then
 end
 
 config.font_size = 14.0
-config.font = wezterm.font_with_fallback({
-    "JetBrainsMono Nerd Font",
-})
 config.allow_square_glyphs_to_overflow_width = "WhenFollowedBySpace"
 config.color_scheme = "iceberg-dark"
 
