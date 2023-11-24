@@ -468,7 +468,24 @@ wk.register({
                 },
             });
             require('copilot_cmp').setup();
+            require('copilot.api').register_status_notification_handler(function(data)
+                -- customize your message however you want
+                local msg = '?'
+                if data.status == 'Normal' then
+                    msg = ' '
+                elseif data.status == 'InProgress' then
+                    msg = ' '
+                else
+                    msg = ' '
+                end
+                vim.print(msg)
+            end)
+            vim.opt.formatoptions:remove({ 'o' })
         end, 'set up and start GH copilot' },
+        d = { function()
+            vim.print('foo')
+        end, 'debug stuff'
+        },
         e = { '<cmd>Copilot enable<cr>', 'enable GH copilot' },
         t = { function()
             if vim.opt.number:get() == false then
