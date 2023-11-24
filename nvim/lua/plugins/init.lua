@@ -1,7 +1,3 @@
--- if vim.fn.has 'nvim-0.9.0' == 1 then
---  vim.loader.enable()
--- end
-
 require 'nvim-treesitter.configs'.setup {
     ensure_installed = { 'bash', 'dockerfile', 'go', 'html', 'javascript', 'lua', 'markdown', 'markdown_inline',
         'python', 'regex', 'ruby', 'rust', 'sql', 'typescript', 'vim', 'yaml' },
