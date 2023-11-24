@@ -26,7 +26,6 @@ parser_config.perl = {
 
 vim.opt.termguicolors = true
 vim.opt.mouse = "v"
-require('bufferline').setup {}
 
 -- require('virt-column').setup()
 
@@ -375,8 +374,6 @@ require('NeoColumn').setup(
     }
 )
 
-require('glow').setup()
-
 local tsj = require('treesj')
 tsj.setup({ max_join_length = 200 })
 
@@ -387,28 +384,11 @@ vim.keymap.set("n", "<leader>xq", function() require("trouble").open("quickfix")
 vim.keymap.set("n", "<leader>xl", function() require("trouble").open("loclist") end)
 vim.keymap.set("n", "gR", function() require("trouble").open("lsp_references") end)
 
--- folding
--- zR - open all folds
--- zM - close all folds
--- zc - close current fold
--- zo - open current fold
-
-vim.o.foldcolumn = '0' -- hide column by default
-vim.o.foldlevel = 99 -- Using ufo provider need a large value, feel free to decrease the value
-vim.o.foldlevelstart = 99
-vim.o.foldenable = true
-
--- Using ufo provider need remap `zR` and `zM`. If Neovim is 0.6.1, remap yourself
-vim.keymap.set('n', 'zR', require('ufo').openAllFolds)
-vim.keymap.set('n', 'zM', require('ufo').closeAllFolds)
-
-require('ufo').setup({
-    provider_selector = function(bufnr, filetype, buftype)
-        return { 'treesitter', 'indent' }
-    end
-})
+require('bufferline').setup()
+require('glow').setup()
 
 require('conf/lualine')
 require('conf/mason')
 require('conf/noice')
+require('conf/ufo')
 require('conf/which-key')
