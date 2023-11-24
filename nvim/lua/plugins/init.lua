@@ -384,7 +384,9 @@ vim.keymap.set("n", "<leader>xq", function() require("trouble").open("quickfix")
 vim.keymap.set("n", "<leader>xl", function() require("trouble").open("loclist") end)
 vim.keymap.set("n", "gR", function() require("trouble").open("lsp_references") end)
 
-require('bufferline').setup()
+require('bufferline').setup {
+    options = { diagnostics = 'nvim_lsp' }
+}
 require('glow').setup()
 
 require('conf/lualine')
