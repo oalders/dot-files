@@ -173,30 +173,6 @@ function! UseTabs()
     :set list
 endfunction
 
-" ########### TidyAll ###########
-
-" https://github.com/jonswar/perl-code-tidyall/blob/master/etc/editors/tidyall.vim
-
-" Run tidyall on the current buffer. If an error occurs, show it and leave it
-" in tidyall.ERR, and undo any changes.
-
-command! TidyAll :call TidyAll()
-function! TidyAll()
-    let l:cur_pos = getpos( '.' )
-    let l:cmdline = ':1,$!tidyall --mode editor --pipe %:p 2> tidyall.ERR'
-    execute( l:cmdline )
-    if v:shell_error
-        echo "\nContents of tidyall.ERR:\n\n" . system( 'cat tidyall.ERR' )
-        silent undo
-    else
-        call system( 'rm tidyall.ERR' )
-    endif
-    call setpos( '.', cur_pos )
-endfunction
-
-" Bind to ,t (or leader+t)
-map <leader>t :call TidyAll()<cr>
-
 " Thanks to D. Ben Knoble for getting histadd() to work:
 " https://vi.stackexchange.com/questions/34818/how-to-use-histadd-with-a-custom-function/34819#34819
 nnoremap <leader>ot :call OT(input("ot: ", "", "file"))<cr>
