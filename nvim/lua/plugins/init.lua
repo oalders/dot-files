@@ -1,4 +1,4 @@
----@diagnostic disable-next-line missing-fields      
+---@diagnostic disable-next-line missing-fields
 require 'nvim-treesitter.configs'.setup {
     ensure_installed = { 'bash', 'dockerfile', 'go', 'html', 'javascript', 'lua', 'markdown', 'markdown_inline',
         'perl', 'python', 'regex', 'ruby', 'rust', 'sql', 'typescript', 'vim', 'yaml' },
