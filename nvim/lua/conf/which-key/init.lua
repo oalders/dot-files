@@ -84,7 +84,12 @@ wk.register({
         end, "hlchunk" },
         h = { "<cmd>DisableHL<cr>", "Disable HL" }
     },
+    t = {
+        d = { function() require('trouble').open('document_diagnostics') end,
+            'Trouble document diagnostics' },
+        w = { function() require('trouble').open('workspace_diagnostics') end,
+            'Trouble workspace diagnostics' },
+    }
 }, { prefix = "<leader>" })
 
 wk.setup {}
-
