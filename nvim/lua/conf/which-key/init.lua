@@ -1,3 +1,4 @@
+local tsj = require('treesj')
 local wk = require("which-key")
 wk.register({
     f = {
