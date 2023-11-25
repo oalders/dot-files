@@ -368,7 +368,10 @@ local tsj = require('treesj')
 tsj.setup({ max_join_length = 200 })
 
 require('bufferline').setup {
-    options = { diagnostics = 'nvim_lsp' }
+    options = {
+        diagnostics = 'nvim_lsp',
+        numbers = 'ordinal',
+    }
 }
 require('glow').setup()
 
