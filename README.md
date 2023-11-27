@@ -151,6 +151,7 @@ Remind myself of vim shortcuts etc.
 * `ctrl-w r` - swap splits
 * `ctrl-o` - return to previous position in file
 * `ý¿¿»šºvertical terminal` - vertical split into a terminal buffer
+* `DiffviewOpen HEAD~1` - view diff. Probably follow with `:colo iceberg`
 * `:GFiles` - `git ls-files | fzf`
 * `:GFiles?` - `git status | fzf` with preview pane
 * `:BCommits` - git commits for the current buffer
