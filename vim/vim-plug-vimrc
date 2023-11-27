@@ -55,6 +55,7 @@ if has('nvim')
   Plug 'nvim-treesitter/nvim-treesitter', { 'do': ':TSUpdate'}  " We recommend updating the parsers on update
   Plug 'shellRaining/hlchunk.nvim', {'on': 'EnableHL'}
   Plug 'sindrets/diffview.nvim'
+  Plug 'Hubro/nvim-splitrun'
 
   Plug 'nvim-lua/plenary.nvim'
   Plug 'jose-elias-alvarez/null-ls.nvim'
