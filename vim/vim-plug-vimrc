@@ -58,7 +58,7 @@ if has('nvim')
   Plug 'Hubro/nvim-splitrun'
 
   Plug 'nvim-lua/plenary.nvim'
-  Plug 'jose-elias-alvarez/null-ls.nvim'
+  Plug 'nvimtools/none-ls.nvim'
 
   Plug 'lukas-reineke/lsp-format.nvim'
 
