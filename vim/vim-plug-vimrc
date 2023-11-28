@@ -1,12 +1,13 @@
 call plug#begin('~/.vim/plugged')
 
-Plug 'airblade/vim-gitgutter' " show git diff markers in the sign column
+" Colour schemes
 " Plug 'arcticicestudio/nord-vim'
+Plug 'cocopon/iceberg.vim'
+
+Plug 'airblade/vim-gitgutter' " show git diff markers in the sign column
 Plug 'ap/vim-css-color'
 Plug 'bkad/CamelCaseMotion' " provide CamelCase motion through words
 Plug 'c9s/perlomni.vim'
-Plug 'chrisbra/unicode.vim'
-Plug 'cocopon/iceberg.vim'
 Plug 'dense-analysis/ale' " , { 'tag': 'v3.3.0' }
 " Plug 'oalders/ale', { 'branch': 'perlimports' }
 Plug 'ekalinin/dockerfile.vim'
@@ -46,60 +47,50 @@ Plug 'yko/mojo.vim'
 
 if has('nvim')
   Plug 'ahmedkhalf/project.nvim'
+  Plug 'akinsho/bufferline.nvim' " display tabs for open buffers
   Plug 'ecthelionvi/NeoColumn.nvim'
-  Plug 'ellisonleao/glow.nvim'
-  Plug 'folke/trouble.nvim'
-  Plug 'folke/which-key.nvim'
+  Plug 'ellisonleao/glow.nvim' " render markdown via :Glow
+  Plug 'folke/trouble.nvim' " <leader>td (document) <leader>tw (workspace)
+  Plug 'folke/which-key.nvim' " better organization of key mappings
+  Plug 'Hubro/nvim-splitrun' " :Splitrun some command
+  Plug 'kyazdani42/nvim-web-devicons' " Recommended (for coloured icons for bufferline.nvim)
+  Plug 'lukas-reineke/lsp-format.nvim'
+  Plug 'nvim-lualine/lualine.nvim' " status line
+  Plug 'nvim-lua/plenary.nvim' " required by other plugins
+  Plug 'nvimtools/none-ls.nvim' " null-ls replacement
   Plug 'nvim-treesitter/nvim-treesitter', { 'do': ':TSUpdate'}  " We recommend updating the parsers on update
+  Plug 'rgroli/other.nvim' " :Other to toggle between test and implementation files
   Plug 'shellRaining/hlchunk.nvim', {'on': 'EnableHL'}
   Plug 'sindrets/diffview.nvim'
-  Plug 'Hubro/nvim-splitrun'
-
-  Plug 'nvim-lua/plenary.nvim'
-  Plug 'nvimtools/none-ls.nvim'
-
-  Plug 'lukas-reineke/lsp-format.nvim'
-
-  Plug 'akinsho/bufferline.nvim'
-  Plug 'kyazdani42/nvim-web-devicons' " Recommended (for coloured icons for bufferline.nvim)
-
-  Plug 'rgroli/other.nvim'
-
-  Plug 'Wansmer/treesj'
-
-  Plug 'williamboman/mason.nvim'
+  Plug 'Wansmer/treesj' " SplitJoin replacement
   Plug 'williamboman/mason-lspconfig.nvim'
+  Plug 'williamboman/mason.nvim'
+  Plug 'zbirenbaum/copilot.lua'
+
+  " folding
+  Plug 'kevinhwang91/promise-async'
+  Plug 'kevinhwang91/nvim-ufo'
+
+  " nvim-cmp
+  Plug 'hrsh7th/cmp-buffer'
+  Plug 'hrsh7th/cmp-cmdline'
+  Plug 'hrsh7th/cmp-nvim-lsp'
+  Plug 'hrsh7th/cmp-path'
+  Plug 'hrsh7th/cmp-vsnip'
+  Plug 'hrsh7th/nvim-cmp'
+  Plug 'hrsh7th/vim-vsnip'
+  Plug 'L3MON4D3/LuaSnip', {'tag': 'v2.*', 'do': 'make install_jsregexp'}
+  Plug 'lvimuser/lsp-inlayhints.nvim'
   Plug 'neovim/nvim-lspconfig'
+  Plug 'onsails/lspkind.nvim' " add pictograms to completion sources
+  Plug 'saadparwaiz1/cmp_luasnip'
+  Plug 'zbirenbaum/copilot-cmp' " include copilot suggestions in completion
 
   " noice
   Plug 'folke/noice.nvim'
   Plug 'MunifTanjim/nui.nvim'
   Plug 'rcarriga/nvim-notify'
 
-  " nvim-cmp
-  Plug 'neovim/nvim-lspconfig'
-  Plug 'hrsh7th/cmp-nvim-lsp'
-  Plug 'hrsh7th/cmp-buffer'
-  Plug 'hrsh7th/cmp-path'
-  Plug 'hrsh7th/cmp-cmdline'
-  Plug 'hrsh7th/nvim-cmp'
-  Plug 'hrsh7th/cmp-vsnip'
-  Plug 'hrsh7th/vim-vsnip'
-  Plug 'lvimuser/lsp-inlayhints.nvim'
-  Plug 'onsails/lspkind.nvim'
-  Plug 'L3MON4D3/LuaSnip', {'tag': 'v2.*', 'do': 'make install_jsregexp'}
-  Plug 'saadparwaiz1/cmp_luasnip'
-
-  Plug 'williamboman/mason.nvim'
-  Plug 'williamboman/mason-lspconfig.nvim'
-
-  Plug 'nvim-lualine/lualine.nvim'
-  Plug 'zbirenbaum/copilot.lua'
-  Plug 'zbirenbaum/copilot-cmp'
-
-  " folding
-  Plug 'kevinhwang91/promise-async'
-  Plug 'kevinhwang91/nvim-ufo'
 else
   Plug 'ConradIrwin/vim-bracketed-paste'
   Plug 'itchyny/lightline.vim'
@@ -118,9 +109,7 @@ endif
 call plug#end()
 
 " Plugins to revisit
-" Plug 'altercation/vim-colors-solarized' " Solarized colour scheme
 " Plug 'dhruvasagar/vim-zoom' " Toggle zoom in / out individual windows (splits)
 " Plug 'jreybert/vimagit' " Ease your git workflow within Vim
 " Plug 'kristijanhusak/vim-carbon-now-sh' " Open selected text in https://carbon.now.sh
 " Plug 'SirVer/ultisnips' " The ultimate snippet solution for Vim
-" Plug 'lifepillar/vim-solarized8'
