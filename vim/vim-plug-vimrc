@@ -16,7 +16,7 @@ Plug 'gregsexton/MatchTag'
 Plug 'haya14busa/vim-auto-mkdir' " create directory path on save
 Plug 'itchyny/vim-cursorword'
 Plug 'jason0x43/vim-js-indent' " recommended by Quramy/tsuquyomi
-Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
+Plug 'junegunn/fzf'
 Plug 'junegunn/fzf.vim'
 Plug 'junegunn/vader.vim'
 Plug 'junegunn/vim-emoji'

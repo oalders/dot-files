@@ -41,6 +41,7 @@ maybe_install dandavison/delta
 maybe_install houseabsolute/omegasort
 maybe_install houseabsolute/precious
 maybe_install jqlang/jq
+maybe_install junegunn/fzf
 maybe_install oalders/is
 
 if is os name eq darwin; then
