@@ -236,4 +236,5 @@ if is os name eq darwin; then
     add_path ~/local/bin/nvim-macos/bin
 fi
 
+add_path ~/dot-files/bin
 posh_me
