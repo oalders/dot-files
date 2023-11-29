@@ -7,11 +7,8 @@ Plug 'cocopon/iceberg.vim'
 Plug 'airblade/vim-gitgutter' " show git diff markers in the sign column
 Plug 'ap/vim-css-color'
 Plug 'bkad/CamelCaseMotion' " provide CamelCase motion through words
-Plug 'c9s/perlomni.vim'
 Plug 'dense-analysis/ale' " , { 'tag': 'v3.3.0' }
 " Plug 'oalders/ale', { 'branch': 'perlimports' }
-Plug 'ekalinin/dockerfile.vim'
-
 Plug 'gregsexton/MatchTag'
 Plug 'haya14busa/vim-auto-mkdir' " create directory path on save
 Plug 'itchyny/vim-cursorword'
@@ -19,14 +16,13 @@ Plug 'jason0x43/vim-js-indent' " recommended by Quramy/tsuquyomi
 Plug 'junegunn/fzf'
 Plug 'junegunn/fzf.vim'
 Plug 'junegunn/vader.vim'
-Plug 'junegunn/vim-emoji'
 Plug 'junegunn/vim-slash'
-Plug 'kburdett/vim-nuuid'
-Plug 'luochen1990/rainbow'
+Plug 'kburdett/vim-nuuid' " <leader>u to insert a new UUID
+Plug 'luochen1990/rainbow' " Rainbow Parentheses Improved
 Plug 'mannih/vim-perl-variable-highlighter'
-Plug 'motemen/xslate-vim'
+Plug 'motemen/xslate-vim' " https://metacpan.org/pod/Text::Xslate
 Plug 'mzlogin/vim-markdown-toc'
-Plug 'ntpeters/vim-better-whitespace'
+Plug 'ntpeters/vim-better-whitespace' " highlight trailing whitespace
 Plug 'oalders/prettysql' " ,fs to format visually selected SQL
 Plug 'oalders/vim-perl', { 'branch': 'dev', 'for': 'perl', 'do': 'make clean carp dancer highlight-all-pragmas moose test-more try-tiny' }
 Plug 'othree/html5.vim'
@@ -39,14 +35,13 @@ Plug 'skaji/syntax-check-perl', { 'branch': 'main' }
 Plug 'tpope/vim-abolish'
 Plug 'tpope/vim-eunuch'
 Plug 'tpope/vim-fugitive'
-Plug 'tpope/vim-surround'
 Plug 'vim-ruby/vim-ruby'
 Plug 'vim-scripts/vim-json-bundle'
 Plug 'yazgoo/yank-history'
 Plug 'yko/mojo.vim'
 
 if has('nvim')
-  Plug 'ahmedkhalf/project.nvim'
+  Plug 'ahmedkhalf/project.nvim' " auto-detect project root dir
   Plug 'akinsho/bufferline.nvim' " display tabs for open buffers
   Plug 'ecthelionvi/NeoColumn.nvim'
   Plug 'ellisonleao/glow.nvim' " render markdown via :Glow
@@ -60,12 +55,12 @@ if has('nvim')
   Plug 'nvimtools/none-ls.nvim' " null-ls replacement
   Plug 'nvim-treesitter/nvim-treesitter', { 'do': ':TSUpdate'}  " We recommend updating the parsers on update
   Plug 'rgroli/other.nvim' " :Other to toggle between test and implementation files
-  Plug 'shellRaining/hlchunk.nvim', {'on': 'EnableHL'}
-  Plug 'sindrets/diffview.nvim'
+  Plug 'shellRaining/hlchunk.nvim', {'on': 'EnableHL'} " <leader>ll (start) leader<lh> (sto" <leader>ll (start) leader<lh> (stop))
+  Plug 'sindrets/diffview.nvim' " File explorer for git diffs
   Plug 'Wansmer/treesj' " SplitJoin replacement
   Plug 'williamboman/mason-lspconfig.nvim'
   Plug 'williamboman/mason.nvim'
-  Plug 'zbirenbaum/copilot.lua'
+  Plug 'zbirenbaum/copilot.lua' " GitHub Copilot
 
   " folding
   Plug 'kevinhwang91/promise-async'
