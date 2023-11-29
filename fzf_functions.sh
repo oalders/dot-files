@@ -33,6 +33,19 @@ _fzf_complete_prove_post() {
 
 [ -n "$BASH" ] && complete -F _fzf_complete_prove -o default -o bashdefault prove
 
+# yath
+_fzf_complete_yath() {
+    _fzf_complete --bind='ctrl-/:toggle-preview' --preview 'bat --style=numbers --color=always --line-range :50 {}' --reverse --multi --prompt="yath> " -- "$@" < <(
+        fd -e t
+    )
+}
+
+_fzf_complete_yath_post() {
+    awk '{print $1}'
+}
+
+[ -n "$BASH" ] && complete -F _fzf_complete_yath -o default -o bashdefault yath
+
 cd_worktree() {
     cd "$(git worktree list | fzf | awk '{print $1}')" || exit
 }
