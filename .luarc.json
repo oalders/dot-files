@@ -1,0 +1,8 @@
+{
+    "workspace.library": [
+        "/home/oalders_maxmind_com/.config/nvim",
+        "${3rd}/luassert/library",
+        "${3rd}/luv/library",
+        "${3rd}/luv/library"
+    ]
+}
