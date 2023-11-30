@@ -334,8 +334,8 @@ endfunction
 
 " ########### Mappings ###########
 "
+"
 nnoremap <leader>xx :call setfperm(expand('%'),"rwxrw-rw-")<cr>
-
 " Change hyphens to underscores
 vnoremap <silent> uu :s/\%V\-/_/g<cr>
 
@@ -363,13 +363,6 @@ nnoremap <leader>b :Buffers<cr>
 
 "dictionary sort unique
 :vnoremap <silent> su :!sort -d --ignore-case<bar> uniq<CR>
-" vim-emoji
-
-set completefunc=emoji#complete
-"let g:gitgutter_sign_added = emoji#for('plus-sign')
-"let g:gitgutter_sign_modified = emoji#for('small_orange_diamond')
-"let g:gitgutter_sign_removed = emoji#for('small_red_triangle')
-"let g:gitgutter_sign_modified_removed = emoji#for('collision')
 
 " CamelCaseMotion
 map <silent> w <Plug>CamelCaseMotion_w
