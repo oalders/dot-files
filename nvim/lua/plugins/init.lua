@@ -151,89 +151,7 @@ cmp.event:on('menu_closed', function()
     vim.b.copilot_suggestion_hidden = false
 end)
 
-require 'lspconfig'.gopls.setup({
-    settings = {
-        gopls = {
-            analyses = {
-                unusedparams = true,
-            },
-            staticcheck = true,
-            gofumpt = true,
-        },
-    },
-})
-require 'lspconfig'.golangci_lint_ls.setup {}
-
--- After setting up mason-lspconfig you may set up servers via lspconfig
--- See server/src/server.ts in PerlNavigator for a list of available settings
-require("lspconfig").perlnavigator.setup {
-    settings = {
-        perlnavigator = {
-            -- perltidyProfile = '',
-            -- perlcriticProfile = '',
-            enableWarnings = true,
-            perlimportsProfile = 'perlimports.toml',
-            includePaths = { 'lib', 'dev/lib', 't/lib' },
-            perlcriticEnabled = true,
-            perlimportsLintEnabled = true,
-            perlimportsTidyEnabled = true,
-            perlPath = 'perl',
-        }
-    },
-    on_new_config = function(new_config, new_root)
-        local f = new_root .. '/.teamcity/pom.xml'
-        local pn = new_config.settings.perlnavigator
-        if vim.fn.filereadable(f) == 1 then
-            pn.perlPath = 'mm-perl'
-            pn.perlcriticProfile = table.concat({ new_root, '.perlcriticrc' }, '/')
-            pn.perltidyProfile = table.concat({ new_root, '.perltidyallrc' }, '/')
-            pn.perlnavigator.perlimportsProfile = table.concat({ new_root, '.perlimports.toml' }, '/')
-        end
-    end,
-}
-
-require('lspconfig').rust_analyzer.setup({
-    settings = {
-        ["rust-analyzer"] = {
-            imports = {
-                granularity = {
-                    group = "module",
-                },
-                prefix = "self",
-            },
-            cargo = {
-                buildScripts = {
-                    enable = true,
-                },
-            },
-            procMacro = {
-                enable = true
-            },
-        }
-    }
-})
-
-require('lspconfig').tsserver.setup {
-    on_attach = require("lsp-format").on_attach,
-    filetypes = { "javascript", "typescript", "typescriptreact" },
-    cmd = { "typescript-language-server", "--stdio" },
-}
-
-require('lspconfig').pylsp.setup {
-    settings = {
-        pylsp = {
-            plugins = {
-                pycodestyle = {
-                    ignore = { 'W391' },
-                    maxLineLength = 100
-                }
-            }
-        }
-    }
-}
-
 wildchar = "<tab>"
--- require("lspconfig").rust_analyzer.setup {}
 
 require('other-nvim').setup {
     mappings = { 'golang' }
@@ -283,9 +201,10 @@ require('glow').setup()
 require("lsp-format").setup {}
 require('nvim-splitrun').setup()
 
-require('conf/lualine')
+require('conf/mason') -- This needs to happen before lspconfig
 require('conf/lspconfig')
-require('conf/mason')
+
+require('conf/lualine')
 require('conf/noice')
 require('conf/ufo')
 require('conf/which-key')

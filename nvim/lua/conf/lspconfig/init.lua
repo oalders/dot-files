@@ -1,3 +1,30 @@
+local lspconfig = require 'lspconfig'
+lspconfig.bashls.setup { filetypes = { "sh" } }
+lspconfig.docker_compose_language_service.setup {}
+lspconfig.lua_ls.setup {
+    settings = {
+        Lua = {
+            runtime = {
+                -- Tell the language server which version of Lua you're using (most likely LuaJIT in the case of Neovim)
+                version = 'LuaJIT',
+            },
+            diagnostics = {
+                -- Get the language server to recognize the `vim` global
+                globals = { 'hs', 'vim' },
+            },
+            workspace = {
+                -- Make the server aware of Neovim runtime files
+                library = vim.api.nvim_get_runtime_file("", true),
+            },
+            -- Do not send telemetry data containing a randomized but unique identifier
+            telemetry = {
+                enable = false,
+            },
+        },
+    },
+}
+lspconfig.yamlls.setup {}
+
 -- Set up lspconfig.
 -- Mappings.
 vim.api.nvim_create_augroup("LspAttach_inlayhints", {})
@@ -54,29 +81,84 @@ vim.api.nvim_create_autocmd('LspAttach', {
 })
 -- end copied from https://github.com/neovim/nvim-lspconfig
 
-require 'lspconfig'.bashls.setup { filetypes = { "sh" } }
-require 'lspconfig'.docker_compose_language_service.setup {}
-require 'lspconfig'.lua_ls.setup {
+lspconfig.gopls.setup({
     settings = {
-        Lua = {
-            runtime = {
-                -- Tell the language server which version of Lua you're using (most likely LuaJIT in the case of Neovim)
-                version = 'LuaJIT',
+        gopls = {
+            analyses = {
+                unusedparams = true,
             },
-            diagnostics = {
-                -- Get the language server to recognize the `vim` global
-                globals = { 'hs', 'vim' },
-            },
-            workspace = {
-                -- Make the server aware of Neovim runtime files
-                library = vim.api.nvim_get_runtime_file("", true),
-            },
-            -- Do not send telemetry data containing a randomized but unique identifier
-            telemetry = {
-                enable = false,
-            },
+            staticcheck = true,
+            gofumpt = true,
         },
     },
+})
+lspconfig.golangci_lint_ls.setup {}
+
+-- After setting up mason-lspconfig you may set up servers via lspconfig
+-- See server/src/server.ts in PerlNavigator for a list of available settings
+lspconfig.perlnavigator.setup {
+    settings = {
+        perlnavigator = {
+            -- perltidyProfile = '',
+            -- perlcriticProfile = '',
+            enableWarnings = true,
+            perlimportsProfile = 'perlimports.toml',
+            includePaths = { 'lib', 'dev/lib', 't/lib' },
+            perlcriticEnabled = true,
+            perlimportsLintEnabled = true,
+            perlimportsTidyEnabled = true,
+            perlPath = 'perl',
+        }
+    },
+    on_new_config = function(new_config, new_root)
+        local f = new_root .. '/.teamcity/pom.xml'
+        local pn = new_config.settings.perlnavigator
+        if vim.fn.filereadable(f) == 1 then
+            pn.perlPath = 'mm-perl'
+            pn.perlcriticProfile = table.concat({ new_root, '.perlcriticrc' }, '/')
+            pn.perltidyProfile = table.concat({ new_root, '.perltidyallrc' }, '/')
+            pn.perlnavigator.perlimportsProfile = table.concat({ new_root, '.perlimports.toml' }, '/')
+        end
+    end,
 }
-require 'lspconfig'.yamlls.setup {}
+
+lspconfig.rust_analyzer.setup({
+    settings = {
+        ["rust-analyzer"] = {
+            imports = {
+                granularity = {
+                    group = "module",
+                },
+                prefix = "self",
+            },
+            cargo = {
+                buildScripts = {
+                    enable = true,
+                },
+            },
+            procMacro = {
+                enable = true
+            },
+        }
+    }
+})
+
+lspconfig.tsserver.setup {
+    on_attach = require("lsp-format").on_attach,
+    filetypes = { "javascript", "typescript", "typescriptreact" },
+    cmd = { "typescript-language-server", "--stdio" },
+}
+
+lspconfig.pylsp.setup {
+    settings = {
+        pylsp = {
+            plugins = {
+                pycodestyle = {
+                    ignore = { 'W391' },
+                    maxLineLength = 100
+                }
+            }
+        }
+    }
+}
 
