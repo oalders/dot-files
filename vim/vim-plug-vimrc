@@ -16,7 +16,11 @@ Plug 'jason0x43/vim-js-indent' " recommended by Quramy/tsuquyomi
 Plug 'junegunn/fzf'
 Plug 'junegunn/fzf.vim'
 Plug 'junegunn/vader.vim'
+
+" automatically clears search highlight when cursor is moved
+" zz after search places the current match at the center of the window
 Plug 'junegunn/vim-slash'
+
 Plug 'kburdett/vim-nuuid' " <leader>u to insert a new UUID
 Plug 'luochen1990/rainbow' " Rainbow Parentheses Improved
 Plug 'mannih/vim-perl-variable-highlighter'
