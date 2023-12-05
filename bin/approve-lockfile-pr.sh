@@ -25,7 +25,13 @@ $script \
     --color \
     "$remote"/main "$remote/$branch"
 
-read -n 1 -s -r -p "Approve PR? Press any key to continue. ctrl-c to exit."
+read -n 1 -t 30 -s -r -p "Approve PR? Press y to continue, r to rebase, n to exit." input
 
-gh pr review --approve "$branch" -F $file
-gh pr merge --merge "$branch"
+if [[ $input == "y" ]]; then
+    gh pr review --approve "$branch" -F $file
+    gh pr merge --merge "$branch"
+elif [[ $input == "r" ]]; then
+    dependabot-rebase.sh "$branch"
+else
+    echo "Input was neither y nor r. Exiting."
+fi
