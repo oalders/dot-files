@@ -28,11 +28,9 @@ export PROMPT_COMMAND='history -a'
 set -o vi
 
 # https://superuser.com/a/975878/120685
-alias brewski='brew update -v && brew upgrade && brew cleanup; brew doctor'
 alias bytes_human='perl -MNumber::Bytes::Human -e "print Number::Bytes::Human::format_bytes shift"'
 alias c="clear && tmux clear-history && perl -E 'say (qq{\n}x65,q{-}x78); system('date');print qq{-}x78, qq{\n}'"
 alias cdr='cd $(git root)'
-alias d=docker
 alias delete-merged-branches='show-merged-branches | xargs -n 1 git branch -d'
 alias dangling-dockers='docker rmi -f $(docker images -f "dangling=true" -q)'
 alias dr='NO_JIGSAW=1 HARNESS_OPTIONS="j8:c" dzil release'
