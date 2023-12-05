@@ -44,7 +44,7 @@ require('lualine').setup {
         lualine_x = { 'encoding', 'fileformat', 'filetype' },
         lualine_y = { 'searchcount' },
         -- lualine_y = { copilot_status },
-        lualine_z = { 'progress' },
+        lualine_z = { 'location', 'progress' },
     },
     inactive_sections = {
         -- lualine_a = {},
