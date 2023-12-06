@@ -40,7 +40,6 @@ Plug 'tpope/vim-abolish'
 Plug 'tpope/vim-eunuch'
 Plug 'tpope/vim-fugitive'
 Plug 'vim-ruby/vim-ruby'
-Plug 'vim-scripts/vim-json-bundle'
 Plug 'yazgoo/yank-history'
 Plug 'yko/mojo.vim'
 
