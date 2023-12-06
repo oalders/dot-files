@@ -80,14 +80,14 @@ if has('nvim')
   Plug 'hrsh7th/cmp-cmdline'
   Plug 'hrsh7th/cmp-nvim-lsp'
   Plug 'hrsh7th/cmp-path'
-  Plug 'hrsh7th/cmp-vsnip'
+  " Plug 'hrsh7th/cmp-vsnip'
   Plug 'hrsh7th/nvim-cmp'
-  Plug 'hrsh7th/vim-vsnip'
-  Plug 'L3MON4D3/LuaSnip', {'tag': 'v2.*', 'do': 'make install_jsregexp'}
+  " Plug 'hrsh7th/vim-vsnip'
+  " Plug 'L3MON4D3/LuaSnip', {'tag': 'v2.*', 'do': 'make install_jsregexp'}
   Plug 'lvimuser/lsp-inlayhints.nvim'
   Plug 'neovim/nvim-lspconfig'
   Plug 'onsails/lspkind.nvim' " add pictograms to completion sources
-  Plug 'saadparwaiz1/cmp_luasnip'
+  " Plug 'saadparwaiz1/cmp_luasnip'
   Plug 'zbirenbaum/copilot-cmp' " include copilot suggestions in completion
 
   " noice
