@@ -60,11 +60,15 @@ if has('nvim')
   Plug 'nvimtools/none-ls.nvim' " null-ls replacement
   Plug 'nvim-treesitter/nvim-treesitter', { 'do': ':TSUpdate'}  " We recommend updating the parsers on update
   Plug 'rgroli/other.nvim' " :Other to toggle between test and implementation files
-  Plug 'shellRaining/hlchunk.nvim', {'on': 'EnableHL'} " <leader>ll (start) leader<lh> (sto" <leader>ll (start) leader<lh> (stop))
+
+  " display lines for indentation
+  " <leader>ll (start) leader<lh> (stop)
+  Plug 'shellRaining/hlchunk.nvim', {'on': 'EnableHL'}
+
   Plug 'sindrets/diffview.nvim' " File explorer for git diffs
   Plug 'Wansmer/treesj' " SplitJoin replacement
-  Plug 'williamboman/mason-lspconfig.nvim'
-  Plug 'williamboman/mason.nvim'
+  Plug 'williamboman/mason-lspconfig.nvim' "  bridge mason.nvim with the lspconfig plugin
+  Plug 'williamboman/mason.nvim' " install and manage LSP servers, linters and tidiers
   Plug 'zbirenbaum/copilot.lua' " GitHub Copilot
 
   " folding
