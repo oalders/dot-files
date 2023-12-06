@@ -313,7 +313,6 @@ fun HideGutter()
     :set nolist
     :set scl=no " sign column
     :set foldcolumn=0
-    :ToggleNeoColumn
 endfun
 
 fun! ShowGutter()
@@ -321,7 +320,6 @@ fun! ShowGutter()
     :set number
     :set list
     :set scl=auto
-    :ToggleNeoColumn
 endfun
 
 function! Requote()

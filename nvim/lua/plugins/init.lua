@@ -176,17 +176,6 @@ null_ls.setup({
     },
 })
 
-require('NeoColumn').setup(
-    {
-        fg_color = "",
-        bg_color = "",
-        NeoColumn = "78",
-        always_on = true,
-        custom_NeoColumn = {},
-        excluded_ft = { "text", "markdown" },
-    }
-)
-
 local tsj = require('treesj')
 tsj.setup({ max_join_length = 200 })
 
