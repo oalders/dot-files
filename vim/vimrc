@@ -303,10 +303,6 @@ fun ShowLines()
     :set colorcolumn=5,9,13,17,21,25,29,78
 endfun
 
-fun SudoWrite()
-    cmap w!! w !sudo tee % > /dev/null
-endfun
-
 fun HideGutter()
     :GitGutterDisable
     :set nonumber
