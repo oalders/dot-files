@@ -116,7 +116,8 @@ trace_process() {
 }
 
 open_files() {
-    sudo lsof -s | awk '$5 == "REG"' | sort -n -r -k 7,7 | head -n 50
+    i=${1:-50}
+    sudo lsof -s | awk '$5 == "REG"' | sort -n -r -k 7,7 | head -n "$i"
 }
 
 git_recover_file() {
