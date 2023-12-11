@@ -35,8 +35,8 @@ cmp.setup({
                 calc = 'calc',
                 emoji = 'emoji',
                 nvim_lsp = 'LSP',
-                luasnip = 'luasnip',
-                vsnip = 'vsnip',
+                -- luasnip = 'luasnip',
+                -- vsnip = 'vsnip',
                 nvim_lua = 'lua',
                 nvim_lsp_signature_help = 'LSP Signature',
                 Copilot = "",
@@ -82,15 +82,15 @@ cmp.setup({
     view = {
         -- entries = 'native',
     },
-    snippet = {
-        -- REQUIRED - you must specify a snippet engine
-        expand = function(args)
-            -- vim.fn["vsnip#anonymous"](args.body) -- For `vsnip` users.
-            require('luasnip').lsp_expand(args.body) -- For `luasnip` users.
-            -- require('snippy').expand_snippet(args.body) -- For `snippy` users.
-            -- vim.fn["UltiSnips#Anon"](args.body) -- For `ultisnips` users.
-        end,
-    },
+    -- snippet = {
+        -- -- REQUIRED - you must specify a snippet engine
+        -- expand = function(args)
+            -- -- vim.fn["vsnip#anonymous"](args.body) -- For `vsnip` users.
+            -- require('luasnip').lsp_expand(args.body) -- For `luasnip` users.
+            -- -- require('snippy').expand_snippet(args.body) -- For `snippy` users.
+            -- -- vim.fn["UltiSnips#Anon"](args.body) -- For `ultisnips` users.
+        -- end,
+    -- },
     sources = cmp.config.sources({
         { name = 'copilot',  group_index = 2 },
         {
@@ -108,7 +108,7 @@ cmp.setup({
         { name = 'calc',     priority = 4 },
         { name = 'nvim_lua', priority = 9 },
         { name = 'nvim_lsp', priority = 9 },
-        { name = 'luasnip',  priority = 8 },
+        -- { name = 'luasnip',  priority = 8 },
     }),
     window = {
         -- completion = cmp.config.window.bordered(),
