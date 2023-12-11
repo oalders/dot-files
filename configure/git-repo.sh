@@ -2,7 +2,8 @@
 
 set -eu
 
-BRANCH=$(git symbolic-ref --short refs/remotes/origin/HEAD | cut -d'/' -f2)
+# Set branch to $1 if it's defined, otherwise capture the output of a shell command
+branch=${1:-$(git symbolic-ref --short refs/remotes/origin/HEAD | cut -d'/' -f2)}
 
 if [ "$BRANCH" = "" ]; then
     if [ -f ".git/refs/remotes/origin/main" ]; then
