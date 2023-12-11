@@ -104,8 +104,8 @@ cmp.setup({
             }
         },
         { name = 'emoji',    priority = 3 },
-        { name = 'path',     priority = 5 },
         { name = 'calc',     priority = 4 },
+        { name = 'path',     priority = 5 },
         { name = 'nvim_lua', priority = 9 },
         { name = 'nvim_lsp', priority = 9 },
         -- { name = 'luasnip',  priority = 8 },
