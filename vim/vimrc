@@ -412,3 +412,8 @@ nnoremap <Leader>u <Plug>Nuuid
 
 " Prevent a mouse selection from triggering visual mode
 set mouse=v
+
+" Use 2 spaces to indent GFM ToC
+" https://github.com/mzlogin/vim-markdown-toc/issues/74
+let g:vmt_list_indent_text = '  '
+let g:vmt_auto_update_on_save = 1

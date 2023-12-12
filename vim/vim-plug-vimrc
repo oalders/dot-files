@@ -24,7 +24,7 @@ Plug 'kburdett/vim-nuuid' " <leader>u to insert a new UUID
 Plug 'luochen1990/rainbow' " Rainbow Parentheses Improved
 Plug 'mannih/vim-perl-variable-highlighter'" highlight other instances of selected var
 Plug 'motemen/xslate-vim' " https://metacpan.org/pod/Text::Xslate
-Plug 'mzlogin/vim-markdown-toc'
+Plug 'mzlogin/vim-markdown-toc' " :GenTocGFM to generate table of contents
 Plug 'ntpeters/vim-better-whitespace' " highlight trailing whitespace
 Plug 'oalders/prettysql' " ,fs to format visually selected SQL
 Plug 'oalders/vim-perl', { 'branch': 'dev', 'for': 'perl', 'do': 'make clean carp dancer highlight-all-pragmas moose test-more try-tiny' }
