@@ -18,6 +18,8 @@
   * [Plugins](#plugins)
     * [tmux-resurrect](#tmux-resurrect)
 * [vim](#vim)
+  * [LSP](#lsp)
+  * [State](#state)
 * [Alfred](#alfred)
 * [Bash](#bash)
 * [less](#less)
@@ -163,6 +165,22 @@ Remind myself of vim shortcuts etc.
 * `gwip` - reflow a block of text and maintain cursor position
 
 See `akinsho/bufferline.nvim` for buffer config.
+
+### LSP
+
+`:LspLog` displays path to log file at the top
+
+Print results of `vim.lsp.log.get_filename()`:
+
+`:lua print(require('vim.lsp.log').get_filename())`
+
+### State
+
+Print location of state directory:
+
+`:lua print(vim.fn.stdpath 'state')`
+
+`:h stdpath()` for args that can be passed.
 
 ## Alfred
 
