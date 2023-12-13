@@ -37,12 +37,18 @@ maybe_install() {
 }
 
 maybe_install crate-ci/typos
-maybe_install dandavison/delta
 maybe_install houseabsolute/omegasort
 maybe_install houseabsolute/precious
 maybe_install jqlang/jq
 maybe_install junegunn/fzf
 maybe_install oalders/is
+
+if is cli output stdout hostname eq wolfblitzer; then
+    ubi --url https://github.com/dandavison/delta/releases/download/0.16.5/git-delta_0.16.5_amd64.deb --in /tmp/ubi
+    sudo dpkg -i /tmp/ubi/delta
+else
+    maybe_install dandavison/delta
+fi
 
 if is os name eq darwin; then
     if is cli version bat ne 0.24.0 || true; then
