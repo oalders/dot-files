@@ -143,12 +143,6 @@ lspconfig.rust_analyzer.setup({
     }
 })
 
-lspconfig.tsserver.setup {
-    on_attach = require("lsp-format").on_attach,
-    filetypes = { "javascript", "typescript", "typescriptreact" },
-    cmd = { "typescript-language-server", "--stdio" },
-}
-
 lspconfig.pylsp.setup {
     settings = {
         pylsp = {

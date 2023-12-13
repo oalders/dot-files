@@ -187,7 +187,6 @@ require('bufferline').setup {
 }
 require('cmp_nvim_lsp')
 require('glow').setup()
-require("lsp-format").setup {}
 require('nvim-splitrun').setup()
 
 require('conf/mason') -- This needs to happen before lspconfig
