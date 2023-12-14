@@ -16,7 +16,7 @@ Plug 'junegunn/fzf'
 Plug 'junegunn/fzf.vim'
 " Plug 'junegunn/vader.vim' " run Vader tests from inside vim
 
-" automatically clears search highlight when cursor is moved
+" automatically clear search highlight when cursor is moved
 " zz after search places the current match at the center of the window
 Plug 'junegunn/vim-slash'
 
@@ -64,28 +64,30 @@ if has('nvim')
 
   Plug 'sindrets/diffview.nvim' " File explorer for git diffs
   Plug 'Wansmer/treesj' " SplitJoin replacement
-  Plug 'williamboman/mason-lspconfig.nvim' "  bridge mason.nvim with the lspconfig plugin
-  Plug 'williamboman/mason.nvim' " install and manage LSP servers, linters and tidiers
   Plug 'zbirenbaum/copilot.lua' " GitHub Copilot
 
   " folding
   Plug 'kevinhwang91/promise-async'
   Plug 'kevinhwang91/nvim-ufo'
 
-  " nvim-cmp
+  " nvim-cmp -- completion + completion sources
   Plug 'hrsh7th/cmp-buffer'
   Plug 'hrsh7th/cmp-cmdline'
   Plug 'hrsh7th/cmp-nvim-lsp'
   Plug 'hrsh7th/cmp-path'
-  " Plug 'hrsh7th/cmp-vsnip'
   Plug 'hrsh7th/nvim-cmp'
+  Plug 'zbirenbaum/copilot-cmp' " include copilot suggestions in completion
+  " Plug 'hrsh7th/cmp-vsnip'
   " Plug 'hrsh7th/vim-vsnip'
   " Plug 'L3MON4D3/LuaSnip', {'tag': 'v2.*', 'do': 'make install_jsregexp'}
-  Plug 'lvimuser/lsp-inlayhints.nvim'
+  " Plug 'saadparwaiz1/cmp_luasnip'
+
+  " LSP
+  Plug 'lvimuser/lsp-inlayhints.nvim' " Partial implementation of LSP inlay hints
   Plug 'neovim/nvim-lspconfig'
   Plug 'onsails/lspkind.nvim' " add pictograms to completion sources
-  " Plug 'saadparwaiz1/cmp_luasnip'
-  Plug 'zbirenbaum/copilot-cmp' " include copilot suggestions in completion
+  Plug 'williamboman/mason-lspconfig.nvim' "  bridge mason.nvim with the lspconfig plugin
+  Plug 'williamboman/mason.nvim' " install and manage LSP servers, linters and tidiers
 
   " noice
   Plug 'folke/noice.nvim'
@@ -100,7 +102,7 @@ else
   Plug 'roxma/vim-hug-neovim-rpc'
 endif
 
-Plug 'tpope/vim-sensible'
+Plug 'tpope/vim-sensible' " Defaults everyone can agree on
 
 if filereadable(expand('~/local-dot-files/local_vim_plug_vimrc'))
     source ~/local-dot-files/local_vim_plug_vimrc
