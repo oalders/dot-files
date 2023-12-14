@@ -40,9 +40,9 @@ Plug 'tpope/vim-abolish'
 Plug 'tpope/vim-eunuch'
 
 Plug 'tpope/vim-fugitive'
-Plug 'vim-ruby/vim-ruby'
+Plug 'vim-ruby/vim-ruby' " Vim/Ruby configuration files
 Plug 'yazgoo/yank-history' " <leader>h to paste from history
-Plug 'yko/mojo.vim'
+Plug 'yko/mojo.vim' " syntax highlighting for mojo epl templates
 
 if has('nvim')
   Plug 'ahmedkhalf/project.nvim' " auto-detect project root dir
