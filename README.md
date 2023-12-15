@@ -201,7 +201,8 @@ viewing outpt.
 
 * `-S` toggle horizontal scrolling
 * `-N` toggle line numbers
-* `10 + arrow key` will now advance horizontal scroll by 10 characters when arrow keys are pressed
+* `10 + arrow key` will now advance horizontal scroll by 10 characters when
+  arrow keys are pressed
 
 ## gh -- GitHub CLI
 
