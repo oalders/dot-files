@@ -23,6 +23,7 @@ lspconfig.lua_ls.setup {
         },
     },
 }
+lspconfig.tsserver.setup {}
 lspconfig.yamlls.setup {}
 
 -- Set up lspconfig.
