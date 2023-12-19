@@ -31,12 +31,12 @@ set -o vi
 alias bytes_human='perl -MNumber::Bytes::Human -e "print Number::Bytes::Human::format_bytes shift"'
 alias c="clear && tmux clear-history && perl -E 'say (qq{\n}x65,q{-}x78); system('date');print qq{-}x78, qq{\n}'"
 alias cdr='cd $(git root)'
-alias delete-merged-branches='show-merged-branches | xargs -n 1 git branch -d'
+alias delete-merged-branches='show-merged-branches | safe-xargs -n 1 git branch -d'
 alias dangling-dockers='docker rmi -f $(docker images -f "dangling=true" -q)'
 alias dr='NO_JIGSAW=1 HARNESS_OPTIONS="j8:c" dzil release'
 alias dzil-prove='dzil run --nobuild prove -lv'
 alias dzil-prove-xs='dzil run prove -lv'
-alias dzil-stale='dzil stale --all | xargs cpm install --global'
+alias dzil-stale='dzil stale --all | safe-xargs cpm install --global'
 alias fix-gpg='pkill -9 gpg-agent && export GPG_TTY=$(tty)'
 alias g=git
 alias gi=git  # fix typos
@@ -53,11 +53,17 @@ alias pine=alpine
 alias s='source ~/.bash_profile && source ~/dot-files/fzf_functions.sh'
 # http://stackoverflow.com/questions/13064613/how-to-prune-local-tracking-branches-that-do-not-exist-on-remote-anymore
 alias show-merged-branches='git branch --no-color --merged | grep -v "\*" | grep -v master | grep -v main | grep -v -e "^+" | grep -v -e "^*"'
-alias ssh-fingerprints='ls ~/.ssh/*.pub | xargs -L 1 ssh-keygen -l -f'
+alias ssh-fingerprints='ls ~/.ssh/*.pub | safe-xargs -L 1 ssh-keygen -l -f'
 # https://stackoverflow.com/a/19280187/406224
 alias takeover="tmux detach -a"
 alias wat='ps --sort=-pcpu -aux|head -10'
 alias xpasswd='perl -MCrypt::XkcdPassword -E "say Crypt::XkcdPassword->make_password"'
+
+if is os name eq 'linux'; then
+    alias safe-xargs='xargs --no-run-if-empty'
+else
+    alias safe-xargs='xargs'
+fi
 
 if is there nvim; then
     alias vi=nvim
