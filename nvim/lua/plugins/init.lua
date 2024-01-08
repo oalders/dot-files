@@ -92,10 +92,12 @@ cmp.setup({
         -- end,
     -- },
     sources = cmp.config.sources({
-        { name = 'copilot',  group_index = 2 },
+        { name = 'copilot',  group_index = 1 },
+        { name = 'nvim_lsp', priority = 2 },
+        { name = 'path',     priority = 3 },
         {
             name = 'buffer',
-            priority = 10,
+            priority = 4,
             keyword_length = 4,
             option = {
                 get_bufnrs = function()
@@ -103,11 +105,9 @@ cmp.setup({
                 end
             }
         },
-        { name = 'emoji',    priority = 3 },
-        { name = 'calc',     priority = 4 },
-        { name = 'path',     priority = 5 },
-        { name = 'nvim_lua', priority = 9 },
-        { name = 'nvim_lsp', priority = 9 },
+        -- { name = 'emoji',    priority = 3 },
+        -- { name = 'calc',     priority = 5 },
+        { name = 'nvim_lua', priority = 5 },
         -- { name = 'luasnip',  priority = 8 },
     }),
     window = {
