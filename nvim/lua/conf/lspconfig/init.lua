@@ -90,10 +90,10 @@ lspconfig.gopls.setup({
             },
             staticcheck = true,
             gofumpt = true,
+            -- root_dir = root_pattern("go.mod", ".git"),
         },
     },
 })
-lspconfig.golangci_lint_ls.setup {}
 
 -- After setting up mason-lspconfig you may set up servers via lspconfig
 -- See server/src/server.ts in PerlNavigator for a list of available settings

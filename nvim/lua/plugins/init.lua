@@ -194,5 +194,6 @@ require('conf/lspconfig')
 
 require('conf/lualine')
 require('conf/noice')
+require('conf/nvim-lint')
 require('conf/ufo')
 require('conf/which-key')

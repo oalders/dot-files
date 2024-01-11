@@ -52,6 +52,7 @@ if has('nvim')
   Plug 'folke/which-key.nvim' " better organization of key mappings
   Plug 'Hubro/nvim-splitrun' " :Splitrun some command
   Plug 'kyazdani42/nvim-web-devicons' " Recommended (for coloured icons for bufferline.nvim)
+  Plug 'mfussenegger/nvim-lint' " Linter harness
   Plug 'nvim-lualine/lualine.nvim' " status line
   Plug 'nvim-lua/plenary.nvim' " required by other plugins
   Plug 'nvimtools/none-ls.nvim' " null-ls replacement
