@@ -85,6 +85,8 @@ wk.register({
         h = { "<cmd>DisableHL<cr>", "Disable HL" }
     },
     t = {
+        c = { function() require('trouble').close() end,
+            'Close Trouble' },
         d = { function() require('trouble').open('document_diagnostics') end,
             'Trouble document diagnostics' },
         w = { function() require('trouble').open('workspace_diagnostics') end,
