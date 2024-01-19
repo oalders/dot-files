@@ -2,6 +2,8 @@
 
 set -u -o pipefail
 
+git worktree prune
+
 if [[ $# -eq "0" || $# -gt "2" ]]; then
     echo "Usage: remove-worktree [-f] branch-name"
     exit
