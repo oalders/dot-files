@@ -36,7 +36,7 @@ require('lualine').setup {
             {
                 'filename',
                 symbols = {
-                    modified = '💾',
+                    modified = '😅😅😅😅😅😅 💾',
                     readonly = '🔒',
                 },
                 path = path_option(),
