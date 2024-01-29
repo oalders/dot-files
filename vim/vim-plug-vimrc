@@ -65,6 +65,7 @@ if has('nvim')
 
   Plug 'sindrets/diffview.nvim' " File explorer for git diffs
   Plug 'Wansmer/treesj' " SplitJoin replacement
+  Plug 'windwp/nvim-autopairs'
   Plug 'zbirenbaum/copilot.lua' " GitHub Copilot
 
   " folding

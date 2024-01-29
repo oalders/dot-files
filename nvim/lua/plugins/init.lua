@@ -18,7 +18,10 @@ vim.opt.termguicolors = true
 vim.opt.mouse = "v"
 
 -- require('virt-column').setup()
+require("nvim-autopairs").setup {}
 
+-- If you want insert `(` after select function or method item
+local cmp_autopairs = require('nvim-autopairs.completion.cmp')
 local cmp = require 'cmp'
 
 ---@diagnostic disable-next-line:redundant-parameter
@@ -142,6 +145,11 @@ cmp.setup.cmdline(':', {
         { name = 'path' },
     },
 })
+
+cmp.event:on(
+  'confirm_done',
+  cmp_autopairs.on_confirm_done()
+)
 
 cmp.event:on('menu_opened', function()
     vim.b.copilot_suggestion_hidden = true
