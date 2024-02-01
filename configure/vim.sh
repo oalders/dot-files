@@ -68,6 +68,7 @@ if ! is there godef || is cli age godef gt 18 hours; then
         nvim +'PlugInstall --sync' +qa || true
         nvim +'PlugUpdate --sync' +qa || true
         nvim +'MasonUpdate --sync' +qa || true
+        nvim +'MasonInstall selene' +qa || true
         nvim +'TSUpdateSync' +qa || true
     fi
 fi
