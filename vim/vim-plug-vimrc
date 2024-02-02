@@ -87,6 +87,8 @@ if has('nvim')
   " LSP
   Plug 'lvimuser/lsp-inlayhints.nvim' " Partial implementation of LSP inlay hints
   Plug 'neovim/nvim-lspconfig'
+  Plug 'nvim-neotest/neotest'
+  Plug 'nvim-neotest/neotest-go'
   Plug 'onsails/lspkind.nvim' " add pictograms to completion sources
   Plug 'williamboman/mason-lspconfig.nvim' "  bridge mason.nvim with the lspconfig plugin
   Plug 'williamboman/mason.nvim' " install and manage LSP servers, linters and tidiers

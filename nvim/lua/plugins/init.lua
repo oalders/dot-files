@@ -201,6 +201,7 @@ require('conf/mason') -- This needs to happen before lspconfig
 require('conf/lspconfig')
 
 require('conf/lualine')
+require('conf/neotest')
 require('conf/noice')
 require('conf/nvim-lint')
 require('conf/ufo')
