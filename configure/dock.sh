@@ -1,30 +1,39 @@
 #!/usr/bin/env bash
 
 set -eu -o pipefail
+if is os name ne darwin; then
+    exit 0
+fi
 
 # shellcheck source=bash_functions.sh
 source ~/dot-files/bash_functions.sh
 
-if is os name eq darwin; then
-    # Requires brew "dockutil" to have been run
+# Requires brew "dockutil" to have been run
 
-    dockutil --remove 'App Store'
-    dockutil --remove 'Contacts'
-    dockutil --remove 'Downloads'
-    dockutil --remove 'FaceTime'
-    dockutil --remove 'Finder'
-    dockutil --remove 'iTunes'
-    dockutil --remove 'Launchpad'
-    dockutil --remove 'Maps'
-    dockutil --remove 'News'
-    dockutil --remove 'Notes'
-    dockutil --remove 'Podcasts'
-    dockutil --remove 'Safari'
-    dockutil --remove 'Siri'
-    dockutil --remove 'System Preferences'
-    dockutil --remove 'Trash'
-    dockutil --remove 'TV'
+# apps is a list containing all of the arguments in the dockutil calls below
+apps=(
+    'App Store'
+    'Contacts'
+    'Downloads'
+    'FaceTime'
+    'Finder'
+    'iTunes'
+    'Launchpad'
+    'Maps'
+    'News'
+    'Notes'
+    'Podcasts'
+    'Siri'
+    'Safari'
+    'System Preferences'
+    'Trash'
+    'TV'
+)
 
-fi
+# iterate over the apps list and remove each app from the dock
+
+for app in "${apps[@]}"; do
+    (dockutil --find "$app" && dockutil --remove "$app") || true
+done
 
 exit 0
