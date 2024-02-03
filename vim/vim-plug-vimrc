@@ -47,6 +47,7 @@ Plug 'yko/mojo.vim' " syntax highlighting for mojo epl templates
 if has('nvim')
   Plug 'ahmedkhalf/project.nvim' " auto-detect project root dir
   Plug 'akinsho/bufferline.nvim' " display tabs for open buffers
+  Plug 'darfink/vim-plist' " read macOS .plist files
   Plug 'ellisonleao/glow.nvim' " render markdown via :Glow
   Plug 'folke/trouble.nvim' " <leader>td (document) <leader>tw (workspace)
   Plug 'folke/which-key.nvim' " better organization of key mappings
