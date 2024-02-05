@@ -30,7 +30,7 @@
     "markdownlint-cli": "^0.39.0",
     "normalize-url": "^8.0.0",
     "npm": "^10.4.0",
-    "prettier": "^3.2.4",
+    "prettier": "^3.2.5",
     "typescript": "^5.3.3",
     "underscore": "^1.13.6",
     "urijs": ">=1.19.11",
