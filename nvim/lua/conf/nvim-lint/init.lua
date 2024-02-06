@@ -12,7 +12,9 @@ l.linters_by_ft = {
     lua = { 'selene' },
     markdown = { 'markdownlint' },
     perl = { 'perlimports' },
+    sh = { 'shellcheck' },
     sql = { 'sqlfluff' },
+    typescript = { 'eslint'},
     vim = { 'vint' },
     yaml = { 'yamllint' },
 }
