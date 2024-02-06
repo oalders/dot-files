@@ -181,7 +181,7 @@ null_ls.setup({
         null_ls.builtins.formatting.gofumpt,
         null_ls.builtins.formatting.perlimports,
         null_ls.builtins.formatting.shfmt,
-    },
+        null_ls.builtins.formatting.trim_whitespace},
 })
 
 local tsj = require('treesj')
