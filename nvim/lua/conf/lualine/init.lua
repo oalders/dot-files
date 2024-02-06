@@ -10,6 +10,25 @@ local function path_option()
     end
 end
 
+-- LSP clients attached to buffer
+local clients_lsp = function()
+    local clients = vim.lsp.get_clients()
+    if next(clients) == nil then
+        return ''
+    end
+
+    local c = {}
+    for _, client in pairs(clients) do
+        local name = client.name
+        if name == 'copilot' then
+            name = '🤠'
+        end
+        table.insert(c, name)
+    end
+    table.sort(c);
+    return '[' .. table.concat(c, ',') .. ']'
+end
+
 require('lualine').setup {
     options = {
         icons_enabled = true,
@@ -41,9 +60,8 @@ require('lualine').setup {
                 },
                 path = path_option(),
             } },
-        lualine_x = { 'encoding', 'fileformat', 'filetype' },
+        lualine_x = { clients_lsp, 'encoding', 'fileformat', 'filetype' },
         lualine_y = { 'searchcount' },
-        -- lualine_y = { copilot_status },
         lualine_z = { 'location', 'progress' },
     },
     inactive_sections = {
@@ -57,5 +75,5 @@ require('lualine').setup {
     tabline = {},
     winbar = {},
     inactive_winbar = {},
-    extensions = {'mason','trouble'}
+    extensions = { 'mason', 'trouble' }
 }
