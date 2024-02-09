@@ -159,8 +159,6 @@ cmp.event:on('menu_closed', function()
     vim.b.copilot_suggestion_hidden = false
 end)
 
-wildchar = "<tab>"
-
 require('other-nvim').setup {
     mappings = { 'golang' }
 }
