@@ -13,59 +13,6 @@ set background=dark
 
 colorscheme iceberg
 
-let g:lightline = {
-      \ 'active': {
-      \   'left': [ [ 'mode', 'paste' ], [ 'readonly', 'relativepath', 'modified' ] ]
-      \ },
-      \ 'colorscheme': 'nord',
-      \ 'component_function': {
-      \   'filename': 'LightlineFilename',
-      \   'modified': 'LightlineModified',
-      \ }
-      \ }
-
-function! LightlineModified()
-    return &modifiable && &modified ? '💾' : ''
-endfunction
-
-" display relative file path rather than just name
-" See https://github.com/itchyny/lightline.vim/issues/87#issuecomment-119130738
-function! LightlineFilename()
-    return expand('%')
-endfunction
-
-let g:lightline#ale#indicator_checking = '👕'
-let g:lightline#ale#indicator_errors = '🚨'
-let g:lightline#ale#indicator_infos = 'ℹ️'
-let g:lightline#ale#indicator_ok = '🆗'
-let g:lightline#ale#indicator_warnings = '🚫'
-
-let g:lightline.component_expand = {
-      \  'linter_checking': 'lightline#ale#checking',
-      \  'linter_errors': 'lightline#ale#errors',
-      \  'linter_infos': 'lightline#ale#infos',
-      \  'linter_ok': 'lightline#ale#ok',
-      \  'linter_warnings': 'lightline#ale#warnings',
-      \ }
-
-let g:lightline.component_type = {
-      \     'linter_checking': 'right',
-      \     'linter_infos': 'right',
-      \     'linter_warnings': 'warning',
-      \     'linter_errors': 'error',
-      \     'linter_ok': 'right',
-      \ }
-
-let g:lightline.active = {
-      \   'right': [
-      \     [ 'linter_checking', 'linter_errors', 'linter_warnings', 'linter_infos', 'linter_ok' ],
-      \     [ 'lineinfo' ],
-      \     [ 'percent' ],
-      \     [ 'fileformat', 'fileencoding', 'filetype']
-      \   ]
-      \ }
-
-
 " Ensure bg color for OceanicNext doesn't get clobbered
 " https://stackoverflow.com/a/41587510/406224
 highlight clear LineNr
@@ -186,63 +133,6 @@ function! OT(fname)
     endif
     call histadd(':', printf('call OT("%s")', escape(a:fname, '"\')))
 endfunction
-
-" ########### Ale ###########
-
-" statusline error display doesn't seem to work
-let g:ale_set_quickfix = 1
-let g:ale_open_list = 1
-
-nmap <silent> <C-k> <Plug>(ale_previous_wrap)
-nmap <silent> <C-j> <Plug>(ale_next_wrap)
-
-" gometalinter currently not enabled
-let g:ale_linters = {
-\   'ansible' : ['ansible-lint'],
-\   'go': [],
-\   'dockerfile': ['hadolint'],
-\   'html': ['alex', 'fecs', 'htmlhint', 'stylelint', 'tidy',],
-\   'json': ['jq',],
-\   'perl': [],
-\   'markdown': ['markdownlint'],
-\   'rust': ['cargo', 'rls'],
-\   'sh': [],
-\   'typescript': ['prettier'],
-\   'vim': ['vint'],
-\   'yaml': [],
-\}
-
-let g:ale_fixers = {
-\   '*': ['remove_trailing_lines', 'trim_whitespace'],
-\   'css': ['prettier'],
-\   'go': [],
-\   'html': ['remove_trailing_lines', 'trim_whitespace', 'prettier'],
-\   'java': ['remove_trailing_lines', 'trim_whitespace', 'google_java_format'],
-\   'javascript': ['eslint','prettier_eslint', 'remove_trailing_lines'],
-\   'json': ['fixjson', 'prettier'],
-\   'lua': ['luafmt', 'remove_trailing_lines', 'trim_whitespace'],
-\   'markdown': ['prettier'],
-\   'perl': [],
-\   'ruby': ['rubocop'],
-\   'rust': ['remove_trailing_lines', 'rustfmt', 'trim_whitespace'],
-\   'sh': [],
-\   'typescript': ['prettier'],
-\   'toml': ['prettier'],
-\   'yaml': [],
-\}
-
-let g:ale_type_map = {
-\    'perlcritic': {'ES': 'WS', 'E': 'W'},
-\}
-
-let g:ale_hover_to_floating_preview = 1
-let g:ale_floating_preview = 1
-let g:ale_floating_window_border = ['│', '─', '╭', '╮', '╯', '╰']
-
-"let g:ale_sign_warning = emoji#for('poop')
-"let g:ale_sign_error = emoji#for('bomb')
-"highlight clear ALEErrorSign
-"highlight clear ALEWarningSign
 
 " define a group `vimrc` and initialize.
 augroup vimrc

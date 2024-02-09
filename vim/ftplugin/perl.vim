@@ -5,23 +5,6 @@ set showmatch " matching brackets
 vnoremap <silent> = :!perltidy -q<CR>
 nnoremap <Leader>p <Esc>:!prove -It/lib -lv %<CR>
 
-let g:ale_perl_syntax_check_executable = 'perl'
-
-" https://github.com/skaji/syntax-check-perl#integrate-with-vim-plug-and-ale
-let g:ale_perl_syntax_check_config = expand('~/dot-files/syntax-check-perl/config.pl')
-
-" show Perl::Critic rules which have been violated
-let g:ale_perl_perlcritic_showrules = 1
-
-" If the perlcriticrc file does not have a leading dot, perlcritic will not
-" find it. Otherwise, don't set a specific perlcritic policy file. Allow
-" perlcritic to search in the current directory and then the home directory.
-if filereadable(expand('perlcriticrc'))
-    let g:ale_perl_perlcritic_profile = 'perlcriticrc'
-else
-    let g:ale_perl_perlcritic_profile = ''
-endif
-
 " https://stackoverflow.com/questions/2345519/how-can-i-script-vim-to-run-perltidy-on-a-buffer
 
 "define :Tidy command to run perltidy on visual selection || entire buffer"

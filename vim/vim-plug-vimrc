@@ -7,8 +7,6 @@ Plug 'cocopon/iceberg.vim'
 Plug 'airblade/vim-gitgutter' " show git diff markers in the sign column
 Plug 'ap/vim-css-color' " show css colors inline
 Plug 'bkad/CamelCaseMotion' " provide CamelCase motion through words
-Plug 'dense-analysis/ale' " , { 'tag': 'v3.3.0' }
-" Plug 'oalders/ale', { 'branch': 'perlimports' }
 Plug 'gregsexton/MatchTag' " highlight matchihng HTML tags
 Plug 'haya14busa/vim-auto-mkdir' " create directory path on save
 Plug 'itchyny/vim-cursorword' " underline the word under the cursor
@@ -101,8 +99,6 @@ if has('nvim')
 
 else
   Plug 'ConradIrwin/vim-bracketed-paste'
-  Plug 'itchyny/lightline.vim'
-  Plug 'maximbaz/lightline-ale'
   Plug 'roxma/nvim-yarp'
   Plug 'roxma/vim-hug-neovim-rpc'
 endif
