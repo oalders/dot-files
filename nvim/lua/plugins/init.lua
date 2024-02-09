@@ -207,5 +207,8 @@ require('conf/lualine')
 require('conf/neotest')
 require('conf/noice')
 require('conf/nvim-lint')
+require('conf/telescope')
 require('conf/ufo')
 require('conf/which-key')
+
+require('persisted').setup {}

@@ -54,8 +54,10 @@ if has('nvim')
   Plug 'mfussenegger/nvim-lint' " Linter harness
   Plug 'nvim-lualine/lualine.nvim' " status line
   Plug 'nvim-lua/plenary.nvim' " required by other plugins
-  Plug 'nvimtools/none-ls.nvim' " null-ls replacement
+  Plug 'nvim-telescope/telescope.nvim', { 'tag': '0.1.5' } " fuzzy finder
   Plug 'nvim-treesitter/nvim-treesitter', { 'do': ':TSUpdate'}  " We recommend updating the parsers on update
+  Plug 'nvimtools/none-ls.nvim' " null-ls replacement
+  Plug 'olimorris/persisted.nvim' " session management
   Plug 'rgroli/other.nvim' " :Other to toggle between test and implementation files
 
   " display lines for indentation
