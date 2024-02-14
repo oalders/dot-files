@@ -26,6 +26,11 @@
 * [gh -- GitHub CLI](#gh----github-cli)
 * [Testing with Docker](#testing-with-docker)
 * [Docker bashrc](#docker-bashrc)
+* [Hammerspoon](#hammerspoon)
+  * [Seal](#seal)
+    * [cpan-repo](#cpan-repo)
+    * [Slackify Name](#slackify-name)
+    * [xpasswd](#xpasswd)
 
 <!-- vim-markdown-toc -->
 
@@ -232,3 +237,21 @@ docker run --rm -it -p 5000:5000                  \
 --volume $PWD:/sandbox                            \
 python:latest bashrc
 ```
+
+## Hammerspoon
+
+### Seal
+
+Launch Seal via `hyper` + `space`
+
+#### cpan-repo
+
+`hyper` + `space` + `cr OrePAN2`
+
+#### Slackify Name
+
+Select name. Then: `hyper` + `space` + `sl`
+
+#### xpasswd
+
+Enter insert mode. Then `hyper` + `space` + `xp`
