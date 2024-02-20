@@ -5,7 +5,7 @@
 cd /tmp || exit 1
 set -eu -o pipefail
 
-version=1.21.3
+version=1.22.0
 
 if is there go && is cli version go gte $version; then
     echo "version $version satisfied"
