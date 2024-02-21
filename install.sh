@@ -47,7 +47,6 @@ run_general_installers() {
         ./installer/wezterm.sh
         ./configure/git.sh
         ./configure/ssh.sh
-        ./installer/pip.sh
         ./installer/nvim.sh
         ./configure/vim.sh
         ./configure/tmux.sh
