@@ -77,4 +77,13 @@ ln -sf $prefix/bin/add-worktree "$HOME/local/bin/add-worktree"
 ln -sf $prefix/bin/remove-worktree "$HOME/local/bin/remove-worktree"
 ln -sf $prefix/bin/tm "$HOME/local/bin/tm"
 
+user_dir="$HOME/Library/Application Support/Code/User"
+if is os name eq darwin && [ -d "$user_dir" ]; then
+    settings="$user_dir/settings.json"
+    if [ ! -L "$settings" ]; then
+        rm -f "$settings"
+        ln -sf $prefix/vscode/user/settings.json "$settings"
+    fi
+fi
+
 exit 0

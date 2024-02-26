@@ -1,0 +1,16 @@
+{
+    "github.copilot.advanced": {
+        
+    },
+    "github.copilot.enable": {
+        "*": false,
+        "plaintext": false,
+        "markdown": false,
+        "scminput": false,
+        "perl": "true",
+        "go": "true",
+        "foo": "true",
+        "bash": "true"
+    },
+    "terminal.integrated.fontFamily": "JetBrainsMono Nerd Font"
+}
