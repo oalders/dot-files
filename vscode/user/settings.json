@@ -1,7 +1,5 @@
 {
-    "github.copilot.advanced": {
-        
-    },
+    "github.copilot.advanced": {},
     "github.copilot.enable": {
         "*": false,
         "plaintext": false,
@@ -12,5 +10,6 @@
         "foo": "true",
         "bash": "true"
     },
-    "terminal.integrated.fontFamily": "JetBrainsMono Nerd Font"
+    "terminal.integrated.fontFamily": "JetBrainsMono Nerd Font",
+    "go.toolsManagement.autoUpdate": true
 }
