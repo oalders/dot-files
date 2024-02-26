@@ -181,7 +181,6 @@ null_ls.setup({
         null_ls.builtins.formatting.perlimports,
         null_ls.builtins.formatting.prettier,
         null_ls.builtins.formatting.shfmt,
-        null_ls.builtins.formatting.trim_whitespace,
     },
 })
 
