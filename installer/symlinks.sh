@@ -7,15 +7,21 @@ source bash_functions.sh
 
 prefix=~/dot-files
 
-mkdir -p ~/.config/bat
-mkdir -p ~/.config/oh-my-posh/themes
-mkdir -p ~/.config/perlimports
-mkdir -p ~/.config/wezterm
-mkdir -p ~/.config/yamllint
-mkdir -p ~/.cpanreporter
-mkdir -p ~/local/bin
-mkdir -p ~/.npm-packages
-mkdir -p ~/.re.pl
+directories=(
+    ~/.config/bat
+    ~/.config/oh-my-posh/themes
+    ~/.config/perlimports
+    ~/.config/wezterm
+    ~/.config/yamllint
+    ~/.cpanreporter
+    ~/local/bin
+    ~/.npm-packages
+    ~/.re.pl
+)
+
+for dir in "${directories[@]}"; do
+    mkdir -p "$dir"
+done
 
 if is os name eq darwin; then
     mkdir -p "$HOME/.config/karabiner"
