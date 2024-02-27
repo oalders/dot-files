@@ -40,25 +40,35 @@ fi
 ln -sf $LINK_FLAG $prefix/dzil ~/.dzil
 ln -sf $LINK_FLAG $prefix/sqitch ~/.sqitch
 
-ln -sf $prefix/ackrc ~/.ackrc
-ln -sf $prefix/bash_profile ~/.bash_profile
-ln -sf $prefix/bashrc ~/.bashrc
-ln -sf $prefix/dataprinter ~/.dataprinter
-ln -sf $prefix/digrc ~/.digrc
-ln -sf $prefix/editorconfig ~/.editorconfig
-ln -sf $prefix/gitignore_global ~/.gitignore_global
-ln -sf $prefix/golangci.yml ~/.golangci.yml
-ln -sf $prefix/inputrc ~/.inputrc
-ln -sf $prefix/minicpanrc ~/.minicpanrc
-ln -sf $prefix/perlcriticrc ~/.perlcriticrc
-ln -sf $prefix/perltidyrc ~/.perltidyrc
-ln -sf $prefix/prettierrc.yaml ~/.prettierrc.yaml
-ln -sf $prefix/profile ~/.profile
-ln -sf $prefix/proverc ~/.proverc
-ln -sf $prefix/psqlrc ~/.psqlrc
-ln -sf $prefix/shellcheckrc ~/.shellcheckrc
-ln -sf $prefix/sqliterc ~/.sqliterc
-ln -sf $prefix/tigrc ~/.tigrc
+files=(
+    "ackrc"
+    "bash_profile"
+    "bashrc"
+    "dataprinter"
+    "digrc"
+    "editorconfig"
+    "gitignore_global"
+    "golangci.yml"
+    "inputrc"
+    "minicpanrc"
+    "perlcriticrc"
+    "perltidyrc"
+    "prettierrc.yaml"
+    "profile"
+    "proverc"
+    "psqlrc"
+    "shellcheckrc"
+    "sqliterc"
+    "tigrc"
+)
+
+if [ "$IS_MM" = false ]; then
+    files+=("npmrc")
+fi
+
+for file in "${files[@]}"; do
+    ln -sf "$prefix/$file" ~/.$file
+done
 
 ln -sf $prefix/bat/config ~/.config/bat/config
 ln -sf $prefix/cpanreporter/config.ini ~/.cpanreporter/config.ini
@@ -77,9 +87,6 @@ if is os name eq darwin; then
     ln -sf "$LINK_FLAG" $prefix/hammerspoon ~/.hammerspoon
 fi
 
-if [ "$IS_MM" = false ]; then
-    ln -sf $prefix/npmrc ~/.npmrc
-fi
 
 ln -sf $prefix/bin/add-worktree "$HOME/local/bin/add-worktree"
 ln -sf $prefix/bin/remove-worktree "$HOME/local/bin/remove-worktree"
