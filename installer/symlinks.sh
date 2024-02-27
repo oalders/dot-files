@@ -19,13 +19,13 @@ directories=(
     ~/.re.pl
 )
 
+if is os name eq darwin; then
+    directories+=("$HOME/.config/karabiner")
+fi
+
 for dir in "${directories[@]}"; do
     mkdir -p "$dir"
 done
-
-if is os name eq darwin; then
-    mkdir -p "$HOME/.config/karabiner"
-fi
 
 nvim_conf_dir="$HOME/.config/nvim"
 # Simplify after deployed to all environments
