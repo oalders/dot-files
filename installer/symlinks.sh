@@ -7,21 +7,15 @@ source bash_functions.sh
 
 prefix=~/dot-files
 
-directories=(
-    ~/.config/bat
-    ~/.config/oh-my-posh/themes
-    ~/.config/perlimports
-    ~/.config/wezterm
-    ~/.config/yamllint
-    ~/.cpanreporter
-    ~/local/bin
-    ~/.npm-packages
-    ~/.re.pl
-)
-
-for dir in "${directories[@]}"; do
-    mkdir -p "$dir"
-done
+mkdir -p ~/.config/bat
+mkdir -p ~/.config/oh-my-posh/themes
+mkdir -p ~/.config/perlimports
+mkdir -p ~/.config/wezterm
+mkdir -p ~/.config/yamllint
+mkdir -p ~/.cpanreporter
+mkdir -p ~/local/bin
+mkdir -p ~/.npm-packages
+mkdir -p ~/.re.pl
 
 if is os name eq darwin; then
     mkdir -p "$HOME/.config/karabiner"
@@ -39,42 +33,35 @@ fi
 
 ln -sf $LINK_FLAG $prefix/dzil ~/.dzil
 ln -sf $LINK_FLAG $prefix/sqitch ~/.sqitch
-
-declare -A files=(
-    ["ackrc"]=".ackrc"
-    ["bash_profile"]=".bash_profile"
-    ["bashrc"]=".bashrc"
-    ["bat/config"]=".config/bat/config"
-    ["cpanreporter/config.ini"]=".cpanreporter/config.ini"
-    ["dataprinter"]=".dataprinter"
-    ["digrc"]=".digrc"
-    ["editorconfig"]=".editorconfig"
-    ["gitignore_global"]=".gitignore_global"
-    ["golangci.yml"]=".golangci.yml"
-    ["inputrc"]=".inputrc"
-    ["minicpanrc"]=".minicpanrc"
-    ["oh-my-posh/themes/local.omp.json"]=".config/oh-my-posh/themes/local.omp.json"
-    ["oh-my-posh/themes/local-tiny.omp.json"]=".config/oh-my-posh/themes/local-tiny.omp.json"
-    ["oh-my-posh/themes/remote.omp.json"]=".config/oh-my-posh/themes/remote.omp.json"
-    ["oh-my-posh/themes/remote-tiny.omp.json"]=".config/oh-my-posh/themes/remote-tiny.omp.json"
-    ["perlcriticrc"]=".perlcriticrc"
-    ["perlimports/perlimports.toml"]=".config/perlimports/perlimports.toml"
-    ["perltidyrc"]=".perltidyrc"
-    ["prettierrc.yaml"]=".prettierrc.yaml"
-    ["profile"]=".profile"
-    ["proverc"]=".proverc"
-    ["psqlrc"]=".psqlrc"
-    ["re.pl/repl.rc"]=".re.pl/repl.rc"
-    ["shellcheckrc"]=".shellcheckrc"
-    ["sqliterc"]=".sqliterc"
-    ["tigrc"]=".tigrc"
-    ["wezterm/wezterm.lua"]=".config/wezterm/wezterm.lua"
-    ["yamllint.yml"]=".config/yamllint/config"
-)
-
-for file in "${!files[@]}"; do
-    ln -sf "$prefix/$file" ~/${files[$file]}
-done
+ln -sf $prefix/ackrc ~/.ackrc
+ln -sf $prefix/bash_profile ~/.bash_profile
+ln -sf $prefix/bashrc ~/.bashrc
+ln -sf $prefix/bat/config ~/.config/bat/config
+ln -sf $prefix/cpanreporter/config.ini ~/.cpanreporter/config.ini
+ln -sf $prefix/dataprinter ~/.dataprinter
+ln -sf $prefix/digrc ~/.digrc
+ln -sf $prefix/editorconfig ~/.editorconfig
+ln -sf $prefix/gitignore_global ~/.gitignore_global
+ln -sf $prefix/golangci.yml ~/.golangci.yml
+ln -sf $prefix/inputrc ~/.inputrc
+ln -sf $prefix/minicpanrc ~/.minicpanrc
+ln -sf $prefix/oh-my-posh/themes/local.omp.json ~/.config/oh-my-posh/themes/local.omp.json
+ln -sf $prefix/oh-my-posh/themes/local-tiny.omp.json ~/.config/oh-my-posh/themes/local-tiny.omp.json
+ln -sf $prefix/oh-my-posh/themes/remote.omp.json ~/.config/oh-my-posh/themes/remote.omp.json
+ln -sf $prefix/oh-my-posh/themes/remote-tiny.omp.json ~/.config/oh-my-posh/themes/remote-tiny.omp.json
+ln -sf $prefix/perlcriticrc ~/.perlcriticrc
+ln -sf $prefix/perlimports/perlimports.toml ~/.config/perlimports/perlimports.toml
+ln -sf $prefix/perltidyrc ~/.perltidyrc
+ln -sf $prefix/prettierrc.yaml ~/.prettierrc.yaml
+ln -sf $prefix/profile ~/.profile
+ln -sf $prefix/proverc ~/.proverc
+ln -sf $prefix/psqlrc ~/.psqlrc
+ln -sf $prefix/re.pl/repl.rc ~/.re.pl/repl.rc
+ln -sf $prefix/shellcheckrc ~/.shellcheckrc
+ln -sf $prefix/sqliterc ~/.sqliterc
+ln -sf $prefix/tigrc ~/.tigrc
+ln -sf $prefix/wezterm/wezterm.lua ~/.config/wezterm/wezterm.lua
+ln -sf $prefix/yamllint.yml ~/.config/yamllint/config
 
 if is os name eq darwin; then
     ln -sf $prefix/gnupg/gpg-agent.conf ~/.gnupg/gpg-agent.conf
