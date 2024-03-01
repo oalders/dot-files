@@ -9,13 +9,12 @@ rm -f ~/.cargo/bin/precious
 if is os name eq darwin; then
     rm -f ~/.cargo/bin/fd
     if is there brew; then
-        brew remove bat || true
-        brew remove bats-core || true
-        brew remove exa || true
-        brew remove gh || true
-        brew remove go || true
-        brew remove nvim || true
-        brew remove prettier || true
+        packages=("bat" "bats-core" "exa" "gh" "go" "nvim" "prettier")
+
+        for package in "${packages[@]}"; do
+            brew remove "$package" || true
+        done
+
         brew untap homebrew/core || true
     fi
 fi
