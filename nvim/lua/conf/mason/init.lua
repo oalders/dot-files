@@ -6,7 +6,7 @@ require("mason-lspconfig").setup {
         "eslint",
         "golangci_lint_ls",
         "gopls",
-        "lua_ls",
+        -- "lua_ls",
         "perlnavigator",
         "rust_analyzer",
         "tsserver",
