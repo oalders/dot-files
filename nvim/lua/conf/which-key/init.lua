@@ -69,6 +69,7 @@ wk.register({
         j = { function() tsj.join() end, 'join the object under cursor' },
         s = { function() tsj.split() end, 'split the object under cursor' },
         x = { '<cmd>Copilot disable<cr>', 'stop GH copilot' },
+        w = { 'Vgw<cr>', 'wrap long lines'},
     },
     l = {
         l = { function()
