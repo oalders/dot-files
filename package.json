@@ -31,6 +31,7 @@
     "normalize-url": "^8.0.1",
     "npm": "^10.5.0",
     "prettier": "^3.2.5",
+    "remove-github-forks": "^2.1.1",
     "typescript": "^5.4.2",
     "underscore": "^1.13.6",
     "urijs": ">=1.19.11",
