@@ -41,7 +41,6 @@ detect_posh_settings() {
         MY_INSIDE_TMUX=true
     fi
 
-    export MY_INSIDE_SSH
     export MY_INSIDE_TMUX
 }
 
@@ -88,13 +87,6 @@ toggle_posh() {
 
 GO111MODULE=on
 GOPATH=~/go
-HAS_PLENV=false
-
-# should probably also ensure that Plenv version is not the system Perl
-if [[ -n ${PLENV_SHELL+set} ]]; then
-    HAS_PLENV=true
-fi
-
 LINK_FLAG=""
 PATH_ALIASES=\~/dot-files=@dots
 
@@ -250,11 +242,8 @@ tmux_session_name() {
 export GO111MODULE
 export GOPATH
 export HARNESS_OPTIONS
-export HAS_PLENV
 export IS_GITHUB
 export IS_MM
 export IS_SUDOER
 export LINK_FLAG
-export MY_POSH_THEME
-export PATH_ALIASES
 export RIPGREP_CONFIG_PATH

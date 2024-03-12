@@ -17,7 +17,7 @@ fi
 perl --version
 
 # Set up some ENV vars so that global installs go to ~/perl5
-if [ "$HAS_PLENV" = false ]; then
+if [[ ! -v PLENV_SHELL ]]; then
     cpanm --notest --local-lib=~/perl5 local::lib && eval "$(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)"
 fi
 
@@ -41,7 +41,8 @@ fi
 
 cpm install -g --verbose --show-build-log-on-failure --cpanfile cpan/cli.cpanfile
 
-if [ "$HAS_PLENV" = true ]; then
+# should probably also ensure that Plenv version is not the system Perl
+if [[ -v PLENV_SHELL ]]; then
     plenv rehash
 fi
 
