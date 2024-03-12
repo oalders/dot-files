@@ -1,4 +1,4 @@
-1) dot files        # cd ~/dot-files && ./install.sh
-2) git gc           # git prune && git lfs prune && git gc
-3) cpm install      # cpm install -g --cpanfile cpanfile
-4) parallel prove   # prove -lr -j $MY_PROCS t
+dot files        # cd ~/dot-files && ./install.sh
+git gc           # git prune && git lfs prune && git gc
+cpm install      # cpm install -g --cpanfile cpanfile
+parallel prove   # prove -lr -j $MY_PROCS t

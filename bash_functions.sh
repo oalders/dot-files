@@ -149,11 +149,11 @@ rename_tab() {
 
 # shellcheck disable=SC2002
 ll() {
-    SELECTION=$(cat ~/dot-files/launch.txt | fzf --reverse --no-multi)
-    COMMAND=$(echo "$SELECTION" | cut -d'#' -f2-)
+    selection=$(nl -n rz -w2 -s' ' ~/dot-files/launch.txt | fzf --reverse --no-multi)
+    command=$(echo "$selection" | cut -d' ' -f2-)
 
-    echo "Running $COMMAND"
-    eval "$COMMAND"
+    echo "Running $command"
+    eval "$command"
 }
 
 format_json() {
