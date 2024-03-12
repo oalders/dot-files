@@ -32,10 +32,10 @@ add_path "/usr/local/go/bin"
 add_path "$HOME/local/bin"
 
 detect_posh_settings() {
-    MY_INSIDE_SSH=false
+    inside_ssh=false
     MY_INSIDE_TMUX=false
     if test "${SSH_CLIENT+x}"; then
-        MY_INSIDE_SSH=true
+        inside_ssh=true
     fi
     if test "${TMUX_PANE+x}"; then
         MY_INSIDE_TMUX=true
@@ -44,39 +44,39 @@ detect_posh_settings() {
     export MY_INSIDE_TMUX
 }
 
-if [[ ! ${MY_POSH_THEME-} || ! ${FORCE_POSH_THEME-} ]]; then
+if [[ ! ${posh_theme-} || ! ${FORCE_POSH_THEME-} ]]; then
     detect_posh_settings
-    MY_POSH_THEME="remote"
+    posh_theme="remote"
 
-    if [[ $MY_INSIDE_SSH == true ]]; then
+    if [[ $inside_ssh == true ]]; then
         if [[ $MY_INSIDE_TMUX == true && ! ${FORCE_POSH_THEME-} ]]; then
-            MY_POSH_THEME="remote-tiny"
+            posh_theme="remote-tiny"
         fi
     else
-        MY_POSH_THEME="local"
+        posh_theme="local"
         if [[ $MY_INSIDE_TMUX == true && ! ${FORCE_POSH_THEME-} ]]; then
-            MY_POSH_THEME="local-tiny"
+            posh_theme="local-tiny"
         fi
     fi
 fi
 
 # posh handling
 posh_me() {
-    eval "$(oh-my-posh prompt init bash --config ~/.config/oh-my-posh/themes/"${MY_POSH_THEME}".omp.json)"
+    eval "$(oh-my-posh prompt init bash --config ~/.config/oh-my-posh/themes/"${posh_theme}".omp.json)"
 }
 
 toggle_posh() {
     detect_posh_settings
-    if [[ $MY_POSH_THEME == "local" ]]; then
-        MY_POSH_THEME="local-tiny"
-    elif [[ $MY_POSH_THEME == "local-tiny" ]]; then
-        MY_POSH_THEME="local"
-    elif [[ $MY_POSH_THEME == "remote" ]]; then
-        MY_POSH_THEME="remote-tiny"
-    elif [[ $MY_POSH_THEME == "remote-tiny" ]]; then
-        MY_POSH_THEME="remote"
+    if [[ $posh_theme == "local" ]]; then
+        posh_theme="local-tiny"
+    elif [[ $posh_theme == "local-tiny" ]]; then
+        posh_theme="local"
+    elif [[ $posh_theme == "remote" ]]; then
+        posh_theme="remote-tiny"
+    elif [[ $posh_theme == "remote-tiny" ]]; then
+        posh_theme="remote"
     else
-        MY_POSH_THEME="remote"
+        posh_theme="remote"
     fi
 
     FORCE_POSH_THEME=true
@@ -157,8 +157,8 @@ ll() {
 }
 
 format_json() {
-    FILE=$1
-    jq <"$FILE" | sed 's/\\n/\n/g' | sed 's/\\t/\t/g'
+    file=$1
+    jq <"$file" | sed 's/\\n/\n/g' | sed 's/\\t/\t/g'
 }
 
 HARNESS_OPTIONS="j1:c"
@@ -173,14 +173,14 @@ if [[ $(command -v nproc) ]]; then
 fi
 
 ghrc() {
-    REPO=$1
-    if [[ $(trurl --verify "$REPO") ]]; then
-        URL=$(trurl --verify "$REPO" --get '{path}')
+    repo=$1
+    if [[ $(trurl --verify "$repo") ]]; then
+        url=$(trurl --verify "$repo" --get '{path}')
 
-        CLONE_TO=$(echo "$URL" | sed 's/^\///' | sed 's/\.git$//')
+        clone_to=$(echo "$url" | sed 's/^\///' | sed 's/\.git$//')
 
-        gh repo clone "$REPO" "$CLONE_TO"
-        cd "$CLONE_TO" || echo "Could not chdir to $CLONE_TO"
+        gh repo clone "$repo" "$clone_to"
+        cd "$clone_to" || echo "Could not chdir to $clone_to"
     fi
 }
 
@@ -188,14 +188,14 @@ change_git_origin() {
     # https://github.com/metacpan/metacpan-api.git
     # git@github.com:metacpan/metacpan-api.git
 
-    REPO=$(git config --get remote.origin.url)
+    repo=$(git config --get remote.origin.url)
 
-    TO=$(trurl "$REPO" --get '{path}' | sed 's/^\///' | sed 's/\.git$//')
+    to=$(trurl "$repo" --get '{path}' | sed 's/^\///' | sed 's/\.git$//')
 
-    GIT="git@github.com:${TO}.git"
+    git="git@github.com:${to}.git"
 
     git remote remove origin
-    git remote add origin "$GIT"
+    git remote add origin "$git"
 }
 
 tmux_session_name() {
@@ -204,31 +204,31 @@ tmux_session_name() {
 
     if [ "$inside_git_repo" ]; then
 
-        BRANCH=$(git rev-parse --abbrev-ref HEAD)
-        CURRENT_DIR=${PWD##*/}
-        CURRENT_DIR=$(printf "%-20s" "$CURRENT_DIR")
+        branch=$(git rev-parse --abbrev-ref HEAD)
+        current_dir=${PWD##*/}
+        current_dir=$(printf "%-20s" "$current_dir")
 
-        PREFIX='⁉️ '
+        prefix='⁉️ '
         if [[ ${PWD##*/} == 'dot-files' ]] || [[ ${PWD##*/} == 'local-dot-files' ]]; then
-            PREFIX='🔵'
+            prefix='🔵'
         elif [[ -f 'dist.ini' ]] || [[ -f 'cpanfile' ]] || [[ -f 'app.psgi' ]]; then
-            PREFIX='🐪'
+            prefix='🐪'
         elif [[ -f 'Cargo.toml' ]]; then
-            PREFIX='🦀'
+            prefix='🦀'
         elif [[ -f 'go.mod' ]]; then
-            PREFIX='🚦'
+            prefix='🚦'
         elif [[ -f 'tsconfig.json' ]] || [[ -f '.npmignore' ]]; then
-            PREFIX='☕'
+            prefix='☕'
         elif [[ -d 'ftplugin' ]]; then
-            PREFIX='🔌'
+            prefix='🔌'
         elif [[ -f 'Dockerfile' ]] || [[ -f 'docker-compose.yml' ]]; then
-            PREFIX='🐳'
+            prefix='🐳'
         fi
-        SESSION_NAME="$PREFIX $CURRENT_DIR  $BRANCH"
+        SESSION_NAME="$prefix $current_dir  $branch"
     else
         SESSION_NAME=$(pwd)
-        STRIP="$HOME/"
-        SESSION_NAME=${SESSION_NAME/$STRIP/}
+        strip="$HOME/"
+        SESSION_NAME=${SESSION_NAME/$strip/}
         padding=58
     fi
 
