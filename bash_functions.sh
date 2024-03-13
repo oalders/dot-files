@@ -149,8 +149,9 @@ rename_tab() {
 
 # shellcheck disable=SC2002
 ll() {
-    selection=$(nl -n rz -w2 -s' ' ~/dot-files/launch.txt | fzf --reverse --no-multi)
-    command=$(echo "$selection" | cut -d' ' -f2-)
+    file=~/dot-files/launch.txt
+    selection=$(nl -n rz -w2 -s' ' $file | fzf --reverse --no-multi)
+    command=$(echo "$selection" | awk -F'# ' '{print $2}')
 
     echo "Running $command"
     eval "$command"
