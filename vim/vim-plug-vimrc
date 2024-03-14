@@ -10,7 +10,7 @@ Plug 'bkad/CamelCaseMotion' " provide CamelCase motion through words
 Plug 'gregsexton/MatchTag' " highlight matchihng HTML tags
 Plug 'haya14busa/vim-auto-mkdir' " create directory path on save
 Plug 'itchyny/vim-cursorword' " underline the word under the cursor
-Plug 'junegunn/fzf'
+Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
 Plug 'junegunn/fzf.vim'
 " Plug 'junegunn/vader.vim' " run Vader tests from inside vim
 
