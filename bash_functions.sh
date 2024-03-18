@@ -67,17 +67,12 @@ posh_me() {
 
 toggle_posh() {
     detect_posh_settings
-    if [[ $posh_theme == "local" ]]; then
-        posh_theme="local-tiny"
-    elif [[ $posh_theme == "local-tiny" ]]; then
-        posh_theme="local"
-    elif [[ $posh_theme == "remote" ]]; then
-        posh_theme="remote-tiny"
-    elif [[ $posh_theme == "remote-tiny" ]]; then
-        posh_theme="remote"
-    else
-        posh_theme="remote"
-    fi
+    case $posh_theme in
+        "local") posh_theme="local-tiny" ;;
+        "local-tiny") posh_theme="local" ;;
+        "remote") posh_theme="remote-tiny" ;;
+        "remote-tiny"|"") posh_theme="remote" ;;
+    esac
 
     FORCE_POSH_THEME=true
     export FORCE_POSH_THEME
