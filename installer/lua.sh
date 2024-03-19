@@ -4,6 +4,6 @@ set -eux
 
 brew install luarocks
 
-luarocks install luacheck
+# luarocks install luacheck
 
 npm install lua-fmt
