@@ -63,4 +63,8 @@ if ! is there gh || is cli age gh gt 7 days; then
     ubi --project cli/cli --in "$in" --exe gh
 fi
 
+if is there gh && ! gh extension list | grep copilot; then
+    gh extension install github/gh-copilot
+fi
+
 exit
