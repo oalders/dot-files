@@ -1,23 +1,18 @@
 #!/bin/bash
 
-set -eux
+set -eux -o pipefail
+
+# shellcheck source=bash_functions.sh
+source ~/dot-files/bash_functions.sh
 
 dir=trurl
-repo=https://github.com/curl/trurl.git
-src="$HOME/dot-files/src"
 
-mkdir -p "$src"
-cd "$src" || exit 1
+clone_or_update_repo $dir "https://github.com/curl/trurl.git"
 
-if [[ -d $dir ]]; then
-    cd $dir
-    git from
-else
-    git clone $repo $dir
-    cd $dir
+if is os name eq linux; then
+    sudo apt-get install libcurl4-gnutls-dev
+    make
 fi
 
-sudo apt-get install libcurl4-gnutls-dev
-make
-
+cd $dir
 cp trurl "$HOME/local/bin/"
