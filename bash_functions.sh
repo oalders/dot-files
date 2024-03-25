@@ -235,6 +235,21 @@ tmux_session_name() {
     export SESSION_NAME
 }
 
+function clone_or_update_repo() {
+    local dir="$1"
+    local repo="$2"
+    local src="$HOME/dot-files/src"
+
+    mkdir -p "$src"
+    cd "$src" || exit 1
+
+    if [[ -d $dir ]]; then
+        git -C "$dir" pull --rebase
+    else
+        git clone "$repo" "$dir"
+    fi
+}
+
 export GO111MODULE
 export GOPATH
 export HARNESS_OPTIONS
