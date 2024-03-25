@@ -14,4 +14,3 @@ rsync -avz ~/dot-files $TARGET:~/
 rsync -avz ~/.vim/plugged $TARGET:~/.vim/
 rsync -avz ~/.vim/autoload $TARGET:~/.vim/
 rsync -avz ~/.tmux/plugins $TARGET:~/.tmux/
-ssh $TARGET "touch ~/.local_vimrc"
