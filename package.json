@@ -21,7 +21,7 @@
     "acorn": "^8.11.3",
     "ansi-regex": ">=5.0.1",
     "bash-language-server": "^5.1.2",
-    "bats": "^1.10.0",
+    "bats": "^1.11.0",
     "diff-lockfiles": "^1.0.2",
     "eslint": "^8.57.0",
     "fixjson": "^1.1.2",
