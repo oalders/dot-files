@@ -100,6 +100,8 @@ add_path "$HOME/.cargo/bin"
 # Haskell binaries installed via cabal
 add_path "$HOME/.cabal/bin"
 
+add_path "$HOME/dot-files/src/git-fuzzy/bin"
+
 localperlbin=~/perl5/bin
 
 if [[ $IS_MM = false && ! -d ~/.plenv && -d $localperlbin ]]; then
