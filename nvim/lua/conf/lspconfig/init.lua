@@ -114,7 +114,6 @@ lspconfig.perlnavigator.setup {
             -- perltidyProfile = '',
             -- perlcriticProfile = '',
             enableWarnings = true,
-            perlimportsProfile = 'perlimports.toml',
             includePaths = { 'lib', 'dev/lib', 't/lib' },
             perlcriticEnabled = true,
             perlimportsLintEnabled = true,
@@ -129,7 +128,6 @@ lspconfig.perlnavigator.setup {
             pn.perlPath = 'mm-perl'
             pn.perlcriticProfile = table.concat({ new_root, '.perlcriticrc' }, '/')
             pn.perltidyProfile = table.concat({ new_root, '.perltidyallrc' }, '/')
-            pn.perlnavigator.perlimportsProfile = table.concat({ new_root, '.perlimports.toml' }, '/')
         end
     end,
 }
