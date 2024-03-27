@@ -29,7 +29,7 @@ set -o vi
 
 # https://superuser.com/a/975878/120685
 alias bytes_human='perl -MNumber::Bytes::Human -e "print Number::Bytes::Human::format_bytes shift"'
-alias c="clear && tmux clear-history && perl -E 'say (qq{\n}x65,q{-}x78); system('date');print qq{-}x78, qq{\n}'"
+alias c="clear && { [ -n \"$TMUX\" ] && tmux clear-history; }"
 alias cdr='cd $(git root)'
 alias date='date +"%a %d %b %Y %T %Z"'
 alias delete-merged-branches='show-merged-branches | safe-xargs -n 1 git branch -d'
