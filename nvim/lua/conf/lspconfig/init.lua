@@ -115,6 +115,7 @@ lspconfig.perlnavigator.setup {
             -- perlcriticProfile = '',
             enableWarnings = true,
             includePaths = { 'lib', 'dev/lib', 't/lib' },
+            logging = false,
             perlcriticEnabled = true,
             perlimportsLintEnabled = true,
             perlimportsTidyEnabled = true,
