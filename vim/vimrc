@@ -268,12 +268,13 @@ vnoremap jq :!jq -S .<cr>
 "command! GEmo
   "\ call fzf#run({'source': 'git diff -w -M origin/main...HEAD --name-only', 'sink': 'e'})
 
-command! -bang GDomo
-  \ call fzf#run(
-  \   fzf#vim#with_preview(
-  \     fzf#wrap({ 'source': 'git domo' }, <bang>0)
-  \   )
-  \ )
+" belongs fzf.vim
+" command! -bang GDomo
+  " \ call fzf#run(
+  " \   fzf#vim#with_preview(
+  " \     fzf#wrap({ 'source': 'git domo' }, <bang>0)
+  " \   )
+  " \ )
 
 " Show comments in italics
 highlight Comment cterm=italic gui=italic term=bold

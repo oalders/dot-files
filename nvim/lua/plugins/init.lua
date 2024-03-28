@@ -206,4 +206,22 @@ require('conf/telescope')
 require('conf/ufo')
 require('conf/which-key')
 
+-- fzf-lua
+local fzf_lua = require('fzf-lua')
+fzf_lua.setup({ "fzf-vim" })
+
+fzf_lua.git_domo = function()
+  fzf_lua.files({
+    prompt = 'GitDomo>',
+    cmd = 'git domo',
+    previewer = 'bat',
+  })
+end
+
+vim.cmd([[
+  command! -bang GDomo lua require('fzf-lua').git_domo()
+]])
+
+-- end
+
 require('persisted').setup {}

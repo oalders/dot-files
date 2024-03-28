@@ -11,7 +11,7 @@ Plug 'gregsexton/MatchTag' " highlight matchihng HTML tags
 Plug 'haya14busa/vim-auto-mkdir' " create directory path on save
 Plug 'itchyny/vim-cursorword' " underline the word under the cursor
 Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
-Plug 'junegunn/fzf.vim'
+" Plug 'junegunn/fzf.vim' " disabled while testing fzf-lua
 " Plug 'junegunn/vader.vim' " run Vader tests from inside vim
 
 " automatically clear search highlight when cursor is moved
@@ -50,6 +50,7 @@ if has('nvim')
   Plug 'folke/trouble.nvim' " <leader>td (document) <leader>tw (workspace)
   Plug 'folke/which-key.nvim' " better organization of key mappings
   Plug 'Hubro/nvim-splitrun' " :Splitrun some command
+  Plug 'ibhagwan/fzf-lua' " maybe replace fzf.vim
   Plug 'kyazdani42/nvim-web-devicons' " Recommended (for coloured icons for bufferline.nvim)
   Plug 'mfussenegger/nvim-lint' " Linter harness
   Plug 'nvim-lualine/lualine.nvim' " status line
