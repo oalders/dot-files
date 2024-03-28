@@ -1,5 +1,6 @@
 -- vim.lsp.set_log_level("debug")
 
+require('lspsaga').setup({})
 local lspconfig = require 'lspconfig'
 lspconfig.bashls.setup { filetypes = { "sh" } }
 lspconfig.docker_compose_language_service.setup {}
