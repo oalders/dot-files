@@ -1,6 +1,11 @@
 -- vim.lsp.set_log_level("debug")
 
 require('lspsaga').setup({})
+
+-- reduce left-right jitter when signcolumn appears and disappears while
+-- scrolling vertically.
+vim.opt.signcolumn = 'yes'
+
 local lspconfig = require 'lspconfig'
 lspconfig.bashls.setup { filetypes = { "sh" } }
 lspconfig.docker_compose_language_service.setup {}
