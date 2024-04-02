@@ -4,7 +4,6 @@ call plug#begin('~/.vim/plugged')
 " Plug 'arcticicestudio/nord-vim'
 Plug 'cocopon/iceberg.vim'
 
-Plug 'airblade/vim-gitgutter' " show git diff markers in the sign column
 Plug 'ap/vim-css-color' " show css colors inline
 Plug 'bkad/CamelCaseMotion' " provide CamelCase motion through words
 Plug 'gregsexton/MatchTag' " highlight matchihng HTML tags
@@ -52,12 +51,13 @@ if has('nvim')
   Plug 'Hubro/nvim-splitrun' " :Splitrun some command
   Plug 'ibhagwan/fzf-lua' " maybe replace fzf.vim
   Plug 'kyazdani42/nvim-web-devicons' " Recommended (for coloured icons for bufferline.nvim)
+  Plug 'lewis6991/gitsigns.nvim' " git signs in gutter
   Plug 'mfussenegger/nvim-lint' " Linter harness
   Plug 'nvim-lualine/lualine.nvim' " status line
   Plug 'nvim-lua/plenary.nvim' " required by other plugins
   Plug 'nvim-telescope/telescope.nvim', { 'tag': '0.1.5' } " fuzzy finder
-  Plug 'nvim-treesitter/nvim-treesitter', { 'do': ':TSUpdate'}  " We recommend updating the parsers on update
   Plug 'nvimtools/none-ls.nvim' " null-ls replacement
+  Plug 'nvim-treesitter/nvim-treesitter', { 'do': ':TSUpdate'}  " We recommend updating the parsers on update
   Plug 'olimorris/persisted.nvim' " session management
   Plug 'rgroli/other.nvim' " :Other to toggle between test and implementation files
 
@@ -106,6 +106,7 @@ if has('nvim')
   Plug 'rcarriga/nvim-notify'
 
 else
+  Plug 'airblade/vim-gitgutter' " show git diff markers in the sign column
   Plug 'ConradIrwin/vim-bracketed-paste'
   Plug 'roxma/nvim-yarp'
   Plug 'roxma/vim-hug-neovim-rpc'
