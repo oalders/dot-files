@@ -224,5 +224,5 @@ vim.cmd([[
 
 -- end
 
-require('gitsigns').setup()
+require('gitsigns').setup{ numhl = true }
 require('persisted').setup {}
