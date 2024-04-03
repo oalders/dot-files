@@ -1,9 +1,6 @@
 set encoding=utf-8
 scriptencoding utf-8
 
-" vim-polyglot
-let g:polyglot_disabled = ['go', 'perl']
-
 source ~/.vim/vim-plug-vimrc
 
 let g:mapleader = ','
