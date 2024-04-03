@@ -1,5 +1,21 @@
 local tsj = require('treesj')
 local wk = require("which-key")
+_G.OpenThis = function(fname)
+    local cmd = 'ot --editor vim --print ' .. vim.fn.shellescape(fname)
+    local handle = io.popen(cmd)
+    local result = handle:read("*a")
+    handle:close()
+
+    if result ~= "" then
+        vim.cmd('e ' .. result)  -- remove shellescape() here
+    else
+        print("Error: could not open file")
+    end
+
+    -- Add the command to the command history
+    vim.fn.histadd(':', string.format(':lua OpenThis("%s")', vim.fn.escape(fname, '"\\')))
+end
+
 wk.register({
     f = {
         f = { '<cmd>Files<cr>', 'open FZF file finder' },
@@ -84,6 +100,12 @@ wk.register({
             })
         end, "hlchunk" },
         h = { "<cmd>DisableHL<cr>", "Disable HL" }
+    },
+    o = {
+        t = {
+          function() OpenThis(vim.fn.input("ot: ", "", "file")) end,
+          "open files via ot"
+        },
     },
     t = {
         c = { function() require('trouble').close() end,
