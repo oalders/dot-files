@@ -1,7 +1,5 @@
 # shellcheck shell=bash
-
 export CLICOLOR=1
-export EDITOR=nvim
 
 # don't put duplicate lines in the history. See bash(1) for more options
 # http://www.linuxjournal.com/content/using-bash-history-more-efficiently-histcontrol
@@ -66,11 +64,6 @@ else
     alias safe-xargs='xargs'
 fi
 
-if is there nvim; then
-    alias vi=nvim
-    alias vim=nvim
-fi
-
 if is os name eq darwin; then
     alias updatedb="sudo /usr/libexec/locate.updatedb"
 
@@ -78,6 +71,18 @@ if is os name eq darwin; then
     remove_path "$HOME/Library/Python/3.9/bin"
     add_path "$HOME/Library/Python/3.11/bin"
     export HOMEBREW_AUTO_UPDATE_SECS=86400
+
+    add_path ~/local/bin/nvim-macos/bin
+    # homebrew's curl needs to come first
+    add_path "/usr/local/opt/curl/bin"
+fi
+
+if is there nvim; then
+    alias vi=nvim
+    alias vim=nvim
+    export EDITOR=nvim
+else
+    export EDITOR=vim
 fi
 
 add_path "$HOME/.local/bin"
@@ -234,15 +239,6 @@ reset_path
 [ -f "$HOME/.ghcup/env" ] && . "$HOME/.ghcup/env" # ghcup-env
 if [ -f "$HOME/.cargo/env" ]; then
     . "$HOME/.cargo/env"
-fi
-
-if is os name eq darwin; then
-    # nvim nightly build
-    add_path ~/local/nvim-osx64/bin
-    # homebrew's curl needs to come first
-    add_path "/usr/local/opt/curl/bin"
-
-    add_path ~/local/bin/nvim-macos/bin
 fi
 
 add_path ~/dot-files/bin
