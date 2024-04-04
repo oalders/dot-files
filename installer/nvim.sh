@@ -54,8 +54,5 @@ else
     mv $download_file "$HOME/local/bin/nvim"
 fi
 
-cd -
-./installer/tree-sitter-perl.sh
-
 echo "done nvim install"
 exit 0
