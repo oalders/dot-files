@@ -7,6 +7,7 @@ require('lspsaga').setup({ code_action = {extend_gitsigns = true}})
 vim.opt.signcolumn = 'yes'
 
 local lspconfig = require 'lspconfig'
+lspconfig.ansiblels.setup {}
 lspconfig.bashls.setup { filetypes = { "sh" } }
 lspconfig.docker_compose_language_service.setup {}
 lspconfig.eslint.setup({
