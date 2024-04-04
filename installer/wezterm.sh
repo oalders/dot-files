@@ -3,7 +3,7 @@
 set -e -u -o pipefail
 
 install_for_linux() (
-    sudo apt install -y libxcb-image0 libxkbcommon-x11-0
+    sudo apt install -y libxcb-image0 libxkbcommon-x11-0 libwayland-client0 libwayland-egl1 libx11-xcb1
     version=$(is known os version)
     file=wezterm-nightly.${1}${version}.deb
 
