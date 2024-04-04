@@ -25,6 +25,7 @@ sudo apt-get install -y -q --no-install-recommends --autoremove \
 if ! is there go; then
     bash installer/golang.sh
     add_path /usr/local/go/bin
+    add_path "$HOME"/local/bin/go/bin
 fi
 
 if ! is there go; then
