@@ -38,7 +38,7 @@ alias dzil-prove-xs='dzil run prove -lv'
 alias dzil-stale='dzil stale --all | safe-xargs cpm install --global'
 alias fix-gpg='pkill -9 gpg-agent && export GPG_TTY=$(tty)'
 alias g=git
-alias gi=git  # fix typos
+alias gi=git # fix typos
 alias git-clean="git gc && git-lfs prune"
 alias gti=git # fix typos
 alias go-clean="go clean -modcache"
@@ -75,6 +75,15 @@ if is os name eq darwin; then
     add_path ~/local/bin/nvim-macos/bin
     # homebrew's curl needs to come first
     add_path "/usr/local/opt/curl/bin"
+
+    # Homebrew installs some binaries here
+    add_path "/usr/local/sbin"
+    add_path "/usr/local/bin"
+
+    # More modern homebrew uses
+    add_path "/opt/homebrew/bin"
+    add_path "/opt/homebrew/sbin"
+
 fi
 
 if is there nvim; then
@@ -91,14 +100,6 @@ add_path "$HOME/local/bin/go/bin"
 
 # node modules locally installing bin files
 add_path "$HOME/dot-files/node_modules/.bin"
-
-# Homebrew installs some binaries here
-add_path "/usr/local/sbin"
-add_path "/usr/local/bin"
-
-# More modern homebrew uses
-add_path "/opt/homebrew/bin"
-add_path "/opt/homebrew/sbin"
 
 # Rust binaries installed via cargo
 add_path "$HOME/.cargo/bin"
