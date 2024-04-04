@@ -2,7 +2,7 @@
 require 'nvim-treesitter.configs'.setup {
     ensure_installed = { 'bash', 'dockerfile', 'go', 'html', 'javascript', 'lua', 'markdown', 'markdown_inline',
         'perl', 'python', 'regex', 'ruby', 'rust', 'sql', 'typescript', 'vim', 'yaml' },
-    -- ensure_installed = 'all',
+    ignore_install = { 'all' },
     highlight = {
         enable = true, -- false will disable the whole extension
         disable = {},  -- list of language that will be disabled
