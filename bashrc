@@ -77,6 +77,7 @@ if is os name eq darwin; then
     # python scripts via pip install --user
     remove_path "$HOME/Library/Python/3.9/bin"
     add_path "$HOME/Library/Python/3.11/bin"
+    export HOMEBREW_AUTO_UPDATE_SECS=86400
 fi
 
 add_path "$HOME/.local/bin"
