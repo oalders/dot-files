@@ -1,6 +1,7 @@
 require("mason").setup()
 require("mason-lspconfig").setup {
     ensure_installed = {
+        "ansiblels",
         "bashls",
         "docker_compose_language_service",
         "eslint",
