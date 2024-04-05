@@ -39,6 +39,7 @@ alias dzil-stale='dzil stale --all | safe-xargs cpm install --global'
 alias fix-gpg='pkill -9 gpg-agent && export GPG_TTY=$(tty)'
 alias g=git
 alias gi=git # fix typos
+alias gri="git rebase -i origin/main"
 alias git-clean="git gc && git-lfs prune"
 alias gti=git # fix typos
 alias go-clean="go clean -modcache"
