@@ -157,8 +157,8 @@ fi
 unset -f tm
 # https://raim.codingfarm.de/blog/2013/01/30/tmux-update-environment/
 tmux() {
-    local tmux
-    tmux=$(type -fp tmux)
+    local tmux_binary
+    tmux_binary=$(type -fp tmux)
 
     if [ $# -ge 1 ] && [ -n "$1" ]; then
         case "$1" in
@@ -183,12 +183,12 @@ tmux() {
             tmux rename-session "$SESSION_NAME"
             ;;
         *)
-            $tmux "$@"
+            $tmux_binary "$@"
             ;;
         esac
     else
         tmux_session_name
-        $tmux new -s "$SESSION_NAME"
+        $tmux_binary new -s "$SESSION_NAME"
     fi
 }
 
