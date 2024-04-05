@@ -210,6 +210,14 @@ require('conf/which-key')
 local fzf_lua = require('fzf-lua')
 fzf_lua.setup({ "fzf-vim" })
 
+fzf_lua.setup {
+  defaults = {
+    file_previewer   = require('fzf-lua.previewer').bat,
+    grep_previewer   = require('fzf-lua.previewer').bat,
+    qflist_previewer = require('fzf-lua.previewer').bat,
+  },
+}
+
 fzf_lua.git_domo = function()
   fzf_lua.files({
     prompt = 'GitDomo>',
