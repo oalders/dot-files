@@ -213,6 +213,9 @@ if ! shopt -oq posix; then
     fi
 fi
 
+# Edit current line via crtl-e
+bind '\C-e: edit-and-execute-command'
+
 # If this happens *before* bash completion setup then command line tab
 # completion via **<TAB> does not work.
 add_path "$HOME/.vim/plugged/fzf/bin"
