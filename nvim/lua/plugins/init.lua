@@ -214,6 +214,7 @@ fzf_lua.setup({
   previewers = {
     builtin = {
       extensions = {
+        ["jpg"]       = { "chafa", "{file}" },
         ["png"]       = { "viu", "-b" },
         ["svg"]       = { "chafa", "{file}" },
       },
