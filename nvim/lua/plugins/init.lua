@@ -221,7 +221,7 @@ fzf_lua.setup {
 fzf_lua.git_domo = function()
   fzf_lua.files({
     prompt = 'GitDomo>',
-    cmd = 'git domo',
+    cmd = '{ git diff --name-only; git domo;} | sort -u',
     previewer = 'bat',
   })
 end
