@@ -90,6 +90,7 @@ wk.register({
         w = { 'Vgw<cr>', 'wrap long lines'},
     },
     l = {
+        c = { function() vim.opt.colorcolumn = "78" end, 'set colorcolumn to 78' },
         l = { function()
             require('hlchunk').setup({
                 indent = {
