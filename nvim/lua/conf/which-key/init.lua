@@ -91,6 +91,7 @@ wk.register({
     },
     l = {
         c = { function() vim.opt.colorcolumn = "78" end, 'set colorcolumn to 78' },
+        cc = { function() vim.opt.colorcolumn = "" end, 'unset colorcolumn' },
         l = { function()
             require('hlchunk').setup({
                 indent = {
