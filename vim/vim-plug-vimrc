@@ -50,6 +50,7 @@ if has('nvim')
   Plug 'folke/which-key.nvim' " better organization of key mappings
   Plug 'Hubro/nvim-splitrun' " :Splitrun some command
   Plug 'ibhagwan/fzf-lua' " maybe replace fzf.vim
+  Plug 'kevinhwang91/nvim-bqf' " improve quickfix window
   Plug 'kyazdani42/nvim-web-devicons' " Recommended (for coloured icons for bufferline.nvim)
   Plug 'lewis6991/gitsigns.nvim' " git signs in gutter
   Plug 'mfussenegger/nvim-lint' " Linter harness
