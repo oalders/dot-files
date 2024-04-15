@@ -237,3 +237,4 @@ vim.cmd([[
 
 require('gitsigns').setup{ numhl = true }
 require('persisted').setup {}
+require('yankbank').setup()
