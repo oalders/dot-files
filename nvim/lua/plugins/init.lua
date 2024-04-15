@@ -204,6 +204,7 @@ require('conf/noice')
 require('conf/nvim-lint')
 require('conf/telescope')
 require('conf/ufo')
+require('conf/open-this') -- needs to happen before which-key
 require('conf/which-key')
 
 -- fzf-lua
