@@ -8,7 +8,19 @@ vim.opt.signcolumn = 'yes'
 
 local lspconfig = require 'lspconfig'
 lspconfig.ansiblels.setup {}
-lspconfig.bashls.setup { filetypes = { "sh" } }
+lspconfig.bashls.setup {
+    filetypes = { "sh" },
+    settings = {
+        diagnostics = {
+            enable = true,
+            shellcheck = {
+                enable = true,
+                executable = "shellcheck",
+                extraArgs = { "-x" }
+            }
+        }
+    }
+}
 lspconfig.docker_compose_language_service.setup {}
 lspconfig.eslint.setup({
   on_attach = function(client, bufnr)
