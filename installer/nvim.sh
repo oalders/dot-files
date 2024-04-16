@@ -9,6 +9,10 @@ if is cli age nvim lt 18 hours; then
     exit
 fi
 
+if is os id eq raspbian; then
+    exit
+fi
+
 cd /tmp || exit
 
 if (is os id eq ubuntu && is os version gte 22.04) || (is os id eq debian); then
@@ -23,19 +27,13 @@ set -x
 URL=https://github.com/neovim/neovim/releases/download/nightly/
 
 if is os name eq darwin; then
-    # Enable if nightly tarballs go missing again
-    # brew install --head neovim
-    # rm -f "$HOME/local/bin/nvim"
-    # exit 0
-
-    dir=nvim-osx64
-    download_file=nvim-macos.tar.gz
+    if is arch eq arm64; then
+        dir=nvim-macos-arm64
+    else
+        dir=nvim-macos-x86_64
+    fi
+    download_file="$dir.tar.gz"
     rm -rf $dir
-elif is os id eq raspbian; then
-    exit 0
-    # Won't run on buster
-    # sudo apt install snapd
-    # sudo snap install nvim --classic
 else
     download_file=nvim.appimage
 fi
@@ -46,7 +44,7 @@ if is os name eq darwin; then
     tar xzvf $download_file
     dest="$HOME/local/bin/nvim-macos"
     rm -rf "$dest"
-    mv nvim-macos "$dest"
+    mv $dir "$dest"
     rm -f "$HOME/local/bin/nvim"
     add_path "$HOME/local/bin/nvim-macos/bin"
 else
