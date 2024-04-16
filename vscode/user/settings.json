@@ -11,5 +11,7 @@
         "bash": "true"
     },
     "terminal.integrated.fontFamily": "JetBrainsMono Nerd Font",
-    "go.toolsManagement.autoUpdate": true
+    "go.toolsManagement.autoUpdate": true,
+    "perlnavigator.perlimportsTidyEnabled": true,
+    "perlnavigator.perlimportsLintEnabled": true
 }
