@@ -1,6 +1,5 @@
 set runtimepath^=~/.vim,~/.vim/after
 set packpath^=~/.vim
-source ~/.vimrc
 
 " https://github.com/mhartington/oceanic-next#installation
 if (has('termguicolors'))
@@ -14,3 +13,5 @@ lua <<EOF
 require('conf')
 require('plugins')
 EOF
+
+colorscheme iceberg
