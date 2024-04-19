@@ -1,6 +1,7 @@
 brew/*.lock.json
-.DS_Store
-hammerspoon/Spoons/
+.ds_store
+hammerspoon/spoons/
+nvim/lazy-lock.json
 .pnp.*
 src/
 .tidyall.d/
