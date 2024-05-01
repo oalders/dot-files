@@ -30,7 +30,7 @@
     "markdownlint": "^0.34.0",
     "markdownlint-cli": "^0.40.0",
     "normalize-url": "^8.0.1",
-    "npm": "^10.6.0",
+    "npm": "^10.7.0",
     "prettier": "^3.2.5",
     "remove-github-forks": "^2.1.1",
     "tree-sitter-cli": "^0.22.5",
