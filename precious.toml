@@ -1,9 +1,16 @@
 [commands.shfmt]
 type     = "both"
 include  = "**/*.sh"
-invoke   = "once"
 cmd = [ "shfmt" ]
 ok_exit_codes = [0]
 lint_failure_exit_codes = [1]
 lint_flags  = "--diff"
 tidy_flags  = ["-w", "-s"]
+
+[commands.stylua]
+cmd = [ "stylua" ]
+type = "both"
+include = "**/*.lua"
+ok_exit_codes = [0]
+lint_failure_exit_codes = [1]
+lint_flags = "--check"
