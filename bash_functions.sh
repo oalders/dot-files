@@ -68,10 +68,10 @@ posh_me() {
 toggle_posh() {
     detect_posh_settings
     case $posh_theme in
-        "local") posh_theme="local-tiny" ;;
-        "local-tiny") posh_theme="local" ;;
-        "remote") posh_theme="remote-tiny" ;;
-        "remote-tiny"|"") posh_theme="remote" ;;
+    "local") posh_theme="local-tiny" ;;
+    "local-tiny") posh_theme="local" ;;
+    "remote") posh_theme="remote-tiny" ;;
+    "remote-tiny" | "") posh_theme="remote" ;;
     esac
 
     FORCE_POSH_THEME=true

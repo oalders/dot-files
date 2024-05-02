@@ -7,4 +7,3 @@ gh pr list --author "app/dependabot" --json headRefName |
     jq '.[].headRefName' |
     fzf |
     xargs -n 1 -o approve-lockfile-pr.sh origin
-

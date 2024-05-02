@@ -87,7 +87,6 @@ if is os name eq darwin; then
     ln -sf "$LINK_FLAG" $prefix/hammerspoon ~/.hammerspoon
 fi
 
-
 ln -sf $prefix/bin/add-worktree "$HOME/local/bin/add-worktree"
 ln -sf $prefix/bin/remove-worktree "$HOME/local/bin/remove-worktree"
 ln -sf $prefix/bin/tm "$HOME/local/bin/tm"
