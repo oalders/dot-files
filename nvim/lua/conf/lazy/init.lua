@@ -12,44 +12,48 @@ end
 vim.opt.rtp:prepend(lazypath)
 
 require('lazy').setup({
--- Colour schemes
--- Plug 'arcticicestudio/nord-vim'
-'cocopon/iceberg.vim',
+    -- Colour schemes
+    -- Plug 'arcticicestudio/nord-vim'
+    'cocopon/iceberg.vim',
 
-'ap/vim-css-color', -- show css colors inline
-'bkad/CamelCaseMotion', -- provide CamelCase motion through words
-'gregsexton/MatchTag', -- highlight matchihng HTML tags
-'haya14busa/vim-auto-mkdir', -- create directory path on save
- 'itchyny/vim-cursorword', -- underline the word under the cursor
- { "junegunn/fzf", dir = "~/.fzf", build = "./install --all" },
--- Plug 'junegunn/fzf.vim' -- disabled while testing fzf-lua
--- Plug 'junegunn/vader.vim' -- run Vader tests from inside vim
+    'ap/vim-css-color', -- show css colors inline
+    'bkad/CamelCaseMotion', -- provide CamelCase motion through words
+    'gregsexton/MatchTag', -- highlight matchihng HTML tags
+    'haya14busa/vim-auto-mkdir', -- create directory path on save
+    'itchyny/vim-cursorword', -- underline the word under the cursor
+    {
+        'junegunn/fzf',
+        dir = '~/.fzf',
+        build = './install --all',
+    },
+    -- Plug 'junegunn/fzf.vim' -- disabled while testing fzf-lua
+    -- Plug 'junegunn/vader.vim' -- run Vader tests from inside vim
 
--- automatically clear search highlight when cursor is moved
--- zz after search places the current match at the center of the window
- 'junegunn/vim-slash',
+    -- automatically clear search highlight when cursor is moved
+    -- zz after search places the current match at the center of the window
+    'junegunn/vim-slash',
 
- 'kburdett/vim-nuuid', -- <leader>u to insert a new UUID
- 'luochen1990/rainbow', -- Rainbow Parentheses Improved
- 'mannih/vim-perl-variable-highlighter',-- highlight other instances of selected var
- 'motemen/xslate-vim', -- https://metacpan.org/pod/Text::Xslate
- 'mzlogin/vim-markdown-toc', -- :GenTocGFM to generate table of contents
- 'ntpeters/vim-better-whitespace', -- highlight trailing whitespace
- -- 'oalders/prettysql' -- ,fs to format visually selected SQL
--- 'oalders/vim-perl', { 'branch': 'dev   ', 'for': 'perl', 'do': 'make clean carp dancer highlight-all-pragmas moose test-more try-tiny' },
- 'othree/html5.vim',
- 'rhysd/git-messenger.vim', -- ,gm to open window
- 'rodjek/vim-puppet', -- { 'for': 'puppet' }, -- Formatting, syntax highlighting etc
- 'rust-lang/rust.vim',
- 'preservim/nerdcommenter',
- 'tpope/vim-abolish',
+    'kburdett/vim-nuuid', -- <leader>u to insert a new UUID
+    'luochen1990/rainbow', -- Rainbow Parentheses Improved
+    'mannih/vim-perl-variable-highlighter', -- highlight other instances of selected var
+    'motemen/xslate-vim', -- https://metacpan.org/pod/Text::Xslate
+    'mzlogin/vim-markdown-toc', -- :GenTocGFM to generate table of contents
+    'ntpeters/vim-better-whitespace', -- highlight trailing whitespace
+    -- 'oalders/prettysql' -- ,fs to format visually selected SQL
+    -- 'oalders/vim-perl', { 'branch': 'dev   ', 'for': 'perl', 'do': 'make clean carp dancer highlight-all-pragmas moose test-more try-tiny' },
+    'othree/html5.vim',
+    'rhysd/git-messenger.vim', -- ,gm to open window
+    'rodjek/vim-puppet', -- { 'for': 'puppet' }, -- Formatting, syntax highlighting etc
+    'rust-lang/rust.vim',
+    'preservim/nerdcommenter',
+    'tpope/vim-abolish',
 
--- :Delete :SudoWrite
- 'tpope/vim-eunuch',
+    -- :Delete :SudoWrite
+    'tpope/vim-eunuch',
 
- 'tpope/vim-fugitive',
- 'vim-ruby/vim-ruby', -- Vim/Ruby configuration files
- 'yko/mojo.vim', -- syntax highlighting for mojo epl templates
+    'tpope/vim-fugitive',
+    'vim-ruby/vim-ruby', -- Vim/Ruby configuration files
+    'yko/mojo.vim', -- syntax highlighting for mojo epl templates
     'ahmedkhalf/project.nvim', -- auto-detect project root
     'akinsho/bufferline.nvim', -- display tabs for open buffers
     'darfink/vim-plist', -- read macOS plist files
@@ -75,11 +79,11 @@ require('lazy').setup({
     -- display lines for indentation
     -- <leader>ll (start) leader<lh> (stop)
     {
-      "shellRaining/hlchunk.nvim",
-      event = { "UIEnter" },
-      config = function()
-        require("hlchunk").setup({})
-      end
+        'shellRaining/hlchunk.nvim',
+        event = { 'UIEnter' },
+        config = function()
+            require('hlchunk').setup({})
+        end,
     },
 
     'sindrets/diffview.nvim', -- File explorer for git diffs
@@ -91,12 +95,12 @@ require('lazy').setup({
         'CopilotC-Nvim/CopilotChat.nvim',
         branch = 'canary',
         dependencies = {
-          { 'zbirenbaum/copilot.lua' }, -- or github/copilot.vim
-          { 'nvim-lua/plenary.nvim' }, -- for curl, log wrapper
+            { 'zbirenbaum/copilot.lua' }, -- or github/copilot.vim
+            { 'nvim-lua/plenary.nvim' }, -- for curl, log wrapper
         },
         opts = {
-          debug = true, -- Enable debugging
-          -- See Configuration section for rest
+            debug = true, -- Enable debugging
+            -- See Configuration section for rest
         },
         -- See Commands section for default commands if you want to lazy load on them
     },
@@ -136,5 +140,5 @@ require('lazy').setup({
     'MunifTanjim/nui.nvim',
     'rcarriga/nvim-notify',
 
-'tpope/vim-sensible' -- Defaults everyone can agree on
+    'tpope/vim-sensible', -- Defaults everyone can agree on
 })
