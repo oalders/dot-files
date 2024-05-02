@@ -1,66 +1,66 @@
 -- vim.lsp.set_log_level("debug")
 
-require('lspsaga').setup({ code_action = {extend_gitsigns = true}})
+require('lspsaga').setup({ code_action = { extend_gitsigns = true } })
 
 -- reduce left-right jitter when signcolumn appears and disappears while
 -- scrolling vertically.
 vim.opt.signcolumn = 'yes'
 
-local lspconfig = require 'lspconfig'
-lspconfig.ansiblels.setup {}
-lspconfig.bashls.setup {
-    filetypes = { "sh" },
+local lspconfig = require('lspconfig')
+lspconfig.ansiblels.setup({})
+lspconfig.bashls.setup({
+    filetypes = { 'sh' },
     settings = {
         diagnostics = {
             enable = true,
             shellcheck = {
                 enable = true,
-                executable = "shellcheck",
-                extraArgs = { "-x" }
-            }
-        }
-    }
-}
-lspconfig.docker_compose_language_service.setup {}
+                executable = 'shellcheck',
+                extraArgs = { '-x' },
+            },
+        },
+    },
+})
+lspconfig.docker_compose_language_service.setup({})
 lspconfig.eslint.setup({
-  on_attach = function(client, bufnr)
-    vim.api.nvim_create_autocmd("BufWritePre", {
-      buffer = bufnr,
-      command = "EslintFixAll",
-    })
-  end,
+    on_attach = function(client, bufnr)
+        vim.api.nvim_create_autocmd('BufWritePre', {
+            buffer = bufnr,
+            command = 'EslintFixAll',
+        })
+    end,
 })
 -- lspconfig.lua_ls.setup {
-    -- settings = {
-        -- Lua = {
-            -- runtime = {
-                -- -- Tell the language server which version of Lua you're using (most likely LuaJIT in the case of Neovim)
-                -- version = 'LuaJIT',
-            -- },
-            -- diagnostics = {
-                -- -- Get the language server to recognize the `vim` global
-                -- globals = { 'hs', 'vim' },
-            -- },
-            -- workspace = {
-                -- checkThirdParty = false,
-                -- -- Make the server aware of Neovim runtime files
-                -- library = vim.api.nvim_get_runtime_file("", true),
-            -- },
-            -- -- Do not send telemetry data containing a randomized but unique identifier
-            -- telemetry = {
-                -- enable = false,
-            -- },
-        -- },
-    -- },
+-- settings = {
+-- Lua = {
+-- runtime = {
+-- -- Tell the language server which version of Lua you're using (most likely LuaJIT in the case of Neovim)
+-- version = 'LuaJIT',
+-- },
+-- diagnostics = {
+-- -- Get the language server to recognize the `vim` global
+-- globals = { 'hs', 'vim' },
+-- },
+-- workspace = {
+-- checkThirdParty = false,
+-- -- Make the server aware of Neovim runtime files
+-- library = vim.api.nvim_get_runtime_file("", true),
+-- },
+-- -- Do not send telemetry data containing a randomized but unique identifier
+-- telemetry = {
+-- enable = false,
+-- },
+-- },
+-- },
 -- }
-lspconfig.tsserver.setup {}
-lspconfig.yamlls.setup {}
+lspconfig.tsserver.setup({})
+lspconfig.yamlls.setup({})
 
 -- Set up lspconfig.
 -- Mappings.
-vim.api.nvim_create_augroup("LspAttach_inlayhints", {})
-vim.api.nvim_create_autocmd("LspAttach", {
-    group = "LspAttach_inlayhints",
+vim.api.nvim_create_augroup('LspAttach_inlayhints', {})
+vim.api.nvim_create_autocmd('LspAttach', {
+    group = 'LspAttach_inlayhints',
     callback = function(args)
         if not (args.data and args.data.client_id) then
             return
@@ -68,7 +68,7 @@ vim.api.nvim_create_autocmd("LspAttach", {
 
         local bufnr = args.buf
         local client = vim.lsp.get_client_by_id(args.data.client_id)
-        require("lsp-inlayhints").on_attach(client, bufnr)
+        require('lsp-inlayhints').on_attach(client, bufnr)
     end,
 })
 
@@ -96,17 +96,32 @@ vim.api.nvim_create_autocmd('LspAttach', {
         vim.keymap.set('n', 'K', vim.lsp.buf.hover, opts)
         vim.keymap.set('n', 'gi', vim.lsp.buf.implementation, opts)
         vim.keymap.set('n', '<C-k>', vim.lsp.buf.signature_help, opts)
-        vim.keymap.set('n', '<space>wa', vim.lsp.buf.add_workspace_folder, opts)
-        vim.keymap.set('n', '<space>wr', vim.lsp.buf.remove_workspace_folder, opts)
+        vim.keymap.set(
+            'n',
+            '<space>wa',
+            vim.lsp.buf.add_workspace_folder,
+            opts
+        )
+        vim.keymap.set(
+            'n',
+            '<space>wr',
+            vim.lsp.buf.remove_workspace_folder,
+            opts
+        )
         vim.keymap.set('n', '<space>wl', function()
             print(vim.inspect(vim.lsp.buf.list_workspace_folders()))
         end, opts)
         vim.keymap.set('n', '<space>D', vim.lsp.buf.type_definition, opts)
         vim.keymap.set('n', '<space>rn', vim.lsp.buf.rename, opts)
-        vim.keymap.set({ 'n', 'v' }, '<space>ca', vim.lsp.buf.code_action, opts)
+        vim.keymap.set(
+            { 'n', 'v' },
+            '<space>ca',
+            vim.lsp.buf.code_action,
+            opts
+        )
         vim.keymap.set('n', 'gr', vim.lsp.buf.references, opts)
         vim.keymap.set('n', '<space>f', function()
-            vim.lsp.buf.format { async = true }
+            vim.lsp.buf.format({ async = true })
         end, opts)
     end,
 })
@@ -127,7 +142,7 @@ lspconfig.gopls.setup({
 
 -- After setting up mason-lspconfig you may set up servers via lspconfig
 -- See server/src/server.ts in PerlNavigator for a list of available settings
-lspconfig.perlnavigator.setup {
+lspconfig.perlnavigator.setup({
     settings = {
         perlnavigator = {
             -- perltidyProfile = '',
@@ -139,27 +154,29 @@ lspconfig.perlnavigator.setup {
             perlimportsLintEnabled = true,
             perlimportsTidyEnabled = true,
             perlPath = 'perl',
-        }
+        },
     },
     on_new_config = function(new_config, new_root)
         local f = new_root .. '/.teamcity/pom.xml'
         local nav = new_config.settings.perlnavigator
         if vim.fn.filereadable(f) == 1 then
             nav.perlPath = 'mm-perl'
-            nav.perlcriticProfile = table.concat({ new_root, '.perlcriticrc' }, '/')
-            nav.perltidyProfile = table.concat({ new_root, '.perltidyallrc' }, '/')
+            nav.perlcriticProfile =
+                table.concat({ new_root, '.perlcriticrc' }, '/')
+            nav.perltidyProfile =
+                table.concat({ new_root, '.perltidyallrc' }, '/')
         end
     end,
-}
+})
 
 lspconfig.rust_analyzer.setup({
     settings = {
-        ["rust-analyzer"] = {
+        ['rust-analyzer'] = {
             imports = {
                 granularity = {
-                    group = "module",
+                    group = 'module',
                 },
-                prefix = "self",
+                prefix = 'self',
             },
             cargo = {
                 buildScripts = {
@@ -167,39 +184,40 @@ lspconfig.rust_analyzer.setup({
                 },
             },
             procMacro = {
-                enable = true
+                enable = true,
             },
-        }
-    }
+        },
+    },
 })
 
-lspconfig.pylsp.setup {
+lspconfig.pylsp.setup({
     settings = {
         pylsp = {
             plugins = {
                 pycodestyle = {
                     ignore = { 'W391' },
-                    maxLineLength = 100
-                }
-            }
-        }
-    }
-}
+                    maxLineLength = 100,
+                },
+            },
+        },
+    },
+})
 
 -- begin
 -- https://github.com/neovim/neovim/issues/20745#issuecomment-1983998972
 local function filter_diagnostics(diagnostic)
-  if diagnostic.source == 'tsserver' then
-    return false
-  end
-  return true
+    if diagnostic.source == 'tsserver' then
+        return false
+    end
+    return true
 end
 
 vim.lsp.handlers['textDocument/publishDiagnostics'] = vim.lsp.with(
-  function(_, result, ctx, config)
-    result.diagnostics = vim.tbl_filter(filter_diagnostics, result.diagnostics)
-    vim.lsp.diagnostic.on_publish_diagnostics(_, result, ctx, config)
-  end,
-  {}
+    function(_, result, ctx, config)
+        result.diagnostics =
+            vim.tbl_filter(filter_diagnostics, result.diagnostics)
+        vim.lsp.diagnostic.on_publish_diagnostics(_, result, ctx, config)
+    end,
+    {}
 )
 -- end

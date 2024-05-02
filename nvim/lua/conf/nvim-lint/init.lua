@@ -1,4 +1,4 @@
-local l = require 'lint'
+local l = require('lint')
 
 vim.api.nvim_create_autocmd({ 'BufWritePost', 'VimEnter', 'BufEnter' }, {
     pattern = { '*' },
@@ -14,7 +14,7 @@ l.linters_by_ft = {
     -- perl = { 'perlimports' },
     -- sh = { 'shellcheck' },
     sql = { 'sqlfluff' },
-    typescript = { 'eslint'},
+    typescript = { 'eslint' },
     vim = { 'vint' },
     yaml = { 'yamllint' },
 }
