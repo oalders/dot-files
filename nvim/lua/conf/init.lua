@@ -26,8 +26,6 @@ vim.opt.laststatus = 2
 vim.opt.backspace = '2'
 vim.cmd('filetype on')
 
-vim.opt.swapfile = false
-
 vim.api.nvim_exec(
     [[
   augroup fileops
