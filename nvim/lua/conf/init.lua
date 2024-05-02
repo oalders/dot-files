@@ -212,11 +212,12 @@ vim.g.NERDCommentEmptyLines = 1
 -- 'luochen1990/rainbow'
 vim.g.rainbow_active = 1 --set to 0 if you want to enable it later via :RainbowToggle
 
--- vim-slash plugin can force the cursor to blink when it first arrives at a match
-if vim.fn.has('timers') then
-  -- Blink 2 times with 50ms interval
-  vim.api.nvim_set_keymap('n', '<plug>(slash-after)', 'slash#blink(2, 50)', {})
-end
+vim.api.nvim_exec([[
+  if has('timers')
+    " Blink 2 times with 50ms interval
+    noremap <expr> <plug>(slash-after) slash#blink(2, 50)
+  endif
+]], false)
 
 -- insert a new uuid at cursor
 vim.g.nuuid_no_mappings = 1
