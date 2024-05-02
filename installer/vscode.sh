@@ -7,7 +7,7 @@ if is os name ne darwin; then
 fi
 
 if ! is there code; then
-   brew install visual-studio-code
+    brew install visual-studio-code
 fi
 
 open vscode:extension/vscodevim.vim
