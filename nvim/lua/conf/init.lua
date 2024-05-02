@@ -17,8 +17,8 @@ vim.cmd('highlight clear SignColumn')
 
 vim.api.nvim_set_keymap('n', '<leader>sv', ':source $MYVIMRC<cr>', {})
 
-vim.opt.shortmess:remove("S")
-vim.opt.shortmess:remove("A")
+vim.opt.shortmess:remove('S')
+vim.opt.shortmess:remove('A')
 
 vim.api.nvim_set_keymap('n', ',ss', '<esc>:syntax sync fromstart<CR>', {})
 
@@ -28,11 +28,14 @@ vim.cmd('filetype on')
 
 vim.opt.swapfile = false
 
-vim.api.nvim_exec([[
+vim.api.nvim_exec(
+    [[
   augroup fileops
     autocmd CursorHold * checktime
   augroup END
-]], false)
+]],
+    false
+)
 
 vim.api.nvim_set_keymap('x', 'p', 'pgvy', {})
 
@@ -91,7 +94,8 @@ function UseTabs()
 end
 
 -- define a group `vimrc` and initialize.
-vim.api.nvim_exec([[
+vim.api.nvim_exec(
+    [[
   augroup vimrc
     autocmd!
     autocmd BufEnter .vim-plug-vimrc  setlocal filetype=vim
@@ -114,7 +118,9 @@ vim.api.nvim_exec([[
     autocmd BufRead,BufNewFile local_bashrc set filetype=sh
     autocmd BufRead,BufNewFile Changes      set filetype=txt
   augroup END
-]], false)
+]],
+    false
+)
 
 -- prevent left and right arrows from being disabled in insert mode when
 -- editing SQL files
@@ -157,40 +163,60 @@ function Requote()
 end
 
 -- nnoremap <leader>xx :call setfperm(expand('%'),"rwxrw-rw-")<cr>
-vim.api.nvim_set_keymap('n', '<leader>xx', ':call setfperm(expand("%"),"rwxrw-rw-")<cr>', {})
+vim.api.nvim_set_keymap(
+    'n',
+    '<leader>xx',
+    ':call setfperm(expand("%"),"rwxrw-rw-")<cr>',
+    {}
+)
 
 -- Change hyphens to underscores
-vim.api.nvim_set_keymap('v', 'uu', ':s/\\%V\\-/_/g<cr>', {silent = true})
+vim.api.nvim_set_keymap('v', 'uu', ':s/\\%V\\-/_/g<cr>', { silent = true })
 
 -- Change underscores to hyphens
-vim.api.nvim_set_keymap('v', 'hh', ':s/\\%V_/-/g<cr>', {silent = true})
+vim.api.nvim_set_keymap('v', 'hh', ':s/\\%V_/-/g<cr>', { silent = true })
 
 -- Change double quotes to single quotes
-vim.api.nvim_set_keymap('v', "''", ':s/\\%V"/\'/g<cr>', {silent = true})
+vim.api.nvim_set_keymap('v', "''", ':s/\\%V"/\'/g<cr>', { silent = true })
 
 -- https://github.com/roxma/vim-hug-neovim-rpc/issues/28
 vim.g.python_host_prog = '/usr/bin/python2'
 vim.g.python3_host_prog = '/usr/bin/python3'
 
 -- fzf
-vim.g.fzf_preview_window = {'down:50%', 'ctrl-/', }
+vim.g.fzf_preview_window = { 'down:50%', 'ctrl-/' }
 vim.api.nvim_set_keymap('n', '<leader>b', ':Buffers<cr>', {})
 
 --remove all trailing whitespace
-vim.api.nvim_set_keymap('n', '-', ':StripWhitespace<CR>', {silent = true})
-vim.api.nvim_set_keymap('v', '-', ':StripWhitespace<CR>', {silent = true})
+vim.api.nvim_set_keymap('n', '-', ':StripWhitespace<CR>', { silent = true })
+vim.api.nvim_set_keymap('v', '-', ':StripWhitespace<CR>', { silent = true })
 
 --dictionary sort
-vim.api.nvim_set_keymap('v', 'so', ':!sort -d --ignore-case<CR>', {silent = true})
+vim.api.nvim_set_keymap(
+    'v',
+    'so',
+    ':!sort -d --ignore-case<CR>',
+    { silent = true }
+)
 
 --dictionary sort unique
-vim.api.nvim_set_keymap('v', 'su', ':!sort -d --ignore-case<bar> uniq<CR>', {silent = true})
+vim.api.nvim_set_keymap(
+    'v',
+    'su',
+    ':!sort -d --ignore-case<bar> uniq<CR>',
+    { silent = true }
+)
 
 -- CamelCaseMotion
-vim.api.nvim_set_keymap('', 'w', '<Plug>CamelCaseMotion_w', {silent = true})
-vim.api.nvim_set_keymap('', 'b', '<Plug>CamelCaseMotion_b', {silent = true})
-vim.api.nvim_set_keymap('', 'e', '<Plug>CamelCaseMotion_e', {silent = true})
-vim.api.nvim_set_keymap('', 'ge', '<Plug>CamelCaseMotion_ge', {silent = true})
+vim.api.nvim_set_keymap('', 'w', '<Plug>CamelCaseMotion_w', { silent = true })
+vim.api.nvim_set_keymap('', 'b', '<Plug>CamelCaseMotion_b', { silent = true })
+vim.api.nvim_set_keymap('', 'e', '<Plug>CamelCaseMotion_e', { silent = true })
+vim.api.nvim_set_keymap(
+    '',
+    'ge',
+    '<Plug>CamelCaseMotion_ge',
+    { silent = true }
+)
 
 -- nmap <leader>h :YankHistoryRgPaste
 vim.api.nvim_set_keymap('n', '<leader>h', ':YankHistoryRgPaste', {})
@@ -212,12 +238,15 @@ vim.g.NERDCommentEmptyLines = 1
 -- 'luochen1990/rainbow'
 vim.g.rainbow_active = 1 --set to 0 if you want to enable it later via :RainbowToggle
 
-vim.api.nvim_exec([[
+vim.api.nvim_exec(
+    [[
   if has('timers')
     " Blink 2 times with 50ms interval
     noremap <expr> <plug>(slash-after) slash#blink(2, 50)
   endif
-]], false)
+]],
+    false
+)
 
 -- insert a new uuid at cursor
 vim.g.nuuid_no_mappings = 1

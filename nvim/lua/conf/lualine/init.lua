@@ -12,7 +12,7 @@ end
 
 -- LSP clients attached to buffer
 local clients_lsp = function()
-    local clients = vim.lsp.get_clients({bufnr = 0})
+    local clients = vim.lsp.get_clients({ bufnr = 0 })
     if next(clients) == nil then
         return ''
     end
@@ -25,11 +25,11 @@ local clients_lsp = function()
         end
         table.insert(c, name)
     end
-    table.sort(c);
+    table.sort(c)
     return '[' .. table.concat(c, ',') .. ']'
 end
 
-require('lualine').setup {
+require('lualine').setup({
     options = {
         icons_enabled = true,
         theme = 'nord',
@@ -46,7 +46,7 @@ require('lualine').setup {
             statusline = 1000,
             tabline = 1000,
             winbar = 1000,
-        }
+        },
     },
     sections = {
         lualine_a = { 'mode' },
@@ -59,7 +59,8 @@ require('lualine').setup {
                     readonly = '🔒',
                 },
                 path = path_option(),
-            } },
+            },
+        },
         lualine_x = { clients_lsp, 'encoding', 'fileformat', 'filetype' },
         lualine_y = { 'searchcount' },
         lualine_z = { 'location', 'progress' },
@@ -75,5 +76,5 @@ require('lualine').setup {
     tabline = {},
     winbar = {},
     inactive_winbar = {},
-    extensions = { 'mason', 'trouble' }
-}
+    extensions = { 'mason', 'trouble' },
+})
