@@ -138,6 +138,9 @@ wk.register({
             'open files via ot',
         },
     },
+    s = {
+        v = { ':source $MYVIMRC<cr>', 'Source VimRC' },
+    },
     t = {
         c = {
             function()
@@ -175,4 +178,15 @@ wk.register({
     },
 }, { prefix = '<leader>' })
 
+wk.register({
+    su = {
+        ':!sort -d --ignore-case<bar> uniq<CR>',
+        'Sort and remove duplicates',
+    },
+}, { mode = 'v', silent = true })
+
 wk.setup({})
+
+require('which-key').register({
+    sv = { ':source $MYVIMRC<cr>', 'Source VimRC' },
+}, { prefix = '<leader>' })

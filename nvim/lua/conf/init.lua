@@ -15,8 +15,6 @@ vim.opt.background = 'dark'
 vim.cmd('highlight clear LineNr')
 vim.cmd('highlight clear SignColumn')
 
-vim.api.nvim_set_keymap('n', '<leader>sv', ':source $MYVIMRC<cr>', {})
-
 vim.opt.shortmess:remove('S')
 vim.opt.shortmess:remove('A')
 
@@ -194,14 +192,6 @@ vim.api.nvim_set_keymap(
     'v',
     'so',
     ':!sort -d --ignore-case<CR>',
-    { silent = true }
-)
-
---dictionary sort unique
-vim.api.nvim_set_keymap(
-    'v',
-    'su',
-    ':!sort -d --ignore-case<bar> uniq<CR>',
     { silent = true }
 )
 
