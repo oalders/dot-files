@@ -1,52 +1,50 @@
-if !has('nvim')
-    call plug#begin('~/.vim/plugged')
+call plug#begin('~/.vim/plugged')
 
-    " Colour schemes
-    " Plug 'arcticicestudio/nord-vim'
-    Plug 'cocopon/iceberg.vim'
+" Colour schemes
+" Plug 'arcticicestudio/nord-vim'
+Plug 'cocopon/iceberg.vim'
 
-    Plug 'ap/vim-css-color' " show css colors inline
-    Plug 'bkad/CamelCaseMotion' " provide CamelCase motion through words
-    Plug 'gregsexton/MatchTag' " highlight matchihng HTML tags
-    Plug 'haya14busa/vim-auto-mkdir' " create directory path on save
-    Plug 'itchyny/vim-cursorword' " underline the word under the cursor
-    Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
-    " Plug 'junegunn/fzf.vim' " disabled while testing fzf-lua
-    " Plug 'junegunn/vader.vim' " run Vader tests from inside vim
+Plug 'ap/vim-css-color' " show css colors inline
+Plug 'bkad/CamelCaseMotion' " provide CamelCase motion through words
+Plug 'gregsexton/MatchTag' " highlight matchihng HTML tags
+Plug 'haya14busa/vim-auto-mkdir' " create directory path on save
+Plug 'itchyny/vim-cursorword' " underline the word under the cursor
+Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
+" Plug 'junegunn/fzf.vim' " disabled while testing fzf-lua
+" Plug 'junegunn/vader.vim' " run Vader tests from inside vim
 
-    " automatically clear search highlight when cursor is moved
-    " zz after search places the current match at the center of the window
-    Plug 'junegunn/vim-slash'
+" automatically clear search highlight when cursor is moved
+" zz after search places the current match at the center of the window
+Plug 'junegunn/vim-slash'
 
-    Plug 'kburdett/vim-nuuid' " <leader>u to insert a new UUID
-    Plug 'luochen1990/rainbow' " Rainbow Parentheses Improved
-    Plug 'mannih/vim-perl-variable-highlighter'" highlight other instances of selected var
-    Plug 'motemen/xslate-vim' " https://metacpan.org/pod/Text::Xslate
-    Plug 'mzlogin/vim-markdown-toc' " :GenTocGFM to generate table of contents
-    Plug 'ntpeters/vim-better-whitespace' " highlight trailing whitespace
-    Plug 'oalders/prettysql' " ,fs to format visually selected SQL
-    Plug 'oalders/vim-perl', { 'branch': 'dev', 'for': 'perl', 'do': 'make clean carp dancer highlight-all-pragmas moose test-more try-tiny' }
-    Plug 'othree/html5.vim'
-    Plug 'rhysd/git-messenger.vim' " ,gm to open window
-    Plug 'rodjek/vim-puppet', { 'for': 'puppet' } " Formatting, syntax highlighting etc
-    Plug 'rust-lang/rust.vim'
-    Plug 'preservim/nerdcommenter'
-    Plug 'skaji/syntax-check-perl', { 'branch': 'main' }
-    Plug 'tpope/vim-abolish'
+Plug 'kburdett/vim-nuuid' " <leader>u to insert a new UUID
+Plug 'luochen1990/rainbow' " Rainbow Parentheses Improved
+Plug 'mannih/vim-perl-variable-highlighter'" highlight other instances of selected var
+Plug 'motemen/xslate-vim' " https://metacpan.org/pod/Text::Xslate
+Plug 'mzlogin/vim-markdown-toc' " :GenTocGFM to generate table of contents
+Plug 'ntpeters/vim-better-whitespace' " highlight trailing whitespace
+Plug 'oalders/prettysql' " ,fs to format visually selected SQL
+Plug 'oalders/vim-perl', { 'branch': 'dev', 'for': 'perl', 'do': 'make clean carp dancer highlight-all-pragmas moose test-more try-tiny' }
+Plug 'othree/html5.vim'
+Plug 'rhysd/git-messenger.vim' " ,gm to open window
+Plug 'rodjek/vim-puppet', { 'for': 'puppet' } " Formatting, syntax highlighting etc
+Plug 'rust-lang/rust.vim'
+Plug 'preservim/nerdcommenter'
+Plug 'skaji/syntax-check-perl', { 'branch': 'main' }
+Plug 'tpope/vim-abolish'
 
-    " :Delete :SudoWrite
-    Plug 'tpope/vim-eunuch'
+" :Delete :SudoWrite
+Plug 'tpope/vim-eunuch'
 
-    Plug 'tpope/vim-fugitive'
-    Plug 'vim-ruby/vim-ruby' " Vim/Ruby configuration files
-    Plug 'yko/mojo.vim' " syntax highlighting for mojo epl templates
+Plug 'tpope/vim-fugitive'
+Plug 'vim-ruby/vim-ruby' " Vim/Ruby configuration files
+Plug 'yko/mojo.vim' " syntax highlighting for mojo epl templates
 
-    Plug 'airblade/vim-gitgutter' " show git diff markers in the sign column
-    Plug 'ConradIrwin/vim-bracketed-paste'
-    Plug 'roxma/nvim-yarp'
-    Plug 'roxma/vim-hug-neovim-rpc'
-    Plug 'tpope/vim-sensible' " Defaults everyone can agree on
-endif
+Plug 'airblade/vim-gitgutter' " show git diff markers in the sign column
+Plug 'ConradIrwin/vim-bracketed-paste'
+Plug 'roxma/nvim-yarp'
+Plug 'roxma/vim-hug-neovim-rpc'
+Plug 'tpope/vim-sensible' " Defaults everyone can agree on
 
 " Initialize plugin system
 call plug#end()
