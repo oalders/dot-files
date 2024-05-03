@@ -159,7 +159,8 @@ Remind myself of vim shortcuts etc.
 * `ctrl-w m` - toggle zooming of splits
 * `ctrl-w r` - swap splits
 * `ctrl-o` - return to previous position in file
-* `ý¿¿»šºvertical terminal` - vertical split into a terminal buffer
+* `gO` - open a loc list with the table of contents for a help file
+* `:vert(ical) terminal` - vertical split into a terminal buffer
 * `DiffviewOpen HEAD~1` - view diff. Probably follow with `:colo iceberg`
 * `:GFiles` - `git ls-files | fzf`
 * `:GFiles?` - `git status | fzf` with preview pane
@@ -202,6 +203,7 @@ to begin the search.
 
 ## Bash
 
+* `ctrl-e` - open current line in `$EDITOR`
 * `fc` - open previous command in `$EDITOR`
 * `fc 2009` - open line 2009 of `history` in `$EDITOR`
 
