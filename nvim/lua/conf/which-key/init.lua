@@ -92,6 +92,15 @@ wk.register({
             end,
             'join the object under cursor',
         },
+        p = {
+            function()
+                local actions = require('CopilotChat.actions')
+                require('CopilotChat.integrations.fzflua').pick(
+                    actions.prompt_actions()
+                )
+            end,
+            'CopilotChat - Prompt actions',
+        },
         s = {
             function()
                 tsj.split()
