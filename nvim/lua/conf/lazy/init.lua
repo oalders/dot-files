@@ -16,6 +16,52 @@ require('lazy').setup({
     -- Plug 'arcticicestudio/nord-vim'
     'cocopon/iceberg.vim',
 
+    {
+        'nvimdev/dashboard-nvim',
+        event = 'VimEnter',
+        config = function()
+            require('dashboard').setup({
+                theme = 'hyper',
+                config = {
+                    week_header = {
+                        enable = true,
+                    },
+                    shortcut = {
+                        {
+                            icon = '♻️',
+                            desc = ' Update',
+                            group = '@property',
+                            action = 'Lazy update',
+                            key = 'u',
+                        },
+                        {
+                            icon = '📂',
+                            desc = 'Git Changed Files',
+                            group = 'Label',
+                            action = ':GDomo',
+                            key = 'g',
+                        },
+                        {
+                            icon = '🚀',
+                            desc = 'SessionLoad',
+                            group = 'DiagnosticHint',
+                            action = ':SessionLoad',
+                            key = 's',
+                        },
+                        {
+                            icon = '🤖',
+                            desc = 'Chat',
+                            group = 'Number',
+                            action = ':CopilotChatOpen',
+                            key = 'c',
+                        },
+                    },
+                },
+            })
+        end,
+        dependencies = { { 'nvim-tree/nvim-web-devicons' } },
+    },
+
     'ap/vim-css-color', -- show css colors inline
     'bkad/CamelCaseMotion', -- provide CamelCase motion through words
     'gregsexton/MatchTag', -- highlight matchihng HTML tags
