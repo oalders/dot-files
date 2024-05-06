@@ -113,6 +113,8 @@ vim.api.nvim_exec(
     autocmd FileType yaml setlocal sw=2 ts=2 sts=2
     autocmd BufRead,BufNewFile local_bashrc set filetype=sh
     autocmd BufRead,BufNewFile Changes      set filetype=txt
+    autocmd FileType dashboard setlocal nobackup noundofile noswapfile
+    autocmd FileType dashboard :DisableWhitespace
   augroup END
 ]],
     false
