@@ -134,7 +134,7 @@ function ExecFile()
     vim.cmd('!"%:p"')
 end
 
-vim.cmd("command! ExecFile lua ExecFile()")
+vim.cmd('command! ExecFile lua ExecFile()')
 
 -- Set line markers to make indentation easier to follow
 -- Enable via :lua ShowLines()
@@ -142,7 +142,7 @@ function ShowLines()
     vim.opt.colorcolumn = '5,9,13,17,21,25,29,78'
 end
 
-vim.cmd("command! ShowLines lua ShowLines()")
+vim.cmd('command! ShowLines lua ShowLines()')
 
 function HideGutter()
     vim.opt.number = false
@@ -151,7 +151,7 @@ function HideGutter()
     vim.opt.foldcolumn = '0'
 end
 
-vim.cmd("command! HideGutter lua HideGutter()")
+vim.cmd('command! HideGutter lua HideGutter()')
 
 function ShowGutter()
     vim.opt.number = true
@@ -159,7 +159,7 @@ function ShowGutter()
     vim.opt.signcolumn = 'auto'
 end
 
-vim.cmd("command! ShowGutter lua ShowGutter()")
+vim.cmd('command! ShowGutter lua ShowGutter()')
 
 function Requote()
     for l = 1, vim.fn.line('$') do
@@ -168,7 +168,7 @@ function Requote()
     end
 end
 
-vim.cmd("command! Requote lua Requote()")
+vim.cmd('command! Requote lua Requote()')
 
 -- nnoremap <leader>xx :call setfperm(expand('%'),"rwxrw-rw-")<cr>
 vim.api.nvim_set_keymap(
