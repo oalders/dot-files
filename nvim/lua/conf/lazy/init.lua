@@ -81,7 +81,10 @@ require('lazy').setup({
 
     'kburdett/vim-nuuid', -- <leader>u to insert a new UUID
     'luochen1990/rainbow', -- Rainbow Parentheses Improved
-    'mannih/vim-perl-variable-highlighter', -- highlight other instances of selected var
+    {
+        'mannih/vim-perl-variable-highlighter', -- highlight other instances of selected var
+        ft = 'perl',
+    },
     'motemen/xslate-vim', -- https://metacpan.org/pod/Text::Xslate
     'mzlogin/vim-markdown-toc', -- :GenTocGFM to generate table of contents
     'ntpeters/vim-better-whitespace', -- highlight trailing whitespace
@@ -90,7 +93,10 @@ require('lazy').setup({
     'othree/html5.vim',
     'rhysd/git-messenger.vim', -- ,gm to open window
     'rodjek/vim-puppet', -- { 'for': 'puppet' }, -- Formatting, syntax highlighting etc
-    'rust-lang/rust.vim',
+    {
+        'rust-lang/rust.vim',
+        ft = 'rust',
+    },
     'preservim/nerdcommenter',
     'tpope/vim-abolish',
 
@@ -98,7 +104,10 @@ require('lazy').setup({
     'tpope/vim-eunuch',
 
     'tpope/vim-fugitive',
-    'vim-ruby/vim-ruby', -- Vim/Ruby configuration files
+    {
+        'vim-ruby/vim-ruby', -- Vim/Ruby configuration files
+        ft = 'ruby',
+    },
     'yko/mojo.vim', -- syntax highlighting for mojo epl templates
     'ahmedkhalf/project.nvim', -- auto-detect project root
     'akinsho/bufferline.nvim', -- display tabs for open buffers
@@ -174,7 +183,7 @@ require('lazy').setup({
 
     -- neotest
     'nvim-neotest/neotest',
-    'nvim-neotest/neotest-go',
+    { 'nvim-neotest/neotest-go', ft = 'go' },
     'nvim-neotest/nvim-nio',
 
     'onsails/lspkind.nvim', -- add pictograms to completion sources
