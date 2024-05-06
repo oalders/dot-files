@@ -182,9 +182,16 @@ require('lazy').setup({
     'nvimdev/lspsaga.nvim',
 
     -- neotest
-    'nvim-neotest/neotest',
-    { 'nvim-neotest/neotest-go', ft = 'go' },
-    'nvim-neotest/nvim-nio',
+    {
+        'nvim-neotest/neotest',
+        dependencies = {
+            'nvim-neotest/neotest-go',
+            'nvim-neotest/nvim-nio',
+            'nvim-lua/plenary.nvim',
+            'antoinemadec/FixCursorHold.nvim',
+            'nvim-treesitter/nvim-treesitter',
+        },
+    },
 
     'onsails/lspkind.nvim', -- add pictograms to completion sources
     'williamboman/mason-lspconfig.nvim', --  bridge mason.nvim with the lspconfig plugin
