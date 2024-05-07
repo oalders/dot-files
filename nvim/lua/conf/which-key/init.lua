@@ -108,6 +108,7 @@ wk.register({
             'split the object under cursor',
         },
         x = { '<cmd>Copilot disable<cr>', 'stop GH copilot' },
+        y = { '<cmd>CopilotChatClose<cr>', 'CopilotChatClose' },
         w = { 'Vgw<cr>', 'wrap long lines' },
     },
     l = {
@@ -188,11 +189,15 @@ wk.register({
 }, { prefix = '<leader>' })
 
 wk.register({
+    co = {
+        '<cmd>CopilotChat<cr>',
+        'CopilotChat'
+    },
     su = {
         ':!sort -d --ignore-case<bar> uniq<CR>',
         'Sort and remove duplicates',
     },
-}, { mode = 'v', silent = true })
+}, { mode = 'v', silent = false })
 
 wk.setup({})
 
