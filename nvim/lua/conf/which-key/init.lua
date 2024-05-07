@@ -194,7 +194,7 @@ wk.register({
         'CopilotChat'
     },
     su = {
-        ':!sort -d --ignore-case<bar> uniq<CR>',
+        ':!sort -d --ignore-case -u',
         'Sort and remove duplicates',
     },
 }, { mode = 'v', silent = false })
