@@ -193,6 +193,10 @@ wk.register({
         '<cmd>CopilotChat<cr>',
         'CopilotChat'
     },
+    cx = {
+        '<cmd>CopilotChatExplain<cr>',
+        'CopilotChatExplain'
+    },
     su = {
         ':!sort -d --ignore-case -u',
         'Sort and remove duplicates',
