@@ -85,12 +85,12 @@ require('lazy').setup({
         'mannih/vim-perl-variable-highlighter', -- highlight other instances of selected var
         ft = 'perl',
     },
-    'motemen/xslate-vim', -- https://metacpan.org/pod/Text::Xslate
-    'mzlogin/vim-markdown-toc', -- :GenTocGFM to generate table of contents
+    { 'motemen/xslate-vim', ft = 'xslate' }, -- https://metacpan.org/pod/Text::Xslate
+    { 'mzlogin/vim-markdown-toc', ft = 'markdown' }, -- :GenTocGFM to generate table of contents
     'ntpeters/vim-better-whitespace', -- highlight trailing whitespace
     -- 'oalders/prettysql' -- ,fs to format visually selected SQL
     -- 'oalders/vim-perl', { 'branch': 'dev   ', 'for': 'perl', 'do': 'make clean carp dancer highlight-all-pragmas moose test-more try-tiny' },
-    'othree/html5.vim',
+    { 'othree/html5.vim', ft = 'html' },
     'rhysd/git-messenger.vim', -- ,gm to open window
     'rodjek/vim-puppet', -- { 'for': 'puppet' }, -- Formatting, syntax highlighting etc
     {
@@ -108,11 +108,13 @@ require('lazy').setup({
         'vim-ruby/vim-ruby', -- Vim/Ruby configuration files
         ft = 'ruby',
     },
-    'yko/mojo.vim', -- syntax highlighting for mojo epl templates
+
+    { 'yko/mojo.vim', ft = 'html.epl', lazy = true }, -- syntax highlighting for mojo epl templates
+
     'ahmedkhalf/project.nvim', -- auto-detect project root
     'akinsho/bufferline.nvim', -- display tabs for open buffers
     'darfink/vim-plist', -- read macOS plist files
-    'ellisonleao/glow.nvim', -- render markdown via :Glow
+    { 'ellisonleao/glow.nvim', ft = 'markdown', config = true, cmd = 'Glow' }, -- render markdown via :Glow
     'folke/trouble.nvim', --  <leader>td (doc) <leader>tw (workspace)
     'folke/which-key.nvim', -- better organization of keybindings
     'Hubro/nvim-splitrun', -- :Splitrun some command
@@ -144,7 +146,6 @@ require('lazy').setup({
     'sindrets/diffview.nvim', -- File explorer for git diffs
     'Wansmer/treesj', -- SplitJoin replacement
     'windwp/nvim-autopairs', --
-    'zbirenbaum/copilot.lua', -- GitHub Copilot
 
     {
         'CopilotC-Nvim/CopilotChat.nvim',
