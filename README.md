@@ -161,7 +161,9 @@ Remind myself of vim shortcuts etc.
 * `ctrl-o` - return to previous position in file
 * `gc` - to toggle commenting on a visual selection
 * `gO` - open a loc list with the table of contents for a help file
-* `:vert(ical) terminal` - vertical split into a terminal buffer
+* `gx` - in normal mode calls `vim.ui.open()` on whatever is under the cursor
+* `:vert(ical) terminal` - vertical split into a terminal buffer. `exit` to
+  close the terminal
 * `DiffviewOpen HEAD~1` - view diff. Probably follow with `:colo iceberg`
 * `:GFiles` - `git ls-files | fzf`
 * `:GFiles?` - `git status | fzf` with preview pane
