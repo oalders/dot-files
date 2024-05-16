@@ -97,7 +97,6 @@ require('lazy').setup({
         'rust-lang/rust.vim',
         ft = 'rust',
     },
-    'preservim/nerdcommenter',
     'tpope/vim-abolish',
 
     -- :Delete :SudoWrite

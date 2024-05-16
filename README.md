@@ -159,6 +159,7 @@ Remind myself of vim shortcuts etc.
 * `ctrl-w m` - toggle zooming of splits
 * `ctrl-w r` - swap splits
 * `ctrl-o` - return to previous position in file
+* `gc` - to toggle commenting on a visual selection
 * `gO` - open a loc list with the table of contents for a help file
 * `:vert(ical) terminal` - vertical split into a terminal buffer
 * `DiffviewOpen HEAD~1` - view diff. Probably follow with `:colo iceberg`

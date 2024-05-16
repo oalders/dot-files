@@ -229,12 +229,6 @@ vim.cmd('highlight Comment cterm=italic gui=italic term=bold')
 vim.cmd('set t_ZH=[3m')
 vim.cmd('set t_ZR=[23m')
 
--- Add spaces after comment delimiters by default
-vim.g.NERDSpaceDelims = 1
-
--- Allow commenting and inverting empty lines (useful when commenting a region)
-vim.g.NERDCommentEmptyLines = 1
-
 -- 'luochen1990/rainbow'
 vim.g.rainbow_active = 1 --set to 0 if you want to enable it later via :RainbowToggle
 
