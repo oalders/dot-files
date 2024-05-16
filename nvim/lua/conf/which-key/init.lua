@@ -76,15 +76,14 @@ wk.register({
             'debug stuff',
         },
         e = { '<cmd>Copilot enable<cr>', 'enable GH copilot' },
-        t = {
+        h = {
             function()
-                if vim.opt.number:get() == false then
-                    vim.fn.ShowGutter()
-                else
-                    vim.fn.HideGutter()
-                end
+                local actions = require('CopilotChat.actions')
+                require('CopilotChat.integrations.fzflua').pick(
+                    actions.help_actions()
+                )
             end,
-            'toggle gutter',
+            'CopilotChat - Help actions',
         },
         j = {
             function()
@@ -106,6 +105,16 @@ wk.register({
                 tsj.split()
             end,
             'split the object under cursor',
+        },
+        t = {
+            function()
+                if vim.opt.number:get() == false then
+                    vim.fn.ShowGutter()
+                else
+                    vim.fn.HideGutter()
+                end
+            end,
+            'toggle gutter',
         },
         x = { '<cmd>Copilot disable<cr>', 'stop GH copilot' },
         y = { '<cmd>CopilotChatClose<cr>', 'CopilotChatClose' },
