@@ -1,22 +1,23 @@
 #!/usr/bin/env bash
 
-set -eu -o pipefail
+set -eux -o pipefail
 
 if [ "$#" -eq 0 ]; then
     # No arguments provided, find files
-    files=$(fd . -e jpg -e jpeg)
+    mapfile -t files < <(fd . -e jpg -e jpeg)
 else
     # Arguments provided, use those as file names
-    files="$@"
+    files=("$@")
 fi
 
 width=600
-for i in $files; do
-    newSuffix="-${width}.jpeg"
-if [[ $i == *$newSuffix ]]; then
+newSuffix="-${width}.jpeg"
+
+for file in "${files[@]}"; do
+    if [[ $file == *$newSuffix ]]; then
+        echo "skipping $file"
         continue
     fi
-    fileNoExt="${i%.*}"
-    resizedFile="${fileNoExt}${newSuffix}"
-    sips -Z $width "$i" --out "$resizedFile"
+    fileNoExt="${file%.*}"
+    sips -Z $width "$file" --out "${fileNoExt}${newSuffix}"
 done
