@@ -168,6 +168,7 @@ Remind myself of vim shortcuts etc.
 * `:Maps` - fzf normal mode mappings
 * `:BLines` - fzf lines in current buffer
 * `:Lines` - fzf lines in loaded buffers
+* `:Splitrun precious tidy --git` - run a command in a split
 * `:GenTocGFM` - generate GitHub flavoured markdown table of contents
 * `[c` and `]c` - navigate to next changed hunk
 * `gwip` - reflow a block of text and maintain cursor position
