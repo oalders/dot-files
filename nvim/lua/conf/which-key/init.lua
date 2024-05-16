@@ -199,13 +199,31 @@ wk.register({
 }, { prefix = '<leader>' })
 
 wk.register({
+    ch = {
+        function()
+            local actions = require('CopilotChat.actions')
+            require('CopilotChat.integrations.fzflua').pick(
+                actions.help_actions()
+            )
+        end,
+        'CopilotChat - Help actions',
+    },
     co = {
         '<cmd>CopilotChat<cr>',
-        'CopilotChat'
+        'CopilotChat',
+    },
+    cp = {
+        function()
+            local actions = require('CopilotChat.actions')
+            require('CopilotChat.integrations.fzflua').pick(
+                actions.prompt_actions()
+            )
+        end,
+        'CopilotChat - Prompt actions',
     },
     cx = {
         '<cmd>CopilotChatExplain<cr>',
-        'CopilotChatExplain'
+        'CopilotChatExplain',
     },
     su = {
         ':!sort -d --ignore-case -u',
