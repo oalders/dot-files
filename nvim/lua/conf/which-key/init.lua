@@ -121,6 +121,7 @@ wk.register({
         w = { 'Vgw<cr>', 'wrap long lines' },
     },
     l = {
+        a = { '<cmd>Lspsaga code_action<cr>', 'Lspsaga code_action' },
         c = {
             function()
                 vim.opt.colorcolumn = '78'
