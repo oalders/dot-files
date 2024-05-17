@@ -10,3 +10,8 @@ require('plugins')
 EOF
 
 colorscheme iceberg
+
+" Show comments in italics
+highlight Comment cterm=italic gui=italic term=bold
+set t_ZH=[3m
+set t_ZR=[23m
