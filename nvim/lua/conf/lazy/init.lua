@@ -14,8 +14,20 @@ vim.opt.rtp:prepend(lazypath)
 require('lazy').setup({
     -- Colour schemes
     -- Plug 'arcticicestudio/nord-vim'
-    'cocopon/iceberg.vim',
-
+    -- 'cocopon/iceberg.vim',
+    {
+        'folke/tokyonight.nvim',
+        lazy = false,
+        priority = 1000,
+        opts = {
+            on_highlights = function(highlights, colors)
+                highlights['@markup.raw.pod'] = {
+                    italic = true,
+                    fg = colors.green,
+                }
+            end,
+        },
+    },
     {
         'nvimdev/dashboard-nvim',
         event = 'VimEnter',

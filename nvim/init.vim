@@ -7,9 +7,8 @@ nnoremap <silent>[b :BufferLineCyclePrev<CR>
 lua <<EOF
 require('conf')
 require('plugins')
+vim.cmd[[colorscheme tokyonight-storm]]
 EOF
-
-colorscheme iceberg
 
 " Show comments in italics
 highlight Comment cterm=italic gui=italic term=bold
