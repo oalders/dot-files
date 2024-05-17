@@ -7,7 +7,7 @@ end
 
 config.font_size = 14.0
 config.allow_square_glyphs_to_overflow_width = 'WhenFollowedBySpace'
-config.color_scheme = 'iceberg-dark'
+config.color_scheme = 'tokyonight_moon'
 
 config.colors = {
     cursor_bg = '#B48EAD',
