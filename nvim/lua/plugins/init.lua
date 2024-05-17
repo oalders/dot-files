@@ -12,6 +12,7 @@ require('nvim-treesitter.configs').setup({
         'markdown',
         'markdown_inline',
         'perl',
+        'pod',
         'python',
         'regex',
         'ruby',
