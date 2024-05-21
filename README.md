@@ -20,6 +20,7 @@
 * [vim](#vim)
   * [LSP](#lsp)
   * [State](#state)
+  * [Mason](#mason)
 * [Alfred](#alfred)
 * [Bash](#bash)
 * [less](#less)
@@ -197,6 +198,11 @@ Print location of state directory:
 `:lua print(vim.fn.stdpath 'state')`
 
 `:h stdpath()` for args that can be passed.
+
+### Mason
+
+Lockfiles. For instance, if it can't update or install `selene`, remove:
+`./share/nvim/mason/staging/selene.lock`
 
 ## Alfred
 
