@@ -46,33 +46,23 @@ detect_posh_settings() {
 
 if [[ ! ${posh_theme-} || ! ${FORCE_POSH_THEME-} ]]; then
     detect_posh_settings
-    posh_theme="remote"
-
-    if [[ $inside_ssh == true ]]; then
-        if [[ $MY_INSIDE_TMUX == true && ! ${FORCE_POSH_THEME-} ]]; then
-            posh_theme="remote-tiny"
-        fi
-    else
-        posh_theme="local"
-        if [[ $MY_INSIDE_TMUX == true && ! ${FORCE_POSH_THEME-} ]]; then
-            posh_theme="local-tiny"
-        fi
+    if [[ $MY_INSIDE_TMUX == true && ! ${FORCE_POSH_THEME-} ]]; then
+        export TINY_POSH=1
     fi
 fi
 
 # posh handling
 posh_me() {
-    eval "$(oh-my-posh prompt init bash --config ~/.config/oh-my-posh/themes/"${posh_theme}".omp.json)"
+    eval "$(oh-my-posh prompt init bash --config ~/.config/oh-my-posh/themes/local.omp.json)"
 }
 
 toggle_posh() {
     detect_posh_settings
-    case $posh_theme in
-    "local") posh_theme="local-tiny" ;;
-    "local-tiny") posh_theme="local" ;;
-    "remote") posh_theme="remote-tiny" ;;
-    "remote-tiny" | "") posh_theme="remote" ;;
-    esac
+    if [[ -n $TINY_POSH ]]; then
+        unset TINY_POSH
+    else
+        export TINY_POSH=1
+    fi
 
     FORCE_POSH_THEME=true
     export FORCE_POSH_THEME
