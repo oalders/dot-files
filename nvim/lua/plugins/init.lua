@@ -108,6 +108,9 @@ cmp.setup({
                 fallback()
             end
         end, { 'i', 's' }),
+
+        -- https://www.reddit.com/r/neovim/comments/svtw2u/scrolling_lsp_floating_window/
+        ['<C-k>'] = cmp.mapping.scroll_docs(-4), -- <C-k><C-k> now bounces me into the floating window
     }),
     preselect = cmp.PreselectMode.None,
     view = {
