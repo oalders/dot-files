@@ -196,14 +196,6 @@ vim.api.nvim_set_keymap('n', '<leader>b', ':Buffers<cr>', {})
 vim.api.nvim_set_keymap('n', '-', ':StripWhitespace<CR>', { silent = true })
 vim.api.nvim_set_keymap('v', '-', ':StripWhitespace<CR>', { silent = true })
 
---dictionary sort
-vim.api.nvim_set_keymap(
-    'v',
-    'so',
-    ':!sort -d --ignore-case<CR>',
-    { silent = true }
-)
-
 -- CamelCaseMotion
 vim.api.nvim_set_keymap('', 'w', '<Plug>CamelCaseMotion_w', { silent = true })
 vim.api.nvim_set_keymap('', 'b', '<Plug>CamelCaseMotion_b', { silent = true })
