@@ -7,7 +7,7 @@ nnoremap <silent>[b :BufferLineCyclePrev<CR>
 lua <<EOF
 require('conf')
 require('plugins')
-vim.cmd[[colorscheme tokyonight-storm]]
+vim.cmd[[colorscheme tokyonight-moon]]
 EOF
 
 " Show comments in italics
