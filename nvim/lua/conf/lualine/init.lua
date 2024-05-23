@@ -21,12 +21,14 @@ local clients_lsp = function()
     for _, client in pairs(clients) do
         local name = client.name
         if name == 'copilot' then
-            name = '🤠'
+            name = '🤖'
+        elseif name == 'perlnavigator' then
+            name = '🐪'
         end
         table.insert(c, name)
     end
     table.sort(c)
-    return '[' .. table.concat(c, ',') .. ']'
+    return '<' .. table.concat(c, ',') .. '>'
 end
 
 require('lualine').setup({
