@@ -1,5 +1,8 @@
 vim.opt.swapfile = false
 
+-- :vertical terminal now opens on the right 😅
+vim.opt.splitright = true
+
 -- mode info is displayed in the statusline
 vim.opt.showmode = false
 
