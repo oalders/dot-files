@@ -221,7 +221,10 @@ require('bufferline').setup({
     },
 })
 require('cmp_nvim_lsp')
-require('glow').setup()
+require('glow').setup({
+    width_ratio = 0.9, -- maximum width of the Glow window compared to the nvim window size (overrides `width`)
+    height_ratio = 0.9,
+})
 require('nvim-splitrun').setup()
 
 require('conf/mason') -- This needs to happen before lspconfig
