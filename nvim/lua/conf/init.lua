@@ -66,9 +66,6 @@ vim.opt.tabstop = 4
 vim.opt.smarttab = true
 vim.opt.expandtab = true
 
-vim.api.nvim_set_keymap('v', '<', '<gv', {})
-vim.api.nvim_set_keymap('v', '>', '>gv', {})
-
 vim.api.nvim_set_keymap('v', '<tab>', '>gv', {})
 vim.api.nvim_set_keymap('v', '<s-tab>', '<gv', {})
 
