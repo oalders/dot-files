@@ -196,6 +196,9 @@ wk.register({
             'Trouble workspace diagnostics',
         },
     },
+    u = {
+        i = { '<Plug>Nuuid', 'Generate UUID' },
+    },
 }, { prefix = '<leader>' })
 
 wk.register({

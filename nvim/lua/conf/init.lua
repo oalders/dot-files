@@ -239,7 +239,6 @@ vim.api.nvim_exec(
 
 -- insert a new uuid at cursor
 vim.g.nuuid_no_mappings = 1
-vim.api.nvim_set_keymap('n', '<Leader>u', '<Plug>Nuuid', {})
 
 -- Prevent a mouse selection from triggering visual mode
 vim.opt.mouse = 'v'
