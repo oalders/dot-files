@@ -10,18 +10,18 @@ config.allow_square_glyphs_to_overflow_width = 'WhenFollowedBySpace'
 config.color_scheme = 'tokyonight_moon'
 
 config.colors = {
-    cursor_bg = '#B48EAD',
+    cursor_bg = '#c099ff',
     tab_bar = {
         active_tab = {
-            bg_color = '#78c1d2',
+            bg_color = '#82aaff',
             fg_color = '#404d5f',
         },
         inactive_tab = {
-            bg_color = '#54748c',
+            bg_color = '#444a73',
             fg_color = '#ddd',
         },
         new_tab = {
-            bg_color = '#54748c',
+            bg_color = '#444a73',
             fg_color = '#ddd',
         },
     },
