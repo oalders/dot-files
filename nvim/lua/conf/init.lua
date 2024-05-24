@@ -1,5 +1,8 @@
 vim.opt.swapfile = false
 
+-- allow undo even after exiting and re-opening a file
+vim.opt.undofile=true
+
 -- :vertical terminal now opens on the right 😅
 vim.opt.splitright = true
 
