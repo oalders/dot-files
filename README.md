@@ -156,6 +156,7 @@ Remind myself of vim shortcuts etc.
 * `:bp` or `[b` - previous buffer
 * `]d` - next diagnostic
 * `[d` - previous diagnostic
+* `ctrl-l` - clear highlighted search terms
 * `ctrl-w =` - equalize width and height of all windows
 * `ctrl-w m` - toggle zooming of splits
 * `ctrl-w r` - swap splits
