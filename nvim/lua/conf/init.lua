@@ -6,6 +6,9 @@ vim.opt.undofile=true
 -- :vertical terminal now opens on the right 😅
 vim.opt.splitright = true
 
+-- keep 10 lines under the cursor when scrolling
+vim.opt.scrolloff = 10
+
 -- mode info is displayed in the statusline
 vim.opt.showmode = false
 
