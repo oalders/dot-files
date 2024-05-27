@@ -153,7 +153,10 @@ require('lazy').setup({
     'shellRaining/hlchunk.nvim',
 
     'sindrets/diffview.nvim', -- File explorer for git diffs
-    'Wansmer/treesj', -- SplitJoin replacement
+    {
+        'Wansmer/treesj',
+        opts = { use_default_keymaps = false, max_join_length = 150 },
+    },
     'windwp/nvim-autopairs', --
 
     {
