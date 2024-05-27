@@ -192,7 +192,6 @@ tmux_session_name() {
 
         branch=$(git rev-parse --abbrev-ref HEAD)
         current_dir=${PWD##*/}
-        current_dir=$(printf "%-20s" "$current_dir")
 
         prefix='⁉️ '
         if [[ ${PWD##*/} == 'dot-files' ]] || [[ ${PWD##*/} == 'local-dot-files' ]]; then
@@ -210,7 +209,7 @@ tmux_session_name() {
         elif [[ -f 'Dockerfile' ]] || [[ -f 'docker-compose.yml' ]]; then
             prefix='🐳'
         fi
-        SESSION_NAME="$prefix $current_dir  $branch"
+        SESSION_NAME="$prefix $current_dir   $branch"
     else
         SESSION_NAME=$(pwd)
         strip="$HOME/"
@@ -221,7 +220,6 @@ tmux_session_name() {
     # A "." will produce a "bad session name" error
     SESSION_NAME=${SESSION_NAME//./-}
     SESSION_NAME=${SESSION_NAME//oalders/OA}
-    SESSION_NAME=$(printf "%-${padding}s" "$SESSION_NAME")
     export SESSION_NAME
 }
 
