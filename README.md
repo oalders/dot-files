@@ -203,7 +203,7 @@ Print location of state directory:
 ### Mason
 
 Lockfiles. For instance, if it can't update or install `selene`, remove:
-`./share/nvim/mason/staging/selene.lock`
+`./local/share/nvim/mason/staging/selene.lock`
 
 ## Alfred
 
