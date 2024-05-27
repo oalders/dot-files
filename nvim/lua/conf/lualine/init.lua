@@ -23,12 +23,13 @@ local clients_lsp = function()
         if name == 'copilot' then
             name = '🤖'
         elseif name == 'perlnavigator' then
-            name = '🐪'
+            name =
+                require('nvim-web-devicons').get_icon_by_filetype('perl', {})
         end
         table.insert(c, name)
     end
     table.sort(c)
-    return '<' .. table.concat(c, ',') .. '>'
+    return '< ' .. table.concat(c, ' | ') .. ' >'
 end
 
 require('lualine').setup({
