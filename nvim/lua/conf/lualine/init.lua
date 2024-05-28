@@ -23,8 +23,9 @@ local clients_lsp = function()
         if name == 'copilot' then
             name = '🤖'
         elseif name == 'perlnavigator' then
-            name =
-                require('nvim-web-devicons').get_icon_by_filetype('perl', {})
+            name = require('nvim-web-devicons').get_icon_by_filetype('perl', {})
+        elseif name == 'eslint' then
+            name = ''
         end
         table.insert(c, name)
     end
