@@ -95,7 +95,7 @@ require('lazy').setup({
     -- zz after search places the current match at the center of the window
     'junegunn/vim-slash',
 
-    'kburdett/vim-nuuid', -- <leader>u to insert a new UUID
+    'kburdett/vim-nuuid', -- <leader>ui to insert a new UUID
     'luochen1990/rainbow', -- Rainbow Parentheses Improved
     {
         'mannih/vim-perl-variable-highlighter', -- highlight other instances of selected var
@@ -105,7 +105,6 @@ require('lazy').setup({
     { 'mzlogin/vim-markdown-toc', ft = 'markdown' }, -- :GenTocGFM to generate table of contents
     'ntpeters/vim-better-whitespace', -- highlight trailing whitespace
     -- 'oalders/prettysql' -- ,fs to format visually selected SQL
-    -- 'oalders/vim-perl', { 'branch': 'dev   ', 'for': 'perl', 'do': 'make clean carp dancer highlight-all-pragmas moose test-more try-tiny' },
     { 'othree/html5.vim', ft = 'html' },
     'rhysd/git-messenger.vim', -- ,gm to open window
     'rodjek/vim-puppet', -- { 'for': 'puppet' }, -- Formatting, syntax highlighting etc
@@ -127,19 +126,38 @@ require('lazy').setup({
     { 'yko/mojo.vim', ft = 'html.epl', lazy = true }, -- syntax highlighting for mojo epl templates
 
     'ahmedkhalf/project.nvim', -- auto-detect project root
-    'akinsho/bufferline.nvim', -- display tabs for open buffers
+    {
+        'akinsho/bufferline.nvim',
+        version = '*',
+        dependencies = 'nvim-tree/nvim-web-devicons',
+    },
     'darfink/vim-plist', -- read macOS plist files
     { 'ellisonleao/glow.nvim', ft = 'markdown', config = true, cmd = 'Glow' }, -- render markdown via :Glow
-    'folke/trouble.nvim', --  <leader>td (doc) <leader>tw (workspace)
-    'folke/which-key.nvim', -- better organization of keybindings
+
+    --  <leader>td (doc) <leader>tw (workspace)
+    {
+        'folke/trouble.nvim',
+        dependencies = { 'nvim-tree/nvim-web-devicons' },
+    },
+
+    -- better organization of keybindings
+    {
+        'folke/which-key.nvim',
+        event = 'VeryLazy',
+        init = function()
+            vim.o.timeout = true
+            vim.o.timeoutlen = 300
+        end,
+    },
     'Hubro/nvim-splitrun', -- :Splitrun some command
     'ibhagwan/fzf-lua', --  replace fzf.vim
     'kevinhwang91/nvim-bqf', -- improve quickfix window
-    'kyazdani42/nvim-web-devicons', -- recommended for bufferlin.nvim (coloured icons)
     'lewis6991/gitsigns.nvim', -- git signs in the gutter
     'mfussenegger/nvim-lint', -- linter harness
-    'nvim-lualine/lualine.nvim', -- status line
-    'nvim-lua/plenary.nvim', -- required by other plugins
+    {
+        'nvim-lualine/lualine.nvim',
+        dependencies = { 'nvim-tree/nvim-web-devicons' },
+    },
     { 'nvim-telescope/telescope.nvim', tag = '0.1.5' }, -- fuzzy finder
     'nvimtools/none-ls.nvim', -- null-ls replacement
     { 'nvim-treesitter/nvim-treesitter', build = ':TSUpdate' }, -- recommend updating parsers on update
@@ -174,20 +192,27 @@ require('lazy').setup({
     },
 
     -- folding
-    'kevinhwang91/promise-async',
-    'kevinhwang91/nvim-ufo',
+    {
+        'kevinhwang91/nvim-ufo',
+        dependencies = { 'kevinhwang91/promise-async' },
+    },
 
-    -- nvim-cmp -- completion + completion sources
-    'hrsh7th/cmp-buffer',
-    'hrsh7th/cmp-cmdline',
-    'hrsh7th/cmp-nvim-lsp',
-    'hrsh7th/cmp-path',
-    'hrsh7th/nvim-cmp',
-    'zbirenbaum/copilot-cmp', -- include copilot suggestions in completion
+    -- completion + completion sources
     -- Plug 'hrsh7th/cmp-vsnip'
     -- Plug 'hrsh7th/vim-vsnip'
     -- Plug 'L3MON4D3/LuaSnip', {'tag': 'v2.*', 'do': 'make install_jsregexp'}
     -- Plug 'saadparwaiz1/cmp_luasnip'
+    {
+        'hrsh7th/nvim-cmp',
+        dependencies = {
+            'hrsh7th/cmp-buffer',
+            'hrsh7th/cmp-cmdline',
+            'hrsh7th/cmp-nvim-lsp',
+            'hrsh7th/cmp-path',
+            'onsails/lspkind.nvim', -- add pictograms to completion sources
+            'zbirenbaum/copilot-cmp', -- include copilot suggestions in completion
+        },
+    },
 
     -- LSP
     'lvimuser/lsp-inlayhints.nvim', -- Partial implementation of LSP inlay hints
@@ -206,7 +231,6 @@ require('lazy').setup({
         },
     },
 
-    'onsails/lspkind.nvim', -- add pictograms to completion sources
     'williamboman/mason-lspconfig.nvim', --  bridge mason.nvim with the lspconfig plugin
     'williamboman/mason.nvim', -- install and manage LSP servers, linters and tidiers
 
