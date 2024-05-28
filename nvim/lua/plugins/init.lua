@@ -15,7 +15,6 @@ require('project_nvim').setup({
 })
 
 local null_ls = require('null-ls')
-
 null_ls.setup({
     sources = {
         null_ls.builtins.formatting.goimports,
@@ -26,8 +25,7 @@ null_ls.setup({
     },
 })
 
-local tsj = require('treesj')
-tsj.setup({ max_join_length = 400 })
+require('treesj').setup({ max_join_length = 400 })
 
 require('bufferline').setup({
     options = {
