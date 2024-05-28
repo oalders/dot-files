@@ -1,39 +1,5 @@
 require('conf/lazy')
 
----@diagnostic disable-next-line missing-fields
-require('nvim-treesitter.configs').setup({
-    ensure_installed = {
-        'bash',
-        'dockerfile',
-        'go',
-        'html',
-        'javascript',
-        'lua',
-        'markdown',
-        'markdown_inline',
-        'perl',
-        'pod',
-        'python',
-        'regex',
-        'ruby',
-        'rust',
-        'sql',
-        'typescript',
-        'vim',
-        'yaml',
-    },
-    ignore_install = { 'all' },
-    highlight = {
-        enable = true, -- false will disable the whole extension
-        disable = {}, -- list of language that will be disabled
-        -- Setting this to true will run `:h syntax` and tree-sitter at the same time.
-        -- Set this to `true` if you depend on 'syntax' being enabled (like for indentation).
-        -- Using this option may slow down your editor, and you may see some duplicate highlights.
-        -- Instead of true it can also be a list of languages
-        additional_vim_regex_highlighting = false,
-    },
-})
-
 vim.opt.termguicolors = true
 vim.opt.mouse = 'v'
 
@@ -88,6 +54,7 @@ require('conf/neotest')
 require('conf/noice')
 require('conf/nvim-lint')
 require('conf/telescope')
+require('conf/treesitter')
 require('conf/ufo')
 require('conf/open-this') -- needs to happen before which-key
 require('conf/which-key')
