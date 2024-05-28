@@ -1,8 +1,5 @@
 require('conf/lazy')
 
-vim.opt.termguicolors = true
-vim.opt.mouse = 'v'
-
 require('nvim-autopairs').setup({})
 
 require('other-nvim').setup({

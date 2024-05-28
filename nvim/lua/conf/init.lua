@@ -244,3 +244,5 @@ vim.g.vmt_list_indent_text = '  '
 vim.g.vmt_auto_update_on_save = 1
 
 vim.opt.cmdheight = 0
+
+vim.opt.termguicolors = true
