@@ -233,6 +233,7 @@ require('lazy').setup({
 
     'williamboman/mason-lspconfig.nvim', --  bridge mason.nvim with the lspconfig plugin
     'williamboman/mason.nvim', -- install and manage LSP servers, linters and tidiers
+    'WhoIsSethDaniel/mason-tool-installer.nvim',
 
     -- noice
     {
