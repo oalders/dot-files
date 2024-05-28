@@ -131,7 +131,6 @@ require('lazy').setup({
         version = '*',
         dependencies = 'nvim-tree/nvim-web-devicons',
     },
-    'darfink/vim-plist', -- read macOS plist files
     { 'ellisonleao/glow.nvim', ft = 'markdown', config = true, cmd = 'Glow' }, -- render markdown via :Glow
 
     --  <leader>td (doc) <leader>tw (workspace)
