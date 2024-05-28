@@ -49,6 +49,7 @@ require('conf/cmp')
 require('conf/mason') -- This needs to happen before lspconfig
 require('conf/lspconfig')
 
+require('conf/fzf')
 require('conf/lualine')
 require('conf/neotest')
 require('conf/noice')
@@ -58,35 +59,6 @@ require('conf/treesitter')
 require('conf/ufo')
 require('conf/open-this') -- needs to happen before which-key
 require('conf/which-key')
-
--- fzf-lua
-local fzf_lua = require('fzf-lua')
-fzf_lua.setup({ 'fzf-vim' })
-
-fzf_lua.setup({
-    previewers = {
-        builtin = {
-            extensions = {
-                ['jpg'] = { 'chafa', '{file}' },
-                ['png'] = { 'viu', '-b' },
-                ['svg'] = { 'chafa', '{file}' },
-            },
-        },
-    },
-})
-
-fzf_lua.git_domo = function()
-    fzf_lua.files({
-        prompt = 'GitDomo>',
-        cmd = '{ git diff --name-only HEAD; git domo;} | sort -u',
-    })
-end
-
-vim.cmd([[
-  command! -bang GDomo lua require('fzf-lua').git_domo()
-]])
-
--- end
 
 require('gitsigns').setup({ numhl = true })
 require('persisted').setup({})
