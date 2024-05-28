@@ -3,7 +3,6 @@ require('conf/lazy')
 vim.opt.termguicolors = true
 vim.opt.mouse = 'v'
 
--- require('virt-column').setup()
 require('nvim-autopairs').setup({})
 
 require('other-nvim').setup({
