@@ -5,10 +5,6 @@ require('mason-tool-installer').setup({
     -- a list of all tools you want to ensure are installed upon
     -- start
     ensure_installed = {
-
-        -- you can pin a tool to a particular version
-        { 'golangci-lint', version = 'v1.47.0' },
-
         -- you can turn off/on auto_update per tool
         { 'bash-language-server', auto_update = true },
 
@@ -36,6 +32,7 @@ require('mason-tool-installer').setup({
 
         -- golang
         -- 'gofumpt',
+        'golangci-lint',
         -- 'golangci_lint_ls',
         -- 'golines',
         -- 'gomodifytags',
