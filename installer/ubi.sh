@@ -68,4 +68,8 @@ if is there gh && ! gh extension list | grep copilot; then
     gh extension install github/gh-copilot || true
 fi
 
+if is there gh && ! gh extension list | grep gh-dash; then
+    gh extension install dlvhdr/gh-dash || true
+fi
+
 exit
