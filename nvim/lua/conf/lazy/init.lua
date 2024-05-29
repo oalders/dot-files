@@ -149,8 +149,14 @@ require('lazy').setup({
         end,
     },
     'Hubro/nvim-splitrun', -- :Splitrun some command
-    'ibhagwan/fzf-lua', --  replace fzf.vim
-    'kevinhwang91/nvim-bqf', -- improve quickfix window
+
+    --  replace fzf.vim
+    {
+        'ibhagwan/fzf-lua',
+        dependencies = { 'nvim-tree/nvim-web-devicons' },
+    },
+
+    { 'kevinhwang91/nvim-bqf', ft = 'qf' }, -- add previews to quickfix window
     'lewis6991/gitsigns.nvim', -- git signs in the gutter
     'mfussenegger/nvim-lint', -- linter harness
     {
