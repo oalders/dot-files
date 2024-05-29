@@ -54,6 +54,6 @@ require('conf/ufo')
 require('conf/open-this') -- needs to happen before which-key
 require('conf/which-key')
 
-require('gitsigns').setup({ numhl = true })
+require('gitsigns').setup({ linehl = true, numhl = true, word_diff = true })
 require('persisted').setup({})
 require('yankbank').setup()
