@@ -195,19 +195,19 @@ tmux_session_name() {
 
         prefix='⁉️ '
         if [[ ${PWD##*/} == 'dot-files' ]] || [[ ${PWD##*/} == 'local-dot-files' ]]; then
-            prefix='🔵'
+            prefix=''
         elif [[ -f 'dist.ini' ]] || [[ -f 'cpanfile' ]] || [[ -f 'app.psgi' ]]; then
-            prefix='🐪'
+            prefix=''
         elif [[ -f 'Cargo.toml' ]]; then
-            prefix='🦀'
+            prefix=''
         elif [[ -f 'go.mod' ]]; then
-            prefix='🚦'
+            prefix=''
         elif [[ -f 'tsconfig.json' ]] || [[ -f '.npmignore' ]]; then
-            prefix='☕'
+            prefix=''
         elif [[ -d 'ftplugin' ]]; then
             prefix='🔌'
         elif [[ -f 'Dockerfile' ]] || [[ -f 'docker-compose.yml' ]]; then
-            prefix='🐳'
+            prefix='󰡨'
         fi
         SESSION_NAME="$prefix $current_dir   $branch"
     else
