@@ -194,7 +194,7 @@ tmux_session_name() {
         current_dir=${PWD##*/}
         current_dir=$(printf "%-18s" "$current_dir")
 
-        prefix='⁉️ '
+        prefix='⁉️'
         if [[ ${PWD##*/} == 'dot-files' ]] || [[ ${PWD##*/} == 'local-dot-files' ]]; then
             prefix=''
         elif [[ -f 'dist.ini' ]] || [[ -f 'cpanfile' ]] || [[ -f 'app.psgi' ]]; then
