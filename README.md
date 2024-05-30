@@ -168,7 +168,8 @@ Remind myself of vim shortcuts etc.
 * `DiffviewOpen HEAD~1` - view diff. Probably follow with `:colo iceberg`
 * `]d` - next diagnostic
 * `[d` - previous diagnostic
-* `gc` - to toggle commenting on a visual selection
+* `gc` - toggle commenting on a visual selection
+* `gcc` - toggle commenting on line under cursor
 * `gd` - go to definition
 * `:GenTocGFM` - generate GitHub flavoured markdown table of contents
 * `:GFiles` - `git ls-files | fzf`
