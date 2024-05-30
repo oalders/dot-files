@@ -246,3 +246,6 @@ vim.g.vmt_auto_update_on_save = 1
 vim.opt.cmdheight = 0
 
 vim.opt.termguicolors = true
+
+-- Show comments in italics
+vim.cmd('highlight Comment cterm=italic gui=italic term=bold')
