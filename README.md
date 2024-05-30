@@ -152,35 +152,36 @@ Install `plenv` as well as the latest Perl version.
 
 Remind myself of vim shortcuts etc.
 
+* `:BCommits` - git commits for the current buffer
+* `:BLines` - fzf lines in current buffer
 * `:bn` or `]b` - next buffer
 * `:bp` or `[b` - previous buffer
-* `]d` - next diagnostic
-* `[d` - previous diagnostic
+* `[c` and `]c` - navigate to next changed hunk
+  close the terminal
+* `crn` - LSP rename
+* `crr` - LSP code action
 * `ctrl-l` - clear highlighted search terms
+* `ctrl-o` - return to previous position in file
 * `ctrl-w =` - equalize width and height of all windows
 * `ctrl-w m` - toggle zooming of splits
 * `ctrl-w r` - swap splits
-* `ctrl-o` - return to previous position in file
-* `gc` - to toggle commenting on a visual selection
-* `gO` - open a loc list with the table of contents for a help file
-* `gx` - in normal mode calls `vim.ui.open()` on whatever is under the cursor
-* `:vert(ical) terminal` - vertical split into a terminal buffer. `exit` to
-  close the terminal
 * `DiffviewOpen HEAD~1` - view diff. Probably follow with `:colo iceberg`
+* `]d` - next diagnostic
+* `[d` - previous diagnostic
+* `gc` - to toggle commenting on a visual selection
+* `gd` - go to definition
+* `:GenTocGFM` - generate GitHub flavoured markdown table of contents
 * `:GFiles` - `git ls-files | fzf`
 * `:GFiles?` - `git status | fzf` with preview pane
-* `:BCommits` - git commits for the current buffer
-* `:Maps` - fzf normal mode mappings
-* `:BLines` - fzf lines in current buffer
-* `:Lines` - fzf lines in loaded buffers
-* `:Splitrun precious tidy --git` - run a command in a split
-* `:GenTocGFM` - generate GitHub flavoured markdown table of contents
-* `[c` and `]c` - navigate to next changed hunk
-* `gwip` - reflow a block of text and maintain cursor position
-* `crn` - LSP rename
-* `crr` - LSP code action
-* `gd` - go to definition
+* `gO` - open a loc list with the table of contents for a help file
 * `gr` - get references
+* `gwip` - reflow a block of text and maintain cursor position
+* `gx` - in normal mode calls `vim.ui.open()` on whatever is under the cursor
+* `<leader>gm` - show commit message for line under cursor
+* `:Lines` - fzf lines in loaded buffers
+* `:Maps` - fzf normal mode mappings
+* `:Splitrun precious tidy --git` - run a command in a split
+* `:vert(ical) terminal` - vertical split into a terminal buffer. `exit` to
 
 See `akinsho/bufferline.nvim` for buffer config.
 
