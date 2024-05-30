@@ -44,7 +44,6 @@ vim.api.nvim_exec(
 vim.api.nvim_set_keymap('x', 'p', 'pgvy', {})
 
 vim.g.auto_save = 1
-vim.g.gitgutter_realtime = 0
 vim.g.auto_save_no_updatetime = 1
 
 vim.cmd('highlight Normal ctermbg=none')
