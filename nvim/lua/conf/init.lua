@@ -54,31 +54,23 @@ vim.opt.ttimeoutlen = 1000
 vim.opt.autoread = true
 vim.opt.synmaxcol = 2000
 
+-- search
 vim.opt.ignorecase = true
 vim.opt.smartcase = true
 vim.opt.hlsearch = true
-
+vim.opt.incsearch = true
 vim.cmd('hi Search ctermbg=LightYellow')
 vim.cmd('hi Search ctermfg=Red')
-
-vim.opt.incsearch = true
 
 vim.cmd('filetype plugin indent on')
 vim.opt.autoindent = true
 
+-- tabs
 vim.opt.softtabstop = 4
 vim.opt.shiftwidth = 4
 vim.opt.tabstop = 4
 vim.opt.smarttab = true
 vim.opt.expandtab = true
-
-vim.api.nvim_set_keymap('v', '<tab>', '>gv', {})
-vim.api.nvim_set_keymap('v', '<s-tab>', '<gv', {})
-
-vim.api.nvim_set_keymap('n', '<tab>', 'I<tab><esc>', {})
-vim.api.nvim_set_keymap('n', '<s-tab>', '^i<bs><esc>', {})
-
-vim.opt.list = true
 vim.opt.listchars = 'tab:\\|.'
 
 -- https://stackoverflow.com/a/69099888/406224
@@ -91,6 +83,14 @@ function UseTabs()
     vim.opt.tabstop = 4
     vim.opt.list = true
 end
+
+vim.opt.list = true
+
+vim.api.nvim_set_keymap('v', '<tab>', '>gv', {})
+vim.api.nvim_set_keymap('v', '<s-tab>', '<gv', {})
+
+vim.api.nvim_set_keymap('n', '<tab>', 'I<tab><esc>', {})
+vim.api.nvim_set_keymap('n', '<s-tab>', '^i<bs><esc>', {})
 
 -- define a group `vimrc` and initialize.
 vim.api.nvim_exec(
