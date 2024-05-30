@@ -78,6 +78,12 @@ require('lazy').setup({
         dependencies = { { 'nvim-tree/nvim-web-devicons' } },
     },
 
+    -- git
+    'lewis6991/gitsigns.nvim', -- git signs in the gutter
+    'rhysd/git-messenger.vim', -- ,gm to open window
+    'sindrets/diffview.nvim', -- File explorer for git diffs
+    'tpope/vim-fugitive', --  :GRemove, :Git diff, etc
+
     'ap/vim-css-color', -- show css colors inline
     'bkad/CamelCaseMotion', -- provide CamelCase motion through words
     'gregsexton/MatchTag', -- highlight matchihng HTML tags
@@ -106,7 +112,6 @@ require('lazy').setup({
     'ntpeters/vim-better-whitespace', -- highlight trailing whitespace
     -- 'oalders/prettysql' -- ,fs to format visually selected SQL
     { 'othree/html5.vim', ft = 'html' },
-    'rhysd/git-messenger.vim', -- ,gm to open window
     'rodjek/vim-puppet', -- { 'for': 'puppet' }, -- Formatting, syntax highlighting etc
     {
         'rust-lang/rust.vim',
@@ -117,7 +122,6 @@ require('lazy').setup({
     -- :Delete :SudoWrite
     'tpope/vim-eunuch',
 
-    'tpope/vim-fugitive',
     {
         'vim-ruby/vim-ruby', -- Vim/Ruby configuration files
         ft = 'ruby',
@@ -157,7 +161,6 @@ require('lazy').setup({
     },
 
     { 'kevinhwang91/nvim-bqf', ft = 'qf' }, -- add previews to quickfix window
-    'lewis6991/gitsigns.nvim', -- git signs in the gutter
     'mfussenegger/nvim-lint', -- linter harness
     {
         'nvim-lualine/lualine.nvim',
@@ -175,7 +178,6 @@ require('lazy').setup({
     -- <leader>ll (start) leader<lh> (stop)
     'shellRaining/hlchunk.nvim',
 
-    'sindrets/diffview.nvim', -- File explorer for git diffs
     {
         'Wansmer/treesj',
         opts = { use_default_keymaps = false, max_join_length = 150 },
