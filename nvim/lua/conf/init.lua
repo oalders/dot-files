@@ -30,7 +30,6 @@ vim.opt.shortmess:remove('A')
 vim.api.nvim_set_keymap('n', ',ss', '<esc>:syntax sync fromstart<CR>', {})
 
 vim.opt.backspace = '2'
-vim.cmd('filetype on')
 
 vim.api.nvim_exec(
     [[
