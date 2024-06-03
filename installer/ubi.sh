@@ -32,7 +32,8 @@ maybe_install() {
     local repo
     IFS='/' read -r project repo <<<"$1"
     if ! is there "$repo" || is cli age "$repo" gt 7 days; then
-        ubi --project "$project/$repo" --in "$in"
+        shift
+        ubi --project "$project/$repo" --in "$in" "$@"
     fi
 }
 
