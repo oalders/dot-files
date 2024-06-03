@@ -210,9 +210,6 @@ vim.api.nvim_set_keymap(
 -- nmap <leader>h :YankHistoryRgPaste
 vim.api.nvim_set_keymap('n', '<leader>h', ':YankHistoryRgPaste', {})
 
--- Format selected JSON via jq
-vim.api.nvim_set_keymap('v', 'jq', ':!jq -S .<cr>', {})
-
 -- 'luochen1990/rainbow'
 vim.g.rainbow_active = 1 --set to 0 if you want to enable it later via :RainbowToggle
 

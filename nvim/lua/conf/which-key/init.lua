@@ -232,6 +232,10 @@ wk.register({
         ':s/_/-/g<cr>',
         'change underscores to hyphens',
     },
+    jq = {
+        ':!jq -S .<cr>',
+        'Format selected JSON via jq',
+    },
     su = {
         ':!sort -d --ignore-case -u',
         'Sort and remove duplicates',
