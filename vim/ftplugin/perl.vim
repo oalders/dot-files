@@ -36,7 +36,7 @@ map ,moose Opackage Foo::Bar;<CR><CR>use Moose;<CR><CR>use MooseX::StrictConstru
 map ,2mod :s/\.pm//<CR>gv:s/\//::/g<CR>
 
 " Try to install missing Perl modules
-nnoremap <leader>l :!perl -Mlazy -c %:p
+nnoremap <leader>lz :!perl -Mlazy -c %:p
 
 " Try to fix module imports
 :vnoremap <silent> im :!perlimports
