@@ -181,12 +181,6 @@ vim.api.nvim_set_keymap(
     {}
 )
 
--- Change hyphens to underscores
-vim.api.nvim_set_keymap('v', 'uu', ':s/\\%V\\-/_/g<cr>', { silent = true })
-
--- Change underscores to hyphens
-vim.api.nvim_set_keymap('v', 'hh', ':s/\\%V_/-/g<cr>', { silent = true })
-
 -- Change double quotes to single quotes
 vim.api.nvim_set_keymap('v', "''", ':s/\\%V"/\'/g<cr>', { silent = true })
 

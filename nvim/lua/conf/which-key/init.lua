@@ -228,9 +228,17 @@ wk.register({
         '<cmd>CopilotChatExplain<cr>',
         'CopilotChatExplain',
     },
+    hh = {
+        ':s/_/-/g<cr>',
+        'change underscores to hyphens',
+    },
     su = {
         ':!sort -d --ignore-case -u',
         'Sort and remove duplicates',
+    },
+    uu = {
+        ':s/-/_/g<cr>',
+        'change hyphens to underscores',
     },
 }, { mode = 'v', silent = false })
 
