@@ -86,7 +86,7 @@ require('lazy').setup({
 
     'ap/vim-css-color', -- show css colors inline
     'bkad/CamelCaseMotion', -- provide CamelCase motion through words
-    'gregsexton/MatchTag', -- highlight matchihng HTML tags
+    'gregsexton/MatchTag', -- highlight matching HTML tags
     'haya14busa/vim-auto-mkdir', -- create directory path on save
     'itchyny/vim-cursorword', -- underline the word under the cursor
     {
