@@ -161,41 +161,42 @@ wk.register({
     s = {
         v = { ':source $MYVIMRC<cr>', 'Source VimRC' },
     },
-    t = {
-        c = {
-            function()
-                require('trouble').close()
-            end,
-            'Close Trouble',
-        },
-        d = {
-            function()
-                require('trouble').open('document_diagnostics')
-            end,
-            'Trouble document diagnostics',
-        },
-        n = {
-            function()
-                require('trouble').next({ skip_groups = true, jump = true })
-            end,
-            'Next trouble issue',
-        },
-        p = {
-            function()
-                require('trouble').previous({
-                    skip_groups = true,
-                    jump = true,
-                })
-            end,
-            'Next trouble issue',
-        },
-        w = {
-            function()
-                require('trouble').open('workspace_diagnostics')
-            end,
-            'Trouble workspace diagnostics',
-        },
-    },
+    -- t = {
+    --     c = {
+    --         function()
+    --             require('trouble').close()
+    --         end,
+    --         'Close Trouble',
+    --     },
+    --     d = {
+    --         '<cmd>Trouble diagnostics toggle<cr>',
+    --         function()
+    --             require('trouble').open('document_diagnostics')
+    --         end,
+    --         'Trouble document diagnostics',
+    --     },
+    --     n = {
+    --         function()
+    --             require('trouble').next({ skip_groups = true, jump = true })
+    --         end,
+    --         'Next trouble issue',
+    --     },
+    --     p = {
+    --         function()
+    --             require('trouble').previous({
+    --                 skip_groups = true,
+    --                 jump = true,
+    --             })
+    --         end,
+    --         'Next trouble issue',
+    --     },
+    --     w = {
+    --         function()
+    --             require('trouble').open('workspace_diagnostics')
+    --         end,
+    --         'Trouble workspace diagnostics',
+    --     },
+    -- },
     u = {
         i = { '<Plug>Nuuid', 'Generate UUID' },
     },
