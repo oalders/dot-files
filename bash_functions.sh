@@ -135,6 +135,12 @@ rename_tab() {
 # shellcheck disable=SC2002
 ll() {
     file=~/dot-files/launch.txt
+
+    # The `nl` command is used for numbering lines in a file. The `-n rz`
+    # option formats the line number to have leading zeros. The `-w2` option
+    # sets the width of the line number field to 2 characters. The `-s' '`
+    # option sets the separator between the line numbers and the text to a
+    # space. `$file` is the file to be numbered.
     selection=$(nl -n rz -w2 -s' ' $file | fzf --reverse --no-multi)
     command=$(echo "$selection" | awk -F'# ' '{print $2}')
 
