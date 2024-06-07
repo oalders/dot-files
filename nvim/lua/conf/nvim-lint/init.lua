@@ -8,6 +8,7 @@ vim.api.nvim_create_autocmd({ 'BufWritePost', 'VimEnter', 'BufEnter' }, {
 })
 
 l.linters_by_ft = {
+    gitcommit = {},
     go = { 'golangcilint' },
     lua = { 'selene' },
     markdown = { 'markdownlint' },

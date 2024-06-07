@@ -186,6 +186,7 @@ Remind myself of vim shortcuts etc.
   * `:vert(ical) terminal` - vertical split into a terminal. `exit` to
     close the terminal
   * `:ToggleTerm to split into a terminal buffer`
+* `:w` in a Git commit buffer to enable a `typos` linter check
 
 See `akinsho/bufferline.nvim` for buffer config.
 
