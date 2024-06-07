@@ -121,7 +121,6 @@ wk.register({
         w = { 'Vgw<cr>', 'wrap long lines' },
     },
     l = {
-        a = { '<cmd>Lspsaga code_action<cr>', 'Lspsaga code_action' },
         c = {
             function()
                 vim.opt.colorcolumn = '78'
@@ -134,7 +133,7 @@ wk.register({
             end,
             'unset colorcolumn',
         },
-        l = {
+        h = {
             function()
                 require('hlchunk').setup({
                     indent = {
@@ -148,7 +147,16 @@ wk.register({
             end,
             'hlchunk',
         },
-        h = { '<cmd>DisableHL<cr>', 'Disable HL' },
+        l = { '<cmd>Lspsaga code_action<cr>', 'Lspsaga code_action' },
+        n = {
+            ':Lspsaga diagnostic_jump_next<cr>',
+            'Next diagnostic issue',
+        },
+        p = {
+            ':Lspsaga diagnostic_jump_prev<cr>',
+            'Previous diagnostic issue',
+        },
+        x = { '<cmd>DisableHL<cr>', 'Disable HL' },
     },
     o = {
         t = {
