@@ -157,7 +157,6 @@ Remind myself of vim shortcuts etc.
 * `:bn` or `]b` - next buffer
 * `:bp` or `[b` - previous buffer
 * `[c` and `]c` - navigate to next changed hunk
-  close the terminal
 * `crn` - LSP rename
 * `crr` - LSP code action
 * `ctrl-l` - clear highlighted search terms
@@ -183,6 +182,7 @@ Remind myself of vim shortcuts etc.
 * `:Maps` - fzf normal mode mappings
 * `:Splitrun precious tidy --git` - run a command in a split
 * `:vert(ical) terminal` - vertical split into a terminal buffer. `exit` to
+  close the terminal
 
 See `akinsho/bufferline.nvim` for buffer config.
 
