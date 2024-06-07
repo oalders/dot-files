@@ -289,6 +289,7 @@ require('lazy').setup({
             'rcarriga/nvim-notify',
         },
     },
+    { 'akinsho/toggleterm.nvim', version = '*', config = true },
 
     'tpope/vim-sensible', -- Defaults everyone can agree on
 })

@@ -181,8 +181,11 @@ Remind myself of vim shortcuts etc.
 * `:Lines` - fzf lines in loaded buffers
 * `:Maps` - fzf normal mode mappings
 * `:Splitrun precious tidy --git` - run a command in a split
-* `:vert(ical) terminal` - vertical split into a terminal buffer. `exit` to
-  close the terminal
+* Terminals
+  * Switch between windows via `Ctrl-\ Ctrl-n` and then `Ctrl-w` etc
+  * `:vert(ical) terminal` - vertical split into a terminal. `exit` to
+    close the terminal
+  * `:ToggleTerm to split into a terminal buffer`
 
 See `akinsho/bufferline.nvim` for buffer config.
 
