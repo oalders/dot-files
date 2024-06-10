@@ -1,13 +1,24 @@
 #!/usr/bin/env bash
 
-set -eux
+set -eu
 
+cache_dir=~/.cache/is
+debounce="$cache_dir"/debounce-ubi.txt
+debounce_hours=6
 in="$HOME/local/bin"
-mkdir -p "$in"
+
+if [ -e $debounce ] && [ -e "$in/is" ] && is cli version is gte 0.5 && is fso age $debounce lt $debounce_hours h; then
+    echo "🚥 will not run more than once every $debounce_hours hours"
+    exit
+fi
 
 # shellcheck source=bash_functions.sh
 source ~/dot-files/bash_functions.sh
+
+mkdir -p "$in"
 add_path "$in"
+
+set -x
 
 if [[ ! "$(command -v curl)" && "$(command -v apt-get)" ]]; then
     if [[ ! "$(command -v sudo)" ]]; then
@@ -37,12 +48,12 @@ maybe_install() {
     fi
 }
 
+maybe_install oalders/is
 maybe_install crate-ci/typos
 maybe_install houseabsolute/omegasort
 maybe_install houseabsolute/precious
 maybe_install jqlang/jq
 maybe_install junegunn/fzf
-maybe_install oalders/is
 maybe_install kubernetes-sigs/kustomize
 
 if is cli output stdout hostname eq wolfblitzer; then
@@ -75,4 +86,6 @@ if is there gh && ! gh extension list | grep gh-dash; then
     gh extension install dlvhdr/gh-dash || true
 fi
 
+mkdir -p $cache_dir
+touch $debounce
 exit
