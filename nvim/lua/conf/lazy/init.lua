@@ -85,7 +85,6 @@ require('lazy').setup({
     'tpope/vim-fugitive', --  :GRemove, :Git diff, etc
 
     'ap/vim-css-color', -- show css colors inline
-    'bkad/CamelCaseMotion', -- provide CamelCase motion through words
     'gregsexton/MatchTag', -- highlight matching HTML tags
     'haya14busa/vim-auto-mkdir', -- create directory path on save
     'itchyny/vim-cursorword', -- underline the word under the cursor
@@ -315,6 +314,27 @@ require('lazy').setup({
                 gg = { text = 'gg', prio = 9 },
                 PrevParagraph = { text = '{', prio = 8 },
                 NextParagraph = { text = '}', prio = 8 },
+            },
+        },
+    },
+
+    {
+        'chrisgrieser/nvim-spider',
+        keys = {
+            {
+                'b',
+                "<cmd>lua require('spider').motion('b')<CR>",
+                mode = { 'n', 'o', 'x' },
+            },
+            {
+                'e',
+                "<cmd>lua require('spider').motion('e')<CR>",
+                mode = { 'n', 'o', 'x' },
+            },
+            {
+                'w',
+                "<cmd>lua require('spider').motion('w')<CR>",
+                mode = { 'n', 'o', 'x' },
             },
         },
     },
