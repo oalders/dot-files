@@ -230,6 +230,32 @@ tmux_session_name() {
     export SESSION_NAME
 }
 
+debounce() {
+    target=$1
+
+    if [ -z "$target" ]; then
+        echo "🤬 No target provided. Usage: debounce thing [number] [units]"
+        return
+    fi
+    number=${2:-6}
+    units=${3:-h}
+
+    # file is $script with slashes converted to dashes
+    file=$(echo "$target" | tr / -)
+
+    cache_dir=~/.cache/debounce
+    debounce="$cache_dir/$file"
+    in="$HOME/local/bin"
+    mkdir -p $cache_dir
+
+    if [ -e "$debounce" ] && [ -e "$in/is" ] && is cli version is gte 0.5 && is fso age "$debounce" lt "$number" "$units"; then
+        echo "🚥 will not run $target than once every $number $units"
+        return
+    fi
+
+    eval "$target" && touch "$debounce"
+}
+
 function clone_or_update_repo() {
     local dir="$1"
     local repo="$2"
