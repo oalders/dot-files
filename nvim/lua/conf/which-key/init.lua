@@ -136,12 +136,24 @@ wk.register({
         h = {
             function()
                 require('hlchunk').setup({
-                    indent = {
-                        chars = { '│', '¦', '┆', '┊' }, -- more code can be found in https://unicodeplus.com/
-                        style = { '#5E81AC' },
-                    },
                     blank = {
                         enable = false,
+                    },
+                    chunk = {
+                        chars = {
+                            horizontal_line = '─',
+                            vertical_line = '│',
+                            left_top = '┌',
+                            left_bottom = '└',
+                            right_arrow = '─',
+                        },
+                        style = '#00ffff',
+                        enable = true,
+                    },
+                    indent = {
+                        chars = { '│', '¦', '┆', '┊' }, -- more code can be found in https://unicodeplus.com/
+                        enable = true,
+                        style = { '#5E81AC' },
                     },
                 })
             end,

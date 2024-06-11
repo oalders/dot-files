@@ -208,7 +208,7 @@ require('lazy').setup({
 
     -- display lines for indentation
     -- <leader>ll (start) leader<lh> (stop)
-    'shellRaining/hlchunk.nvim',
+    { 'shellRaining/hlchunk.nvim' },
 
     {
         'Wansmer/treesj',
