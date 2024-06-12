@@ -235,20 +235,25 @@ debounce() {
         echo "🤬 Not enough arguments provided. Usage: debounce 6 h something"
         return
     fi
+
+    # exit as early as possible if we can't create the cache dir
+    # test -d appears to be slightly faster (3ms?) than mkdir -p
+    cache_dir=~/.cache/debounce
+    test -d $cache_dir || mkdir -p $cache_dir
+
     number=$1
     units=$2
     shift 2
+
+    # everything remaining is runnable
     target="$*"
 
     # file is $target with slashes converted to dashes
     file=$(echo "$target" | tr / -)
 
-    cache_dir=~/.cache/debounce
     debounce="$cache_dir/$file"
-    in="$HOME/local/bin"
-    mkdir -p $cache_dir
 
-    if [ -e "$debounce" ] && [ -e "$in/is" ] && is cli version is gte 0.5 && is fso age "$debounce" lt "$number" "$units"; then
+    if [ -f "$debounce" ] && is fso age "$debounce" lt "$number" "$units"; then
         echo "🚥 will not run $target more than once every $number $units"
         return
     fi
