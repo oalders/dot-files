@@ -168,7 +168,7 @@ wk.register({
             ':Lspsaga diagnostic_jump_prev<cr>',
             'Previous diagnostic issue',
         },
-        x = { '<cmd>DisableHL<cr>', 'Disable HL' },
+        x = { ':DisableHLChunk<cr>', 'disable hlchunk' },
     },
     o = {
         t = {
