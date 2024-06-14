@@ -18,6 +18,8 @@
   * [Plugins](#plugins)
     * [tmux-resurrect](#tmux-resurrect)
 * [vim](#vim)
+  * [Mouse](#mouse)
+  * [Buffers](#buffers)
   * [LSP](#lsp)
   * [State](#state)
   * [Mason](#mason)
@@ -187,6 +189,17 @@ Remind myself of vim shortcuts etc.
     close the terminal
   * `:ToggleTerm to split into a terminal buffer`
 * `:w` in a Git commit buffer to enable a `typos` linter check
+
+### Mouse
+
+When mouse is enabled, clicking in the terminal automatically sets it to
+`normal` mode.
+
+* `:set mouse=a` to enable mouse
+* `:set mouse=` to disable mouse
+* `ctrl-a ctrl-m` to toggle mouse in `tmux`
+
+### Buffers
 
 See `akinsho/bufferline.nvim` for buffer config.
 
