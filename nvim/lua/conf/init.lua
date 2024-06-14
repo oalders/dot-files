@@ -27,8 +27,6 @@ vim.cmd('highlight clear SignColumn')
 vim.opt.shortmess:remove('S')
 vim.opt.shortmess:remove('A')
 
-vim.api.nvim_set_keymap('n', ',ss', '<esc>:syntax sync fromstart<CR>', {})
-
 vim.opt.backspace = '2'
 
 vim.api.nvim_exec(
