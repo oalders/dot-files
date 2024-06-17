@@ -181,6 +181,12 @@ wk.register({
     s = {
         v = { ':source $MYVIMRC<cr>', 'Source VimRC' },
     },
+    t = {
+        t = {
+            ':ToggleTerm<cr>',
+            'toggle terminal',
+        },
+    },
     v = {
         t = {
             ':ToggleTerm direction=vertical size=145<cr>',
