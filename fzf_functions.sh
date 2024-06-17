@@ -42,5 +42,5 @@ _fzf_complete_yath_post() {
 [ -n "$BASH" ] && complete -F _fzf_complete_yath -o default -o bashdefault yath
 
 cd_worktree() {
-    cd "$(git worktree list | fzf | awk '{print $1}')" || exit
+    cd "$(git worktree list | fzf --preview='git log --oneline -n10 {2}' | awk '{print $1}')" || exit
 }
