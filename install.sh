@@ -28,7 +28,6 @@ add_path "$HOME/local/bin"
 run_mac_installers() {
     local mac_installers=(
         ./installer/xcode.sh
-        ./installer/homebrew.sh
         # time ./installer/homebrew-maintenance.sh || true
         # ./installer/fonts.sh
         # https://github.com/kcrawford/dockutil/issues/127
@@ -38,12 +37,12 @@ run_mac_installers() {
     )
 
     run_installers "${mac_installers[@]}"
+    debounce 1 d ./installer/homebrew.sh
 }
 
 run_general_installers() {
     local installers=(
         ./installer/linux.sh
-        ./installer/maintenance.sh
         ./installer/wezterm.sh
         ./configure/git.sh
         ./configure/ssh.sh
@@ -59,6 +58,7 @@ run_general_installers() {
     )
 
     run_installers "${installers[@]}"
+    debounce 7 d ./installer/maintenance.sh
 }
 
 if is os name eq darwin; then
