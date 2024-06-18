@@ -154,6 +154,10 @@ elif is there brew; then
     fi
 fi
 
+if [ -f "$HOME/local/bin/is" ]; then
+    complete -C "$HOME/local/bin/is" is
+fi
+
 unset -f tm
 # https://raim.codingfarm.de/blog/2013/01/30/tmux-update-environment/
 tmux() {
