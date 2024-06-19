@@ -235,6 +235,10 @@ wk.register({
 }, { prefix = '<leader>' })
 
 wk.register({
+    cf = {
+        ':CopilotChatFix<cr>',
+        'CopilotChatFix',
+    },
     ch = {
         function()
             local actions = require('CopilotChat.actions')
