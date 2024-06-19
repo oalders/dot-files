@@ -12,7 +12,7 @@ rm_worktree() {
     # Get list of worktrees and strip it down to the branch name
     # [oalders/branch-name], which should generally also correspond to the tmux
     # session name.
-    git worktree list | fzf | sed -rn 's/.*\[(.*)\]/\1/gp' | safe-xargs remove-worktree "$@"
+    git worktree list | fzf --preview='cd {1} && git status {2}' | sed -rn 's/.*\[(.*)\]/\1/gp' | safe-xargs remove-worktree "$@"
 }
 
 # prove
