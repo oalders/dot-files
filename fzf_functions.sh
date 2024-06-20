@@ -8,13 +8,6 @@ f() {
     fzf --bind='ctrl-/:toggle-preview' --preview "bat --style=numbers --color=always --line-range :500 {}" "$@"
 }
 
-rm_worktree() {
-    # Get list of worktrees and strip it down to the branch name
-    # [oalders/branch-name], which should generally also correspond to the tmux
-    # session name.
-    git worktree list | fzf --preview='cd {1} && git status {2}' | sed -rn 's/.*\[(.*)\]/\1/gp' | safe-xargs remove-worktree "$@"
-}
-
 # prove
 _fzf_complete_prove() {
     _fzf_complete --bind='ctrl-/:toggle-preview' --preview 'bat --style=numbers --color=always --line-range :50 {}' --reverse --multi --prompt="prove> " -- "$@" < <(
@@ -42,5 +35,12 @@ _fzf_complete_yath_post() {
 [ -n "$BASH" ] && complete -F _fzf_complete_yath -o default -o bashdefault yath
 
 cd_worktree() {
-    cd "$(git worktree list | fzf --preview='git log --oneline -n10 {2}' | awk '{print $1}')" || exit
+    cd "$(git worktree list | fzf --preview='git log --oneline -n10 {2}' --preview-window 'up,border-horizontal' | awk '{print $1}')" || exit
+}
+
+rm_worktree() {
+    # Get list of worktrees and strip it down to the branch name
+    # [oalders/branch-name], which should generally also correspond to the tmux
+    # session name.
+    git worktree list | fzf --preview='cd {1} && git status {2}' --preview-window 'up,border-horizontal' | sed -rn 's/.*\[(.*)\]/\1/gp' | safe-xargs remove-worktree "$@"
 }
