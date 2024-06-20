@@ -28,6 +28,7 @@ require('mason-tool-installer').setup({
         'tsserver',
         'vim-language-server',
         'vint',
+        'yamllint',
         'yamlls',
 
         -- golang
