@@ -7,9 +7,9 @@ source ~/dot-files/bash_functions.sh
 
 set -x
 
-target_version=18
+target_version=20
 if is os name eq linux && is cli version --major node lt $target_version && is user sudoer; then
-    curl -sL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+    curl -sL https://deb.nodesource.com/setup_$target_version.x | sudo -E bash -
     sudo apt-get install -y nodejs
 fi
 
