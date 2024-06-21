@@ -13,8 +13,8 @@ if is os name eq linux && is cli version --major node lt $target_version && is u
     sudo apt-get install -y nodejs
 fi
 
-npm install npm@latest
-npm install
+debounce 1 d npm install npm@latest
+debounce 1 d npm install
 
 if [[ $IS_GITHUB == false ]] && is os name eq darwin; then
     mkdir -p "$HOME/.npm-packages/lib"
