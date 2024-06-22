@@ -200,22 +200,41 @@ tmux_session_name() {
         current_dir=${PWD##*/}
         current_dir=$(printf "%-18s" "$current_dir")
 
+        declare -A fileToPrefix=(
+            ["dot-files"]=""
+            ["local-dot-files"]=""
+            ["www-olafalders-dot-com"]=""
+            ["dist.ini"]=""
+            ["cpanfile"]=""
+            ["app.psgi"]=""
+            ["Cargo.toml"]=""
+            ["go.mod"]=""
+            ["tsconfig.json"]=""
+            [".npmignore"]=""
+            ["ftplugin"]="🔌"
+            ["Dockerfile"]="󰡨"
+            ["docker-compose.yml"]="󰡨"
+            ["package.json"]=""
+            ["freelancer-theme"]=""
+        )
+
         prefix='⁉️'
-        if [[ ${PWD##*/} == 'dot-files' ]] || [[ ${PWD##*/} == 'local-dot-files' ]]; then
-            prefix=''
-        elif [[ -f 'dist.ini' ]] || [[ -f 'cpanfile' ]] || [[ -f 'app.psgi' ]]; then
-            prefix=''
-        elif [[ -f 'Cargo.toml' ]]; then
-            prefix=''
-        elif [[ -f 'go.mod' ]]; then
-            prefix=''
-        elif [[ -f 'tsconfig.json' ]] || [[ -f '.npmignore' ]]; then
-            prefix=''
-        elif [[ -d 'ftplugin' ]]; then
-            prefix='🔌'
-        elif [[ -f 'Dockerfile' ]] || [[ -f 'docker-compose.yml' ]]; then
-            prefix='󰡨'
+        if git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+            mainCheckoutDir=$(git rev-parse --git-common-dir)
+            if [[ $mainCheckoutDir != ".git" ]]; then
+                parentDir=$(dirname "$mainCheckoutDir")
+                topDir=$(basename "$parentDir")
+            fi
         fi
+        if [[ ! $topDir ]]; then
+            topDir=$(basename "$PWD")
+        fi
+        for file in "${!fileToPrefix[@]}"; do
+            if [[ $topDir == "$file" ]] || [[ -f "$file" ]]; then
+                prefix="${fileToPrefix[$file]}"
+                break
+            fi
+        done
         SESSION_NAME="$prefix  $current_dir   $branch"
     else
         SESSION_NAME=$(pwd)
