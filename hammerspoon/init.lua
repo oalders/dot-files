@@ -207,7 +207,7 @@ Install:andUse('Seal', {
 
 local bellTV = 'https://tv.bell.ca'
 local github = 'https://github.com/notifications'
-local gmail = 'https://mail.google.com/mail/u/0/'
+local gmail = 'https://mail.google.com/mail/u/0/#all'
 local ircCloud = 'https://www.irccloud.com/irc/'
 local PT = 'https://www.pivotaltracker.com'
 local remoteDesktop = 'https://remotedesktop.google.com'
