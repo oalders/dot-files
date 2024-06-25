@@ -12,7 +12,7 @@ is cli version tmux eq $target_version && exit
 is os name eq darwin && exit
 
 if [[ $IS_SUDOER == true ]]; then
-    sudo apt-get install -y libevent-dev libncurses5-dev
+    sudo apt-get install -y bison libevent-dev libncurses5-dev
 fi
 
 release="tmux-$target_version"
