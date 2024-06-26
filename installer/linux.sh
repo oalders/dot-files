@@ -20,7 +20,17 @@ fi
 set -x
 
 sudo apt-get install -y -q --no-install-recommends --autoremove \
-    cpanminus curl jq libnet-ssleay-perl pandoc python3-setuptools ripgrep shellcheck tig tree
+    chafa \
+    cpanminus \
+    curl \
+    jq \
+    libnet-ssleay-perl \
+    pandoc \
+    python3-setuptools \
+    ripgrep \
+    shellcheck \
+    tig \
+    tree
 
 if ! is there go; then
     bash installer/golang.sh
