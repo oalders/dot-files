@@ -201,21 +201,38 @@ tmux_session_name() {
         current_dir=$(printf "%-18s" "$current_dir")
 
         declare -A fileToPrefix=(
+            #perl
+            ["app.psgi"]=""
+            ["cpanfile"]=""
+            ["dist.ini"]=""
+
+            # rust
+            ["Cargo.toml"]=""
+
+            # docker
+            ["docker-compose.yml"]="󰡨"
+            ["Dockerfile"]="󰡨"
+
+            # configuration
             ["dot-files"]=""
             ["local-dot-files"]=""
-            ["www-olafalders-dot-com"]=""
-            ["dist.ini"]=""
-            ["cpanfile"]=""
-            ["app.psgi"]=""
-            ["Cargo.toml"]=""
-            ["go.mod"]=""
-            ["tsconfig.json"]=""
-            [".npmignore"]=""
-            ["ftplugin"]="🔌"
-            ["Dockerfile"]="󰡨"
-            ["docker-compose.yml"]="󰡨"
-            ["package.json"]=""
+
+            # markdown -- nvim devicons doesn't have an icon for hugo
             ["freelancer-theme"]=""
+            ["www-olafalders-dot-com"]=""
+
+            # neovim plugin
+            ["ftplugin"]="🔌"
+
+            # go
+            ["go.mod"]=""
+
+            # typescript
+            [".npmignore"]=""
+            ["tsconfig.json"]=""
+
+            # node
+            ["package.json"]=""
         )
 
         # We can't preserve the order of the keys in associative array above
