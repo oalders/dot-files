@@ -218,6 +218,25 @@ tmux_session_name() {
             ["freelancer-theme"]=""
         )
 
+        # We can't preserve the order of the keys in associative array above
+        keys=(
+            "dot-files"
+            "local-dot-files"
+            "www-olafalders-dot-com"
+            "dist.ini"
+            "cpanfile"
+            "app.psgi"
+            "Cargo.toml"
+            "go.mod"
+            "tsconfig.json"
+            ".npmignore"
+            "ftplugin"
+            "Dockerfile"
+            "docker-compose.yml"
+            "package.json"
+            "freelancer-theme"
+        )
+
         prefix='⁉️'
         if git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
             mainCheckoutDir=$(git rev-parse --git-common-dir)
@@ -229,7 +248,7 @@ tmux_session_name() {
         if [[ ! $topDir ]]; then
             topDir=$(basename "$PWD")
         fi
-        for file in "${!fileToPrefix[@]}"; do
+        for file in "${keys[@]}"; do
             if [[ $topDir == "$file" ]] || [[ -f "$file" ]]; then
                 prefix="${fileToPrefix[$file]}"
                 break
