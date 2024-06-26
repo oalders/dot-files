@@ -41,6 +41,7 @@ else
     maybe_install oalders/is
 fi
 
+maybe_install atanunq/viu
 maybe_install crate-ci/typos
 maybe_install houseabsolute/omegasort
 maybe_install houseabsolute/precious
