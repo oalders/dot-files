@@ -30,6 +30,9 @@ require('lazy').setup({
                     fg = colors.green,
                 }
             end,
+            plugins = {
+                auto = true
+            }
         },
     },
     {
