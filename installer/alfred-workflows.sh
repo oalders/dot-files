@@ -20,6 +20,7 @@ wait_for_input() {
     read -n 1 -s -r -p "Press any key to continue"
 }
 
+debounce 90 d wait_for_input 'https://alfred.app/workflows/rknightuk/http-status-codes/download/' 'http-status-codes.alfredworkflow'
 debounce 90 d wait_for_input 'https://github.com/alexchantastic/alfred-ip-address-workflow/releases/download/v1.0.3' 'alfred-ip-address-workflow.alfredworkflow'
 debounce 90 d wait_for_input 'https://github.com/epilande/alfred-browser-tabs/releases/download/v1.0.7' 'Browser-Tabs.alfredworkflow'
 debounce 90 d wait_for_input 'https://github.com/gharlan/alfred-github-workflow/releases/download/v1.7.1' 'github.alfredworkflow'
