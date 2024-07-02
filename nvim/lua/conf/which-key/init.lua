@@ -182,6 +182,18 @@ wk.register({
         v = { ':source $MYVIMRC<cr>', 'Source VimRC' },
     },
     t = {
+        -- make isolating Playwright tests less painful
+        o = {
+            function()
+                local line = vim.api.nvim_get_current_line()
+                if string.find(line, 'test.only') then
+                    vim.api.nvim_command('s/test.only/test/')
+                else
+                    vim.api.nvim_command('s/test/test.only/')
+                end
+            end,
+            'Toggle test.only',
+        },
         t = {
             ':ToggleTerm<cr>',
             'toggle terminal',
