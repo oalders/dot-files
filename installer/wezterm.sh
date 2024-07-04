@@ -2,6 +2,9 @@
 
 set -e -u -o pipefail
 
+# shellcheck source=bash_functions.sh
+source ~/dot-files/bash_functions.sh
+
 install_for_linux() (
     sudo apt install -y libxcb-image0 libxkbcommon-x11-0 libwayland-client0 libwayland-egl1 libx11-xcb1
     version=$(is known os version)
@@ -15,7 +18,7 @@ install_for_linux() (
 
 if is os name eq darwin; then
     if is there wezterm; then
-        brew upgrade homebrew/cask/wezterm
+        debounce 18 h brew upgrade homebrew/cask/wezterm
     else
         brew tap wez/wezterm
         brew install --cask wezterm --no-quarantine

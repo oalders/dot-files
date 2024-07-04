@@ -7,18 +7,17 @@ install_dir="$HOME/local/bin"
 source ~/dot-files/bash_functions.sh
 add_path "$install_dir"
 
+cmd=("ubi" "-p" "JanDeDobbeleer/oh-my-posh" "--in" "$install_dir")
+
 # Pass a version arg if you want to install oh-my-posh on macOS"
 # e.g. ./installer/oh-my-posh.sh v8.27.0"
+if [[ ${1+x} ]]; then
+    cmd+=("--tag" "$1")
+fi
 
 set -x
 
-cmd="ubi -p JanDeDobbeleer/oh-my-posh --in $install_dir"
-
-if [[ ${1+x} ]]; then
-    cmd="$cmd --tag $1"
-fi
-
-$cmd
+debounce 1 d "${cmd[@]}"
 
 if [[ $IS_GITHUB == true ]]; then
     exit 0

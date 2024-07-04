@@ -2,8 +2,11 @@
 
 set -eux
 
-brew install luarocks
+# shellcheck source=bash_functions.sh
+source ~/dot-files/bash_functions.sh
+
+debounce 1 d brew install luarocks
 
 # luarocks install luacheck
 
-npm install lua-fmt
+debounce 1 d npm install lua-fmt
