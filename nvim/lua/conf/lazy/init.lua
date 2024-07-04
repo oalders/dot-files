@@ -171,7 +171,17 @@ require('lazy').setup({
         version = '*',
         dependencies = 'nvim-tree/nvim-web-devicons',
     },
-    { 'ellisonleao/glow.nvim', ft = 'markdown', config = true, cmd = 'Glow' }, -- render markdown via :Glow
+    {
+        'ellisonleao/glow.nvim',
+        event = 'VeryLazy',
+        ft = 'markdown',
+        config = true,
+        cmd = 'Glow',
+        opts = {
+            width_ratio = 0.9, -- maximum width of the Glow window compared to the nvim window size (overrides `width`)
+            height_ratio = 0.9,
+        },
+    }, -- render markdown via :Glow
 
     --  <leader>td (doc) <leader>tw (workspace)
     {
