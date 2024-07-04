@@ -302,7 +302,6 @@ require('lazy').setup({
     },
 
     -- LSP
-    'lvimuser/lsp-inlayhints.nvim', -- Partial implementation of LSP inlay hints
     'neovim/nvim-lspconfig',
     {
         'nvimdev/lspsaga.nvim',

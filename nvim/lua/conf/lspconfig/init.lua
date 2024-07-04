@@ -56,19 +56,6 @@ lspconfig.yamlls.setup({})
 
 -- Set up lspconfig.
 -- Mappings.
-vim.api.nvim_create_augroup('LspAttach_inlayhints', {})
-vim.api.nvim_create_autocmd('LspAttach', {
-    group = 'LspAttach_inlayhints',
-    callback = function(args)
-        if not (args.data and args.data.client_id) then
-            return
-        end
-
-        local bufnr = args.buf
-        local client = vim.lsp.get_client_by_id(args.data.client_id)
-        require('lsp-inlayhints').on_attach(client, bufnr)
-    end,
-})
 
 -- copied from https://github.com/neovim/nvim-lspconfig
 -- Global mappings.
@@ -78,17 +65,30 @@ vim.keymap.set('n', '[d', vim.diagnostic.goto_prev)
 vim.keymap.set('n', ']d', vim.diagnostic.goto_next)
 vim.keymap.set('n', '<space>q', vim.diagnostic.setloclist)
 
+local no_inlay_hints = { '' }
+
 -- Use LspAttach autocommand to only map the following keys
 -- after the language server attaches to the current buffer
 vim.api.nvim_create_autocmd('LspAttach', {
     group = vim.api.nvim_create_augroup('UserLspConfig', {}),
-    callback = function(ev)
+    callback = function(args)
+        local bufnr = args.buf
+        local client_id = args.data.client_id
+        local client = vim.lsp.get_client_by_id(client_id)
+        -- vim.notify(client.name .. ' (attached)', vim.log.levels.INFO)
+        if
+            client.server_capabilities.inlayHintProvider
+            and not vim.tbl_contains(no_inlay_hints, client.name)
+        then
+            vim.notify(client.name .. ' (inlay hints enabled)', vim.log.levels.INFO)
+            vim.lsp.inlay_hint.enable(true)
+        end
         -- Enable completion triggered by <c-x><c-o>
-        vim.bo[ev.buf].omnifunc = 'v:lua.vim.lsp.omnifunc'
+        vim.bo[args.buf].omnifunc = 'v:lua.vim.lsp.omnifunc'
 
         -- Buffer local mappings.
         -- See `:help vim.lsp.*` for documentation on any of the below functions
-        local opts = { buffer = ev.buf }
+        local opts = { buffer = args.buf }
         vim.keymap.set('n', 'gD', vim.lsp.buf.declaration, opts)
         vim.keymap.set('n', 'gd', vim.lsp.buf.definition, opts)
         vim.keymap.set('n', 'K', vim.lsp.buf.hover, opts)
