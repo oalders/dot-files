@@ -304,7 +304,14 @@ require('lazy').setup({
     -- LSP
     'lvimuser/lsp-inlayhints.nvim', -- Partial implementation of LSP inlay hints
     'neovim/nvim-lspconfig',
-    'nvimdev/lspsaga.nvim',
+    {
+        'nvimdev/lspsaga.nvim',
+        event = 'VeryLazy',
+        opts = {
+            code_action = { extend_gitsigns = true, show_server_name = true },
+            lightbulb = { enable = true, enable_in_insert = false, sign = false, },
+        },
+    },
 
     -- neotest
     {
