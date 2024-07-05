@@ -52,7 +52,7 @@ config.keys = {
     {
         key = ']',
         mods = 'CTRL|ALT',
-        action = wezterm.action.ActivateTabRelative(-1),
+        action = wezterm.action.ActivateTabRelative(1),
     },
     {
         key = 't',
