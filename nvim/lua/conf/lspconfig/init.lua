@@ -1,6 +1,9 @@
 -- vim.lsp.set_log_level("debug")
 
-require('lspsaga').setup({ code_action = { extend_gitsigns = true }, code_action_prompt = false })
+require('lspsaga').setup({
+    code_action = { extend_gitsigns = true },
+    code_action_prompt = false,
+})
 
 -- reduce left-right jitter when signcolumn appears and disappears while
 -- scrolling vertically.
