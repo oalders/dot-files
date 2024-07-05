@@ -57,7 +57,7 @@ config.keys = {
     {
         key = 't',
         mods = 'ALT',
-        action = wezterm.action.SpawnTab 'CurrentPaneDomain',
+        action = wezterm.action.SpawnTab('CurrentPaneDomain'),
     },
 }
 
