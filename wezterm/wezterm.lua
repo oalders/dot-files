@@ -31,4 +31,23 @@ config.front_end = 'OpenGL'
 
 config.warn_about_missing_glyphs = true
 
+-- try to map some shortcuts on Linux to be more like macOS defaults.
+config.keys = {
+    {
+        key = '[',
+        mods = 'CTRL|ALT',
+        action = wezterm.action.ActivateTabRelative(-1),
+    },
+    {
+        key = ']',
+        mods = 'CTRL|ALT',
+        action = wezterm.action.ActivateTabRelative(-1),
+    },
+    {
+        key = 't',
+        mods = 'ALT',
+        action = wezterm.action.SpawnTab 'CurrentPaneDomain',
+    },
+}
+
 return config
