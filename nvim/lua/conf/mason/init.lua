@@ -16,7 +16,7 @@ require('mason-tool-installer').setup({
         -- 'json-to-struct',
         -- 'luacheck',
         -- 'luaformatter',
-        -- 'lua-language-server',
+        'lua-language-server',
         -- 'misspell',
         'perlnavigator',
         -- 'rust_analyzer',
