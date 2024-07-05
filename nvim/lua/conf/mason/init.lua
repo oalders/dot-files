@@ -1,4 +1,4 @@
-require('mason').setup()
+require('mason').setup({ log_level = vim.log.levels.INFO })
 require('mason-lspconfig').setup()
 require('mason-tool-installer').setup({
 
