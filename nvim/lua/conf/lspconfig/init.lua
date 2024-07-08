@@ -107,7 +107,10 @@ vim.api.nvim_create_autocmd('LspAttach', {
             client.server_capabilities.inlayHintProvider
             and not vim.tbl_contains(no_inlay_hints, client.name)
         then
-            vim.notify(client.name .. ' (inlay hints enabled)', vim.log.levels.INFO)
+            vim.notify(
+                client.name .. ' (inlay hints enabled)',
+                vim.log.levels.INFO
+            )
             vim.lsp.inlay_hint.enable(true)
         end
         -- Enable completion triggered by <c-x><c-o>
