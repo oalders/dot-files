@@ -1,0 +1,12 @@
+#!/bin/bash
+
+# xsv select URL get.csv | tail --lines=+2 | xargs -n1 ~/dot-files/bin/dl-audio
+
+set -eu -o pipefail
+
+if [ "$#" -ne 1 ]; then
+    echo "Usage: $0 <URL>"
+    exit 1
+fi
+
+yt-dlp -x --audio-format mp3 --add-metadata "$1"
