@@ -323,6 +323,17 @@ require('lazy').setup({
         opts = {}, -- required, even if empty
     },
 
+    -- Auto-close quickfix based on a timer
+    {
+        'mei28/qfc.nvim',
+        config = function()
+            require('qfc').setup({
+                timeout = 3000, -- Timeout setting in milliseconds
+                autoclose = true, -- Enable/disable autoclose feature
+            })
+        end,
+    },
+
     -- neotest
     {
         'nvim-neotest/neotest',
