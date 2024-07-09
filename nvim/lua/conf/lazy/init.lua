@@ -308,7 +308,11 @@ require('lazy').setup({
         event = 'VeryLazy',
         opts = {
             code_action = { extend_gitsigns = true, show_server_name = true },
-            lightbulb = { enable = true, enable_in_insert = false, sign = false, },
+            lightbulb = {
+                enable = true,
+                enable_in_insert = false,
+                sign = false,
+            },
         },
     },
 
