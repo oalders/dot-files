@@ -7,10 +7,10 @@ require('other-nvim').setup({
 })
 
 require('project_nvim').setup({
-    detection_methods = { 'pattern', 'lsp' },
-    manual_mode = true,
-    patterns = { '.git', 'Makefile' },
-    silent_chdir = false,
+    detection_methods = { 'pattern', 'lsp'},
+    manual_mode = false,
+    patterns = { 'playwright.config.ts', '.git', 'Makefile' },
+    silent_chdir = true, -- enable for debugging
     -- ignore_lsp = { 'null-ls' },
     scope_chdir = 'global',
 })

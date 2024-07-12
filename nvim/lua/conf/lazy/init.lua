@@ -165,7 +165,10 @@ require('lazy').setup({
 
     { 'yko/mojo.vim',     ft = 'html.epl', lazy = true }, -- syntax highlighting for mojo epl templates
 
-    'ahmedkhalf/project.nvim', -- auto-detect project root
+    {
+        'ahmedkhalf/project.nvim',
+        ft = 'typescript',
+    }, -- auto-detect project root
     {
         'akinsho/bufferline.nvim',
         version = '*',
