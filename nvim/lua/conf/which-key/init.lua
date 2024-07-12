@@ -186,9 +186,17 @@ wk.register({
         o = {
             function()
                 local line = vim.api.nvim_get_current_line()
-                if string.find(line, 'test.only') then
+                if string.find(line, 'test.describe.only') then
+                    vim.api.nvim_command(
+                        's/test.describe.only/test.describe/'
+                    )
+                elseif string.find(line, 'test.only') then
                     vim.api.nvim_command('s/test.only/test/')
-                else
+                elseif string.find(line, 'test.describe') then
+                    vim.api.nvim_command(
+                        's/test.describe/test.describe.only/'
+                    )
+                elseif string.find(line, 'test') then
                     vim.api.nvim_command('s/test/test.only/')
                 end
             end,
