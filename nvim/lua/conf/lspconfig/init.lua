@@ -235,19 +235,19 @@ lspconfig.pylsp.setup({
 
 -- begin
 -- https://github.com/neovim/neovim/issues/20745#issuecomment-1983998972
-local function filter_diagnostics(diagnostic)
-    if diagnostic.source == 'tsserver' then
-        return false
-    end
-    return true
-end
-
-vim.lsp.handlers['textDocument/publishDiagnostics'] = vim.lsp.with(
-    function(_, result, ctx, config)
-        result.diagnostics =
-            vim.tbl_filter(filter_diagnostics, result.diagnostics)
-        vim.lsp.diagnostic.on_publish_diagnostics(_, result, ctx, config)
-    end,
-    {}
-)
+-- local function filter_diagnostics(diagnostic)
+--     if diagnostic.source == 'tsserver' then
+--         return false
+--     end
+--     return true
+-- end
+--
+-- vim.lsp.handlers['textDocument/publishDiagnostics'] = vim.lsp.with(
+--     function(_, result, ctx, config)
+--         result.diagnostics =
+--             vim.tbl_filter(filter_diagnostics, result.diagnostics)
+--         vim.lsp.diagnostic.on_publish_diagnostics(_, result, ctx, config)
+--     end,
+--     {}
+-- )
 -- end
