@@ -117,14 +117,14 @@ require('lazy').setup({
             end,
         },
     },
-    'rhysd/git-messenger.vim', -- ,gm to open window
-    'sindrets/diffview.nvim', -- File explorer for git diffs
-    'tpope/vim-fugitive', --  :GRemove, :Git diff, etc
+    'rhysd/git-messenger.vim',   -- ,gm to open window
+    'sindrets/diffview.nvim',    -- File explorer for git diffs
+    'tpope/vim-fugitive',        --  :GRemove, :Git diff, etc
 
-    'ap/vim-css-color', -- show css colors inline
-    'gregsexton/MatchTag', -- highlight matching HTML tags
+    'ap/vim-css-color',          -- show css colors inline
+    'gregsexton/MatchTag',       -- highlight matching HTML tags
     'haya14busa/vim-auto-mkdir', -- create directory path on save
-    'itchyny/vim-cursorword', -- underline the word under the cursor
+    'itchyny/vim-cursorword',    -- underline the word under the cursor
     {
         'junegunn/fzf',
         dir = '~/.fzf',
@@ -137,15 +137,15 @@ require('lazy').setup({
     -- zz after search places the current match at the center of the window
     'junegunn/vim-slash',
 
-    'kburdett/vim-nuuid', -- <leader>ui to insert a new UUID
-    'luochen1990/rainbow', -- Rainbow Parentheses Improved
+    'kburdett/vim-nuuid',                       -- <leader>ui to insert a new UUID
+    'luochen1990/rainbow',                      -- Rainbow Parentheses Improved
     {
         'mannih/vim-perl-variable-highlighter', -- highlight other instances of selected var
         ft = 'perl',
     },
-    { 'motemen/xslate-vim', ft = 'xslate' }, -- https://metacpan.org/pod/Text::Xslate
+    { 'motemen/xslate-vim',       ft = 'xslate' },   -- https://metacpan.org/pod/Text::Xslate
     { 'mzlogin/vim-markdown-toc', ft = 'markdown' }, -- :GenTocGFM to generate table of contents
-    'ntpeters/vim-better-whitespace', -- highlight trailing whitespace
+    'ntpeters/vim-better-whitespace',                -- highlight trailing whitespace
     -- 'oalders/prettysql' -- ,fs to format visually selected SQL
     { 'othree/html5.vim', ft = 'html' },
     'rodjek/vim-puppet', -- { 'for': 'puppet' }, -- Formatting, syntax highlighting etc
@@ -163,7 +163,7 @@ require('lazy').setup({
         ft = 'ruby',
     },
 
-    { 'yko/mojo.vim', ft = 'html.epl', lazy = true }, -- syntax highlighting for mojo epl templates
+    { 'yko/mojo.vim',     ft = 'html.epl', lazy = true }, -- syntax highlighting for mojo epl templates
 
     'ahmedkhalf/project.nvim', -- auto-detect project root
     {
@@ -239,19 +239,19 @@ require('lazy').setup({
         dependencies = { 'nvim-tree/nvim-web-devicons' },
     },
 
-    { 'kevinhwang91/nvim-bqf', ft = 'qf' }, -- add previews to quickfix window
-    'mfussenegger/nvim-lint', -- linter harness
+    { 'kevinhwang91/nvim-bqf',         ft = 'qf' }, -- add previews to quickfix window
+    'mfussenegger/nvim-lint',               -- linter harness
     {
         'nvim-lualine/lualine.nvim',
         dependencies = { 'nvim-tree/nvim-web-devicons' },
     },
-    { 'nvim-telescope/telescope.nvim', tag = '0.1.5' }, -- fuzzy finder
-    'nvimtools/none-ls.nvim', -- null-ls replacement
+    { 'nvim-telescope/telescope.nvim', tag = '0.1.5' },         -- fuzzy finder
+    'nvimtools/none-ls.nvim',                                   -- null-ls replacement
     { 'nvim-treesitter/nvim-treesitter', build = ':TSUpdate' }, -- recommend updating parsers on update
-    'olimorris/persisted.nvim', -- session management
-    'ptdewey/yankbank-nvim', -- easy access to yanks and deletes
-    'rgroli/other.nvim', -- :Other to toggle between test and implementation files
-    'windwp/nvim-autopairs', --
+    'olimorris/persisted.nvim',                                 -- session management
+    'ptdewey/yankbank-nvim',                                    -- easy access to yanks and deletes
+    'rgroli/other.nvim',                                        -- :Other to toggle between test and implementation files
+    'windwp/nvim-autopairs',                                    --
 
     -- display lines for indentation
     -- <leader>ll (start) leader<lh> (stop)
@@ -268,7 +268,7 @@ require('lazy').setup({
         branch = 'canary',
         dependencies = {
             { 'zbirenbaum/copilot.lua' }, -- or github/copilot.vim
-            { 'nvim-lua/plenary.nvim' }, -- for curl, log wrapper
+            { 'nvim-lua/plenary.nvim' },  -- for curl, log wrapper
         },
         opts = {
             debug = false, -- Enable debugging
@@ -296,7 +296,7 @@ require('lazy').setup({
             'hrsh7th/cmp-cmdline',
             'hrsh7th/cmp-nvim-lsp',
             'hrsh7th/cmp-path',
-            'onsails/lspkind.nvim', -- add pictograms to completion sources
+            'onsails/lspkind.nvim',   -- add pictograms to completion sources
             'zbirenbaum/copilot-cmp', -- include copilot suggestions in completion
         },
     },
@@ -328,7 +328,7 @@ require('lazy').setup({
         'mei28/qfc.nvim',
         config = function()
             require('qfc').setup({
-                timeout = 3000, -- Timeout setting in milliseconds
+                timeout = 3000,   -- Timeout setting in milliseconds
                 autoclose = true, -- Enable/disable autoclose feature
             })
         end,
@@ -378,7 +378,7 @@ require('lazy').setup({
     },
 
     'williamboman/mason-lspconfig.nvim', --  bridge mason.nvim with the lspconfig plugin
-    'williamboman/mason.nvim', -- install and manage LSP servers, linters and tidiers
+    'williamboman/mason.nvim',           -- install and manage LSP servers, linters and tidiers
     'WhoIsSethDaniel/mason-tool-installer.nvim',
 
     -- noice
