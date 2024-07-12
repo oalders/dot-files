@@ -11,3 +11,5 @@ bind stash x !?git stash drop %(stash)
 
 # Check out branch at this commit
 bind main B !git checkout -b "%(prompt Checkout at new branch: )" %(commit)
+
+color cursor          black   white
