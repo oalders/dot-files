@@ -22,8 +22,8 @@ rm -rf $archive $release
 curl --fail --location "https://github.com/tmux/tmux/releases/download/$target_version/$archive" -o $archive
 tar xzvf $archive
 cd $release
-./configure --enable-sixel && make
-sudo make install
+./configure --prefix ~/local
+make install
 
 # Also remove any remaining server sockets, or we may be unable to restart tmux.
 # https://github.com/tmux/tmux/issues/2376#issuecomment-695195592
