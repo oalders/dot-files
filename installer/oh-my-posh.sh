@@ -24,7 +24,9 @@ if [[ $IS_GITHUB == true ]]; then
 fi
 
 if ! is there fc-list; then
-    sudo apt-get install -y fontconfig
+    if [[ $IS_SUDOER == true ]]; then
+        sudo apt-get install -y fontconfig
+    fi
 fi
 
 font='JetBrainsMono'

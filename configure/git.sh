@@ -111,7 +111,9 @@ source ~/dot-files/bash_functions.sh
 # Requires git-lfs to have been installed
 if ! is there git-lfs; then
     if is os name eq linux; then
-        sudo apt-get install git-lfs || git lfs update --force
+        if [[ $IS_SUDOER == true ]]; then
+            sudo apt-get install git-lfs || git lfs update --force
+        fi
     fi
     git lfs install
 fi
