@@ -251,7 +251,7 @@ require('lazy').setup({
     { 'nvim-telescope/telescope.nvim', tag = '0.1.5' },         -- fuzzy finder
     'nvimtools/none-ls.nvim',                                   -- null-ls replacement
     { 'nvim-treesitter/nvim-treesitter', build = ':TSUpdate' }, -- recommend updating parsers on update
-    'olimorris/persisted.nvim',                                 -- session management
+    { 'olimorris/persisted.nvim', opts = {}},                                 -- session management
     'ptdewey/yankbank-nvim',                                    -- easy access to yanks and deletes
     'rgroli/other.nvim',                                        -- :Other to toggle between test and implementation files
     'windwp/nvim-autopairs',                                    --
