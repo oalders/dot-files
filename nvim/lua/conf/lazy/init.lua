@@ -107,7 +107,7 @@ require('lazy').setup({
             opts = {
                 linehl = true,
                 numhl = true,
-                word_diff = true,
+                word_diff = false,
                 on_attach = function(bufnr)
                     local gitsigns = require('gitsigns')
                     local function map(mode, l, r, opts)
