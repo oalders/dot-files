@@ -392,13 +392,22 @@ require('lazy').setup({
         {
             'Isrothy/neominimap.nvim',
             enabled = true,
-            lazy = false,                  -- WARN: NO NEED to Lazy load
+            lazy = false, -- WARN: NO NEED to Lazy load
             init = function()
-                vim.opt.wrap = false       -- Recommended
-                vim.opt.sidescrolloff = 36 -- It's recommended to set a large value
-                vim.g.neominimap = {
-                    auto_enable = true,
-                }
+                local filepath = vim.fn.expand('%:p')
+                local filetype = vim.bo.filetype
+                if
+                    not (
+                        string.sub(filepath, 1, 4) == '/tmp'
+                        or filetype == 'gitcommit'
+                    )
+                then
+                    vim.opt.wrap = false -- Recommended
+                    vim.opt.sidescrolloff = 36 -- It's recommended to set a large value
+                    vim.g.neominimap = {
+                        auto_enable = true,
+                    }
+                end
             end,
         },
 
