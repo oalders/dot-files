@@ -136,6 +136,10 @@ require('lazy').setup({
             },
         },
         'rhysd/git-messenger.vim',   -- ,gm to open window
+
+        -- DiffviewOpen
+        -- DiffviewOpen origin/main
+        -- DiffviewFileHistory %
         'sindrets/diffview.nvim',    -- File explorer for git diffs
         'tpope/vim-fugitive',        --  :GRemove, :Git diff, etc
 
