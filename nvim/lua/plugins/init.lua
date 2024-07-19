@@ -6,14 +6,14 @@ require('other-nvim').setup({
     mappings = { 'golang' },
 })
 
-require('project_nvim').setup({
-    detection_methods = { 'pattern', 'lsp'},
-    manual_mode = false,
-    patterns = { 'playwright.config.ts', '.git', 'Makefile' },
-    silent_chdir = true, -- enable for debugging
-    -- ignore_lsp = { 'null-ls' },
-    scope_chdir = 'global',
-})
+-- require('project_nvim').setup({
+--     detection_methods = { 'pattern', 'lsp'},
+--     manual_mode = false,
+--     patterns = { 'playwright.config.ts', '.git', 'Makefile' },
+--     silent_chdir = true, -- enable for debugging
+--     -- ignore_lsp = { 'null-ls' },
+--     scope_chdir = 'global',
+-- })
 
 local null_ls = require('null-ls')
 null_ls.setup({
