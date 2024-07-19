@@ -16,8 +16,8 @@ fi
 
 echo "Setting main branch in local Git aliases to \"$branch\""
 
-git config alias.dom "diff -w -M --relative origin/$branch...HEAD"
-git config alias.doms "diff -w -M --relative origin/$branch...HEAD --stat"
-git config alias.domo "diff -w -M --relative origin/$branch...HEAD --name-only"
+git config alias.dom "diff -w -M origin/$branch...HEAD"
+git config alias.doms "diff -w -M origin/$branch...HEAD --stat"
+git config alias.domo "diff -w -M origin/$branch...HEAD --name-only"
 git config alias.from "!git fetch -p; git rebase origin/$branch"
 git config alias.prom "pull --rebase origin $branch"
