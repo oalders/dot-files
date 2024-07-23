@@ -396,22 +396,33 @@ require('lazy').setup({
         {
             'Isrothy/neominimap.nvim',
             enabled = true,
-            lazy = false, -- WARN: NO NEED to Lazy load
+            lazy = false,                  -- WARN: NO NEED to Lazy load
             init = function()
-                local filepath = vim.fn.expand('%:p')
-                local filetype = vim.bo.filetype
-                if
-                    not (
-                        string.sub(filepath, 1, 4) == '/tmp'
-                        or filetype == 'gitcommit'
-                    )
-                then
-                    vim.opt.wrap = false -- Recommended
-                    vim.opt.sidescrolloff = 36 -- It's recommended to set a large value
-                    vim.g.neominimap = {
-                        auto_enable = true,
-                    }
-                end
+                vim.opt.wrap = false       -- Recommended
+                vim.opt.sidescrolloff = 36 -- It's recommended to set a large value
+                vim.g.neominimap = {
+                    auto_enable = true,
+                    exclude_filetypes = {
+                        'dashboard',
+                        'gitcommit',
+                        'help',
+                    },
+                    exclude_buftypes = {
+                        'nofile',
+                        'nowrite',
+                        'prompt',
+                        'quickfix',
+                        'terminal',
+                    },
+                    -- When false is returned, the minimap will not be created for this buffer
+                    buf_filter = function(bufnr)
+                        local bufname = vim.api.nvim_buf_get_name(bufnr)
+                        if string.sub(bufname, 1, 4) == '/tmp' then
+                            return false
+                        end
+                        return true
+                    end,
+                }
             end,
         },
 
