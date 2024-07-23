@@ -112,14 +112,7 @@ wk.add({
     { '<leader>gx', '<cmd>Copilot disable<cr>',  desc = 'stop GH copilot' },
     { '<leader>gy', '<cmd>CopilotChatClose<cr>', desc = 'CopilotChatClose' },
     {
-        '<leader>lc',
-        function()
-            vim.opt.colorcolumn = '78'
-        end,
-        desc = 'set colorcolumn to 78',
-    },
-    {
-        '<leader>lh',
+        '<leader>hl',
         function()
             require('hlchunk').setup({
                 blank = {
@@ -144,6 +137,18 @@ wk.add({
             })
         end,
         desc = 'hlchunk',
+    },
+    {
+        '<leader>hx',
+        ':DisableHLChunk<cr>:DisableHLIndent<cr>',
+        desc = 'Disable hlchunk and hlindent',
+    },
+    {
+        '<leader>lc',
+        function()
+            vim.opt.colorcolumn = '78'
+        end,
+        desc = 'set colorcolumn to 78',
     },
     {
         '<leader>ll',
