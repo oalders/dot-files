@@ -135,7 +135,7 @@ require('lazy').setup({
                 end,
             },
         },
-        'rhysd/git-messenger.vim',   -- ,gm to open window
+        'rhysd/git-messenger.vim', -- ,gm to open window
 
         -- DiffviewOpen
         -- DiffviewOpen origin/main
