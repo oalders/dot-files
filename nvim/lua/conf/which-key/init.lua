@@ -304,7 +304,3 @@ wk.register({
 }, { mode = 'v', silent = false })
 
 wk.setup({})
-
-require('which-key').register({
-    sv = { ':source $MYVIMRC<cr>', 'Source VimRC' },
-}, { prefix = '<leader>' })
