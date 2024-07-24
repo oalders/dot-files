@@ -352,6 +352,7 @@ require('lazy').setup({
         },
 
         -- Auto-close quickfix based on a timer
+        -- :QFC [enable|disable|toggle]
         {
             'mei28/qfc.nvim',
             config = function()
@@ -360,6 +361,7 @@ require('lazy').setup({
                     autoclose = true, -- Enable/disable autoclose feature
                 })
             end,
+            ft = 'qf', -- for lazy load
         },
 
         {
