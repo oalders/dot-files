@@ -419,7 +419,10 @@ require('lazy').setup({
                     -- When false is returned, the minimap will not be created for this buffer
                     buf_filter = function(bufnr)
                         local bufname = vim.api.nvim_buf_get_name(bufnr)
-                        if string.sub(bufname, 1, 4) == '/tmp' then
+                        if
+                            string.sub(bufname, 1, 4) == '/tmp'
+                            or string.sub(bufname, 1, 8) == '/private' -- macOS
+                        then
                             return false
                         end
                         return true
