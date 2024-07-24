@@ -39,7 +39,6 @@ require('conf/fzf')
 require('conf/lualine')
 require('conf/neotest')
 require('conf/nvim-lint')
-require('conf/telescope')
 require('conf/treesitter')
 require('conf/ufo')
 require('conf/open-this') -- needs to happen before which-key
