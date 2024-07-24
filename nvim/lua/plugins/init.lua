@@ -1,7 +1,5 @@
 require('conf/lazy')
 
-require('nvim-autopairs').setup({})
-
 require('other-nvim').setup({
     mappings = { 'golang' },
 })
@@ -26,15 +24,12 @@ null_ls.setup({
     },
 })
 
-require('treesj').setup({ max_join_length = 400 })
-
 require('bufferline').setup({
     options = {
         diagnostics = 'nvim_lsp',
         numbers = 'ordinal',
     },
 })
-require('nvim-splitrun').setup()
 
 require('conf/cmp')
 require('conf/mason') -- This needs to happen before lspconfig

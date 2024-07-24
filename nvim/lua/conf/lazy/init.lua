@@ -256,7 +256,8 @@ require('lazy').setup({
                 vim.o.timeoutlen = 300
             end,
         },
-        'Hubro/nvim-splitrun', -- :Splitrun some command
+        -- :Splitrun some command
+        { 'Hubro/nvim-splitrun',   opts = {} },
 
         --  replace fzf.vim
         {
@@ -274,9 +275,11 @@ require('lazy').setup({
         'nvimtools/none-ls.nvim',                                   -- null-ls replacement
         { 'nvim-treesitter/nvim-treesitter', build = ':TSUpdate' }, -- recommend updating parsers on update
         { 'olimorris/persisted.nvim',        opts = {} },           -- session management
-        'ptdewey/yankbank-nvim',                                    -- easy access to yanks and deletes
-        'rgroli/other.nvim',                                        -- :Other to toggle between test and implementation files
-        'windwp/nvim-autopairs',                                    --
+
+        -- easy access to yanks and deletes
+        { 'ptdewey/yankbank-nvim',           opts = {} },
+        'rgroli/other.nvim',     -- :Other to toggle between test and implementation files
+        'windwp/nvim-autopairs', --
 
         -- display lines for indentation
         -- <leader>ll (start) leader<lh> (stop)
@@ -284,10 +287,9 @@ require('lazy').setup({
 
         {
             'Wansmer/treesj',
-            opts = { use_default_keymaps = false, max_join_length = 150 },
+            opts = { use_default_keymaps = false, max_join_length = 400 },
         },
-        'windwp/nvim-autopairs', --
-
+        { 'windwp/nvim-autopairs',    opts = {} },
         {
             'CopilotC-Nvim/CopilotChat.nvim',
             branch = 'canary',
