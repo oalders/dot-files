@@ -11,4 +11,5 @@ fi
 
 cache_dir="$HOME/.cache/yt-dlp"
 mkdir -p "$cache_dir"
-yt-dlp -x --audio-format mp3 --add-metadata --download-archive "$cache_dir/archive.txt""$1"
+set -x
+yt-dlp -x --audio-format mp3 --add-metadata --download-archive "$cache_dir/archive.txt" "$1"
