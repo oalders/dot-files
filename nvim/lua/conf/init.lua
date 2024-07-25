@@ -24,8 +24,10 @@ vim.opt.background = 'dark'
 vim.cmd('highlight clear LineNr')
 vim.cmd('highlight clear SignColumn')
 
-vim.opt.shortmess:remove('S')
-vim.opt.shortmess:remove('A')
+-- disable vim's intro screen
+vim.opt.shortmess:append('I')
+
+vim.opt.shortmess:remove('S', 'A')
 
 vim.opt.backspace = '2'
 
