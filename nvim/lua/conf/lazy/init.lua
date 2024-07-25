@@ -311,7 +311,12 @@ require('lazy').setup({
         { 'olimorris/persisted.nvim',        opts = {} },           -- session management
 
         -- easy access to yanks and deletes
-        { 'ptdewey/yankbank-nvim',           opts = {} },
+        {
+            'ptdewey/yankbank-nvim',
+            config = function()
+                require('yankbank').setup()
+            end,
+        },
         'rgroli/other.nvim',     -- :Other to toggle between test and implementation files
         'windwp/nvim-autopairs', --
 
