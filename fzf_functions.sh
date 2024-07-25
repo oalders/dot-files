@@ -2,7 +2,11 @@
 
 # Keep fzf config and functions together
 export FZF_DEFAULT_COMMAND='fd --type f --hidden --follow --exclude .git'
-export FZF_DEFAULT_OPTS='--multi --pointer ">>"'
+
+# I want tab to move up and down in the list, just like it does with my vim
+# completion. With this config tab moves down, shift-tab moves up and the space
+# bar toggles selection.
+export FZF_DEFAULT_OPTS="--multi --pointer '>>' --bind 'space:toggle,tab:down,shift-tab:up'"
 
 f() {
     fzf --bind='ctrl-/:toggle-preview' --preview "bat --style=numbers --color=always --line-range :500 {}" "$@"
