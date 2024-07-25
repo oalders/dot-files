@@ -32,7 +32,6 @@ require('bufferline').setup({
 })
 
 require('conf/cmp')
-require('conf/mason') -- This needs to happen before lspconfig
 require('conf/lspconfig')
 
 require('conf/fzf')
