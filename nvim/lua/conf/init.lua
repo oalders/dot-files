@@ -27,7 +27,8 @@ vim.cmd('highlight clear SignColumn')
 -- disable vim's intro screen
 vim.opt.shortmess:append('I')
 
-vim.opt.shortmess:remove('S', 'A')
+-- S: skip messages about writing a file
+vim.opt.shortmess:remove('S')
 
 vim.opt.backspace = '2'
 
