@@ -113,5 +113,5 @@
       ]
     }
   ],
-  "auto_upgrade": true
+  "auto_upgrade": false
 }
