@@ -448,6 +448,7 @@ require('lazy').setup({
                     exclude_filetypes = {
                         'dashboard',
                         'gitcommit',
+                        'gitrebase',
                         'help',
                     },
                     exclude_buftypes = {
