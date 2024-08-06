@@ -79,13 +79,6 @@ require('lazy').setup({
                                 key = 'g',
                             },
                             {
-                                icon = '🚀',
-                                desc = 'SessionLoad',
-                                group = 'DiagnosticHint',
-                                action = ':SessionLoad',
-                                key = 's',
-                            },
-                            {
                                 icon = '🤖',
                                 desc = 'Chat',
                                 group = 'Number',
@@ -308,7 +301,15 @@ require('lazy').setup({
         }, -- fuzzy finder
         'nvimtools/none-ls.nvim', -- null-ls replacement
         { 'nvim-treesitter/nvim-treesitter', build = ':TSUpdate' }, -- recommend updating parsers on update
-        { 'olimorris/persisted.nvim', opts = {} }, -- session management
+        -- { 'olimorris/persisted.nvim',        opts = {} },           -- session management
+        -- session management
+        {
+            'folke/persistence.nvim',
+            event = 'BufReadPre', -- this will only start session saving when an actual file was opened
+            opts = {
+                -- add any custom options here
+            },
+        },
 
         -- easy access to yanks and deletes
         {
