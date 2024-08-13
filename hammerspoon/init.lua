@@ -82,36 +82,64 @@ end
 -- Greek letters. This allows me to use names in Slack without highlighting the
 -- person in question.
 -- Borrowed from https://nikhilism.com/post/2021/useful-hammerspoon-tips/
-local function slackifyName()
+local greek = {
+    a = 'α',
+    b = 'β',
+    d = 'δ',
+    D = 'Δ',
+    e = 'ε',
+    f = 'φ',
+    F = 'Φ',
+    --g = "γ",
+    g = 'ɡ', -- small Latin letter script g (not Greek, but easier to read)
+    G = 'Γ',
+    i = 'ι',
+    k = 'κ',
+    l = 'λ',
+    m = 'μ',
+    n = 'ν',
+    O = 'Ω',
+    o = 'ω',
+    P = 'Π',
+    p = 'π',
+    ph = 'φ',
+    t = 'τ',
+    th = 'θ',
+    v = 'φ',
+}
+local latin = {
+    a = 'ɑ',
+    b = 'ƀ',
+    c = 'ɔ',
+    d = 'ɖ',
+    e = 'ɛ',
+    f = 'ƒ',
+    g = 'ɡ',
+    h = 'ɦ',
+    i = 'ɪ',
+    j = 'ʝ',
+    k = 'ƙ',
+    l = 'ɭ',
+    m = 'ɱ',
+    n = 'ɲ',
+    o = 'ɵ',
+    p = 'ƥ',
+    q = 'ʠ',
+    r = 'ɽ',
+    s = 'ʂ',
+    t = 'ʈ',
+    u = 'ʊ',
+    v = 'ʋ',
+    w = 'ʍ',
+    x = 'x', -- No script version, using Latin
+    y = 'ʏ',
+    z = 'ʐ',
+}
+local function slackifyName(characterSet)
     local name = currentSelection()
-    local greek = {
-        a = 'α',
-        b = 'β',
-        d = 'δ',
-        D = 'Δ',
-        e = 'ε',
-        f = 'φ',
-        F = 'Φ',
-        --g = "γ",
-        G = 'Γ',
-        i = 'ι',
-        k = 'κ',
-        l = 'λ',
-        m = 'μ',
-        n = 'ν',
-        O = 'Ω',
-        o = 'ω',
-        P = 'Π',
-        p = 'π',
-        ph = 'φ',
-        t = 'τ',
-        th = 'θ',
-        v = 'φ',
-    }
-    for key, value in pairs(greek) do
+    for key, value in pairs(characterSet) do
         name = name:gsub(key, value)
     end
-
     replaceIt(name)
 end
 
@@ -185,7 +213,13 @@ Install:andUse('Seal', {
             ['Slackify Name'] = {
                 keyword = 'sl',
                 fn = function(str)
-                    slackifyName(str)
+                    slackifyName(greek)
+                end,
+            },
+            ['Slackify Name Easy'] = {
+                keyword = 'se',
+                fn = function(str)
+                    slackifyName(latin)
                 end,
             },
             ['xpasswd'] = {
