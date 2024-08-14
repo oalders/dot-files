@@ -20,6 +20,7 @@ fi
 set -x
 
 sudo apt-get install -y -q --no-install-recommends --autoremove \
+    build-essential \
     chafa \
     cpanminus \
     curl \
