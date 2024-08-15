@@ -28,6 +28,8 @@
 * [less](#less)
 * [gh -- GitHub CLI](#gh----github-cli)
 * [Testing with Docker](#testing-with-docker)
+  * [Fresh](#fresh)
+  * [Interactive](#interactive)
 * [Docker bashrc](#docker-bashrc)
 * [Hammerspoon](#hammerspoon)
   * [Seal](#seal)
@@ -255,6 +257,14 @@ viewing outpt.
 * `gh pr checks`: get status of checks for a PR in current branch
 
 ## Testing with Docker
+
+### Fresh
+
+```bash
+docker run --volume $PWD:/root/dot-files ubuntu:latest /bin/env bash -c "cd /root/dot-files && ./install.sh"
+```
+
+### Interactive
 
 ```bash
 docker run -it --volume $PWD:/root/dot-files ubuntu:latest /bin/env bash

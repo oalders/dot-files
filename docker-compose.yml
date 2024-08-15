@@ -1,0 +1,8 @@
+version: '3.8'
+services:
+  app:
+    image: ubuntu:latest
+    platform: linux/arm64/v8
+    volumes:
+      - .:/root/dot-files
+    command: /bin/env bash -c "cd /root/dot-files && ./install.sh"
