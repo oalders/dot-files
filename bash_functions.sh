@@ -145,6 +145,7 @@ ll() {
     command=$(echo "$selection" | awk -F'# ' '{print $2}')
 
     echo "Running $command"
+    history -s "$command"
     eval "$command"
 }
 
