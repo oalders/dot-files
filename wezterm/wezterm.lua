@@ -15,7 +15,7 @@ if handle then
 end
 
 config.allow_square_glyphs_to_overflow_width = 'WhenFollowedBySpace'
-config.color_scheme = 'tokyonight_moon'
+config.color_scheme = 'Tokyo Night Moon'
 
 config.colors = {
     cursor_bg = '#c099ff',
