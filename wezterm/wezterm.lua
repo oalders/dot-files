@@ -40,6 +40,21 @@ config.front_end = 'OpenGL'
 -- config.window_background_opacity = .65
 -- config.macos_window_background_blur = 20
 
+-- See https://alexplescan.com/posts/2024/08/10/wezterm/
+-- Removes the title bar, leaving only the tab bar. Keeps
+-- the ability to resize by dragging the window's edges.
+-- On macOS, 'RESIZE|INTEGRATED_BUTTONS' also looks nice if
+-- you want to keep the window controls visible and integrate
+-- them into the tab bar.
+config.window_decorations = 'RESIZE'
+-- Sets the font for the window frame (tab bar)
+config.window_frame = {
+  -- Berkeley Mono for me again, though an idea could be to try a
+  -- serif font here instead of monospace for a nicer look?
+  -- font = wezterm.font({ weight = 'Bold' }),
+  font_size = 12,
+}
+
 config.warn_about_missing_glyphs = true
 
 -- try to map some shortcuts on Linux to be more like macOS defaults.
