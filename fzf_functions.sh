@@ -4,8 +4,8 @@
 export FZF_DEFAULT_COMMAND='fd --type f --hidden --follow --exclude .git'
 
 # I want tab to move up and down in the list, just like it does with my vim
-# completion. With this config tab moves down, shift-tab moves up and the space
-# bar toggles selection.
+# completion. With this config tab moves down, shift-tab moves up and
+# ctrl-space toggles selection.
 export FZF_DEFAULT_OPTS="--multi --pointer '>>' --bind 'ctrl-space:toggle,tab:down,shift-tab:up'"
 
 f() {
