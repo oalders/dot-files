@@ -1,7 +1,7 @@
 vim.opt.swapfile = false
 
 -- allow undo even after exiting and re-opening a file
-vim.opt.undofile=true
+vim.opt.undofile = true
 
 -- :vertical terminal now opens on the right 😅
 vim.opt.splitright = true
@@ -152,6 +152,7 @@ function HideGutter()
     vim.opt.list = false
     vim.opt.signcolumn = 'no' -- sign column
     vim.opt.foldcolumn = '0'
+    vim.cmd('Neominimap off')
 end
 
 vim.cmd('command! HideGutter lua HideGutter()')
@@ -160,6 +161,7 @@ function ShowGutter()
     vim.opt.number = true
     vim.opt.list = true
     vim.opt.signcolumn = 'auto'
+    vim.cmd('Neominimap on')
 end
 
 vim.cmd('command! ShowGutter lua ShowGutter()')
