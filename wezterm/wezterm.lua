@@ -82,16 +82,20 @@ wezterm.on('update-status', function(window)
   local bg = color_scheme.background
   local fg = color_scheme.foreground
 
-  window:set_right_status(wezterm.format({
-    -- First, we draw the arrow...
-    { Background = { Color = 'none' } },
-    { Foreground = { Color = bg } },
-    { Text = SOLID_LEFT_ARROW },
-    -- Then we draw our text
-    { Background = { Color = bg } },
-    { Foreground = { Color = fg } },
-    { Text = ' ' .. wezterm.hostname() .. ' ' },
-  }))
+    window:set_right_status(wezterm.format({
+        -- First, we draw the arrow...
+        { Background = { Color = 'none' } },
+        { Foreground = { Color = bg } },
+        { Text = SOLID_LEFT_ARROW },
+        -- Then we draw our text
+        { Background = { Color = bg } },
+        { Foreground = { Color = fg } },
+        {
+            Text = wezterm.hostname():match('^olaf-')
+                    and ' 🤔🚀🚀🚀 '
+                or (' ' .. wezterm.hostname() .. ' '),
+        },
+    }))
 end)
 
 return config
