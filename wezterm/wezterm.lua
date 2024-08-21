@@ -3,15 +3,9 @@ local wezterm = require('wezterm')
 local config = wezterm.config_builder()
 config.font_size = 14.0
 
-local handle = io.popen('hostname')
-if handle then
-    local result = handle:read('*a')
-    handle:close()
-
-    -- fit more text on Chromebook's small screen
-    if result:match('penguin') then
-        config.font_size = 11.0
-    end
+-- fit more text on Chromebook's small screen
+if wezterm.hostname():match('penguin') then
+    config.font_size = 11.0
 end
 
 config.allow_square_glyphs_to_overflow_width = 'WhenFollowedBySpace'
