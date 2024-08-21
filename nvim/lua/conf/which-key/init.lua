@@ -73,7 +73,7 @@ wk.add({
         end,
         desc = 'set up and start GH copilot',
     },
-    { '<leader>ge', '<cmd>Copilot enable<cr>',   desc = 'enable GH copilot' },
+    { '<leader>ge', '<cmd>Copilot enable<cr>', desc = 'enable GH copilot' },
     {
         '<leader>gh',
         function()
@@ -108,8 +108,8 @@ wk.add({
         end,
         desc = 'split the object under cursor',
     },
-    { '<leader>gw', 'Vgw<cr>',                   desc = 'wrap long lines' },
-    { '<leader>gx', '<cmd>Copilot disable<cr>',  desc = 'stop GH copilot' },
+    { '<leader>gw', 'Vgw<cr>', desc = 'wrap long lines' },
+    { '<leader>gx', '<cmd>Copilot disable<cr>', desc = 'stop GH copilot' },
     { '<leader>gy', '<cmd>CopilotChatClose<cr>', desc = 'CopilotChatClose' },
     {
         '<leader>hl',
@@ -165,7 +165,7 @@ wk.add({
         ':Lspsaga diagnostic_jump_prev<cr>',
         desc = 'Previous diagnostic issue',
     },
-    { '<leader>lx', ':DisableHLChunk<cr>',  desc = 'disable hlchunk' },
+    { '<leader>lx', ':DisableHLChunk<cr>', desc = 'disable hlchunk' },
     {
         '<leader>ot',
         function()
@@ -191,7 +191,7 @@ wk.add({
         desc = 'Toggle test.only',
     },
     { '<leader>tt', '<cmd>ToggleTerm<cr>', desc = 'toggle terminal' },
-    { '<leader>ui', '<Plug>Nuuid',         desc = 'Generate UUID' },
+    { '<leader>ui', '<Plug>Nuuid', desc = 'Generate UUID' },
     {
         '<leader>vt',
         ':ToggleTerm direction=vertical size=145<cr>',

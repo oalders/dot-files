@@ -266,7 +266,7 @@ tmux_session_name() {
             topDir=$(basename "$PWD")
         fi
         for file in "${keys[@]}"; do
-            if [[ $topDir == "$file" ]] || [[ -f "$file" ]]; then
+            if [[ $topDir == "$file" ]] || [[ -f $file ]]; then
                 prefix="${fileToPrefix[$file]}"
                 break
             fi
