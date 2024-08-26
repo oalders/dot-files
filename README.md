@@ -261,13 +261,13 @@ viewing outpt.
 ### Fresh
 
 ```bash
-docker run --volume $PWD:/root/dot-files ubuntu:latest /bin/env bash -c "cd /root/dot-files && ./install.sh"
+docker-compose up
 ```
 
 ### Interactive
 
 ```bash
-docker run -it --volume $PWD:/root/dot-files ubuntu:latest /bin/env bash
+docker-compose run --rm app /bin/env bash
 ```
 
 In the Docker container:
