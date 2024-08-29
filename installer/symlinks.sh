@@ -21,6 +21,7 @@ directories=(
 
 if is os name eq darwin; then
     directories+=("$HOME/.config/karabiner")
+    directories+=("$HOME/hammerspoon")
 fi
 
 for dir in "${directories[@]}"; do
