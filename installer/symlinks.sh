@@ -73,9 +73,6 @@ done
 ln -sf $prefix/bat/config ~/.config/bat/config
 ln -sf $prefix/cpanreporter/config.ini ~/.cpanreporter/config.ini
 ln -sf $prefix/oh-my-posh/themes/local.omp.json ~/.config/oh-my-posh/themes/local.omp.json
-ln -sf $prefix/oh-my-posh/themes/local-tiny.omp.json ~/.config/oh-my-posh/themes/local-tiny.omp.json
-ln -sf $prefix/oh-my-posh/themes/remote.omp.json ~/.config/oh-my-posh/themes/remote.omp.json
-ln -sf $prefix/oh-my-posh/themes/remote-tiny.omp.json ~/.config/oh-my-posh/themes/remote-tiny.omp.json
 ln -sf $prefix/perlimports/perlimports.toml ~/.config/perlimports/perlimports.toml
 ln -sf $prefix/re.pl/repl.rc ~/.re.pl/repl.rc
 ln -sf $prefix/wezterm/wezterm.lua ~/.config/wezterm/wezterm.lua
