@@ -163,7 +163,7 @@ require('lazy').setup({
         'ntpeters/vim-better-whitespace', -- highlight trailing whitespace
         -- 'oalders/prettysql' -- ,fs to format visually selected SQL
         { 'othree/html5.vim', ft = 'html' },
-        'rodjek/vim-puppet', -- { 'for': 'puppet' }, -- Formatting, syntax highlighting etc
+        -- 'rodjek/vim-puppet', -- { 'for': 'puppet' }, -- Formatting, syntax highlighting etc
         {
             'rust-lang/rust.vim',
             ft = 'rust',
