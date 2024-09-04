@@ -210,10 +210,10 @@ require('lazy').setup({
                 {
                     '<leader>td',
                     '<cmd>Trouble diagnostics toggle<cr>',
-                    desc = 'Diagnostics (Trouble)',
+                    desc = 'Workspace Diagnostics (Trouble)',
                 },
                 {
-                    '<leader>xX',
+                    '<leader>tb',
                     '<cmd>Trouble diagnostics toggle filter.buf=0<cr>',
                     desc = 'Buffer Diagnostics (Trouble)',
                 },
