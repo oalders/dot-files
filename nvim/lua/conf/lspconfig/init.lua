@@ -51,7 +51,7 @@ lspconfig.lua_ls.setup({
         },
     },
 })
-lspconfig.tsserver.setup({
+lspconfig.ts_ls.setup({
     settings = {
         typescript = {
             inlayHints = {
