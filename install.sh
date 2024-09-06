@@ -34,6 +34,7 @@ run_mac_installers() {
         # ./installer/dockutil.sh
         #./configure/dock.sh
         ./installer/lua.sh
+        ./installer/spoon-installer.sh
     )
 
     run_installers "${mac_installers[@]}"

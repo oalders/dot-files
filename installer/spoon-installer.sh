@@ -2,6 +2,11 @@
 
 set -eux
 
+if [ -d "./hammerspoon/Spoons" ] && [ "$(ls -A ./hammerspoon/Spoons)" ]; then
+  echo "Spoons have already been installed"
+  exit 0
+fi
+
 cd /tmp || exit 1
 
 file=SpoonInstall.spoon.zip
