@@ -18,7 +18,7 @@
   "homepage": "https://github.com/oalders/dot-files#readme",
   "dependencies": {
     "@johnnymorganz/stylua-bin": "^0.20.0",
-    "@xmldom/xmldom": ">=0.9.1",
+    "@xmldom/xmldom": ">=0.9.2",
     "acorn": "^8.12.1",
     "ansi-regex": ">=5.0.1",
     "bash-language-server": "^5.4.0",
