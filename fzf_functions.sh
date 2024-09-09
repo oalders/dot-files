@@ -53,5 +53,5 @@ rm_worktree() {
         fzf --preview='cd {1} && git status' \
             --preview-window 'up,border-horizontal' |
         sed -rn 's/.*\[(.*)\]/\1/gp' |
-        safe-xargs remove-worktree "$@"
+        safe_xargs remove-worktree "$@"
 }
