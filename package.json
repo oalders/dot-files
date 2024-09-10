@@ -20,7 +20,7 @@
     "@johnnymorganz/stylua-bin": "^0.20.0",
     "@xmldom/xmldom": ">=0.9.2",
     "acorn": "^8.12.1",
-    "ansi-regex": ">=5.0.1",
+    "ansi-regex": ">=6.1.0",
     "bash-language-server": "^5.4.0",
     "bats": "^1.11.0",
     "diff-lockfiles": "^1.1.0",
