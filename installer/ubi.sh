@@ -42,6 +42,7 @@ else
 fi
 
 maybe_install atanunq/viu
+maybe_install bensadeh/tailspin --exe tspin
 maybe_install crate-ci/typos
 maybe_install houseabsolute/omegasort
 maybe_install houseabsolute/precious
