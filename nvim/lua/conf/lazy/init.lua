@@ -522,7 +522,7 @@ require('lazy').setup({
                     'shfmt',
                     'sqlfluff',
                     'stylua',
-                    'tsserver',
+                    'ts_ls',
                     'vim-language-server',
                     'vint',
                     'yamllint',
