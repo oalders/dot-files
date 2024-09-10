@@ -93,6 +93,8 @@ require('lazy').setup({
         },
 
         -- git
+        {'akinsho/git-conflict.nvim', version = '2.0.0', config = true},
+
         -- git signs in the gutter
         {
             'lewis6991/gitsigns.nvim',
