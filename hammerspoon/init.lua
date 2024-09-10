@@ -294,7 +294,6 @@ hs.hotkey.bind(
 )
 hs.hotkey.bind(hyper, 'p', nil, chrome_tab_action(PT, PT))
 hs.hotkey.bind(hyper, 'q', slackifyName)
-hs.hotkey.bind(hyper, 'v', open_app_action('Visual Studio Code'))
 hs.hotkey.bind(hyper, 'w', chrome_tab_action(remoteDesktop, remoteDesktop))
 
 local open_slack_threads = function(name)
