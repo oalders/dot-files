@@ -338,6 +338,7 @@ require('lazy').setup({
             dependencies = {
                 { 'zbirenbaum/copilot.lua' }, -- or github/copilot.vim
                 { 'nvim-lua/plenary.nvim' }, -- for curl, log wrapper
+                { 'https://github.com/gptlang/lua-tiktoken' },
             },
             opts = {
                 debug = false, -- Enable debugging
