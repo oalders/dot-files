@@ -21,6 +21,19 @@ wk.add({
         desc = 'open all folds',
     },
     {
+        '<leader>gb',
+        function()
+            local input = vim.fn.input('Quick Chat about buffer: ')
+            if input ~= '' then
+                require('CopilotChat').ask(
+                    input,
+                    { selection = require('CopilotChat.select').buffer }
+                )
+            end
+        end,
+        desc = 'CopilotChat - Quick chat',
+    },
+    {
         '<leader>gc',
         function()
             require('copilot').setup({
