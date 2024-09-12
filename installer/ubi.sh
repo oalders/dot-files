@@ -75,6 +75,6 @@ if is there gh && ! gh extension list | grep --quiet copilot; then
     gh extension install github/gh-copilot || true
 fi
 
-if is there gh && ! gh extension list | grep --quiet gh-dash; then
-    gh extension install dlvhdr/gh-dash || true
+if  [ "$IS_MM" = false ] && is there gh && ! gh extension list | grep --quiet gh-dash; then
+    command debounce 1 d gh extension install dlvhdr/gh-dash || true
 fi
