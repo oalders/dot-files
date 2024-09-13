@@ -17,11 +17,10 @@ install_for_linux() (
 )
 
 if is os name eq darwin; then
-    if is there wezterm; then
-        debounce 18 h brew upgrade homebrew/cask/wezterm
+    if ! is there wezterm; then
+        brew install --cask wezterm@nightly
     else
-        brew tap wez/wezterm
-        brew install --cask wezterm --no-quarantine
+        command debounce 1 d brew upgrade --cask wezterm@nightly --no-quarantine --greedy-latest
     fi
 elif is os name eq linux; then
     if ! is user sudoer; then
