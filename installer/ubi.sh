@@ -23,7 +23,7 @@ fi
 maybe_install() {
     project="$1"
     shift
-    debounce 1 d ubi --project "$project" --in "$in" "$@"
+    command debounce 1 d ubi --project "$project" --in "$in" "$@"
 }
 
 if [ ! -f "$in/ubi" ]; then
@@ -39,6 +39,10 @@ if [[ ! -f "$in/is" ]]; then
     ubi --project oalders/is --in "$in"
 else
     maybe_install oalders/is
+fi
+
+if ! is there debounce; then
+    ubi --project oalders/debounce --in "$in"
 fi
 
 maybe_install atanunq/viu
