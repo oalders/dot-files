@@ -240,6 +240,17 @@ wk.add({
         mode = 'v',
     },
     {
+        'cp',
+        function()
+            local actions = require('CopilotChat.actions')
+            require('CopilotChat.integrations.fzflua').pick(
+                actions.prompt_actions()
+            )
+        end,
+        desc = 'CopilotChat - Prompt actions',
+        mode = 'v',
+    },
+    {
         'cx',
         '<cmd>CopilotChatExplain<cr>',
         desc = 'CopilotChatExplain',
