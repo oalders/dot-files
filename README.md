@@ -161,7 +161,7 @@ Remind myself of vim shortcuts etc.
 * `:bn` or `]b` - next buffer
 * `:bp` or `[b` - previous buffer
 * `[c` and `]c` - navigate to next changed hunk
-* `crn` - LSP rename
+* `<space>rn` - LSP rename
 * `crr` - LSP code action
 * `ctrl-l` - clear highlighted search terms
 * `ctrl-o` - return to previous position in file
@@ -177,6 +177,7 @@ Remind myself of vim shortcuts etc.
 * `:GenTocGFM` - generate GitHub flavoured markdown table of contents
 * `:GFiles` - `git ls-files | fzf`
 * `:GFiles?` - `git status | fzf` with preview pane
+* `:Gitsigns reset_hunk` - reset hunk at cursor
 * `gO` - open a loc list with the table of contents for a help file
 * `gr` - get references
 * `gwip` - reflow a block of text and maintain cursor position
