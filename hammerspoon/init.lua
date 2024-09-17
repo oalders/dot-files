@@ -241,7 +241,7 @@ Install:andUse('Seal', {
 
 local bellTV = 'https://tv.bell.ca'
 local github = 'https://github.com/notifications'
-local gmail = 'https://mail.google.com/mail/u/0/#all'
+local gmail = 'https://mail.google.com/'
 local ircCloud = 'https://www.irccloud.com/irc/'
 local PT = 'https://www.pivotaltracker.com'
 local remoteDesktop = 'https://remotedesktop.google.com'
@@ -253,7 +253,7 @@ hs.hotkey.bind(
     my_hotkeys,
     'g',
     nil,
-    chrome_tab_action(gmail, gmail .. '#all')
+    chrome_tab_action(gmail, gmail .. 'mail/u/0/#all')
 )
 hs.hotkey.bind(my_hotkeys, 'i', nil, open_app_action('wezterm'))
 hs.hotkey.bind(my_hotkeys, 'l', nil, open_app_action('Slack'))
