@@ -331,7 +331,14 @@ require('lazy').setup({
             'Wansmer/treesj',
             opts = { use_default_keymaps = false, max_join_length = 400 },
         },
-        { 'windwp/nvim-autopairs', opts = {} },
+        {
+            'windwp/nvim-autopairs',
+            config = true,
+            event = 'InsertEnter',
+            opts = {
+                disable_filetype = { 'markdown' }, -- ``` completion is bonkers
+            },
+        },
         {
             'CopilotC-Nvim/CopilotChat.nvim',
             branch = 'canary',
