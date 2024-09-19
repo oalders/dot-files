@@ -1,8 +1,9 @@
 -- fzf-lua
 local fzf_lua = require('fzf-lua')
-fzf_lua.setup({ 'fzf-vim' })
 
 fzf_lua.setup({
+    'fzf-vim',
+    fzf_colors = true,
     previewers = {
         builtin = {
             extensions = {
