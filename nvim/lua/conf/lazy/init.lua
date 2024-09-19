@@ -341,6 +341,7 @@ require('lazy').setup({
                 { 'https://github.com/gptlang/lua-tiktoken' },
             },
             opts = {
+                auto_follow_cursor = false,
                 debug = false, -- Enable debugging
                 context = 'buffers',
                 -- See Configuration section for rest
