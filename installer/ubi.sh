@@ -80,5 +80,5 @@ if is there gh && ! gh extension list | grep --quiet copilot; then
 fi
 
 if  [ "$IS_MM" = false ] && is there gh && ! gh extension list | grep --quiet gh-dash; then
-    command debounce 1 d gh extension install dlvhdr/gh-dash || true
+    debounce 1 d gh extension install dlvhdr/gh-dash || true
 fi

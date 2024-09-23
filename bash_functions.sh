@@ -286,7 +286,7 @@ tmux_session_name() {
     export SESSION_NAME
 }
 
-debounce() {
+db() {
     if [ $# -lt 3 ]; then
         echo "🤬 Not enough arguments provided. Usage: debounce 6 h something"
         return
