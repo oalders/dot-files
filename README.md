@@ -81,13 +81,13 @@ Afterwards it should look something like:
 
 Then:
 
-```bash
+```shell
 chsh -s /opt/homebrew/bin/bash $USER
 ```
 
 ### Trackpad and Dock defaults
 
-```bash
+```shell
 ./configure/macos.sh
 ```
 
@@ -95,13 +95,13 @@ chsh -s /opt/homebrew/bin/bash $USER
 
 On my personal machines after I'm logged in to the app store:
 
-```bash
+```shell
 brew bundle install --file=brew/mas
 ```
 
 ### Hammerspoon Spoon Installer
 
-```bash
+```shell
 ./installer/spoon-installer.sh
 ```
 
@@ -111,7 +111,7 @@ Then double-click the `SpoonInstall.spoon` file. This fixes the following error:
 
 ### Alfred Workflows
 
-```bash
+```shell
 installer/alfred-workflows.sh
 ```
 
@@ -125,7 +125,7 @@ Run after Alfred has been installed. Confirm each install individually.
 
 ### Plenv
 
-```bash
+```shell
 ./installer/plenv.sh
 ```
 
@@ -262,19 +262,19 @@ viewing outpt.
 
 ### Fresh
 
-```bash
+```shell
 docker-compose up
 ```
 
 ### Interactive
 
-```bash
+```shell
 docker-compose run --rm app /bin/env bash
 ```
 
 In the Docker container:
 
-```bash
+```shell
 cd /root/dot-files
 USER=root ./installer/inside-docker.sh && ./install.sh
 ```
