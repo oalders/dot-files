@@ -45,6 +45,10 @@ if ! is there debounce; then
     ubi --project oalders/debounce --in "$in"
 fi
 
+# install early so we can possibly use an updated version in following runs of
+# maybe_install
+maybe_install oalders/debounce
+
 maybe_install atanunq/viu
 maybe_install bensadeh/tailspin --exe tspin
 maybe_install crate-ci/typos
@@ -53,7 +57,6 @@ maybe_install houseabsolute/precious
 maybe_install jqlang/jq
 maybe_install junegunn/fzf
 maybe_install kubernetes-sigs/kustomize
-maybe_install oalders/debounce
 
 if is cli output stdout hostname eq wolfblitzer; then
     ubi --url https://github.com/dandavison/delta/releases/download/0.16.5/git-delta_0.16.5_amd64.deb --in /tmp/ubi
