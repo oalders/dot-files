@@ -162,6 +162,13 @@ require('lazy').setup({
         },
         { 'motemen/xslate-vim', ft = 'xslate' }, -- https://metacpan.org/pod/Text::Xslate
         { 'mzlogin/vim-markdown-toc', ft = 'markdown' }, -- :GenTocGFM to generate table of contents
+        {
+            'MeanderingProgrammer/render-markdown.nvim',
+            opts = {},
+            dependencies = {
+                'nvim-treesitter/nvim-treesitter',
+            },
+        },
         'ntpeters/vim-better-whitespace', -- highlight trailing whitespace
         -- 'oalders/prettysql' -- ,fs to format visually selected SQL
         { 'othree/html5.vim', ft = 'html' },
