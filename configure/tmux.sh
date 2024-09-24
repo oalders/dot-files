@@ -32,8 +32,11 @@ fi
 
 # tmux needs to be running in order to source a config file etc
 # Also clean up an old CI sessions
-tmux kill-session -t CI || true
-tmux new-session -d -s CI
+session_name='CI'
+if tmux has-session -t $session_name; then
+    tmux kill-session -t $session_name
+fi
+tmux new-session -d -s $session_name
 tmux ls
 
 tmux source ~/.tmux.conf
@@ -42,6 +45,6 @@ tmux source ~/.tmux.conf
 ~/.tmux/plugins/tpm/bin/update_plugins all
 ~/.tmux/plugins/tpm/bin/clean_plugins
 
-tmux kill-session -t CI
+tmux kill-session -t $session_name
 
 exit 0
