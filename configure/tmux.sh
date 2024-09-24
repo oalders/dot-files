@@ -10,9 +10,7 @@ add_path "$HOME/local/bin"
 
 set -x
 
-if ! is there tmux || is cli version tmux lt 3.2; then
-    ./installer/tmux.sh
-fi
+./installer/tmux.sh
 
 ln -sf $PREFIX/tmux.conf ~/.tmux.conf
 
