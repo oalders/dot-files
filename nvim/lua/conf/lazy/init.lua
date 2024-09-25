@@ -65,6 +65,13 @@ require('lazy').setup({
                         },
                         shortcut = {
                             {
+                                icon = '🚀 ',
+                                desc = ' Last Session',
+                                group = '@property',
+                                action = ':LastSession',
+                                key = 'l',
+                            },
+                            {
                                 icon = '♻️',
                                 desc = ' Update',
                                 group = '@property',

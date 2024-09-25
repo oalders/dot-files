@@ -164,6 +164,12 @@ function ShowGutter()
     vim.cmd('Neominimap on')
 end
 
+function LastSession()
+    require('persistence').load()
+end
+
+vim.cmd('command! LastSession lua LastSession()')
+
 vim.cmd('command! ShowGutter lua ShowGutter()')
 
 function Requote()
