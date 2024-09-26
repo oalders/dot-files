@@ -87,6 +87,7 @@ wk.add({
         desc = 'set up and start GH copilot',
     },
     { '<leader>ge', '<cmd>Copilot enable<cr>', desc = 'enable GH copilot' },
+    { '<leader>gf', '<cmd>GFiles?<cr>', desc = 'git changed files' },
     {
         '<leader>gh',
         function()
