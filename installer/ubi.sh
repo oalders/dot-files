@@ -57,6 +57,7 @@ maybe_install houseabsolute/precious
 maybe_install jqlang/jq
 maybe_install junegunn/fzf
 maybe_install kubernetes-sigs/kustomize
+maybe_install tummychow/git-absorb
 
 if is cli output stdout hostname eq wolfblitzer; then
     ubi --url https://github.com/dandavison/delta/releases/download/0.16.5/git-delta_0.16.5_amd64.deb --in /tmp/ubi
