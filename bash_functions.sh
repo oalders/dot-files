@@ -203,9 +203,9 @@ tmux_session_name() {
 
         declare -A fileToPrefix=(
             #perl
-            ["app.psgi"]=""
-            ["cpanfile"]=""
-            ["dist.ini"]=""
+            ["app.psgi"]=""
+            ["cpanfile"]=""
+            ["dist.ini"]=""
 
             # rust
             ["Cargo.toml"]=""
@@ -219,8 +219,8 @@ tmux_session_name() {
             ["local-dot-files"]=""
 
             # markdown -- nvim devicons doesn't have an icon for hugo
-            ["freelancer-theme"]=""
-            ["www-olafalders-dot-com"]=""
+            ["freelancer-theme"]="󰍔"
+            ["www-olafalders-dot-com"]="󰍔"
 
             # neovim plugin
             ["ftplugin"]="🔌"
