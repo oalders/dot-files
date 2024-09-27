@@ -1,4 +1,7 @@
 # don't install these on CI
+tap "FelixKratz/formulae"
+brew "borders"
+
 brew "dockutil"
 brew "git-lfs"
 brew "mas"
