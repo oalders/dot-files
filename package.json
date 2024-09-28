@@ -21,7 +21,7 @@
     "@xmldom/xmldom": ">=0.9.3",
     "acorn": "^8.12.1",
     "ansi-regex": ">=6.1.0",
-    "bash-language-server": "^5.4.0",
+    "bash-language-server": "^5.4.2",
     "bats": "^1.11.0",
     "diff-lockfiles": "^1.1.0",
     "eslint": "^9.11.1",
