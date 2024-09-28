@@ -30,24 +30,13 @@ if [ ! -f "$in/ubi" ]; then
     curl --silent --location \
         https://raw.githubusercontent.com/houseabsolute/ubi/master/bootstrap/bootstrap-ubi.sh |
         TARGET=$in sh
-
 else
-    debounce 1 d "$in/ubi" --self-upgrade
+    db 1 d "$in/ubi" --self-upgrade
 fi
 
-if [[ ! -f "$in/is" ]]; then
-    ubi --project oalders/is --in "$in"
-else
-    maybe_install oalders/is
-fi
-
-if ! is there debounce; then
-    ubi --project oalders/debounce --in "$in"
-fi
-
-# install early so we can possibly use an updated version in following runs of
-# maybe_install
-maybe_install oalders/debounce
+# there's a bit of a bootstrapping issue here, so we'll use the bash function
+# to debounce debounce
+db 1 d ubi --project oalders/debounce --in "$in"
 
 maybe_install atanunq/viu
 maybe_install bensadeh/tailspin --exe tspin
@@ -57,6 +46,7 @@ maybe_install houseabsolute/precious
 maybe_install jqlang/jq
 maybe_install junegunn/fzf
 maybe_install kubernetes-sigs/kustomize
+maybe_install oalders/is
 maybe_install tummychow/git-absorb
 
 if is cli output stdout hostname eq wolfblitzer; then
