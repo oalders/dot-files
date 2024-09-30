@@ -275,7 +275,6 @@ docker-compose run --rm app /bin/env bash
 In the Docker container:
 
 ```shell
-cd /root/dot-files
 USER=root ./installer/inside-docker.sh && ./install.sh
 ```
 
