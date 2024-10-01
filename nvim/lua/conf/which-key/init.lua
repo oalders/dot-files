@@ -229,17 +229,7 @@ wk.add({
         mode = 'v',
     },
     { 'co', '<cmd>CopilotChatOpen<cr>', desc = 'CopilotChat', mode = 'v' },
-    {
-        'cp',
-        function()
-            local actions = require('CopilotChat.actions')
-            require('CopilotChat.integrations.fzflua').pick(
-                actions.prompt_actions()
-            )
-        end,
-        desc = 'CopilotChat - Prompt actions',
-        mode = 'v',
-    },
+    { '<leader>co', '<cmd>CopilotChatOpen<cr>', desc = 'CopilotChat', mode = 'n' },
     {
         'cp',
         function()
