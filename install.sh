@@ -33,7 +33,6 @@ run_mac_installers() {
         # https://github.com/kcrawford/dockutil/issues/127
         # ./installer/dockutil.sh
         #./configure/dock.sh
-        ./installer/lua.sh
         ./installer/spoon-installer.sh
     )
 
