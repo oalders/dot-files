@@ -330,8 +330,13 @@ require('lazy').setup({
         -- easy access to yanks and deletes
         {
             'ptdewey/yankbank-nvim',
+            dependencies = 'kkharji/sqlite.lua',
             config = function()
-                require('yankbank').setup()
+                require('yankbank').setup({
+                    max_entries = 20,
+                    persist_type = 'sqlite',
+                    sep = '〰️〰️〰️〰️〰️〰️〰️〰️',
+                })
             end,
         },
         'rgroli/other.nvim', -- :Other to toggle between test and implementation files
