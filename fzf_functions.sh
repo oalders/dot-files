@@ -40,7 +40,7 @@ _fzf_complete_yath_post() {
 
 cd_worktree() {
     cd "$(git worktree list |
-        fzf --preview='git log --oneline -n10 {2}' \
+        fzf --preview='git log --oneline -n10 {2} | tac | tspin' \
             --preview-window 'up,border-horizontal' |
         awk '{print $1}')" || exit
 }
