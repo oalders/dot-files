@@ -40,7 +40,7 @@ _fzf_complete_yath_post() {
 
 cd_worktree() {
     cd "$(git worktree list |
-        fzf --preview='git log --pretty=format:"%ad %h %s" --date=format:"%Y-%m-%d" -n10 {2} | tac | tspin' \
+        fzf --preview='git log --pretty=format:"%ad %<(8,trunc)%aL %h %s" --date=format:"%Y-%m-%d" -n10 {2} | tac | tspin' \
             --preview-window 'up,border-horizontal' |
         awk '{print $1}')" || exit
 }
