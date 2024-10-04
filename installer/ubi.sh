@@ -50,8 +50,11 @@ maybe_install oalders/is
 maybe_install tummychow/git-absorb
 
 if is cli output stdout hostname eq wolfblitzer; then
-    ubi --url https://github.com/dandavison/delta/releases/download/0.16.5/git-delta_0.16.5_amd64.deb --in /tmp/ubi
-    sudo dpkg -i /tmp/ubi/delta
+    delta_version=0.16.5
+    if is cli version delta ne $delta_version; then
+        ubi --url https://github.com/dandavison/delta/releases/download/${delta_version}/git-delta_${delta_version}_amd64.deb --in /tmp/ubi
+        sudo dpkg -i /tmp/ubi/delta
+    fi
 elif is os name eq darwin; then
     maybe_install dandavison/delta
 else
