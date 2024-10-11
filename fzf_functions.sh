@@ -50,7 +50,7 @@ rm_worktree() {
     # [oalders/branch-name], which should generally also correspond to the tmux
     # session name.
     git worktree list |
-        fzf --preview='cd {1} && git status' \
+        fzf --preview='cd {1} && git status | tspin' \
             --preview-window 'up,border-horizontal' |
         sed -rn 's/.*\[(.*)\]/\1/gp' |
         safe_xargs remove-worktree "$@"
