@@ -3,11 +3,6 @@ local wezterm = require('wezterm')
 local config = wezterm.config_builder()
 config.font_size = 14.0
 
--- fit more text on Chromebook's small screen
-if wezterm.hostname():match('penguin') then
-    config.font_size = 11.0
-end
-
 config.allow_square_glyphs_to_overflow_width = 'WhenFollowedBySpace'
 config.color_scheme = 'Tokyo Night Moon'
 
@@ -97,5 +92,11 @@ wezterm.on('update-status', function(window)
         },
     }))
 end)
+
+-- fit more text on Chromebook's small screen
+if wezterm.hostname():match('penguin') then
+    config.font_size = 11.0
+    config.window_decorations = 'INTEGRATED_BUTTONS'
+end
 
 return config
