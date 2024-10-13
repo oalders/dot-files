@@ -374,6 +374,15 @@ require('lazy').setup({
             },
             -- See Commands section for default commands if you want to lazy load on them
         },
+        {
+            'zbirenbaum/copilot.lua',
+            cmd = 'Copilot',
+            event = 'InsertEnter',
+            config = function()
+                require('copilot').setup({})
+            end,
+            enabled = false, -- enable this to do auth
+        },
 
         -- folding
         {
