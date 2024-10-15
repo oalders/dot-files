@@ -704,8 +704,8 @@ require('lazy').setup({
         {
             'Isrothy/neominimap.nvim',
             enabled = true,
-            lazy = false, -- WARN: NO NEED to Lazy load
-            filetype = { 'go', 'perl', 'typescript' },
+            lazy = true, -- WARN: NO NEED to Lazy load
+            ft = { 'go', 'perl', 'typescript' },
             init = function()
                 vim.opt.wrap = false -- Recommended
                 vim.opt.sidescrolloff = 36 -- It's recommended to set a large value
@@ -742,6 +742,7 @@ require('lazy').setup({
         -- neotest
         {
             'nvim-neotest/neotest',
+            lazy = true,
             dependencies = {
                 'nvim-neotest/neotest-go',
                 'nvim-neotest/nvim-nio',
@@ -749,7 +750,7 @@ require('lazy').setup({
                 'antoinemadec/FixCursorHold.nvim',
                 'nvim-treesitter/nvim-treesitter',
             },
-            filetype = 'go',
+            ft = 'go',
             config = function()
                 local neotest = require('neotest')
                 local neotest_ns = vim.api.nvim_create_namespace('neotest')
@@ -781,7 +782,6 @@ require('lazy').setup({
                     },
                 })
             end,
-            event = 'VeryLazy',
         },
 
         --  bridge mason.nvim with the lspconfig plugin
