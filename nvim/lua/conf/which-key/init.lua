@@ -1,4 +1,3 @@
-local tsj = require('treesj')
 local wk = require('which-key')
 wk.add({
     {
@@ -101,7 +100,7 @@ wk.add({
     {
         '<leader>gj',
         function()
-            tsj.join()
+            require('treesj').join()
         end,
         desc = 'join the object under cursor',
     },
@@ -118,7 +117,7 @@ wk.add({
     {
         '<leader>gs',
         function()
-            tsj.split()
+            require('treesj').split()
         end,
         desc = 'split the object under cursor',
     },
@@ -229,7 +228,12 @@ wk.add({
         mode = 'v',
     },
     { 'co', '<cmd>CopilotChatOpen<cr>', desc = 'CopilotChat', mode = 'v' },
-    { '<leader>co', '<cmd>CopilotChatOpen<cr>', desc = 'CopilotChat', mode = 'n' },
+    {
+        '<leader>co',
+        '<cmd>CopilotChatOpen<cr>',
+        desc = 'CopilotChat',
+        mode = 'n',
+    },
     {
         'cp',
         function()

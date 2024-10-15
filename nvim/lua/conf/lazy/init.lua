@@ -100,7 +100,12 @@ require('lazy').setup({
         },
 
         -- git
-        { 'akinsho/git-conflict.nvim', version = '2.0.0', config = true },
+        {
+            'akinsho/git-conflict.nvim',
+            version = '2.0.0',
+            config = true,
+            event = 'VeryLazy',
+        },
 
         -- git signs in the gutter
         {
@@ -137,16 +142,16 @@ require('lazy').setup({
                 end,
             },
         },
-        'rhysd/git-messenger.vim', -- ,gm to open window
+        { 'rhysd/git-messenger.vim', event = 'VeryLazy' }, -- ,gm to open window
 
         -- DiffviewOpen
         -- DiffviewOpen origin/main
         -- DiffviewFileHistory %
-        'sindrets/diffview.nvim', -- File explorer for git diffs
-        'tpope/vim-fugitive', --  :GRemove, :Git diff, etc
+        { 'sindrets/diffview.nvim', event = 'VeryLazy' }, -- File explorer for git diffs
+        { 'tpope/vim-fugitive', event = 'VeryLazy' }, --  :GRemove, :Git diff, etc
 
-        'ap/vim-css-color', -- show css colors inline
-        'gregsexton/MatchTag', -- highlight matching HTML tags
+        { 'ap/vim-css-color', event = 'VeryLazy' }, -- show css colors inline
+        { 'gregsexton/MatchTag', ft = 'html' }, -- highlight matching HTML tags
         'haya14busa/vim-auto-mkdir', -- create directory path on save
         'itchyny/vim-cursorword', -- underline the word under the cursor
         {
@@ -175,14 +180,17 @@ require('lazy').setup({
             dependencies = {
                 'nvim-treesitter/nvim-treesitter',
             },
+            ft = 'markdown',
+            event = 'VeryLazy',
         },
         'ntpeters/vim-better-whitespace', -- highlight trailing whitespace
         -- 'oalders/prettysql' -- ,fs to format visually selected SQL
-        { 'othree/html5.vim', ft = 'html' },
+        { 'othree/html5.vim', ft = 'html', event = 'VeryLazy' },
         -- 'rodjek/vim-puppet', -- { 'for': 'puppet' }, -- Formatting, syntax highlighting etc
         {
             'rust-lang/rust.vim',
             ft = 'rust',
+            event = 'VeryLazy',
         },
         'tpope/vim-abolish',
 
@@ -275,10 +283,54 @@ require('lazy').setup({
         },
 
         { 'kevinhwang91/nvim-bqf', ft = 'qf' }, -- add previews to quickfix window
-        'mfussenegger/nvim-lint', -- linter harness
+        {
+            'mfussenegger/nvim-lint',
+            event = 'VeryLazy',
+            config = function()
+                local l = require('lint')
+
+                vim.api.nvim_create_autocmd(
+                    { 'BufWritePost', 'VimEnter', 'BufEnter' },
+                    {
+                        pattern = { '*' },
+                        callback = function()
+                            l.try_lint()
+                        end,
+                    }
+                )
+
+                l.linters_by_ft = {
+                    gitcommit = {},
+                    go = { 'golangcilint' },
+                    lua = { 'selene' },
+                    markdown = { 'markdownlint' },
+                    -- perl = { 'perlimports' },
+                    -- sh = { 'shellcheck' },
+                    sql = { 'sqlfluff' },
+                    typescript = { 'eslint' },
+                    vim = { 'vint' },
+                    yaml = { 'yamllint' },
+                }
+
+                for ft, _ in pairs(l.linters_by_ft) do
+                    table.insert(l.linters_by_ft[ft], 'typos')
+                end
+            end,
+            filetype = {
+                'gitcommit',
+                'go',
+                'lua',
+                'markdown',
+                'sql',
+                'typescript',
+                'vim',
+                'yaml',
+            },
+        },
         {
             'nvim-lualine/lualine.nvim',
             dependencies = { 'nvim-tree/nvim-web-devicons' },
+            event = 'VeryLazy',
         },
         {
             'nvim-telescope/telescope.nvim',
@@ -315,7 +367,7 @@ require('lazy').setup({
                 },
             },
         }, -- fuzzy finder
-        'nvimtools/none-ls.nvim', -- null-ls replacement
+        { 'nvimtools/none-ls.nvim', event = 'VeryLazy' }, -- null-ls replacement
         { 'nvim-treesitter/nvim-treesitter', build = ':TSUpdate' }, -- recommend updating parsers on update
         -- { 'olimorris/persisted.nvim',        opts = {} },           -- session management
         -- session management
@@ -338,6 +390,7 @@ require('lazy').setup({
                     sep = '〰️〰️〰️〰️〰️〰️〰️〰️',
                 })
             end,
+            event = 'VeryLazy',
         },
         'rgroli/other.nvim', -- :Other to toggle between test and implementation files
         'windwp/nvim-autopairs', --
@@ -349,6 +402,7 @@ require('lazy').setup({
         {
             'Wansmer/treesj',
             opts = { use_default_keymaps = false, max_join_length = 400 },
+            event = 'VeryLazy',
         },
         {
             'windwp/nvim-autopairs',
@@ -372,6 +426,7 @@ require('lazy').setup({
                 context = 'buffers',
                 -- See Configuration section for rest
             },
+            event = 'VeryLazy',
             -- See Commands section for default commands if you want to lazy load on them
         },
         {
@@ -404,6 +459,37 @@ require('lazy').setup({
                 'hrsh7th/cmp-path',
                 'onsails/lspkind.nvim', -- add pictograms to completion sources
                 'zbirenbaum/copilot-cmp', -- include copilot suggestions in completion
+            },
+            enabled = false,
+        },
+
+        {
+            'saghen/blink.cmp',
+            lazy = false, -- lazy loading handled internally
+            -- optional: provides snippets for the snippet source
+            dependencies = 'rafamadriz/friendly-snippets',
+
+            -- use a release tag to download pre-built binaries
+            version = 'v0.*',
+            -- OR build from source, requires nightly: https://rust-lang.github.io/rustup/concepts/channels.html#working-with-nightly-rust
+            -- build = 'cargo build --release',
+
+            opts = {
+                highlight = {
+                    -- sets the fallback highlight groups to nvim-cmp's highlight groups
+                    -- useful for when your theme doesn't support blink.cmp
+                    -- will be removed in a future release, assuming themes add support
+                    use_nvim_cmp_as_default = true,
+                },
+                -- set to 'mono' for 'Nerd Font Mono' or 'normal' for 'Nerd Font'
+                -- adjusts spacing to ensure icons are aligned
+                nerd_font_variant = 'normal',
+
+                -- experimental auto-brackets support
+                -- accept = { auto_brackets = { enabled = true } }
+
+                -- experimental signature help support
+                -- trigger = { signature_help = { enabled = true } }
             },
         },
 
