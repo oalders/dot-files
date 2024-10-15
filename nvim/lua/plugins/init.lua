@@ -31,7 +31,6 @@ require('bufferline').setup({
     },
 })
 
--- require('conf/cmp')
 require('conf/lspconfig')
 
 require('conf/fzf')

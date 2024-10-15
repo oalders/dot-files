@@ -477,11 +477,133 @@ require('lazy').setup({
                 'onsails/lspkind.nvim', -- add pictograms to completion sources
                 'zbirenbaum/copilot-cmp', -- include copilot suggestions in completion
             },
-            enabled = false,
+            enabled = true,
+            config = function()
+                local cmp = require('cmp')
+                local cmp_autopairs = require('nvim-autopairs.completion.cmp')
+
+                cmp.setup({
+                    experimental = {
+                        ghost_text = true,
+                    },
+                    formatting = {
+                        format = function(entry, item)
+                            item =
+                                require('lspkind').cmp_format()(entry, item)
+                            local alias = {
+                                buffer = 'buffer',
+                                path = 'path',
+                                calc = 'calc',
+                                emoji = 'emoji',
+                                nvim_lsp = 'LSP',
+                                nvim_lua = 'lua',
+                                nvim_lsp_signature_help = 'LSP Signature',
+                                Copilot = '',
+                            }
+
+                            if entry.source.name == 'nvim_lsp' then
+                                item.menu = entry.source.source.client.name
+                            else
+                                item.menu = alias[entry.source.name]
+                                    or entry.source.name
+                            end
+
+                            local fixed_width = false
+                            if fixed_width then
+                                vim.o.pumwidth = fixed_width
+                            end
+                            local win_width = vim.api.nvim_win_get_width(0)
+                            local max_content_width = fixed_width
+                                    and fixed_width - 10
+                                or math.floor(win_width * 0.1)
+                            local content = item.abbr
+                            if #content > max_content_width then
+                                item.abbr = vim.fn.strcharpart(
+                                    content,
+                                    0,
+                                    max_content_width - 3
+                                ) .. '...'
+                            else
+                                item.abbr = content
+                                    .. (' '):rep(max_content_width - #content)
+                            end
+                            return item
+                        end,
+                    },
+                    mapping = cmp.mapping.preset.insert({
+                        ['<C-Space>'] = cmp.mapping.complete(),
+                        ['<C-e>'] = cmp.mapping.abort(),
+                        ['<CR>'] = cmp.mapping.confirm({
+                            behavior = cmp.ConfirmBehavior.Replace,
+                            select = true,
+                        }),
+                        ['<Tab>'] = cmp.mapping(function(fallback)
+                            if cmp.visible() then
+                                cmp.select_next_item()
+                            else
+                                fallback()
+                            end
+                        end, { 'i', 's' }),
+                        ['<C-k>'] = cmp.mapping.scroll_docs(-4),
+                    }),
+                    preselect = cmp.PreselectMode.None,
+                    sources = cmp.config.sources({
+                        { name = 'copilot', group_index = 1 },
+                        { name = 'nvim_lsp', priority = 2 },
+                        { name = 'path', priority = 3 },
+                        {
+                            name = 'buffer',
+                            priority = 4,
+                            keyword_length = 4,
+                            option = {
+                                get_bufnrs = function()
+                                    return vim.api.nvim_list_bufs()
+                                end,
+                            },
+                        },
+                        { name = 'nvim_lua', priority = 5 },
+                    }),
+                })
+
+                cmp.setup.filetype('gitcommit', {
+                    sources = cmp.config.sources({
+                        { name = 'cmp_git' },
+                    }, {
+                        { name = 'buffer' },
+                    }),
+                })
+
+                cmp.setup.cmdline({ '/', '?' }, {
+                    mapping = cmp.mapping.preset.cmdline(),
+                    sources = {
+                        { name = 'buffer' },
+                    },
+                })
+
+                cmp.setup.cmdline(':', {
+                    mapping = cmp.mapping.preset.cmdline(),
+                    sources = cmp.config.sources({
+                        { name = 'cmdline', keyword_length = 2 },
+                        { name = 'nvim_lua' },
+                        { name = 'path' },
+                    }),
+                })
+
+                cmp.event:on('confirm_done', cmp_autopairs.on_confirm_done())
+
+                cmp.event:on('menu_opened', function()
+                    vim.b.copilot_suggestion_hidden = true
+                end)
+
+                cmp.event:on('menu_closed', function()
+                    vim.b.copilot_suggestion_hidden = false
+                end)
+            end,
         },
 
         {
             'saghen/blink.cmp',
+            enabled = false,
             lazy = false, -- lazy loading handled internally
             -- optional: provides snippets for the snippet source
             dependencies = 'rafamadriz/friendly-snippets',
