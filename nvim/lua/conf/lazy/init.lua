@@ -181,16 +181,14 @@ require('lazy').setup({
                 'nvim-treesitter/nvim-treesitter',
             },
             ft = 'markdown',
-            event = 'VeryLazy',
         },
         'ntpeters/vim-better-whitespace', -- highlight trailing whitespace
         -- 'oalders/prettysql' -- ,fs to format visually selected SQL
-        { 'othree/html5.vim', ft = 'html', event = 'VeryLazy' },
+        { 'othree/html5.vim', ft = 'html' },
         -- 'rodjek/vim-puppet', -- { 'for': 'puppet' }, -- Formatting, syntax highlighting etc
         {
             'rust-lang/rust.vim',
             ft = 'rust',
-            event = 'VeryLazy',
         },
         'tpope/vim-abolish',
 
@@ -202,7 +200,7 @@ require('lazy').setup({
             ft = 'ruby',
         },
 
-        { 'yko/mojo.vim', ft = 'html.epl', lazy = true }, -- syntax highlighting for mojo epl templates
+        { 'yko/mojo.vim', ft = 'html.epl' }, -- syntax highlighting for mojo epl templates
 
         -- {
         --     'ahmedkhalf/project.nvim',
@@ -215,7 +213,7 @@ require('lazy').setup({
         },
         {
             'ellisonleao/glow.nvim',
-            event = 'VeryLazy',
+            enabled = false,
             ft = 'markdown',
             config = true,
             cmd = 'Glow',
@@ -228,6 +226,7 @@ require('lazy').setup({
         --  <leader>td (doc) <leader>tw (workspace)
         {
             'folke/trouble.nvim',
+            event = 'LspAttach',
             opts = {}, -- for default options, refer to the configuration section for custom setup.
             cmd = 'Trouble',
             keys = {
@@ -316,7 +315,7 @@ require('lazy').setup({
                     table.insert(l.linters_by_ft[ft], 'typos')
                 end
             end,
-            filetype = {
+            ft = {
                 'gitcommit',
                 'go',
                 'lua',
@@ -392,7 +391,7 @@ require('lazy').setup({
             end,
             event = 'VeryLazy',
         },
-        'rgroli/other.nvim', -- :Other to toggle between test and implementation files
+        { 'rgroli/other.nvim', ft = 'go' }, -- :Other to toggle between test and implementation files
         'windwp/nvim-autopairs', --
 
         -- display lines for indentation
@@ -704,7 +703,6 @@ require('lazy').setup({
         {
             'Isrothy/neominimap.nvim',
             enabled = true,
-            lazy = true, -- WARN: NO NEED to Lazy load
             ft = { 'go', 'perl', 'typescript' },
             init = function()
                 vim.opt.wrap = false -- Recommended
