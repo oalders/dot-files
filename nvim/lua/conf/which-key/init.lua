@@ -125,38 +125,6 @@ wk.add({
     { '<leader>gx', '<cmd>Copilot disable<cr>', desc = 'stop GH copilot' },
     { '<leader>gy', '<cmd>CopilotChatClose<cr>', desc = 'CopilotChatClose' },
     {
-        '<leader>hl',
-        function()
-            require('hlchunk').setup({
-                blank = {
-                    enable = false,
-                },
-                chunk = {
-                    chars = {
-                        horizontal_line = '─',
-                        vertical_line = '│',
-                        left_top = '┌',
-                        left_bottom = '└',
-                        right_arrow = '─',
-                    },
-                    style = '#00ffff',
-                    enable = true,
-                },
-                indent = {
-                    chars = { '│', '¦', '┆', '┊' }, -- more code can be found in https://unicodeplus.com/
-                    enable = true,
-                    style = { '#5E81AC' },
-                },
-            })
-        end,
-        desc = 'hlchunk',
-    },
-    {
-        '<leader>hx',
-        ':DisableHLChunk<cr>:DisableHLIndent<cr>',
-        desc = 'Disable hlchunk and hlindent',
-    },
-    {
         '<leader>lc',
         function()
             vim.opt.colorcolumn = '78'

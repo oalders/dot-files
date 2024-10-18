@@ -395,8 +395,43 @@ require('lazy').setup({
         'windwp/nvim-autopairs', --
 
         -- display lines for indentation
-        -- <leader>ll (start) leader<lh> (stop)
-        { 'shellRaining/hlchunk.nvim' },
+        {
+            'shellRaining/hlchunk.nvim',
+            keys = {
+                {
+                    '<leader>hl',
+                    function()
+                        require('hlchunk').setup({
+                            blank = {
+                                enable = false,
+                            },
+                            chunk = {
+                                chars = {
+                                    horizontal_line = '─',
+                                    vertical_line = '│',
+                                    left_top = '┌',
+                                    left_bottom = '└',
+                                    right_arrow = '─',
+                                },
+                                style = '#00ffff',
+                                enable = true,
+                            },
+                            indent = {
+                                chars = { '│', '¦', '┆', '┊' }, -- more code can be found in https://unicodeplus.com/
+                                enable = true,
+                                style = { '#5E81AC' },
+                            },
+                        })
+                    end,
+                    desc = 'hlchunk',
+                },
+                {
+                    '<leader>hx',
+                    ':DisableHLChunk<cr>:DisableHLIndent<cr>',
+                    desc = 'Disable hlchunk and hlindent',
+                },
+            },
+        },
 
         {
             'Wansmer/treesj',
