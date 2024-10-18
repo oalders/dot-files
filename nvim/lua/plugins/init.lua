@@ -1,9 +1,5 @@
 require('conf/lazy')
 
-require('other-nvim').setup({
-    mappings = { 'golang' },
-})
-
 -- require('project_nvim').setup({
 --     detection_methods = { 'pattern', 'lsp'},
 --     manual_mode = false,
