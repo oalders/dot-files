@@ -373,7 +373,22 @@ require('lazy').setup({
                 },
             },
         }, -- fuzzy finder
-        { 'nvimtools/none-ls.nvim', event = 'VeryLazy' }, -- null-ls replacement
+        {
+            'nvimtools/none-ls.nvim', -- null-ls replacement
+            ft = { 'go', 'javascript', 'typescript', 'bash', 'sh', 'lua' },
+            config = function()
+                local null_ls = require('null-ls')
+                null_ls.setup({
+                    sources = {
+                        null_ls.builtins.formatting.goimports,
+                        null_ls.builtins.formatting.gofumpt,
+                        null_ls.builtins.formatting.prettier,
+                        null_ls.builtins.formatting.shfmt,
+                        null_ls.builtins.formatting.stylua,
+                    },
+                })
+            end,
+        },
         { 'nvim-treesitter/nvim-treesitter', build = ':TSUpdate' }, -- recommend updating parsers on update
         -- { 'olimorris/persisted.nvim',        opts = {} },           -- session management
         -- session management
