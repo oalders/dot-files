@@ -22,7 +22,7 @@
           "style": "diamond",
           "leading_diamond": "\ue0b6",
           "trailing_diamond": "\ue0b0",
-          "template": "{{ if .Env.SSH_CONNECTION }}\udb80\udf18 {{ .HostName }}{{ end }}",
+          "template": "{{ if .Env.SSH_CONNECTION }}\udb80\udf18 {{ .HostName | splitList \".\" | first}}{{ end }}",
           "properties": {
             "display_host": true,
             "display_user": false
