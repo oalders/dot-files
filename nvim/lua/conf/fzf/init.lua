@@ -6,6 +6,7 @@ fzf_lua.setup({
 })
 fzf_lua.setup({
     fzf_colors = true,
+    winopts = { width = 0.98 },
     previewers = {
         builtin = {
             extensions = {
