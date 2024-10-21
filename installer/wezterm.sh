@@ -27,7 +27,7 @@ elif is os name eq linux; then
         exit 0
     fi
     is there wezterm && is cli age wezterm lt 18 hours && exit
-    if is os id eq ubuntu && is os version in 20.04,22.04; then
+    if is os id eq ubuntu && is os version in 20.04,22.04,24.04; then
         install_for_linux Ubuntu
     elif is os id eq debian && is os version --major in 10,11; then
         install_for_linux Debian
