@@ -152,7 +152,9 @@ function HideGutter()
     vim.opt.list = false
     vim.opt.signcolumn = 'no' -- sign column
     vim.opt.foldcolumn = '0'
-    vim.cmd('Neominimap off')
+    if vim.fn.exists(':Neominimap') == 2 then
+        vim.cmd('Neominimap off')
+    end
 end
 
 vim.cmd('command! HideGutter lua HideGutter()')
@@ -161,7 +163,9 @@ function ShowGutter()
     vim.opt.number = true
     vim.opt.list = true
     vim.opt.signcolumn = 'auto'
-    vim.cmd('Neominimap on')
+    if vim.fn.exists(':Neominimap') == 2 then
+        vim.cmd('Neominimap on')
+    end
 end
 
 function LastSession()
