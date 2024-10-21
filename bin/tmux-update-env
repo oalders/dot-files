@@ -1,0 +1,25 @@
+#!/bin/bash
+
+# Sometimes when I ssh in to a dev environment and try to "git pull" in a
+# running tmux session from the previous day, I will not be able to pull,
+# because I've connected using a different SSH socket and the environment
+# inside tmux env is no longer in sync.
+#
+# Update some environment vars in every pane of every window where "bash" is
+# the current command. We don't want to send commands to, for instance, a
+# running instance of neovim. Run this after logging in for the first time each
+# day to prevent having manually to update the tmux env in many different
+# workspaces.
+
+set -eu -o pipefail
+
+tmux list-sessions -F "#{session_name}" | while read -r session; do
+    tmux list-windows -t "$session" -F "#{window_index}" | while read -r window; do
+        tmux list-panes -t "$session:$window" -F "#{pane_index} #{pane_id}" | while read -r pane_index pane_id; do
+            current_command=$(tmux display-message -p -t "$pane_id" "#{pane_current_command}")
+            if [ "$current_command" = "bash" ]; then
+                tmux send-keys -t "$pane_id" "tmux ue > /dev/null" C-m
+            fi
+        done
+    done
+done
