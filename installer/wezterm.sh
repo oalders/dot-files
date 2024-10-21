@@ -24,6 +24,7 @@ if is os name eq darwin; then
     fi
 elif is os name eq linux; then
     if ! is user sudoer; then
+        echo "😭 $USER is not a sudoer"
         exit 0
     fi
     is there wezterm && is cli age wezterm lt 18 hours && exit
