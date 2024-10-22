@@ -219,6 +219,17 @@ require('lazy').setup({
             end,
         },
         {
+            'EL-MASTOR/bufferlist.nvim',
+            enabled = false,
+            lazy = true,
+            keys = {
+                { '<Leader>b', ':BufferList<CR>', desc = 'Open bufferlist' },
+            },
+            dependencies = 'nvim-tree/nvim-web-devicons',
+            cmd = 'BufferList',
+            opts = {},
+        },
+        {
             'ellisonleao/glow.nvim',
             enabled = false,
             ft = 'markdown',
