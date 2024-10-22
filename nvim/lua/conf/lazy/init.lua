@@ -1035,7 +1035,11 @@ require('lazy').setup({
             },
         },
         { 'akinsho/toggleterm.nvim', version = '*', config = true },
-        { 'nvchad/showkeys', cmd = 'ShowkeysToggle', enabled = false },
+        {
+            'nvchad/showkeys',
+            cmd = 'ShowkeysToggle',
+            enabled = false,
+        },
 
         -- {
         --     'tris203/precognition.nvim',
