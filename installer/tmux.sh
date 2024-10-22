@@ -6,7 +6,7 @@ set -eu
 source ~/dot-files/bash_functions.sh
 
 set -x
-target_version=3.4
+target_version=3.5a
 
 is cli version tmux eq $target_version && exit
 is os name eq darwin && exit
