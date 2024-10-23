@@ -438,9 +438,13 @@ require('lazy').setup({
         -- display lines for indentation
         {
             'shellRaining/hlchunk.nvim',
+            event = { 'BufReadPre', 'BufNewFile' },
+            config = function()
+                require('hlchunk').setup({})
+            end,
             keys = {
                 {
-                    '<leader>hl',
+                    '<leader>lh',
                     function()
                         require('hlchunk').setup({
                             blank = {
@@ -467,7 +471,7 @@ require('lazy').setup({
                     desc = 'hlchunk',
                 },
                 {
-                    '<leader>hx',
+                    '<leader>lx',
                     ':DisableHLChunk<cr>:DisableHLIndent<cr>',
                     desc = 'Disable hlchunk and hlindent',
                 },

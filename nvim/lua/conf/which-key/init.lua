@@ -146,7 +146,6 @@ wk.add({
         ':Lspsaga diagnostic_jump_prev<cr>',
         desc = 'Previous diagnostic issue',
     },
-    { '<leader>lx', ':DisableHLChunk<cr>', desc = 'disable hlchunk' },
     {
         '<leader>ot',
         function()
