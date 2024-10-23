@@ -53,4 +53,8 @@ else
 fi
 
 echo "done nvim install"
+
+# nvim --headless "+Lazy! sync" +qa
+nvim --headless "+MasonToolsUpdateSync" +qa
+
 exit 0
