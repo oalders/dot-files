@@ -44,7 +44,7 @@ if is os name eq darwin; then
     tar xzvf $download_file
     dest="$HOME/local/bin/nvim-macos"
     rm -rf "$dest"
-    mv $dir "$dest"
+    mv "$dir" "$dest"
     rm -f "$HOME/local/bin/nvim"
     add_path "$HOME/local/bin/nvim-macos/bin"
 else
