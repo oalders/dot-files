@@ -3,3 +3,4 @@ git gc           # git prune && git lfs prune && git gc
 cpm install      # cpm install -g --cpanfile cpanfile
 parallel prove   # prove -lr -j $MY_PROCS t
 img preview      # fzf --preview='fzf-preview.sh {}'
+iCloud           # cd ~/Library/Mobile\ Documents/com~apple~CloudDocs/
