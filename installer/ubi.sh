@@ -41,6 +41,7 @@ db 1 d ubi --project oalders/debounce --in "$in"
 maybe_install atanunq/viu
 maybe_install bensadeh/tailspin --exe tspin
 maybe_install crate-ci/typos
+maybe_install golangci/golangci-lint
 maybe_install houseabsolute/omegasort
 maybe_install houseabsolute/precious
 maybe_install jesseduffield/lazydocker

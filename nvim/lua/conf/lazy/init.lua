@@ -950,7 +950,7 @@ require('lazy').setup({
 
                     -- golang
                     -- 'gofumpt',
-                    'golangci-lint',
+                    -- 'golangci-lint',
                     -- 'golangci_lint_ls',
                     -- 'golines',
                     -- 'gomodifytags',
