@@ -45,6 +45,7 @@ maybe_install golangci/golangci-lint
 maybe_install houseabsolute/omegasort
 maybe_install houseabsolute/precious
 maybe_install jesseduffield/lazydocker
+maybe_install jesseduffield/lazygit
 maybe_install jqlang/jq
 maybe_install junegunn/fzf
 maybe_install kubernetes-sigs/kustomize
