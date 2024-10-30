@@ -9,7 +9,17 @@ rm -f ~/.cargo/bin/precious
 if is os name eq darwin; then
     rm -f ~/.cargo/bin/fd
     if is there brew; then
-        packages=("bat" "bats-core" "exa" "gh" "go" "nvim" "prettier")
+        packages=(
+            "bat"
+            "bats-core"
+            "exa"
+            "gh"
+            "git-delta"
+            "go"
+            "nvim"
+            "prettier"
+            "reattach-to-user-namespace"
+        )
 
         for package in "${packages[@]}"; do
             brew remove "$package" || true
