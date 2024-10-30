@@ -14,13 +14,6 @@ set -x
 
 ln -sf $PREFIX/tmux.conf ~/.tmux.conf
 
-if is os name eq darwin; then
-    echo "Symlinking MacOS source file"
-    ln -sf $PREFIX/tmux/macos ~/.tmux-this-os
-else
-    ln -sf $PREFIX/tmux/linux ~/.tmux-this-os
-fi
-
 LOCALCHECKOUT=~/.tmux/plugins/tpm
 if [ ! -d $LOCALCHECKOUT ]; then
     git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
