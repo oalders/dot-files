@@ -30,4 +30,8 @@ brew bundle install --file=brew/defaults
 brew bundle install --file=brew/local-only
 # brew bundle install --file=brew/mas
 
+if is os version gte 14; then
+    brew install borders
+fi
+
 exit 0
