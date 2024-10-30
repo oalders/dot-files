@@ -155,6 +155,8 @@ function HideGutter()
     if vim.fn.exists(':Neominimap') == 2 then
         vim.cmd('Neominimap off')
     end
+    vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled())
+    vim.diagnostic.config({ virtual_text = false })
 end
 
 vim.cmd('command! HideGutter lua HideGutter()')
@@ -166,6 +168,8 @@ function ShowGutter()
     if vim.fn.exists(':Neominimap') == 2 then
         vim.cmd('Neominimap on')
     end
+    vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled())
+    vim.diagnostic.config({ virtual_text = true })
 end
 
 function LastSession()
