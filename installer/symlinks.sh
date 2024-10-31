@@ -8,7 +8,7 @@ source bash_functions.sh
 prefix=~/dot-files
 
 directories=(
-    ~/.config/bat
+    "$(bat --config-dir)"
     ~/.config/oh-my-posh/themes
     ~/.config/perlimports
     ~/.config/wezterm
@@ -71,7 +71,7 @@ for file in "${files[@]}"; do
     ln -sf "$prefix/$file" ~/.$file
 done
 
-ln -sf $prefix/bat/config ~/.config/bat/config
+ln -sf $prefix/bat/config "$(bat --config-file)"
 ln -sf $prefix/cpanreporter/config.ini ~/.cpanreporter/config.ini
 ln -sf $prefix/oh-my-posh/themes/local.omp.json ~/.config/oh-my-posh/themes/local.omp.json
 ln -sf $prefix/perlimports/perlimports.toml ~/.config/perlimports/perlimports.toml
