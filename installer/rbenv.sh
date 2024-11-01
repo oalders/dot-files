@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 set -eu -o pipefail
-version=3.3.0
+version=3.3.5
 
 if is os name ne 'darwin'; then
     exit
