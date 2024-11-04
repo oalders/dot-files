@@ -11,3 +11,6 @@ overrides:
       - "**/*.yml"
     options:
       tabWidth: 2
+  - files: "*.ts"
+    options:
+      semi: true
