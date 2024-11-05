@@ -5,9 +5,13 @@ set -e -u -o pipefail -x
 remote=$1
 branch=$2
 
+gh pr view "$branch"
 gh pr checks "$branch"
 
-git fetch "$remote"
+gh repo sync
+gh repo sync -b "$branch" --force
+git fetch origin || true
+git pull --rebase origin main || true
 file=/tmp/diff.txt
 
 echo '```' >$file
@@ -29,7 +33,7 @@ read -n 1 -t 30 -s -r -p "Approve PR? Press y to continue, r to rebase, n to exi
 
 if [[ $input == "y" ]]; then
     gh pr review --approve "$branch" -F $file
-    gh pr merge --merge "$branch"
+    gh pr merge --merge "$branch" || gh pr --merge "$branch" --auto
 elif [[ $input == "r" ]]; then
     dependabot-rebase.sh "$branch"
 else
