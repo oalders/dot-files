@@ -158,14 +158,22 @@ wk.add({
         '<leader>to',
         function()
             local line = vim.api.nvim_get_current_line()
-            if string.find(line, 'test.describe.only') then
-                vim.api.nvim_command('s/test.describe.only/test.describe/')
-            elseif string.find(line, 'test.only') then
-                vim.api.nvim_command('s/test.only/test/')
-            elseif string.find(line, 'test.describe') then
-                vim.api.nvim_command('s/test.describe/test.describe.only/')
-            elseif string.find(line, 'test') then
-                vim.api.nvim_command('s/test/test.only/')
+            local patterns = {
+                { 'test.describe.only', 'test.describe' },
+                { 'test.only', 'test' },
+                { 'it.only', 'it' },
+                { 'test.describe', 'test.describe.only' },
+                { 'test', 'test.only' },
+                { 'it', 'it.only' },
+            }
+
+            for _, pattern in ipairs(patterns) do
+                if string.find(line, pattern[1]) then
+                    vim.api.nvim_command(
+                        's/' .. pattern[1] .. '/' .. pattern[2] .. '/'
+                    )
+                    break
+                end
             end
         end,
         desc = 'Toggle test.only',
