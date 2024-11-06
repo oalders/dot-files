@@ -256,6 +256,7 @@ tmux_session_name() {
         )
 
         prefix='⁉️'
+        topDir=''
         if git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
             mainCheckoutDir=$(git rev-parse --git-common-dir)
             if [[ $mainCheckoutDir != ".git" ]]; then
