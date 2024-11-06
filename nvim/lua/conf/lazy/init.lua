@@ -782,7 +782,7 @@ require('lazy').setup({
 
         {
             'Isrothy/neominimap.nvim',
-            enabled = true,
+            enabled = false,
             ft = { 'go', 'perl', 'typescript' },
             init = function()
                 vim.opt.wrap = false -- Recommended
