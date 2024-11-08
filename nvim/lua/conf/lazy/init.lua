@@ -54,6 +54,12 @@ require('lazy').setup({
             },
         },
         {
+            'folke/snacks.nvim',
+            priority = 1000,
+            lazy = false,
+            opts = {},
+        },
+        {
             'nvimdev/dashboard-nvim',
             event = 'VimEnter',
             config = function()
