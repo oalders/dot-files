@@ -19,19 +19,35 @@ fi
 
 set -x
 
-sudo apt-get install -y -q --no-install-recommends --autoremove \
-    build-essential \
-    chafa \
-    cpanminus \
-    curl \
-    jq \
-    libnet-ssleay-perl \
-    pandoc \
-    python3-setuptools \
-    ripgrep \
-    shellcheck \
-    tig \
-    tree
+if is os id eq almalinux; then
+    sudo dnf install -y -q \
+        chafa \
+        cpanminus \
+        curl \
+        jq \
+        npm \
+        pandoc \
+        python3-setuptools \
+        ripgrep \
+        tig \
+        tree
+    exit 0
+else
+
+    sudo apt-get install -y -q --no-install-recommends --autoremove \
+        build-essential \
+        chafa \
+        cpanminus \
+        curl \
+        jq \
+        libnet-ssleay-perl \
+        pandoc \
+        python3-setuptools \
+        ripgrep \
+        shellcheck \
+        tig \
+        tree
+fi
 
 if ! is there go; then
     bash installer/golang.sh

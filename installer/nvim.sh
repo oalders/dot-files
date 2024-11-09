@@ -26,6 +26,10 @@ set -x
 
 URL=https://github.com/neovim/neovim/releases/download/nightly/
 
+if is os id eq almalinux; then
+    URL=https://github.com/neovim/neovim-releases/releases/download/v0.10.2/
+fi
+
 if is os name eq darwin; then
     if is arch eq arm64; then
         dir=nvim-macos-arm64

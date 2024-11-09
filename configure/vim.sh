@@ -23,10 +23,8 @@ ln -sf "$LINK_FLAG" $PREFIX/vim/after/syntax/gitcommit.vim ~/.vim/after/syntax/g
 if is there go; then
     go version
     unset GOPROXY
-    if is cli age shfmt gt 18 hours; then
-        go install mvdan.cc/sh/v3/cmd/shfmt@latest
-        go install mvdan.cc/gofumpt@latest
-    fi
+    debounce 18 h go install mvdan.cc/sh/v3/cmd/shfmt@latest
+    debounce 18 h go install mvdan.cc/gofumpt@latest
 else
     echo "Go not found. Not installing shfmt or gofumpt"
 fi
