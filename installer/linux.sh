@@ -24,6 +24,7 @@ if is os id eq almalinux; then
         chafa \
         cpanminus \
         curl \
+        fd-find \
         jq \
         npm \
         pandoc \
