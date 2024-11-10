@@ -940,6 +940,7 @@ require('lazy').setup({
                     -- 'luacheck',
                     -- 'luaformatter',
                     'lua-language-server',
+                    'markdownlint',
                     -- 'misspell',
                     'perlnavigator',
                     -- 'rust_analyzer',
