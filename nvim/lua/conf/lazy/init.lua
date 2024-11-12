@@ -99,6 +99,7 @@ require('lazy').setup({
                                 key = 'c',
                             },
                         },
+                        footer = { '', '„Quäl dich, du Sau!“' },
                     },
                 })
             end,
