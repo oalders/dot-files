@@ -61,6 +61,10 @@ require('lazy').setup({
             opts = {},
         },
         {
+            -- fade inactive buffers and preserve syntax highlighting
+            'TaDaa/vimade',
+        },
+        {
             'nvimdev/dashboard-nvim',
             event = 'VimEnter',
             config = function()
