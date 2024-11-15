@@ -63,6 +63,7 @@ require('lazy').setup({
         {
             -- fade inactive buffers and preserve syntax highlighting
             'TaDaa/vimade',
+            enabled = false,
         },
         {
             'nvimdev/dashboard-nvim',
