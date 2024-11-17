@@ -224,9 +224,7 @@ bind '\C-e: edit-and-execute-command'
 
 # If this happens *before* bash completion setup then command line tab
 # completion via **<TAB> does not work.
-add_path "$HOME/.vim/plugged/fzf/bin"
-[ -f "$HOME"/.vim/plugged/fzf/shell/key-bindings.bash ] && . "$HOME"/.vim/plugged/fzf/shell/key-bindings.bash
-[ -f "$HOME"/.vim/plugged/fzf/shell/completion.bash ] && . "$HOME"/.vim/plugged/fzf/shell/completion.bash
+eval "$(fzf --bash)"
 
 add_path "/usr/local/go/bin"
 
