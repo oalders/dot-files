@@ -42,6 +42,7 @@ else
         curl \
         jq \
         libnet-ssleay-perl \
+        locate \
         pandoc \
         python3-setuptools \
         ripgrep \
