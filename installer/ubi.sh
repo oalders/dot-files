@@ -82,3 +82,11 @@ fi
 if  [ "$IS_MM" = false ] && is there gh && ! gh extension list | grep --quiet gh-dash; then
     debounce 1 d gh extension install dlvhdr/gh-dash || true
 fi
+
+url=https://raw.githubusercontent.com/junegunn/fzf/refs/heads/master/bin/fzf-tmux
+target="$HOME/local/bin/fzf-tmux"
+
+if ! is there fzf-tmux; then
+    curl -o "$target" "$url"
+    chmod 755 "$target"
+fi
