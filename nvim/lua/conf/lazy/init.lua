@@ -345,6 +345,10 @@ require('lazy').setup({
                 for ft, _ in pairs(l.linters_by_ft) do
                     table.insert(l.linters_by_ft[ft], 'typos')
                 end
+                local e2e_dir = 'web/e2e'
+                if vim.fn.isdirectory(e2e_dir) == 1 then
+                    l.linters_by_ft.typescript = nil
+                end
             end,
             ft = {
                 'gitcommit',
