@@ -2,6 +2,10 @@
 
 set -eu
 
+if is os id eq almalinux; then
+    exit
+fi
+
 # shellcheck source=bash_functions.sh
 source ~/dot-files/bash_functions.sh
 

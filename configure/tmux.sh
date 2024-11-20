@@ -2,6 +2,10 @@
 
 set -eu -o pipefail
 
+if is os id eq almalinux; then
+    exit
+fi
+
 PREFIX=~/dot-files
 
 # shellcheck source=bash_functions.sh

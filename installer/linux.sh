@@ -19,7 +19,7 @@ fi
 
 set -x
 
-if is os id eq almalinux; then
+if ! is there apt; then
     sudo dnf install -y -q \
         chafa \
         cpanminus \
