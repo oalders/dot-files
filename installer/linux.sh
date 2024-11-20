@@ -43,6 +43,7 @@ else
         jq \
         libnet-ssleay-perl \
         locate \
+        luarocks \
         pandoc \
         python3-setuptools \
         ripgrep \
