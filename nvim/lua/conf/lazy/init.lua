@@ -417,7 +417,7 @@ require('lazy').setup({
                 })
             end,
         },
-        { 'nvim-treesitter/nvim-treesitter', build = ':TSUpdate' }, -- recommend updating parsers on update
+        { 'nvim-treesitter/nvim-treesitter', build = ':TSUpdate | :TSInstall diff' }, -- recommend updating parsers on update
         -- { 'olimorris/persisted.nvim',        opts = {} },           -- session management
         -- session management
         {
