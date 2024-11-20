@@ -417,7 +417,10 @@ require('lazy').setup({
                 })
             end,
         },
-        { 'nvim-treesitter/nvim-treesitter', build = ':TSUpdate | :TSInstall diff' }, -- recommend updating parsers on update
+        {
+            'nvim-treesitter/nvim-treesitter',
+            build = ':TSUpdate | :TSInstall diff',
+        }, -- recommend updating parsers on update
         -- { 'olimorris/persisted.nvim',        opts = {} },           -- session management
         -- session management
         {
@@ -522,7 +525,7 @@ require('lazy').setup({
                 context = 'buffers',
                 -- See Configuration section for rest
             },
-            build = "make tiktoken",
+            build = 'make tiktoken',
             event = 'VeryLazy',
             -- See Commands section for default commands if you want to lazy load on them
         },
