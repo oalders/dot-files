@@ -81,7 +81,6 @@ fi
 # takes a commit name as sole arg
 git config --global alias.whatis "show -s --pretty='tformat:%h (%s, %ad)' --date=short"
 
-# for Facebook Path Picker (fpp)
 git config --global grep.lineNumber true
 
 git config --global grep.patternType perl

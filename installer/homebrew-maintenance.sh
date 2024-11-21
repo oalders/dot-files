@@ -13,7 +13,6 @@ brew remove bison
 brew remove diff-so-fancy
 brew remove erlang@20
 brew remove fd
-brew remove fpp
 brew remove geoip
 brew remove ghc@8.2
 brew remove hub
