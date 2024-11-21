@@ -575,7 +575,7 @@ require('lazy').setup({
                 'hrsh7th/cmp-nvim-lsp',
                 'hrsh7th/cmp-path',
                 'onsails/lspkind.nvim', -- add pictograms to completion sources
-                'zbirenbaum/copilot-cmp', -- include copilot suggestions in completion
+                -- 'zbirenbaum/copilot-cmp', -- include copilot suggestions in completion
             },
             enabled = true,
             config = function()
@@ -598,7 +598,7 @@ require('lazy').setup({
                                 nvim_lsp = 'LSP',
                                 nvim_lua = 'lua',
                                 nvim_lsp_signature_help = 'LSP Signature',
-                                Copilot = '',
+                                -- Copilot = '',
                             }
 
                             if entry.source.name == 'nvim_lsp' then
@@ -648,7 +648,7 @@ require('lazy').setup({
                     }),
                     preselect = cmp.PreselectMode.None,
                     sources = cmp.config.sources({
-                        { name = 'copilot', group_index = 1 },
+                        -- { name = 'copilot', group_index = 1 },
                         { name = 'nvim_lsp', priority = 2 },
                         { name = 'path', priority = 3 },
                         {
@@ -691,13 +691,13 @@ require('lazy').setup({
 
                 cmp.event:on('confirm_done', cmp_autopairs.on_confirm_done())
 
-                cmp.event:on('menu_opened', function()
-                    vim.b.copilot_suggestion_hidden = true
-                end)
-
-                cmp.event:on('menu_closed', function()
-                    vim.b.copilot_suggestion_hidden = false
-                end)
+                -- cmp.event:on('menu_opened', function()
+                --     vim.b.copilot_suggestion_hidden = true
+                -- end)
+                --
+                -- cmp.event:on('menu_closed', function()
+                --     vim.b.copilot_suggestion_hidden = false
+                -- end)
             end,
         },
 
