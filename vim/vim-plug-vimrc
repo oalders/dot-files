@@ -30,7 +30,6 @@ Plug 'rhysd/git-messenger.vim' " ,gm to open window
 Plug 'rodjek/vim-puppet', { 'for': 'puppet' } " Formatting, syntax highlighting etc
 Plug 'rust-lang/rust.vim'
 Plug 'preservim/nerdcommenter'
-Plug 'skaji/syntax-check-perl', { 'branch': 'main' }
 Plug 'tpope/vim-abolish'
 
 " :Delete :SudoWrite
