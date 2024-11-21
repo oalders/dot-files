@@ -523,6 +523,8 @@ require('lazy').setup({
                 auto_follow_cursor = false,
                 debug = false, -- Enable debugging
                 context = 'buffers',
+                model = 'gpt-4o',
+                chat_autocomplete = false,
                 -- See Configuration section for rest
             },
             build = 'make tiktoken',
