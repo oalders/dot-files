@@ -85,13 +85,14 @@ if is there nvim; then
     alias vi=nvim
     alias vim=nvim
     export EDITOR=nvim
+    remove_path "$HOME/local/bin/go/bin"
+    add_path "$HOME/.local/share/nvim/mason/bin"
 else
     export EDITOR=vim
 fi
 
 add_path "$HOME/.local/bin"
 add_path "$HOME/local/bin"
-add_path "$HOME/local/bin/go/bin"
 
 # node modules locally installing bin files
 add_path "$HOME/dot-files/node_modules/.bin"

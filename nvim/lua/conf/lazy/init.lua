@@ -976,16 +976,16 @@ require('lazy').setup({
                     'yamlls',
 
                     -- golang
-                    -- 'gofumpt',
-                    -- 'golangci-lint',
-                    -- 'golangci_lint_ls',
-                    -- 'golines',
-                    -- 'gomodifytags',
-                    -- 'gopls',
-                    -- 'gotests',
-                    -- 'impl',
-                    -- 'revive',
-                    -- 'staticcheck',
+                    'gofumpt',
+                    'golangci-lint',
+                    'golangci_lint_ls',
+                    'golines',
+                    'gomodifytags',
+                    'gopls',
+                    'gotests',
+                    'impl',
+                    'revive',
+                    'staticcheck',
                 },
 
                 -- if set to true this will check each tool for updates. If updates

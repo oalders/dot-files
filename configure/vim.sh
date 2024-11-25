@@ -20,15 +20,6 @@ mkdir -p ~/.vim/after/plugin
 ln -sf "$LINK_FLAG" $PREFIX/vim/after/syntax/perl/heredoc-sql.vim ~/.vim/after/syntax/perl/heredoc-sql.vim
 ln -sf "$LINK_FLAG" $PREFIX/vim/after/syntax/gitcommit.vim ~/.vim/after/syntax/gitcommit.vim
 
-if is there go; then
-    go version
-    unset GOPROXY
-    debounce 18 h go install mvdan.cc/sh/v3/cmd/shfmt@latest
-    debounce 18 h go install mvdan.cc/gofumpt@latest
-else
-    echo "Go not found. Not installing shfmt or gofumpt"
-fi
-
 # vim
 curl -fLo ~/.vim/autoload/plug.vim --create-dirs \
     https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
