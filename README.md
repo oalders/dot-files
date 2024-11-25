@@ -139,6 +139,7 @@ Install `plenv` as well as the latest Perl version.
 
 ### Shortcuts
 
+`ctrl-a a`: toggle mouse
 `ctrl-a + L`: toggle session
 `ctrl-a + <space>`: tmux which-key
 
