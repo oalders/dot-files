@@ -525,6 +525,9 @@ require('lazy').setup({
                 context = 'buffers',
                 model = 'gpt-4o',
                 chat_autocomplete = false,
+                prompts = {
+                    Perl2Go = '> /COPILOT_GENERATE\n\nConvert the selected code from Perl to Go',
+                },
                 -- See Configuration section for rest
             },
             build = 'make tiktoken',
