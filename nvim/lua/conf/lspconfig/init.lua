@@ -172,6 +172,9 @@ lspconfig.gopls.setup({
             -- root_dir = root_pattern("go.mod", ".git"),
         },
     },
+    flags = {
+        debounce_text_changes = 1000,
+    },
 })
 
 -- After setting up mason-lspconfig you may set up servers via lspconfig
