@@ -165,16 +165,24 @@ lspconfig.gopls.setup({
     settings = {
         gopls = {
             analyses = {
+                shadow = true,
+                useany = true,
                 unusedparams = true,
+                unusedvariable = true,
             },
             staticcheck = true,
             gofumpt = true,
+            usePlaceholders = true,
+            hints = { functionTypeParameters = true },
             -- root_dir = root_pattern("go.mod", ".git"),
         },
     },
     flags = {
         debounce_text_changes = 1000,
     },
+    -- on_attach = function(client, bufnr)
+    --     print(vim.inspect(client.server_capabilities))
+    -- end,
 })
 
 -- After setting up mason-lspconfig you may set up servers via lspconfig
