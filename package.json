@@ -31,7 +31,7 @@
     "markdownlint-cli": "^0.43.0",
     "normalize-url": "^8.0.1",
     "npm": "^10.9.1",
-    "prettier": "^3.3.3",
+    "prettier": "^3.4.0",
     "remove-github-forks": "^2.1.1",
     "tree-sitter-cli": "^0.24.4",
     "typescript": "^5.7.2",
