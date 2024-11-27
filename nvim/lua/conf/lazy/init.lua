@@ -674,11 +674,12 @@ require('lazy').setup({
                     preselect = cmp.PreselectMode.None,
                     sources = cmp.config.sources({
                         -- { name = 'copilot', group_index = 1 },
-                        { name = 'nvim_lsp', priority = 2 },
+                        { name = 'nvim_lsp', priority = 1 },
                         { name = 'path', priority = 3 },
+                        { name = 'nvim_lua', priority = 4 },
                         {
                             name = 'buffer',
-                            priority = 4,
+                            priority = 10,
                             keyword_length = 4,
                             option = {
                                 get_bufnrs = function()
@@ -686,7 +687,6 @@ require('lazy').setup({
                                 end,
                             },
                         },
-                        { name = 'nvim_lua', priority = 5 },
                     }),
                 })
 
