@@ -603,12 +603,19 @@ require('lazy').setup({
                     experimental = {
                         ghost_text = true,
                     },
+                    window = {
+                        completion = cmp.config.window.bordered({
+                            col_offset = 20,
+                            row_offset = -10, -- Adjust this value to set the number of lines above the code
+                        }),
+                        documentation = cmp.config.window.bordered(),
+                    },
                     formatting = {
                         format = function(entry, item)
                             item =
                                 require('lspkind').cmp_format()(entry, item)
                             local alias = {
-                                buffer = 'buffer',
+                                buffer = 'bfr',
                                 path = 'path',
                                 calc = 'calc',
                                 emoji = 'emoji',
