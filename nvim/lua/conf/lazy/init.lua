@@ -632,11 +632,12 @@ require('lazy').setup({
                                     or entry.source.name
                             end
 
-                            local fixed_width = false
-                            if fixed_width then
-                                vim.o.pumwidth = fixed_width
-                            end
                             local win_width = vim.api.nvim_win_get_width(0)
+                                or 50
+                            local fixed_width = math.floor(win_width * 0.5)
+                            if fixed_width then
+                                vim.o.pumwidth = fixed_width or 50
+                            end
                             local max_content_width = fixed_width
                                     and fixed_width - 10
                                 or math.floor(win_width * 0.1)
