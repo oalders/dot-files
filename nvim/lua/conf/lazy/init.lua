@@ -54,6 +54,11 @@ require('lazy').setup({
             },
         },
         {
+            -- Toggle via :ZenMode
+            'folke/zen-mode.nvim',
+            opts = {},
+        },
+        {
             'folke/snacks.nvim',
             enabled = false,
             priority = 1000,
