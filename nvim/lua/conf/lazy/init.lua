@@ -540,7 +540,13 @@ require('lazy').setup({
                 model = 'gpt-4o',
                 chat_autocomplete = false,
                 prompts = {
-                    Perl2Go = '> /COPILOT_GENERATE\n\nConvert the selected code from Perl to Go',
+                    Perl2Go = '> /COPILOT_GENERATE\n\n'
+                        .. 'Convert the selected code from Perl to Go.\n'
+                        .. '* Use `map[string]struct{}{}` when converting a hash '
+                        .. 'which is only there to track if keys exist\n'
+                        .. '* avoid deprecated libraries and constructs\n'
+                        .. '* for error assertions in tests, use require\n'
+                        .. '* prefer netip.ParseAddr over net.ParseIP\n',
                 },
                 -- See Configuration section for rest
             },
