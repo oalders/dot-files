@@ -63,6 +63,11 @@ config.keys = {
         mods = 'ALT',
         action = wezterm.action.SpawnTab('CurrentPaneDomain'),
     },
+    {
+        key = 'w',
+        mods = 'ALT',
+        action = wezterm.action.CloseCurrentTab({ confirm = true }),
+    },
 }
 
 wezterm.on('update-status', function(window)
