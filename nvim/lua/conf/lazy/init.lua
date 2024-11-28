@@ -114,12 +114,14 @@ require('lazy').setup({
         -- Smooth cursor movement.
         {
             'sphamba/smear-cursor.nvim',
+            enabled = false,
             opts = {},
         },
 
         -- Smooth scrolling.
         {
             'karb94/neoscroll.nvim',
+            enabled = false,
             config = function()
                 require('neoscroll').setup({})
             end,
