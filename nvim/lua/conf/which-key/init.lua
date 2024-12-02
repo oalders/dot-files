@@ -202,6 +202,7 @@ wk.add({
         desc = 'CopilotChat - Help actions',
         mode = 'v',
     },
+    { '<leader>cc', '<cmd>CopilotChatClose<cr>', desc = 'CopilotChat close' },
     { 'co', '<cmd>CopilotChatOpen<cr>', desc = 'CopilotChat', mode = 'v' },
     {
         '<leader>co',
