@@ -551,7 +551,13 @@ require('lazy').setup({
                         .. 'which is only there to track if keys exist\n'
                         .. '* avoid deprecated libraries and constructs\n'
                         .. '* for error assertions in tests, use require\n'
-                        .. '* prefer netip.ParseAddr over net.ParseIP\n',
+                        .. '* prefer netip.ParseAddr over net.ParseIP\n';
+
+                    QuickFix = '> /COPILOT_GENERATE\n\n'
+                        .. 'There is a problem with the selected code.\n'
+                        .. ' * rewrite the code with the bug fixed.\n'
+                        .. ' * show only the changed lines.';
+
                 },
                 -- See Configuration section for rest
             },
