@@ -123,7 +123,6 @@ wk.add({
     },
     { '<leader>gw', 'Vgw<cr>', desc = 'wrap long lines' },
     { '<leader>gx', '<cmd>Copilot disable<cr>', desc = 'stop GH copilot' },
-    { '<leader>gy', '<cmd>CopilotChatClose<cr>', desc = 'CopilotChatClose' },
     {
         '<leader>lc',
         function()
@@ -202,13 +201,16 @@ wk.add({
         desc = 'CopilotChat - Help actions',
         mode = 'v',
     },
-    { '<leader>cc', '<cmd>CopilotChatClose<cr>', desc = 'CopilotChat close' },
-    { 'co', '<cmd>CopilotChatOpen<cr>', desc = 'CopilotChat', mode = 'v' },
     {
-        '<leader>co',
-        '<cmd>CopilotChatOpen<cr>',
-        desc = 'CopilotChat',
-        mode = 'n',
+        '<leader>cc',
+        '<cmd>CopilotChatToggle<cr>',
+        desc = 'CopilotChat toggle',
+    },
+    {
+        'cc',
+        '<cmd>CopilotChatToggle<cr>',
+        desc = 'CopilotChat toggle',
+        mode = 'v',
     },
     {
         'cp',
