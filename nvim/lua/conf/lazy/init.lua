@@ -189,6 +189,7 @@ require('lazy').setup({
         'itchyny/vim-cursorword', -- underline the word under the cursor
         {
             'junegunn/fzf',
+            enabled = false,
             dir = '~/.fzf',
             build = './install --all',
         },
