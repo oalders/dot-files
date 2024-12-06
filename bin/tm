@@ -6,11 +6,10 @@
 # to get a tmux kill-session picker:
 # tm kill-session<cr>
 
-fzf_command="fzf-tmux -p --delimiter=: --with-nth 1 --color=hl:2"
+# fzf_command="fzf-tmux -p --delimiter=: --with-nth 1 --color=hl:2"
+# line=$(tmux list-session -F "#{session_name}" | $fzf_command) || exit 0
 
-# select pane
-line=$(tmux list-session -F "#{session_name}" | $fzf_command) || exit 0
-
+session=$(tmux list-sessions -F \#S | gum filter --placeholder "Pick any session!")
 subcommand=attach
 
 if [ $# -gt 0 ]; then
@@ -19,4 +18,4 @@ elif test "${TMUX+x}"; then
     subcommand="switch"
 fi
 
-tmux "$subcommand" -t "$line"
+tmux "$subcommand" -t "$session"
