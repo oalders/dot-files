@@ -241,3 +241,8 @@ vim.opt.termguicolors = true
 
 -- Show comments in italics
 vim.cmd('highlight Comment cterm=italic gui=italic term=bold')
+
+-- Remap macro recording to 'Q' instead of 'q'
+-- It's too easy to start recording accidentally
+vim.keymap.set('n', 'q', '<nop>', {})
+vim.keymap.set('n', 'Q', 'q', { desc = 'Record macro', noremap = true })
