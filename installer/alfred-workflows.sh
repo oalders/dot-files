@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-set -eux
+set -eu
 
 cd /tmp
 
@@ -20,14 +20,15 @@ wait_for_input() {
     read -n 1 -s -r -p "Press any key to continue"
 }
 
-debounce 90 d wait_for_input 'https://alfred.app/workflows/rknightuk/http-status-codes/download/' 'http-status-codes.alfredworkflow'
-debounce 90 d wait_for_input 'https://github.com/alexchantastic/alfred-ip-address-workflow/releases/download/v1.0.3' 'alfred-ip-address-workflow.alfredworkflow'
-debounce 90 d wait_for_input 'https://github.com/epilande/alfred-browser-tabs/releases/download/v1.0.7' 'Browser-Tabs.alfredworkflow'
-debounce 90 d wait_for_input 'https://github.com/gharlan/alfred-github-workflow/releases/download/v1.7.1' 'github.alfredworkflow'
-debounce 90 d wait_for_input 'https://github.com/jsumners/alfred-emoji/releases/download/v2.2.0' 'alfred-emoji.alfredworkflow'
-debounce 90 d wait_for_input 'https://github.com/mrodalgaard/alfred-network-workflow/releases/download/v1.1' 'Network.alfredworkflow'
-debounce 90 d wait_for_input 'https://github.com/packal/repository/raw/master/com.pawelgrzybek.div' 'div.alfredworkflow'
-debounce 90 d wait_for_input 'https://github.com/ruedap/alfred-font-awesome-workflow/releases/download/v5.15.3.1' 'Font-Awesome.alfredworkflow'
+set -x
+db 90 d wait_for_input 'https://alfred.app/workflows/rknightuk/http-status-codes/download/' 'http-status-codes.alfredworkflow'
+db 90 d wait_for_input 'https://github.com/alexchantastic/alfred-ip-address-workflow/releases/download/v1.0.3' 'alfred-ip-address-workflow.alfredworkflow'
+db 90 d wait_for_input 'https://github.com/epilande/alfred-browser-tabs/releases/download/v1.0.7' 'Browser-Tabs.alfredworkflow'
+db 90 d wait_for_input 'https://github.com/gharlan/alfred-github-workflow/releases/download/v1.7.1' 'github.alfredworkflow'
+db 90 d wait_for_input 'https://github.com/jsumners/alfred-emoji/releases/download/v2.2.0' 'alfred-emoji.alfredworkflow'
+db 90 d wait_for_input 'https://github.com/mrodalgaard/alfred-network-workflow/releases/download/v1.1' 'Network.alfredworkflow'
+db 90 d wait_for_input 'https://github.com/packal/repository/raw/master/com.pawelgrzybek.div' 'div.alfredworkflow'
+db 90 d wait_for_input 'https://github.com/ruedap/alfred-font-awesome-workflow/releases/download/v5.15.3.1' 'Font-Awesome.alfredworkflow'
 
 # shellcheck disable=SC2317
 alfred_metacpan() {
@@ -37,7 +38,7 @@ alfred_metacpan() {
     cd "$repo" && mkdir -p dist && make && open dist/metacpan-0.0.5.alfredworkflow
 }
 
-debounce 90 d alfred_metacpan
+db 90 d alfred_metacpan
 
 exit 0
 
