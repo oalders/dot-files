@@ -66,7 +66,7 @@ else
 fi
 
 if is os name eq darwin; then
-    if is cli version bat ne 0.24.0 || true; then
+    if ! is there bat || is cli version bat ne 0.24.0; then
         ubi --in "$in" \
             --url https://github.com/sharkdp/bat/releases/download/v0.23.0/bat-v0.23.0-x86_64-apple-darwin.tar.gz
     fi
