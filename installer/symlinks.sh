@@ -80,7 +80,6 @@ ln -sf $prefix/wezterm/wezterm.lua ~/.config/wezterm/wezterm.lua
 ln -sf $prefix/yamllint.yml ~/.config/yamllint/config
 
 if is os name eq darwin; then
-    ln -sf $prefix/gnupg/gpg-agent.conf ~/.gnupg/gpg-agent.conf
     ln -sf $prefix/karabiner/karabiner.json ~/.config/karabiner/karabiner.json
     ln -sf "$LINK_FLAG" $prefix/hammerspoon ~/.hammerspoon
 fi

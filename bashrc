@@ -36,7 +36,6 @@ alias dr='NO_JIGSAW=1 HARNESS_OPTIONS="j8:c" dzil release'
 alias dzil-prove='dzil run --nobuild prove -lv'
 alias dzil-prove-xs='dzil run prove -lv'
 alias dzil-stale='dzil stale --all | safe_xargs cpm install --global'
-alias fix-gpg='pkill -9 gpg-agent && export GPG_TTY=$(tty)'
 alias g=git
 alias gi=git # fix typos
 alias gri="git rebase -i origin/main"
