@@ -101,6 +101,9 @@ brew bundle install --file=brew/mas
 
 ### Hammerspoon Spoon Installer
 
+Launch `Hammerspoon` at least once *before* running this command. It may need
+to set up some directories for the spoon installation.
+
 ```shell
 ./installer/spoon-installer.sh
 ```
