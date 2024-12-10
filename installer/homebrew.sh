@@ -34,4 +34,10 @@ if is os version gte 14; then
     brew install borders
 fi
 
+# if we keep cask "karabiner-elements" in the brewfile we get a dialog asking
+# us to choose a keyboard layout every time this file is executed.
+if ! brew list --cask | grep karabiner-elements; then
+    brew install --cask karabiner-elements
+fi
+
 exit 0
