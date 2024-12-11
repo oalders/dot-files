@@ -15,7 +15,6 @@ if is os name eq darwin; then
             "exa"
             "gh"
             "git-delta"
-            "go"
             "nvim"
             "prettier"
             "reattach-to-user-namespace"
