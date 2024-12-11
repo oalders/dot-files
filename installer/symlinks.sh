@@ -80,8 +80,13 @@ ln -sf $prefix/wezterm/wezterm.lua ~/.config/wezterm/wezterm.lua
 ln -sf $prefix/yamllint.yml ~/.config/yamllint/config
 
 if is os name eq darwin; then
-    ln -sf $prefix/karabiner/karabiner.json ~/.config/karabiner/karabiner.json
     ln -sf "$LINK_FLAG" $prefix/hammerspoon ~/.hammerspoon
+
+    # This pops up a karabiner dialogue asking you to choose a keyboard, so
+    # we'll only create the link if it doesn't already exist.
+    if [ ! -L ~/.config/karabiner/karabiner.json ]; then
+        ln -sf $prefix/karabiner/karabiner.json ~/.config/karabiner/karabiner.json
+    fi
 fi
 
 ln -sf $prefix/bin/add-worktree "$HOME/local/bin/add-worktree"
