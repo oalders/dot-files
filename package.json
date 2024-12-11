@@ -33,7 +33,7 @@
     "npm": "^10.9.2",
     "prettier": "^3.4.2",
     "remove-github-forks": "^2.1.1",
-    "tree-sitter-cli": "^0.24.4",
+    "tree-sitter-cli": "^0.24.5",
     "typescript": "^5.7.2",
     "underscore": "^1.13.7",
     "urijs": ">=1.19.11",
