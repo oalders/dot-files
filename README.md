@@ -10,6 +10,7 @@
   * [Hammerspoon Spoon Installer](#hammerspoon-spoon-installer)
   * [Alfred Workflows](#alfred-workflows)
   * [Alfred Nord Theme](#alfred-nord-theme)
+  * [Alfred Configuration](#alfred-configuration)
 * [All Fresh Installs](#all-fresh-installs)
   * [Plenv](#plenv)
 * [tmux](#tmux)
@@ -123,6 +124,17 @@ Run after Alfred has been installed. Confirm each install individually.
 ### Alfred Nord Theme
 
 [Install Alfred Nord Theme](https://www.alfredapp.com/extras/theme/5Y8E7URIWQ/)
+[Install Alfred Tokyo Night Theme](https://www.alfredapp.com/extras/theme/puSaeqbft2/)
+
+### Alfred Configuration
+
+* Add `ta` as a keyword for Chrome Browser tab search
+* Record shortcuts for `div` workflow
+  * meta + 1 - left
+  * meta + 2 - right
+  * meta + 3 - full
+  * meta + 4 - top
+  * meta + 5 - bottom
 
 ## All Fresh Installs
 
