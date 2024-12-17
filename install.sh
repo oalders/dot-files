@@ -34,7 +34,6 @@ run_mac_installers() {
         # ./installer/dockutil.sh
         #./configure/dock.sh
         ./installer/spoon-installer.sh
-        ./configure/screenshots.sh
     )
 
     run_installers "${mac_installers[@]}"
@@ -65,6 +64,7 @@ run_general_installers() {
 
 if is os name eq darwin; then
     run_mac_installers
+    debounce 30 d ./configure/screenshots.sh
 fi
 
 run_general_installers

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -eux -o pipefail
+set -eu -o pipefail
 
 default_folder=~/Documents/screenshots
 mkdir -p $default_folder
