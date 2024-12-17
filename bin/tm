@@ -12,6 +12,11 @@
 session=$(tmux list-sessions -F \#S | gum filter --placeholder "Pick any session!")
 subcommand=attach
 
+if [ -z "$session" ]; then
+    echo "No session selected. Exiting."
+    exit 0
+fi
+
 if [ $# -gt 0 ]; then
     subcommand="$1"
 elif test "${TMUX+x}"; then
