@@ -27,7 +27,7 @@
     "eslint": "^9.17.0",
     "fixjson": "^1.1.2",
     "lua-fmt": "^2.6.0",
-    "markdownlint": "^0.37.2",
+    "markdownlint": "^0.37.3",
     "markdownlint-cli": "^0.43.0",
     "normalize-url": "^8.0.1",
     "npm": "^11.0.0",
