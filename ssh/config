@@ -1,3 +1,6 @@
+Match exec "[ -f ~/.colima/ssh_config ]"
+  Include ~/.colima/ssh_config
+
 HashKnownHosts=yes
 VisualHostKey=yes
 
