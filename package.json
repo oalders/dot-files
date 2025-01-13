@@ -24,7 +24,7 @@
     "bash-language-server": "^5.4.3",
     "bats": "^1.11.1",
     "diff-lockfiles": "^1.1.0",
-    "eslint": "^9.17.0",
+    "eslint": "^9.18.0",
     "fixjson": "^1.1.2",
     "lua-fmt": "^2.6.0",
     "markdownlint": "^0.37.3",
