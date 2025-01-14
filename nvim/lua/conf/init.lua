@@ -246,3 +246,12 @@ vim.cmd('highlight Comment cterm=italic gui=italic term=bold')
 -- It's too easy to start recording accidentally
 vim.keymap.set('n', 'q', '<nop>', {})
 vim.keymap.set('n', 'Q', 'q', { desc = 'Record macro', noremap = true })
+
+-- undercurl
+-- https://dev.to/anurag_pramanik/how-to-enable-undercurl-in-neovim-terminal-and-tmux-setup-guide-2ld7
+vim.cmd([[let &t_Cs = "\e[4:3m"]])
+vim.cmd([[let &t_Ce = "\e[4:0m"]])
+
+-- Enable spell check
+vim.opt.spell = true
+vim.opt.spelllang = { "en_us" }

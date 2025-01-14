@@ -55,6 +55,7 @@ run_general_installers() {
         ./installer/cz.sh
         ./installer/imgcat.sh
         ./configure/bat.sh
+        ./configure/term.sh
         ./installer/oh-my-posh.sh
     )
 
