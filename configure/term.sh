@@ -1,6 +1,12 @@
 #!/bin/bash
 
 set -eu -o pipefail
+
+if [ ! -v "$TERM" ]; then
+  echo "TERM var does not exist. Is this CI?"
+  exit 0
+fi
+
 TERMINFO_FILE="/tmp/${TERM}.ti"
 
 # exit if this is already configured
