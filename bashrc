@@ -78,6 +78,7 @@ if is os name eq darwin; then
     add_path "/opt/homebrew/bin"
     add_path "/opt/homebrew/sbin"
 
+    add_path "/Applications/WezTerm.app/Contents/MacOS"
 fi
 
 if is there nvim; then
