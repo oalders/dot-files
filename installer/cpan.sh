@@ -10,7 +10,7 @@ source ~/dot-files/bash_functions.sh
 
 set -x
 
-if [ "$IS_MM" = true ]; then
+if is var IS_MM eq true; then
     exit 0
 fi
 

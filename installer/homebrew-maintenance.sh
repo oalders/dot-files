@@ -36,7 +36,7 @@ rm -rf /usr/local/etc/luarocks
 rm -rf /usr/local/etc/luarocks51
 brew remove truncate
 
-if [ "$IS_MM" = false ]; then
+if is var IS_MM eq false; then
     brew remove virtualbox
 fi
 

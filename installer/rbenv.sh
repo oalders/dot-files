@@ -12,7 +12,7 @@ if ! is there rbenv; then
 fi
 
 # Might need to initialize rbenv in the shell
-if [ -z "${RBENV_SHELL:-}" ]; then
+if ! is var RBENV_SHELL set; then
     eval "$(rbenv init - bash)"
 fi
 
