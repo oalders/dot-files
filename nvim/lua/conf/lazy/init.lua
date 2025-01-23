@@ -172,6 +172,15 @@ require('lazy').setup({
                             gitsigns.nav_hunk('prev')
                         end
                     end)
+
+                    -- reset hunk
+                    map('n', '<leader>rh', gitsigns.reset_hunk)
+                    map('v', '<leader>rh', function()
+                        gitsigns.reset_hunk({
+                            vim.fn.line('.'),
+                            vim.fn.line('v'),
+                        })
+                    end)
                 end,
             },
         },
