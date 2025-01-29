@@ -550,7 +550,7 @@ require('lazy').setup({
             opts = {
                 auto_follow_cursor = false,
                 debug = false, -- Enable debugging
-                context = 'buffers',
+                context = 'buffer',
                 model = 'gpt-4o',
                 chat_autocomplete = false,
                 prompts = {
