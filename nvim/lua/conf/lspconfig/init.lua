@@ -178,7 +178,7 @@ lspconfig.gopls.setup({
         },
     },
     flags = {
-        debounce_text_changes = 1000,
+        debounce_text_changes = 3000,
     },
     -- on_attach = function(client, bufnr)
     --     print(vim.inspect(client.server_capabilities))
