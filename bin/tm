@@ -9,6 +9,11 @@
 # fzf_command="fzf-tmux -p --delimiter=: --with-nth 1 --color=hl:2"
 # line=$(tmux list-session -F "#{session_name}" | $fzf_command) || exit 0
 
+if ! tmux has-session 2>/dev/null; then
+    echo "tmux is not running. Exiting."
+    exit 0
+fi
+
 session=$(tmux list-sessions -F \#S | gum filter --placeholder "Pick any session!")
 subcommand=attach
 
