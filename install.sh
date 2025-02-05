@@ -28,7 +28,6 @@ add_path "$HOME/local/bin"
 run_mac_installers() {
     local mac_installers=(
         ./installer/xcode.sh
-        # time ./installer/homebrew-maintenance.sh || true
         # ./installer/fonts.sh
         # https://github.com/kcrawford/dockutil/issues/127
         # ./installer/dockutil.sh
