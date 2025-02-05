@@ -255,3 +255,7 @@ vim.cmd([[let &t_Ce = "\e[4:0m"]])
 -- Enable spell check
 vim.opt.spell = true
 vim.opt.spelllang = { "en_us" }
+
+-- Set some diff options
+-- Stolen from https://www.reddit.com/r/neovim/comments/1ihpvaf/comment/maz7fmu/
+vim.opt.diffopt="filler,internal,closeoff,algorithm:histogram,context:5,linematch:60"
