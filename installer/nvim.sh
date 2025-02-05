@@ -5,7 +5,7 @@
 
 set -eux
 
-if is cli age nvim lt 18 hours; then
+if is there nvim && is cli age nvim lt 18 hours; then
     exit
 fi
 
