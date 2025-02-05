@@ -94,5 +94,11 @@ sketchybar --add item clock right \
            --set battery update_freq=120 script="$PLUGIN_DIR/battery.sh" \
            --subscribe battery system_woke power_source_change
 
+sketchybar -m --add item mic right \
+           --set mic update_freq=3 \
+                        script="$PLUGIN_DIR/mic.sh" \
+                        click_script="$PLUGIN_DIR/mic-click.sh" \
+           --subscribe mic volume_change
+
 ##### Force all scripts to run the first time (never do this in a script) #####
 sketchybar --update
