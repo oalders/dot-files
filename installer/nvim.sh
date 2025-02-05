@@ -39,7 +39,7 @@ if is os name eq darwin; then
     download_file="$dir.tar.gz"
     rm -rf $dir
 else
-    download_file=nvim.appimage
+    download_file=nvim-linux-x86_64.appimage
 fi
 
 curl -LO --fail -z $download_file "$URL$download_file"
