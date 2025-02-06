@@ -40,6 +40,9 @@ default=(
 )
 sketchybar --default "${default[@]}"
 
+sketchybar --add item rocket left \
+           --set rocket icon=🤘 label.drawing=off
+
 ##### Adding Mission Control Space Indicators #####
 # Let's add some mission control spaces:
 # https://felixkratz.github.io/SketchyBar/config/components#space----associate-mission-control-spaces-with-an-item
