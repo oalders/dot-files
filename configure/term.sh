@@ -1,5 +1,6 @@
 #!/bin/bash
 
+# enable undercurl in terminal
 set -eu -o pipefail
 
 if [ ! -v "$TERM" ]; then
