@@ -26,11 +26,11 @@ wk.add({
             if input ~= '' then
                 require('CopilotChat').ask(
                     input,
-                    { selection = require('CopilotChat.select').buffer }
+                    { selection = require('CopilotChat.select').buffers }
                 )
             end
         end,
-        desc = 'CopilotChat - Quick chat',
+        desc = 'CopilotChat - Buffers context',
     },
     {
         '<leader>gc',
