@@ -147,6 +147,11 @@ wk.add({
         desc = 'Previous diagnostic issue',
     },
     {
+        '<leader>ls',
+        ':FzfLua lsp_document_symbols<cr>',
+        desc = 'List symbols in document',
+    },
+    {
         '<leader>ot',
         function()
             OpenThis(vim.fn.input('ot: ', '', 'file'))
