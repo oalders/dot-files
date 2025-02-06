@@ -1,11 +1,11 @@
 #!/bin/bash
 
-set -eu -o pipefail
+set -eux -o pipefail
 
 default_folder=~/Documents/screenshots
 mkdir -p $default_folder
 
-current_folder=$(defaults read com.apple.screencapture location)
+current_folder=$(defaults read com.apple.screencapture location) || true
 
 echo "$current_folder"
 if [[ "$current_folder" != "$default_folder" ]]; then
