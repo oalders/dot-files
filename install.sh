@@ -63,6 +63,7 @@ run_general_installers() {
 
 if is os name eq darwin; then
     run_mac_installers
+    ps x | grep sketchybar | grep -v grep && brew services restart sketchybar
     debounce 30 d ./configure/screenshots.sh
 fi
 
