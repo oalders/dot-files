@@ -97,6 +97,11 @@ sketchybar --add item clock right \
            --set battery update_freq=120 script="$PLUGIN_DIR/battery.sh" \
            --subscribe battery system_woke power_source_change
 
+sketchybar --add item wifi right                         \
+           --set wifi    script="$PLUGIN_DIR/wifi.sh"    \
+                         background.padding_right=6      \
+                         update_freq=30
+
 sketchybar -m --add item mic right \
            --set mic update_freq=3 \
                         script="$PLUGIN_DIR/simple-mic.sh" \
