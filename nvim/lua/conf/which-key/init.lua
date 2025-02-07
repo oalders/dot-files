@@ -232,7 +232,8 @@ wk.add({
     {
         'ct',
         function()
-            local input = vim.fn.input('Write a Go test for visual selection: ')
+            local input =
+                vim.fn.input('Write a Go test for visual selection: ')
             if input ~= '' then
                 local message = [[
 Write a Golang test for the visual selection.
@@ -240,6 +241,7 @@ Write a Golang test for the visual selection.
 * Prefer assert.Equal() over test.expected.
 * Show me only the changed lines.
 * Test for errors using require.NoError()
+* Use assert.True and assert.False when testing booleans
 * Follow patterns in the corresponding _test.go file, if it exists
             ]]
                 require('CopilotChat').ask(input .. '\n' .. message, {
