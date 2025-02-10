@@ -14,11 +14,10 @@ PLUGIN_DIR="$CONFIG_DIR/plugins"
 # If you are looking for other colors, see the color picker:
 # https://felixkratz.github.io/SketchyBar/config/tricks#color-picker
 
-
 if system_profiler SPDisplaysDataType | grep -q "Resolution: 2880 x 1864 Retina"; then
-  HEIGHT=33
+    HEIGHT=33
 else
-  HEIGHT=25
+    HEIGHT=25
 fi
 
 sketchybar --bar position=top height=$HEIGHT blur_radius=30 color=0x40000000
@@ -29,21 +28,21 @@ sketchybar --bar position=top height=$HEIGHT blur_radius=30 color=0x40000000
 # https://felixkratz.github.io/SketchyBar/config/items
 
 default=(
-  padding_left=5
-  padding_right=5
-  icon.font="Hack Nerd Font:Bold:17.0"
-  label.font="Hack Nerd Font:Bold:14.0"
-  icon.color=0xffffffff
-  label.color=0xffffffff
-  icon.padding_left=4
-  icon.padding_right=4
-  label.padding_left=4
-  label.padding_right=4
+    padding_left=5
+    padding_right=5
+    icon.font="Hack Nerd Font:Bold:17.0"
+    label.font="Hack Nerd Font:Bold:14.0"
+    icon.color=0xffffffff
+    label.color=0xffffffff
+    icon.padding_left=4
+    icon.padding_right=4
+    label.padding_left=4
+    label.padding_right=4
 )
 sketchybar --default "${default[@]}"
 
 sketchybar --add item rocket left \
-           --set rocket icon=🤘 label.drawing=off
+    --set rocket icon=🤘 label.drawing=off
 
 ##### Adding Mission Control Space Indicators #####
 # Let's add some mission control spaces:
@@ -51,22 +50,21 @@ sketchybar --add item rocket left \
 # to indicate active and available mission control spaces.
 
 SPACE_ICONS=("1" "2" "3" "4" "5" "6" "7" "8" "9" "10")
-for i in "${!SPACE_ICONS[@]}"
-do
-  sid="$(($i+1))"
-  space=(
-    space="$sid"
-    icon="${SPACE_ICONS[i]}"
-    icon.padding_left=7
-    icon.padding_right=7
-    background.color=0x40ffffff
-    background.corner_radius=5
-    background.height=$HEIGHT
-    label.drawing=off
-    script="$PLUGIN_DIR/space.sh"
-    click_script="yabai -m space --focus $sid"
-  )
-  sketchybar --add space space."$sid" left --set space."$sid" "${space[@]}"
+for i in "${!SPACE_ICONS[@]}"; do
+    sid="$(($i + 1))"
+    space=(
+        space="$sid"
+        icon="${SPACE_ICONS[i]}"
+        icon.padding_left=7
+        icon.padding_right=7
+        background.color=0x40ffffff
+        background.corner_radius=5
+        background.height=$HEIGHT
+        label.drawing=off
+        script="$PLUGIN_DIR/space.sh"
+        click_script="yabai -m space --focus $sid"
+    )
+    sketchybar --add space space."$sid" left --set space."$sid" "${space[@]}"
 done
 
 ##### Adding Left Items #####
@@ -74,10 +72,10 @@ done
 # only the properties deviating from the current defaults need to be set
 
 sketchybar --add item chevron left \
-           --set chevron icon= label.drawing=off \
-           --add item front_app left \
-           --set front_app icon.drawing=off script="$PLUGIN_DIR/front_app.sh" \
-           --subscribe front_app front_app_switched
+    --set chevron icon= label.drawing=off \
+    --add item front_app left \
+    --set front_app icon.drawing=off script="$PLUGIN_DIR/front_app.sh" \
+    --subscribe front_app front_app_switched
 
 ##### Adding Right Items #####
 # In the same way as the left items we can add items to the right side.
@@ -91,13 +89,10 @@ sketchybar --add item chevron left \
 # https://felixkratz.github.io/SketchyBar/config/events
 
 sketchybar --add item clock right \
-           --set clock update_freq=10 icon=  script="$PLUGIN_DIR/clock.sh" \
-           --add item volume right \
-           --set volume script="$PLUGIN_DIR/volume.sh" \
-           --subscribe volume volume_change \
-           --add item battery right \
-           --set battery update_freq=120 script="$PLUGIN_DIR/battery.sh" \
-           --subscribe battery system_woke power_source_change
+    --set clock update_freq=10 icon= script="$PLUGIN_DIR/clock.sh" \
+    --add item volume right \
+    --set volume script="$PLUGIN_DIR/volume.sh" \
+    --subscribe volume volume_change
 
 sketchybar --add item wifi right                         \
            --set wifi    script="$PLUGIN_DIR/wifi.sh"    \
@@ -105,10 +100,10 @@ sketchybar --add item wifi right                         \
                          update_freq=30
 
 sketchybar -m --add item mic right \
-           --set mic update_freq=3 \
-                        script="$PLUGIN_DIR/simple-mic.sh" \
-                        click_script="$PLUGIN_DIR/simple-mic-click.sh" \
-           --subscribe mic volume_change
+    --set mic update_freq=3 \
+    script="$PLUGIN_DIR/simple-mic.sh" \
+    click_script="$PLUGIN_DIR/simple-mic-click.sh" \
+    --subscribe mic volume_change
 
 ##### Force all scripts to run the first time (never do this in a script) #####
 sketchybar --update
