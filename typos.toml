@@ -1,6 +1,7 @@
 [default.extend-words]
 noice = "noice"
 ot = "ot"
+fo = "fo"
 
 [files]
 extend-exclude = []
