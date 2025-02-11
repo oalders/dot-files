@@ -242,6 +242,7 @@ Write a Golang test for the visual selection.
 * Show me only the changed lines.
 * Test for errors using require.NoError()
 * Use assert.True and assert.False when testing booleans
+* Use assert.InEpsilon or assert.InDelta when comparing floats
 * Follow patterns in the corresponding _test.go file, if it exists
             ]]
                 require('CopilotChat').ask(input .. '\n' .. message, {
