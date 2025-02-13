@@ -1,12 +1,12 @@
 # Tokyo Night Color Palette
-export BLACK=0xFFC5C8D6
-export BLUE=0xff7AA2F7
+export BLACK=0xFF1E1E2E
+export BLUE=0xFF1A3B66
 export CYAN=0xff7DCFFF
 export GREEN=0xff9ECE6A
 export GREY=0xffA9B1D6
 export MAGENTA=0xffBB9AF7
 export ORANGE=0xffFF9E64
-export RED=0xffF7768E
+export RED=0xFFF07178
 export WHITE=0xFFC5C8D6
 export YELLOW=0xffE0AF68
 export TRANSPARENT=0x00000000
