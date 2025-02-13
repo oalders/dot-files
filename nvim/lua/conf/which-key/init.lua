@@ -213,6 +213,11 @@ wk.add({
         desc = 'CopilotChat toggle',
     },
     {
+        '<leader>cr',
+        '<cmd>CopilotChatReset<cr>',
+        desc = 'CopilotChat reset',
+    },
+    {
         'cc',
         '<cmd>CopilotChatToggle<cr>',
         desc = 'CopilotChat toggle',
