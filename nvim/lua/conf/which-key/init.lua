@@ -321,6 +321,32 @@ Write a Golang test for the visual selection.
         desc = 'do not save session on exit',
         mode = 'n',
     },
+    {
+        '<space>ww',
+        function()
+            for _, buf in ipairs(vim.api.nvim_list_bufs()) do
+                -- Check if the buffer is writable, not 'nofile', and has unsaved changes
+                local buftype = vim.api.nvim_buf_get_option(buf, 'buftype')
+                local is_readonly =
+                    vim.api.nvim_buf_get_option(buf, 'readonly')
+                local is_modified =
+                    vim.api.nvim_buf_get_option(buf, 'modified') -- Check if the buffer is modified
+
+                -- Only write if the buffer is writable, has changes, and is not 'nofile'
+                if
+                    buftype ~= 'nofile'
+                    and not is_readonly
+                    and is_modified
+                then
+                    -- Write the buffer if it has unsaved changes
+                    vim.api.nvim_command('buf ' .. buf) -- Switch to the buffer
+                    vim.api.nvim_command('write') -- Write the buffer
+                end
+            end
+        end,
+        desc = 'write all non-readonly buffers',
+        mode = 'n',
+    },
 })
 
 wk.setup({})
