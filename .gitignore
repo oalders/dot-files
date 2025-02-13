@@ -3,5 +3,6 @@ brew/*.lock.json
 hammerspoon/Spoons/
 nvim/lazy-lock.json
 .pnp.*
+sketchybar/plugins/.laptop
 src/
 .tidyall.d/
