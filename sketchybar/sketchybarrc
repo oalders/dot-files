@@ -40,6 +40,7 @@ button=(
     icon.padding_left=7
     icon.padding_right=7
     background.color="$BLUE"
+    label.padding_right=8
 )
 
 sketchybar --default "${default[@]}"
@@ -108,7 +109,7 @@ sketchybar --add item wifi right \
     update_freq=30
 
 sketchybar -m --add item mic right \
-    --set mic update_freq=3 "${button[@]}" \
+    --set mic update_freq=3 "${button[@]}" icon.padding_right=0 \
     script="$PLUGIN_DIR/simple-mic.sh" \
     click_script="$PLUGIN_DIR/simple-mic-click.sh" \
     --subscribe mic volume_change
