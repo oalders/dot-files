@@ -15,7 +15,13 @@ PLUGIN_DIR="$CONFIG_DIR/plugins"
 # If you are looking for other colors, see the color picker:
 # https://felixkratz.github.io/SketchyBar/config/tricks#color-picker
 
-sketchybar --bar position=top height=25 notch_display_height=33 blur_radius=30 color="$BLACK"
+if system_profiler SPDisplaysDataType | grep -q "Resolution: 2880 x 1864 Retina"; then
+    HEIGHT=33
+else
+    HEIGHT=25
+fi
+
+sketchybar --bar position=top height=$HEIGHT blur_radius=0 color=$BLACK shadow=on
 
 ##### Changing Defaults #####
 # We now change some default values, which are applied to all further items.
