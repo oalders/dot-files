@@ -57,6 +57,7 @@ else
 fi
 
 echo "done nvim install"
+ldd --version
 
 # nvim --headless "+Lazy! sync" +qa
 nvim --headless "+MasonToolsUpdateSync" +qa

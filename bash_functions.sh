@@ -91,9 +91,7 @@ elif is os name eq linux; then
 fi
 
 IS_GITHUB=false
-
-LOOKS_LIKE_GITHUB=${GITHUB_WORKSPACE-}
-if [[ -n $LOOKS_LIKE_GITHUB ]]; then
+if is var GITHUB_WORKSPACE set; then
     IS_GITHUB=true
 fi
 
