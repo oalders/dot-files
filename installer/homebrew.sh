@@ -40,4 +40,6 @@ if ! brew list --cask | grep karabiner-elements; then
     brew install --cask karabiner-elements
 fi
 
+brew services restart sketchybar
+
 exit 0
