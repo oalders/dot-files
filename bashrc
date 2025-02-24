@@ -257,3 +257,8 @@ posh_me
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"                   # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion" # This loads nvm bash_completion
+
+# get better diagnostic messages from JSON formatted Go stack traces
+better() {
+    echo "$1" | jq | tspin | sed 's/\\n/\n/g' | sed 's/\\t/\t/g'
+}
