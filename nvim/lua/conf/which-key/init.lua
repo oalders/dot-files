@@ -260,6 +260,28 @@ Write a Golang test for the visual selection.
         mode = 'v',
     },
     {
+        'cg',
+        function()
+            local input =
+                vim.fn.input('Convert the selected code from Perl to Go: ')
+            if input ~= '' then
+                local message = [[
+Convert the selected code from Perl to Go.
+* Use `map[string]struct{}{}` when converting a hash which is only there to track if keys exist
+* avoid deprecated libraries and constructs
+* for error assertions in tests, use require
+* prefer netip.ParseAddr over net.ParseIP
+            ]]
+                require('CopilotChat').ask(input .. '\n' .. message, {
+                    context = { 'buffers' },
+                    selection = require('CopilotChat.select').visual,
+                })
+            end
+        end,
+        desc = 'CopilotChat - Write Go test for selection',
+        mode = 'v',
+    },
+    {
         'cx',
         '<cmd>CopilotChatExplain<cr>',
         desc = 'CopilotChatExplain',
