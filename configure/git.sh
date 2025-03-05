@@ -8,18 +8,42 @@ git config --global user.email "olaf@wundersolutions.com"
 git config --global user.name "Olaf Alders"
 
 git config --global --replace remote.origin.fetch "+refs/pull/*/head:refs/remotes/origin/pull-requests/*"
-git config --global branch.autosetuprebase always
-git config --global color.ui "auto"
-git config --global diff.algorithm histogram
-git config --global github.user oalders
-git config --global help.autocorrect 10
-git config --global init.defaultBranch main
-git config --global push.default current
-git config --global rebase.autosquash true
-git config --global rebase.instructionFormat "(%an <%ae>) %s"
-git config --global rerere.enabled 1
 
 git config --global branch.autosetuprebase always
+git config --global branch.sort -committerdate
+
+git config --global color.ui auto
+
+git config --global column.ui auto
+
+git config --global diff.algorithm histogram
+git config --global diff.colorMoved true
+git config --global diff.mnemonicPrefix true
+git config --global diff.renames true
+
+git config --global fetch.prune true
+git config --global fetch.pruneTags true
+git config --global fetch.all true
+
+git config --global github.user oalders
+
+git config --global help.autocorrect prompt
+
+git config --global init.defaultBranch main
+
+git config --global push.default simple
+git config --global push.autoSetupRemote true
+git config --global push.followTags true
+
+git config --global rebase.autostash true
+git config --global rebase.autosquash true
+git config --global rebase.instructionFormat "(%an <%ae>) %s"
+
+git config --global rerere.enabled true
+git config --global rerere.autoupdate true
+
+git config --global tag.sort = version.refname
+
 git config --global alias.auto-set-head 'remote set-head origin -a'
 git config --global alias.b 'branch'
 git config --global alias.ba 'branch -a'
@@ -65,7 +89,7 @@ git config --global alias.view-stash 'stash show -p stash@{0}'
 git config --global color.ui auto
 git config --global core.excludesfile ~/.gitignore_global
 
-git config --global merge.conflictstyle diff3
+git config --global merge.conflictstyle zdiff3
 
 if is os id ne debian; then
     # configure delta as git's pager
