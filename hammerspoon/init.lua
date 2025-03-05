@@ -171,7 +171,6 @@ spoon.SpoonInstall.use_syncinstall = true
 local Install = spoon.SpoonInstall
 
 Install:andUse('BingDaily')
-Install:andUse('CircleClock')
 Install:andUse('EmmyLua')
 Install:andUse('LookupSelection', { hotkeys = { lexicon = { hyper, 'd' } } })
 Install:andUse('MicMute', {
