@@ -243,7 +243,6 @@ local bellTV = 'https://tv.bell.ca'
 local github = 'https://github.com/notifications'
 local gmail = 'https://mail.google.com/'
 local ircCloud = 'https://www.irccloud.com/irc/'
-local PT = 'https://www.pivotaltracker.com'
 local remoteDesktop = 'https://remotedesktop.google.com'
 
 hs.hotkey.bind(my_hotkeys, 'a', cpanAuthorLink)
@@ -292,7 +291,6 @@ hs.hotkey.bind(
     nil,
     chrome_tab_action(ircCloud, ircCloud .. 'magnet/channel/metacpan')
 )
-hs.hotkey.bind(hyper, 'p', nil, chrome_tab_action(PT, PT))
 hs.hotkey.bind(hyper, 'q', slackifyName)
 hs.hotkey.bind(hyper, 'w', chrome_tab_action(remoteDesktop, remoteDesktop))
 
