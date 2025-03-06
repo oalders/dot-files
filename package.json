@@ -19,7 +19,7 @@
   "dependencies": {
     "@johnnymorganz/stylua-bin": "^2.0.2",
     "@xmldom/xmldom": ">=0.9.8",
-    "acorn": "^8.14.0",
+    "acorn": "^8.14.1",
     "ansi-regex": ">=6.1.0",
     "bash-language-server": "^5.4.3",
     "bats": "^1.11.1",
