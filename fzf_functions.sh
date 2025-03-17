@@ -1,6 +1,7 @@
 #!/bin/env bash
 
 # Keep fzf config and functions together
+# fzf multi-select is ctrl-space
 export FZF_DEFAULT_COMMAND='fd --type f --hidden --follow --exclude .git'
 
 # I want tab to move up and down in the list, just like it does with my vim
