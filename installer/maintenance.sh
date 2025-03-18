@@ -12,6 +12,7 @@ if is os name eq darwin; then
         packages=(
             "bat"
             "bats-core"
+            "dart-sass-embedded"
             "exa"
             "gh"
             "git-delta"
@@ -26,6 +27,8 @@ if is os name eq darwin; then
 
         brew untap homebrew/core || true
     fi
+    brew untap Homebrew/homebrew-cask-fonts
+    brew untap Homebrew/homebrew-services
 fi
 
 # path used to be an alias, but that keeps a copy of $PATH in it, which is
