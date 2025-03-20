@@ -71,7 +71,8 @@ for i in "${!SPACE_ICONS[@]}"; do
         background.height="$HEIGHT"
         label.drawing=off
         script="$PLUGIN_DIR/space.sh"
-        click_script="yabai -m space --focus $sid"
+        # click_script="yabai -m space --focus $sid"
+        "${button[@]}"
     )
     sketchybar --add space space."$sid" left --set space."$sid" "${space[@]}"
 done
