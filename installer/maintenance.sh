@@ -27,6 +27,7 @@ if is os name eq darwin; then
 
         brew untap homebrew/core || true
     fi
+    brew untap Homebrew/homebrew-bundle
     brew untap Homebrew/homebrew-cask-fonts
     brew untap Homebrew/homebrew-services
 fi
