@@ -63,6 +63,9 @@ run_general_installers() {
 
 if is os name eq darwin; then
     run_mac_installers
+    if is os version gte 15 && ! is there rectangle; then
+        brew install --cask rectangle
+    fi
     ps x | grep sketchybar | grep -v grep && brew services restart sketchybar
     debounce 30 d ./configure/screenshots.sh
 fi
