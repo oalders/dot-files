@@ -567,6 +567,14 @@ require('lazy').setup({
                         .. ' * explain the error in the selected text\n'
                         .. ' * rewrite the code with the bug fixed.\n'
                         .. ' * show only the changed lines.',
+
+                    ToPlaywright = '> /COPILOT_GENERATE\n\n'
+                        .. 'This is a git diff which contains test which have been ported from Perl to Typescript\'s Playwright testing framework.\n'
+                        .. '* Enumerate the tests which have been deleted in the Perl files\n'
+                        .. '* Enumerate the tests which have been added on the Go side\n'
+                        .. '* Have any tests been deleted in Perl but not ported to Go?\n'
+                        .. '* Are there any differences between the old and the new tests?\n'
+                        .. '* If there\'s a chance of some loss of test coverage, where is a good place to start looking?\n'
                 },
                 -- See Configuration section for rest
             },
