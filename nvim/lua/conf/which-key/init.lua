@@ -138,7 +138,10 @@ wk.add({
     },
     {
         '<leader>ln',
-        ':Lspsaga diagnostic_jump_next<cr>',
+        -- ':Lspsaga diagnostic_jump_next<cr>',
+        function()
+            require('telescope.builtin').diagnostics()
+        end,
         desc = 'Next diagnostic issue',
     },
     {
