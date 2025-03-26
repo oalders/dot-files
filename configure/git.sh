@@ -42,7 +42,7 @@ git config --global rebase.instructionFormat "(%an <%ae>) %s"
 git config --global rerere.enabled true
 git config --global rerere.autoupdate true
 
-git config --global tag.sort = version.refname
+# git config --global tag.sort = version.refname
 
 git config --global alias.auto-set-head 'remote set-head origin -a'
 git config --global alias.b 'branch'
