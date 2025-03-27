@@ -19,14 +19,13 @@ if system_profiler SPDisplaysDataType | grep -q "Resolution: 2880 x 1864 Retina"
     HEIGHT=33
 else
     HEIGHT=25
+    # Rectangle doesn't seem to know about SketchyBar, so we'll set some padding at
+    # the top of the screen. If this is being set for the first time, Rectangle
+    # will need to be restarted.
+    # This is kind of a weird place to put this, but we're already calculating the
+    # height anyway.
+    defaults write com.knollsoft.Rectangle screenEdgeGapTop -int $HEIGHT
 fi
-
-# Rectangle doesn't seem to know about SketchyBar, so we'll set some padding at
-# the top of the screen. If this is being set for the first time, Rectangle
-# will need to be restarted.
-# This is kind of a weird place to put this, but we're already calculating the
-# height anyway.
-defaults write com.knollsoft.Rectangle screenEdgeGapTop -int $HEIGHT
 
 sketchybar --bar position=top height=$HEIGHT blur_radius=0 color=$BLACK shadow=on
 
