@@ -1033,6 +1033,7 @@ require('lazy').setup({
 
                     -- golang
                     'gofumpt',
+                    'goimports',
                     'golangci-lint',
                     'golangci_lint_ls',
                     'golines',
