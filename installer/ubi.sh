@@ -95,4 +95,3 @@ fi
 if is var IS_MM eq false && is there gh && ! gh extension list | grep --quiet gh-dash; then
     debounce 1 d gh extension install dlvhdr/gh-dash || true
 fi
-

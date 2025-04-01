@@ -45,7 +45,7 @@ if [ "$BUTTON" = "left" ]; then
     MIC_VOLUME=$(osascript -e 'input volume of (get volume settings)')
 
     # Check if MIC_NAME is not meaningful
-    if [[ "$MIC_NAME" != "$VALIDATED_MIC_NAME" || -z "$MIC_NAME" ]]; then
+    if [[ $MIC_NAME != "$VALIDATED_MIC_NAME" || -z $MIC_NAME ]]; then
         # If the mic name is not valid or empty
         sketchybar -m --set mic label="" icon=
     else

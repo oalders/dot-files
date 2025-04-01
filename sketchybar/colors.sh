@@ -1,14 +1,14 @@
 # Tokyo Night Color Palette
-export BLACK=0xFF1E1E2E        # Dark background color, very close to Tokyo Night
-export BLUE=0xFF1A3B66         # Dark, muted blue for the theme
-export CYAN=0xFF79B0D1         # Light cyan, a bit more subdued
-export GREEN=0xFF9ECE6A        # Soft green
-export GREY=0xFF565F89         # Slightly darker grey with more contrast
-export MAGENTA=0xFFBB9AF7      # Slightly cooler magenta
-export ORANGE=0xFF9D7F64       # A more muted, earthy orange
-export RED=0xFF9D6D6C          # Darker, more desaturated red
-export WHITE=0xFFC5C8D6        # Soft, cool off-white
-export YELLOW=0xFFE8C08A       # Muted yellow with a subtle earthy tone
+export BLACK=0xFF1E1E2E   # Dark background color, very close to Tokyo Night
+export BLUE=0xFF1A3B66    # Dark, muted blue for the theme
+export CYAN=0xFF79B0D1    # Light cyan, a bit more subdued
+export GREEN=0xFF9ECE6A   # Soft green
+export GREY=0xFF565F89    # Slightly darker grey with more contrast
+export MAGENTA=0xFFBB9AF7 # Slightly cooler magenta
+export ORANGE=0xFF9D7F64  # A more muted, earthy orange
+export RED=0xFF9D6D6C     # Darker, more desaturated red
+export WHITE=0xFFC5C8D6   # Soft, cool off-white
+export YELLOW=0xFFE8C08A  # Muted yellow with a subtle earthy tone
 
 export TRANSPARENT=0x00000000
 export BG0=0xff1A1B26
