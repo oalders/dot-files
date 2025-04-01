@@ -91,6 +91,10 @@ git config --global core.excludesfile ~/.gitignore_global
 
 git config --global merge.conflictstyle zdiff3
 
+# Use Neovim with a 3 panes layout (LOCAL, MERGED and REMOTE)
+# It is invoked at the command line via "git mergetool"
+git mergetool --tool nvimdiff2
+
 if is os id ne debian; then
     # configure delta as git's pager
     git config --global core.pager 'delta'
