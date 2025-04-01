@@ -1,5 +1,4 @@
 tap "buo/cask-upgrade"
-tap "homebrew/bundle"
 brew "asciinema"
 brew "ansible-lint"
 brew "aspell"
