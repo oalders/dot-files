@@ -71,7 +71,7 @@ vim.opt.shiftwidth = 4
 vim.opt.tabstop = 4
 vim.opt.smarttab = true
 vim.opt.expandtab = true
-vim.opt.listchars = 'tab:\\|.'
+vim.opt.listchars = 'tab:→  '
 
 -- https://stackoverflow.com/a/69099888/406224
 function UseTabs()
