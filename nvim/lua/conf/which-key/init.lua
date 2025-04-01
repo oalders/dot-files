@@ -89,6 +89,13 @@ wk.add({
     { '<leader>ge', '<cmd>Copilot enable<cr>', desc = 'enable GH copilot' },
     { '<leader>gf', '<cmd>GFiles?<cr>', desc = 'git changed files' },
     {
+        '<leader>gl',
+        function()
+            require('fzf-lua').git({ 'git domo' })
+        end,
+        desc = 'git changed files',
+    },
+    {
         '<leader>gh',
         function()
             local actions = require('CopilotChat.actions')
