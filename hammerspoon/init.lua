@@ -254,12 +254,6 @@ hs.hotkey.bind(
 )
 hs.hotkey.bind(my_hotkeys, 'i', nil, open_app_action('wezterm'))
 hs.hotkey.bind(my_hotkeys, 'l', nil, open_app_action('Slack'))
-hs.hotkey.bind(
-    my_hotkeys,
-    'm',
-    nil,
-    chrome_tab_action('https://meet.google.com/', '')
-)
 hs.hotkey.bind(my_hotkeys, 'n', nil, chrome_tab_action(github, github))
 hs.hotkey.bind(
     my_hotkeys,
@@ -276,12 +270,6 @@ hs.hotkey.bind(hyper, 'g', nil, chrome_tab_action(gmail, gmail .. '#all'))
 hs.hotkey.bind(hyper, 'i', nil, open_app_action('wezterm'))
 hs.hotkey.bind(hyper, 'k', xpasswd)
 hs.hotkey.bind(hyper, 'l', nil, open_app_action('Slack'))
-hs.hotkey.bind(
-    hyper,
-    'm',
-    nil,
-    chrome_tab_action('https://meet.google.com/', '')
-)
 -- hs.hotkey.bind(hyper, "n", nil, chrome_tab_action(github, github))
 hs.hotkey.bind(
     hyper,
