@@ -27,9 +27,9 @@ if is os name eq darwin; then
 
         brew untap homebrew/core || true
     fi
-    brew untap Homebrew/homebrew-bundle
+    brew untap Homebrew/homebrew-bundle || true
     brew untap Homebrew/homebrew-cask-fonts || true
-    brew untap Homebrew/homebrew-services
+    brew untap Homebrew/homebrew-services || true
 fi
 
 # path used to be an alias, but that keeps a copy of $PATH in it, which is
