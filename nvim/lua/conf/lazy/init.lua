@@ -181,6 +181,9 @@ require('lazy').setup({
                             vim.fn.line('v'),
                         })
                     end)
+                    map('v', '<leader>sh', function()
+                        gitsigns.stage_hunk({
+                            vim.fn.line('.'),
                 end,
             },
         },
