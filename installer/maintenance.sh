@@ -5,6 +5,7 @@ set -eux
 rm -rf ~/.vimtmp
 rm -f ~/.cargo/bin/bat
 rm -f ~/.cargo/bin/precious
+rm -f ~/local/bin/golangci-lint # now installed via Mason
 
 if is os name eq darwin; then
     rm -f ~/.cargo/bin/fd
