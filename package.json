@@ -33,7 +33,7 @@
     "npm": "^11.2.0",
     "prettier": "^3.5.3",
     "tree-sitter-cli": "^0.25.3",
-    "typescript": "^5.8.2",
+    "typescript": "^5.8.3",
     "underscore": "^1.13.7",
     "urijs": ">=1.19.11",
     "ws": "^8.18.1",
