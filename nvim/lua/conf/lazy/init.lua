@@ -560,7 +560,7 @@ require('lazy').setup({
                 chat_autocomplete = true,
                 debug = false, -- Enable debugging
                 context = 'buffer',
-                model = 'gpt-4o',
+                model = 'claude-3.7-sonnet',
                 prompts = {
                     Perl2Go = '> /COPILOT_GENERATE\n\n'
                         .. 'Convert the selected code from Perl to Go.\n'
