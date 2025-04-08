@@ -559,6 +559,11 @@ require('lazy').setup({
                 auto_follow_cursor = false,
                 chat_autocomplete = true,
                 debug = false, -- Enable debugging
+                -- > #buffer
+                -- > #buffer:2
+                -- > #files:\*.lua
+                -- > #git:staged
+                -- > #url:https://example.com
                 context = 'buffer',
                 model = 'claude-3.7-sonnet',
                 prompts = {
