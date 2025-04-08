@@ -589,6 +589,11 @@ require('lazy').setup({
                         .. '* Are there any differences between the old and the new tests?\n'
                         .. "* If there's a chance of some loss of test coverage, where is a good place to start looking?\n",
                 },
+                -- or select model via $ in chat
+                sticky = {
+                    -- '@models Using Claude 3.7 Sonnet',
+                    '#buffer',
+                },
                 -- See Configuration section for rest
             },
             build = 'make tiktoken',
