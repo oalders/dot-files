@@ -29,7 +29,7 @@ else
     defaults write com.knollsoft.Rectangle screenEdgeGapTop -int $HEIGHT
 fi
 
-sketchybar --bar position=top height=$HEIGHT blur_radius=0 color=$BLACK shadow=on
+sketchybar --bar position=top height=$HEIGHT blur_radius=0 color="$BLACK" shadow=on
 
 ##### Changing Defaults #####
 # We now change some default values, which are applied to all further items.
