@@ -1,5 +1,7 @@
 #!/bin/bash
 
+PATH=~/local/bin:"$PATH"
+
 # This is a demo config to showcase some of the most important commands.
 # It is meant to be changed and configured, as it is intentionally kept sparse.
 # For a (much) more advanced configuration example see my dotfiles:
@@ -110,7 +112,7 @@ sketchybar --add item clock right \
     --set volume script="$PLUGIN_DIR/volume.sh" "${button[@]}" \
     --subscribe volume volume_change
 
-if [ -f "$PLUGIN_DIR/.laptop" ]; then
+if is battery count gt 0; then
     sketchybar --add item battery right \
         --set battery update_freq=120 script="$PLUGIN_DIR/battery.sh" "${button[@]}" \
         --subscribe battery system_woke power_source_change

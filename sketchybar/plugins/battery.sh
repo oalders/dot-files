@@ -1,7 +1,7 @@
 #!/bin/sh
 
-PERCENTAGE="$(pmset -g batt | grep -Eo "\d+%" | cut -d% -f1)"
-CHARGING="$(pmset -g batt | grep 'AC Power')"
+PATH=~/local/bin:"$PATH"
+PERCENTAGE="$(is known battery current-charge --round)"
 
 if [ "$PERCENTAGE" = "" ]; then
     exit 0
@@ -25,7 +25,7 @@ case "${PERCENTAGE}" in
 *) ICON="" ;;
 esac
 
-if [[ "$CHARGING" != "" ]]; then
+if is battery state eq charging; then
     ICON=""
 fi
 
