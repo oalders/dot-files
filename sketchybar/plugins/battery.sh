@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 PATH=~/local/bin:"$PATH"
 PERCENTAGE="$(is known battery current-charge --round)"
