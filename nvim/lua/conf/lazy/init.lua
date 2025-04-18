@@ -625,7 +625,7 @@ require('lazy').setup({
                 vim.keymap.set('n', 'zM', require('ufo').closeAllFolds)
 
                 require('ufo').setup({
-                    provider_selector = function(bufnr, filetype, buftype)
+                    provider_selector = function()
                         return { 'treesitter', 'indent' }
                     end,
                 })
