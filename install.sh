@@ -63,7 +63,7 @@ run_general_installers() {
 
 if is os name eq darwin; then
     run_mac_installers
-    if ! is there rectangle; then
+    if ! is there rectangle && ! test -d /Applications/Rectangle.app; then
         brew install --cask rectangle
         defaults write com.knollsoft.Rectangle launchOnLogin -bool true
     fi
