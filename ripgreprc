@@ -2,3 +2,6 @@
 --line-number
 --no-heading
 --with-filename
+--hidden
+--glob
+!.git/
