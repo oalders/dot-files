@@ -16,6 +16,8 @@ git config --global color.ui auto
 
 git config --global column.ui auto
 
+git config --global commit.verbose true
+
 git config --global diff.algorithm histogram
 git config --global diff.colorMoved true
 git config --global diff.mnemonicPrefix true
