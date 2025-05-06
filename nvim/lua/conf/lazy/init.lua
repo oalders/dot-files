@@ -567,6 +567,16 @@ require('lazy').setup({
                 context = 'buffer',
                 model = 'claude-3.7-sonnet',
                 prompts = {
+                    GoTest = '> /COPILOT_GENERATE\n\n'
+                        .. 'Write tests for the selected Go.\n'
+                        .. '* Use `map[string]struct{}{}` when creating a hash '
+                        .. 'which is only there to track if keys exist\n'
+                        .. '* avoid deprecated libraries and constructs\n'
+                        .. '* for error assertions in tests, use require\n'
+                        .. '* prefer netip.ParseAddr over net.ParseIP\n'
+                        .. '* do not use database mocks\n'
+                        .. '* follow existing patterns in the corresponding test file or in adjacent tests\n',
+
                     Perl2Go = '> /COPILOT_GENERATE\n\n'
                         .. 'Convert the selected code from Perl to Go.\n'
                         .. '* Use `map[string]struct{}{}` when converting a hash '
