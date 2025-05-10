@@ -203,7 +203,6 @@ require('lazy').setup({
             },
             ft = 'markdown',
         },
-        'ntpeters/vim-better-whitespace', -- highlight trailing whitespace
         -- 'oalders/prettysql' -- ,fs to format visually selected SQL
         { 'othree/html5.vim', ft = 'html' },
         -- 'rodjek/vim-puppet', -- { 'for': 'puppet' }, -- Formatting, syntax highlighting etc
@@ -1130,6 +1129,16 @@ require('lazy').setup({
             'mcauley-penney/visual-whitespace.nvim',
             config = true,
             -- keys = { 'v', 'V', '<C-v>' }, -- optionally, lazy load on visual mode keys
+        },
+        {
+            'echasnovski/mini.trailspace',
+            version = false,
+            ft = {
+                'go',
+                'markdown',
+                'perl',
+                'typescript',
+            },
         },
 
         -- {

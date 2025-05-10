@@ -207,10 +207,6 @@ vim.g.python3_host_prog = '/usr/bin/python3'
 vim.g.fzf_preview_window = { 'down:50%', 'ctrl-/' }
 vim.api.nvim_set_keymap('n', '<leader>b', ':Buffers<cr>', {})
 
---remove all trailing whitespace
-vim.api.nvim_set_keymap('n', '-', ':StripWhitespace<CR>', { silent = true })
-vim.api.nvim_set_keymap('v', '-', ':StripWhitespace<CR>', { silent = true })
-
 -- 'luochen1990/rainbow'
 vim.g.rainbow_active = 1 --set to 0 if you want to enable it later via :RainbowToggle
 
