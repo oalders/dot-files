@@ -60,61 +60,31 @@ require('lazy').setup({
         },
         {
             'folke/snacks.nvim',
-            enabled = false,
+            enabled = true,
             priority = 1000,
             lazy = false,
-            opts = {},
+            opts = {
+                dashboard = {
+                    sections = {
+                        -- {
+                        --     section = 'terminal',
+                        --     cmd = 'chafa ~/dot-files/wall.png --format symbols --symbols vhalf --size 60x17 --stretch; sleep .1',
+                        --     height = 17,
+                        --     padding = 1,
+                        -- },
+                        {
+                            pane = 1,
+                            { section = 'keys', gap = 1, padding = 1 },
+                            { section = 'startup' },
+                        },
+                    },
+                },
+            },
         },
         {
             -- fade inactive buffers and preserve syntax highlighting
             'TaDaa/vimade',
             enabled = false,
-        },
-        {
-            'nvimdev/dashboard-nvim',
-            event = 'VimEnter',
-            config = function()
-                require('dashboard').setup({
-                    theme = 'hyper',
-                    config = {
-                        week_header = {
-                            enable = true,
-                        },
-                        shortcut = {
-                            {
-                                icon = '🚀 ',
-                                desc = ' Last Session',
-                                group = '@property',
-                                action = ':LastSession',
-                                key = 'l',
-                            },
-                            {
-                                icon = '♻️',
-                                desc = ' Update',
-                                group = '@property',
-                                action = 'Lazy update',
-                                key = 'u',
-                            },
-                            {
-                                icon = '📂',
-                                desc = 'Git Changed Files',
-                                group = 'Label',
-                                action = ':GDomo',
-                                key = 'g',
-                            },
-                            {
-                                icon = '🤖',
-                                desc = 'Chat',
-                                group = 'Number',
-                                action = ':CopilotChatOpen',
-                                key = 'c',
-                            },
-                        },
-                        footer = { '', '„Quäl dich, du Sau!“' },
-                    },
-                })
-            end,
-            dependencies = { { 'nvim-tree/nvim-web-devicons' } },
         },
         -- Smooth cursor movement.
         {
