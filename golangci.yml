@@ -1,8 +1,5 @@
----
+version: "2"
 linters:
-  disable:
-    - typecheck
-    - wsl
   enable:
     - asasalint
     - asciicheck
@@ -12,23 +9,18 @@ linters:
     - contextcheck
     - cyclop
     - decorder
-    # - depguard
     - dogsled
     - dupl
     - dupword
     - durationcheck
-    - errcheck
     - errchkjson
     - errname
     - errorlint
-    - execinquery
     - exhaustive
     - exhaustruct
-    - exportloopref
     - forbidigo
     - forcetypeassert
     - funlen
-    - gci
     - gochecknoglobals
     - gochecknoinits
     - gocognit
@@ -37,21 +29,13 @@ linters:
     - gocyclo
     - godot
     - godox
-    # - goerr113
-    - gofmt
-    - gofumpt
     - goheader
-    - goimports
-    # - gomnd
     - gomoddirectives
     - gomodguard
     - goprintffuncname
     - gosec
-    - gosimple
-    - govet
     - grouper
     - importas
-    - ineffassign
     - interfacebloat
     - ireturn
     - lll
@@ -63,7 +47,6 @@ linters:
     - nestif
     - nilerr
     - nilnil
-    # - nlreturn
     - noctx
     - nolintlint
     - nonamedreturns
@@ -77,36 +60,58 @@ linters:
     - rowserrcheck
     - sqlclosecheck
     - staticcheck
-    - stylecheck
     - tagliatelle
-    - tenv
     - testableexamples
     - testpackage
     - thelper
     - tparallel
     - unconvert
     - unparam
-    - unused
     - usestdlibvars
     - varnamelen
     - wastedassign
     - whitespace
     - wrapcheck
-linters-settings:
-  funlen:
-    lines: 75
-    statements: 40
-  govet:
-    enable:
-      - fieldalignment
-  lll:
-    line-length: 100
-  revive:
-    rules:
-      - name: var-naming
-        severity: warning
-        disabled: false
-        arguments:
-          - [ "ID" ] # AllowList
-          - [ "VM" ] # DenyList
-          - - upperCaseConst: true
+  disable:
+    - wsl
+  settings:
+    funlen:
+      lines: 75
+      statements: 40
+    govet:
+      enable:
+        - fieldalignment
+    lll:
+      line-length: 100
+    revive:
+      rules:
+        - name: var-naming
+          arguments:
+            - - ID
+            - - VM
+            - - upperCaseConst: true
+          severity: warning
+          disabled: false
+  exclusions:
+    generated: lax
+    presets:
+      - comments
+      - common-false-positives
+      - legacy
+      - std-error-handling
+    paths:
+      - third_party$
+      - builtin$
+      - examples$
+formatters:
+  enable:
+    - gci
+    - gofmt
+    - gofumpt
+    - goimports
+  exclusions:
+    generated: lax
+    paths:
+      - third_party$
+      - builtin$
+      - examples$
