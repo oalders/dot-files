@@ -11,6 +11,7 @@ permissions:
 jobs:
   build:
     runs-on: ${{ matrix.os }}
+    timeout-minutes: 15
     if: >
       ${{
       ( github.actor == 'dependabot[bot]' &&
