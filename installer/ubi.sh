@@ -95,3 +95,7 @@ fi
 if is var IS_MM eq false && is there gh && ! gh extension list | grep --quiet gh-dash; then
     debounce 1 d gh extension install dlvhdr/gh-dash || true
 fi
+
+# ensure is completions are up to date
+# shellcheck disable=SC2016
+debounce 1 d bash -c 'eval "$(is install-completions)"'
