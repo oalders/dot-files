@@ -89,7 +89,7 @@ require('lazy').setup({
         -- Smooth cursor movement.
         {
             'sphamba/smear-cursor.nvim',
-            enabled = false,
+            enabled = true,
             opts = {},
         },
 
