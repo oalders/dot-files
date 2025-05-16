@@ -2,6 +2,8 @@
 # .prettierrc or .prettierrc.yaml
 semi: false
 singleQuote: true
+printWidth: 80
+proseWrap: "always"
 overrides:
   - files: "*.test.js"
     options:
