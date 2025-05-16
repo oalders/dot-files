@@ -933,7 +933,6 @@ require('lazy').setup({
         --         }
         --     end,
         -- },
-
         -- neotest
         {
             'nvim-neotest/neotest',
