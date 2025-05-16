@@ -1162,7 +1162,11 @@ require('lazy').setup({
                 'rcarriga/nvim-notify',
             },
         },
-        { 'akinsho/toggleterm.nvim', version = '*', config = true },
+        {
+            'akinsho/toggleterm.nvim',
+            version = '*',
+            config = true,
+        },
         {
             'nvchad/showkeys',
             cmd = 'ShowkeysToggle',
