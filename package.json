@@ -28,7 +28,7 @@
     "fixjson": "^1.1.2",
     "lua-fmt": "^2.6.0",
     "markdownlint": "^0.38.0",
-    "markdownlint-cli": "^0.44.0",
+    "markdownlint-cli": "^0.45.0",
     "normalize-url": "^8.0.1",
     "npm": "^11.4.0",
     "prettier": "^3.5.3",
