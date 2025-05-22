@@ -793,8 +793,10 @@ require('lazy').setup({
 
         -- LSP
         'neovim/nvim-lspconfig',
+
         {
             'nvimdev/lspsaga.nvim',
+            enabled = true,
             event = 'VeryLazy',
             opts = {
                 code_action = {
@@ -807,6 +809,41 @@ require('lazy').setup({
                     sign = false,
                 },
             },
+            config = function(_, opts)
+                require('lspsaga').setup(opts)
+
+                -- Function to toggle winbar
+                local function toggle_winbar()
+                    if vim.wo.winbar == '' then
+                        -- Re-enable lspsaga winbar
+                        vim.wo.winbar = nil
+                        -- Force lspsaga to refresh the winbar
+                        local ok, saga =
+                            pcall(require, 'lspsaga.symbol.winbar')
+                        if ok then
+                            saga.get_bar()
+                        end
+                    else
+                        -- Disable winbar
+                        vim.wo.winbar = ''
+                    end
+                end
+
+                -- Create user command
+                vim.api.nvim_create_user_command(
+                    'ToggleWinbar',
+                    toggle_winbar,
+                    {}
+                )
+
+                -- Optional: Create a keymap
+                vim.keymap.set(
+                    'n',
+                    '<leader>tw',
+                    toggle_winbar,
+                    { desc = 'Toggle winbar' }
+                )
+            end,
         },
 
         -- Display LSP inlay hints at the end of the line, rather than within the line.
