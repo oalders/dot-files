@@ -897,42 +897,42 @@ require('lazy').setup({
             },
         },
 
-        {
-            'Isrothy/neominimap.nvim',
-            enabled = false,
-            ft = { 'go', 'perl', 'typescript' },
-            init = function()
-                vim.opt.wrap = false -- Recommended
-                vim.opt.sidescrolloff = 36 -- It's recommended to set a large value
-                vim.g.neominimap = {
-                    auto_enable = true,
-                    exclude_filetypes = {
-                        'dashboard',
-                        'gitcommit',
-                        'gitrebase',
-                        'help',
-                    },
-                    exclude_buftypes = {
-                        'nofile',
-                        'nowrite',
-                        'prompt',
-                        'quickfix',
-                        'terminal',
-                    },
-                    -- When false is returned, the minimap will not be created for this buffer
-                    buf_filter = function(bufnr)
-                        local bufname = vim.api.nvim_buf_get_name(bufnr)
-                        if
-                            string.sub(bufname, 1, 4) == '/tmp'
-                            or string.sub(bufname, 1, 8) == '/private' -- macOS
-                        then
-                            return false
-                        end
-                        return true
-                    end,
-                }
-            end,
-        },
+        -- {
+        --     'Isrothy/neominimap.nvim',
+        --     enabled = false,
+        --     ft = { 'go', 'perl', 'typescript' },
+        --     init = function()
+        --         vim.opt.wrap = false -- Recommended
+        --         vim.opt.sidescrolloff = 36 -- It's recommended to set a large value
+        --         vim.g.neominimap = {
+        --             auto_enable = true,
+        --             exclude_filetypes = {
+        --                 'dashboard',
+        --                 'gitcommit',
+        --                 'gitrebase',
+        --                 'help',
+        --             },
+        --             exclude_buftypes = {
+        --                 'nofile',
+        --                 'nowrite',
+        --                 'prompt',
+        --                 'quickfix',
+        --                 'terminal',
+        --             },
+        --             -- When false is returned, the minimap will not be created for this buffer
+        --             buf_filter = function(bufnr)
+        --                 local bufname = vim.api.nvim_buf_get_name(bufnr)
+        --                 if
+        --                     string.sub(bufname, 1, 4) == '/tmp'
+        --                     or string.sub(bufname, 1, 8) == '/private' -- macOS
+        --                 then
+        --                     return false
+        --                 end
+        --                 return true
+        --             end,
+        --         }
+        --     end,
+        -- },
 
         -- neotest
         {
