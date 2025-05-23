@@ -51,6 +51,7 @@ maybe_install jqlang/jq
 maybe_install junegunn/fzf
 maybe_install kubernetes-sigs/kustomize
 maybe_install oalders/is
+maybe_install stripe/stripe-cli --exe stripe
 maybe_install tummychow/git-absorb
 
 if is cli output stdout hostname eq wolfblitzer; then
