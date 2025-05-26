@@ -10,6 +10,8 @@ local function path_option()
     end
 end
 
+vim.api.nvim_set_hl(0, 'LspClientsFg', { fg = '#bb9af7' })
+
 -- LSP clients attached to buffer
 local clients_lsp = function()
     local clients = vim.lsp.get_clients({ bufnr = 0 })
@@ -31,7 +33,7 @@ local clients_lsp = function()
         table.insert(c, name)
     end
     table.sort(c)
-    return '< ' .. table.concat(c, ' | ') .. ' >'
+    return '%#LspClientsFg#' .. table.concat(c, '  ') .. '%*'
 end
 
 require('lualine').setup({
