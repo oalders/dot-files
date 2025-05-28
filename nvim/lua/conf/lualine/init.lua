@@ -11,6 +11,7 @@ local function path_option()
 end
 
 vim.api.nvim_set_hl(0, 'LspClientsFg', { fg = '#bb9af7' })
+vim.api.nvim_set_hl(0, 'ModifiedFileBg', { bg = '#ffc777', fg = '#1a1b26' })
 
 -- LSP clients attached to buffer
 local clients_lsp = function()
@@ -71,10 +72,13 @@ require('lualine').setup({
             {
                 'filename',
                 symbols = {
-                    modified = '😅😅😅😅😅😅 💾',
+                    modified = ' 󰠠 ',
                     readonly = '🔒',
                 },
                 path = path_option(),
+                color = function()
+                    return vim.bo.modified and 'ModifiedFileBg' or nil
+                end,
             },
         },
         lualine_x = { clients_lsp, 'encoding', 'fileformat', 'filetype' },
