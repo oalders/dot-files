@@ -4,7 +4,7 @@
 -- 3: absolute path with tilde
 local function path_option()
     if vim.o.columns > 78 then
-        return 3
+        return 1
     else
         return 0
     end
