@@ -81,7 +81,7 @@ require('lualine').setup({
                 end,
             },
         },
-        lualine_x = { clients_lsp, 'encoding', 'fileformat', 'filetype' },
+        lualine_x = { clients_lsp, 'encoding', 'filetype' },
         lualine_y = { 'searchcount' },
         lualine_z = { 'location', 'progress' },
     },
