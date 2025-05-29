@@ -12,6 +12,11 @@ end
 
 vim.api.nvim_set_hl(0, 'LspClientsFg', { fg = '#bb9af7' })
 vim.api.nvim_set_hl(0, 'ModifiedFileBg', { bg = '#ffc777', fg = '#1a1b26' })
+vim.api.nvim_set_hl(
+    0,
+    'NonUtf8Encoding',
+    { bg = '#ff6b6b', fg = '#ffffff', bold = true }
+)
 
 -- LSP clients attached to buffer
 local clients_lsp = function()
@@ -36,6 +41,16 @@ local clients_lsp = function()
     table.sort(c)
     return '%#LspClientsFg#' .. table.concat(c, '  ') .. '%*'
 end
+
+vim.api.nvim_create_autocmd({ 'BufRead', 'BufNewFile' }, {
+    callback = function()
+        local enc = vim.bo.fenc
+        if enc == '' then
+            enc = vim.o.enc
+        end
+        vim.b.show_encoding = (enc ~= 'utf-8')
+    end,
+})
 
 require('lualine').setup({
     options = {
@@ -81,7 +96,17 @@ require('lualine').setup({
                 end,
             },
         },
-        lualine_x = { clients_lsp, 'encoding', 'filetype' },
+        lualine_x = {
+            clients_lsp,
+            {
+                'encoding',
+                cond = function()
+                    return vim.b.show_encoding
+                end,
+                color = 'NonUtf8Encoding',
+            },
+            'filetype',
+        },
         lualine_y = { 'searchcount' },
         lualine_z = { 'location', 'progress' },
     },
