@@ -545,7 +545,11 @@ require('lazy').setup({
                         .. '* for error assertions in tests, use require\n'
                         .. '* prefer netip.ParseAddr over net.ParseIP\n'
                         .. '* do not use database mocks\n'
-                        .. '* follow existing patterns in the corresponding test file or in adjacent tests\n',
+                        .. '* follow existing patterns in the corresponding test file or in adjacent tests\n'
+                        .. '* do not create database fixtures. Use existing ones. Check for .toml files\n'
+                        .. '* create test contexts via t.Context()\n'
+                        .. '* import assert from github.com/stretchr/testify/assert\n'
+                        .. '* import require from github.com/stretchr/testify/require\n',
 
                     Perl2Go = '> /COPILOT_GENERATE\n\n'
                         .. 'Convert the selected code from Perl to Go.\n'
