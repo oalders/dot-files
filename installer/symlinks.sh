@@ -11,6 +11,7 @@ directories=(
     "$(bat --config-dir)"
     ~/.config/oh-my-posh/themes
     ~/.config/perlimports
+    ~/.config/sqlfluff
     ~/.config/wezterm
     ~/.config/yamllint
     ~/.cpanreporter
@@ -75,6 +76,7 @@ ln -sf $prefix/bat/config "$(bat --config-file)"
 ln -sf $prefix/cpanreporter/config.ini ~/.cpanreporter/config.ini
 ln -sf $prefix/oh-my-posh/themes/local.omp.json ~/.config/oh-my-posh/themes/local.omp.json
 ln -sf $prefix/perlimports/perlimports.toml ~/.config/perlimports/perlimports.toml
+ln -sf $prefix/config/sqlfluff ~/.config/sqlfluff/.sqlfluff
 ln -sf $prefix/re.pl/repl.rc ~/.re.pl/repl.rc
 ln -sf $prefix/wezterm/wezterm.lua ~/.config/wezterm/wezterm.lua
 ln -sf $prefix/yamllint.yml ~/.config/yamllint/config
