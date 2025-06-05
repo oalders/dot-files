@@ -234,6 +234,9 @@ vim.opt.cmdheight = 0
 
 vim.opt.termguicolors = true
 
+-- Use system clipboard
+vim.opt.clipboard = "unnamedplus"
+
 -- Show comments in italics
 vim.cmd('highlight Comment cterm=italic gui=italic term=bold')
 
