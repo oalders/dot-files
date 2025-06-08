@@ -91,7 +91,11 @@ git config --global alias.view-stash 'stash show -p stash@{0}'
 git config --global color.ui auto
 git config --global core.excludesfile ~/.gitignore_global
 
-git config --global merge.conflictstyle zdiff3
+if is cli version git gte 2.35; then
+    git config --global merge.conflictstyle zdiff3
+else
+    git config --global merge.conflictstyle diff3
+fi
 
 # Use Neovim with a 3 panes layout (LOCAL, MERGED and REMOTE)
 # It is invoked at the command line via "git mergetool"
