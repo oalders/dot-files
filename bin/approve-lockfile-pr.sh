@@ -2,6 +2,12 @@
 
 set -e -u -o pipefail -x
 
+if [ $# -ne 2 ]; then
+    echo "Usage: $0 <remote> <branch>"
+    echo "Example: $0 origin dependabot/npm_and_yarn/lodash-4.17.21"
+    exit 1
+fi
+
 remote=$1
 branch=$2
 
