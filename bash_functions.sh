@@ -74,7 +74,6 @@ toggle_posh() {
 GO111MODULE=on
 GOPATH=~/go
 LINK_FLAG=""
-PATH_ALIASES=\~/dot-files=@dots
 
 if is os name eq darwin; then
     LINK_FLAG="-hF"
@@ -85,7 +84,6 @@ if is os name eq darwin; then
     alias vi="nvim"
     alias vim="nvim"
 
-    PATH_ALIASES=\~/dot-files=@dots,\~/Documents/github=@gh,\~/Documents/github/oalders=@gho
 elif is os name eq linux; then
     LINK_FLAG="-T"
 fi

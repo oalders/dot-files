@@ -43,4 +43,6 @@ alias | grep " du=" && unalias du
 alias | grep " ls=" && unalias ls
 alias | grep " ps=" && unalias ps
 
+unset PATH_ALIASES
+
 exit 0
