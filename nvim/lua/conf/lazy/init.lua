@@ -444,7 +444,7 @@ require('lazy').setup({
             dependencies = 'kkharji/sqlite.lua',
             config = function()
                 require('yankbank').setup({
-                    max_entries = 20,
+                    max_entries = 200,
                     persist_type = 'sqlite',
                     sep = '〰️〰️〰️〰️〰️〰️〰️〰️',
                 })
