@@ -48,7 +48,7 @@ detect_posh_settings() {
 if [[ ! ${posh_theme-} || ! ${FORCE_POSH_THEME-} ]]; then
     detect_posh_settings
     if [[ $MY_INSIDE_TMUX == true && ! ${FORCE_POSH_THEME-} ]]; then
-        export TINY_POSH=1
+        export TINY_POSH=true
     fi
 fi
 
@@ -62,7 +62,7 @@ toggle_posh() {
     if [[ -n $TINY_POSH ]]; then
         unset TINY_POSH
     else
-        export TINY_POSH=1
+        export TINY_POSH=true
     fi
 
     FORCE_POSH_THEME=true
