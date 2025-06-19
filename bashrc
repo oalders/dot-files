@@ -46,6 +46,7 @@ alias grep='grep --color=auto --exclude-dir=.git'
 alias l='ls -lAtr'
 alias l.='ls -ldF .[a-zA-Z0-9]* --color=tty' #only show dotfiles
 alias linebreaks="perl -pi -e 's/\r/\n/g'"
+alias ls=eza
 alias lsd='ls --group-directories-first'
 alias octal_perms='stat -c "%a %n"'
 alias pine=alpine

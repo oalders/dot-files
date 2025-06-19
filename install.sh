@@ -58,6 +58,7 @@ run_general_installers() {
     )
 
     run_installers "${installers[@]}"
+    debounce 30 days ./configure/eza.sh
     debounce 7 d ./installer/maintenance.sh
 }
 
