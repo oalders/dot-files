@@ -42,7 +42,6 @@ maybe_install atanunq/viu
 maybe_install bensadeh/tailspin --exe tspin
 maybe_install charmbracelet/gum
 maybe_install crate-ci/typos
-maybe_install eza-community/eza
 maybe_install golangci/golangci-lint
 maybe_install houseabsolute/omegasort
 maybe_install houseabsolute/precious
@@ -65,6 +64,7 @@ elif is os name eq darwin; then
     maybe_install dandavison/delta
 else
     maybe_install dandavison/delta --matching musl
+    maybe_install eza-community/eza
 fi
 
 if is os name eq darwin; then
