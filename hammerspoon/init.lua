@@ -182,7 +182,7 @@ Install:andUse('Seal', {
     hotkeys = { show = { hyper, 'space' } },
     fn = function(s)
         s:loadPlugins({
-            'apps',
+            -- 'apps',
             'calc',
             'screencapture',
             'useractions',
