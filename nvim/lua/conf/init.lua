@@ -1,3 +1,5 @@
+--- vim.g throws a lot of diagnostic warnings
+---@diagnostic disable: inject-field
 vim.opt.swapfile = false
 
 -- allow undo even after exiting and re-opening a file
