@@ -42,7 +42,8 @@ vim.api.nvim_exec(
 ]],
     false
 )
-
+-- paste and keep clipboard content - allows pasting the same text multiple
+-- times over different selections
 vim.api.nvim_set_keymap('x', 'p', 'pgvy', {})
 
 vim.g.auto_save = 1
