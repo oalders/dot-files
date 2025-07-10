@@ -239,6 +239,10 @@ vim.opt.termguicolors = true
 -- Use system clipboard
 vim.opt.clipboard = "unnamedplus"
 
+-- Delete single character without copying to clipboard
+vim.keymap.set('n', 'x', '"_x', { desc = 'Delete character without copying' })
+vim.keymap.set('n', 'X', '"_X', { desc = 'Delete character backwards without copying' })
+
 -- Show comments in italics
 vim.cmd('highlight Comment cterm=italic gui=italic term=bold')
 
