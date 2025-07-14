@@ -5,7 +5,7 @@ cmd = [ "shfmt" ]
 ok_exit_codes = [0]
 lint_failure_exit_codes = [1]
 lint_flags  = "--diff"
-tidy_flags  = ["-w", "-s"]
+tidy_flags  = ["-w", "-s", "-i", "4"]
 
 [commands.stylua]
 cmd = [ "stylua" ]
