@@ -1027,16 +1027,11 @@ require('lazy').setup({
         },
 
         --  bridge mason.nvim with the lspconfig plugin
-        {
-            'williamboman/mason-lspconfig.nvim',
-            version = '^1.0.0',
-            opts = {},
-        },
+        { 'williamboman/mason-lspconfig.nvim', opts = {} },
 
         -- install and manage LSP servers, linters and tidiers
         {
             'williamboman/mason.nvim',
-            version = '^1.0.0',
             opts = { log_level = vim.log.levels.INFO },
         },
 
