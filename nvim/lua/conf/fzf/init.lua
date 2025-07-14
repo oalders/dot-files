@@ -1,3 +1,4 @@
+---@diagnostic disable: undefined-global
 -- fzf-lua
 local fzf_lua = require('fzf-lua')
 
