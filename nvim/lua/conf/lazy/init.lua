@@ -536,7 +536,7 @@ require('lazy').setup({
                 -- > #git:staged
                 -- > #url:https://example.com
                 context = 'buffer',
-                model = 'claude-3.7-sonnet',
+                model = 'claude-sonnet-4',
                 prompts = {
                     GoTest = '> /COPILOT_GENERATE\n\n'
                         .. 'Write tests for the selected Go.\n'
