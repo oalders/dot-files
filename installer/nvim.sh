@@ -60,9 +60,9 @@ echo "done nvim install"
 
 if is var IS_GITHUB eq true; then
     ldd --version
+else
+    # nvim --headless "+Lazy! sync" +qa
+    nvim --headless "+MasonToolsUpdateSync" +qa
 fi
-
-# nvim --headless "+Lazy! sync" +qa
-nvim --headless "+MasonToolsUpdateSync" +qa
 
 exit 0
