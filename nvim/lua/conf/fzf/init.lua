@@ -8,6 +8,8 @@ fzf_lua.setup({
 fzf_lua.setup({
     fzf_colors = true,
     winopts = { width = 0.98 },
+    -- This section probably isn't needed when using snacks.nvim, because
+    -- snacks.nvim will be detected and fzf-lua will hand off rendering to it.
     previewers = {
         builtin = {
             extensions = {
