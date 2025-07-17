@@ -802,8 +802,6 @@ require('lazy').setup({
         },
 
         -- LSP
-        'neovim/nvim-lspconfig',
-
         {
             'nvimdev/lspsaga.nvim',
             enabled = true,
@@ -1032,9 +1030,6 @@ require('lazy').setup({
             end,
         },
 
-        --  bridge mason.nvim with the lspconfig plugin
-        { 'williamboman/mason-lspconfig.nvim', opts = {} },
-
         -- install and manage LSP servers, linters and tidiers
         {
             'williamboman/mason.nvim',
@@ -1051,11 +1046,11 @@ require('lazy').setup({
                     -- you can turn off/on auto_update per tool
                     { 'bash-language-server', auto_update = true },
 
-                    'ansiblels',
-                    'bashls',
-                    'docker_compose_language_service',
+                    'ansible-language-server',
+                    'bash-language-server',
+                    'docker-compose-language-service',
                     'editorconfig-checker',
-                    'eslint',
+                    'eslint-lsp',
                     -- 'json-to-struct',
                     -- 'luacheck',
                     -- 'luaformatter',
@@ -1069,17 +1064,17 @@ require('lazy').setup({
                     'shfmt',
                     'sqlfluff',
                     'stylua',
-                    'ts_ls',
+                    'typescript-language-server',
                     'vim-language-server',
                     'vint',
                     'yamllint',
-                    'yamlls',
+                    'yaml-language-server',
 
                     -- golang
                     'gofumpt',
                     'goimports',
                     'golangci-lint',
-                    'golangci_lint_ls',
+                    'golangci-lint-langserver',
                     'golines',
                     'gomodifytags',
                     'gopls',
@@ -1119,7 +1114,6 @@ require('lazy').setup({
                 -- the ability to to use the alternative names of packages provided
                 -- by these plugins but disables them from immediately becoming loaded
                 integrations = {
-                    ['mason-lspconfig'] = true,
                     ['mason-null-ls'] = true,
                     ['mason-nvim-dap'] = true,
                 },

@@ -1,12 +1,26 @@
+---@diagnostic disable: undefined-global
 -- vim.lsp.set_log_level("debug")
 
 -- reduce left-right jitter when signcolumn appears and disappears while
 -- scrolling vertically.
 vim.opt.signcolumn = 'yes'
 
-local lspconfig = require('lspconfig')
-lspconfig.ansiblels.setup({})
-lspconfig.bashls.setup({
+-- Configure global defaults using vim.lsp.config
+vim.lsp.config('*', {
+    root_markers = { '.git' },
+})
+
+-- Configure individual LSP servers using vim.lsp.config
+
+-- Ansible Language Server
+vim.lsp.config('ansiblels', {
+    cmd = { 'ansible-language-server', '--stdio' },
+    filetypes = { 'yaml.ansible' },
+})
+
+-- Bash Language Server
+vim.lsp.config('bashls', {
+    cmd = { 'bash-language-server', 'start' },
     filetypes = { 'sh' },
     settings = {
         diagnostics = {
@@ -19,18 +33,70 @@ lspconfig.bashls.setup({
         },
     },
 })
-lspconfig.docker_compose_language_service.setup({})
-lspconfig.eslint.setup({
-    on_attach = function(client, bufnr)
-        vim.api.nvim_create_autocmd('BufWritePre', {
-            buffer = bufnr,
-            command = 'EslintFixAll',
-        })
-    end,
+
+-- Docker Compose Language Service
+vim.lsp.config('docker_compose_language_service', {
+    cmd = { 'docker-compose-langserver', '--stdio' },
+    filetypes = { 'yaml.docker-compose' },
+    root_markers = {
+        'docker-compose.yaml',
+        'docker-compose.yml',
+        'compose.yaml',
+        'compose.yml',
+    },
 })
 
--- https://github.com/neovim/nvim-lspconfig/blob/master/doc/configs.md#lua_ls
-lspconfig.lua_ls.setup({
+-- ESLint Language Server
+vim.lsp.config('eslint', {
+    cmd = { 'vscode-eslint-language-server', '--stdio' },
+    filetypes = {
+        'javascript',
+        'javascriptreact',
+        'typescript',
+        'typescriptreact',
+        'vue',
+        'svelte',
+    },
+    root_markers = {
+        '.eslintrc',
+        '.eslintrc.js',
+        '.eslintrc.json',
+        'eslint.config.js',
+    },
+    settings = {
+        codeAction = {
+            disableRuleComment = {
+                enable = true,
+                location = 'separateLine',
+            },
+            showDocumentation = {
+                enable = true,
+            },
+        },
+        codeActionOnSave = {
+            enable = false,
+            mode = 'all',
+        },
+        format = true,
+        nodePath = '',
+        onIgnoredFiles = 'off',
+        packageManager = 'npm',
+        quiet = false,
+        rulesCustomizations = {},
+        run = 'onType',
+        useESLintClass = false,
+        validate = 'on',
+        workingDirectory = {
+            mode = 'location',
+        },
+    },
+})
+
+-- Lua Language Server
+vim.lsp.config('lua_ls', {
+    cmd = { 'lua-language-server' },
+    filetypes = { 'lua' },
+    root_markers = { '.luarc.json', '.luarc.jsonc' },
     settings = {
         Lua = {
             runtime = {
@@ -58,7 +124,17 @@ lspconfig.lua_ls.setup({
         },
     },
 })
-lspconfig.ts_ls.setup({
+
+-- TypeScript Language Server
+vim.lsp.config('ts_ls', {
+    cmd = { 'typescript-language-server', '--stdio' },
+    filetypes = {
+        'javascript',
+        'javascriptreact',
+        'typescript',
+        'typescriptreact',
+    },
+    root_markers = { 'tsconfig.json', 'package.json', 'jsconfig.json' },
     settings = {
         typescript = {
             inlayHints = {
@@ -88,12 +164,138 @@ lspconfig.ts_ls.setup({
         },
     },
 })
-lspconfig.yamlls.setup({})
 
--- Set up lspconfig.
--- Mappings.
+-- YAML Language Server
+vim.lsp.config('yamlls', {
+    cmd = { 'yaml-language-server', '--stdio' },
+    filetypes = { 'yaml', 'yaml.docker-compose', 'yaml.gitlab' },
+    root_markers = { '.yamllint', '.yamllint.yml', '.yamllint.yaml' },
+})
 
--- copied from https://github.com/neovim/nvim-lspconfig
+-- Go Language Server
+vim.lsp.config('gopls', {
+    cmd = { 'gopls' },
+    filetypes = { 'go', 'gomod', 'gowork', 'gotmpl' },
+    root_markers = { 'go.work', 'go.mod' },
+    settings = {
+        gopls = {
+            analyses = {
+                shadow = true,
+                useany = true,
+                unusedparams = true,
+                unusedvariable = true,
+            },
+            staticcheck = true,
+            gofumpt = true,
+            usePlaceholders = true,
+            hints = { functionTypeParameters = true },
+        },
+    },
+    flags = {
+        debounce_text_changes = 3000,
+    },
+})
+
+-- Perl Navigator
+vim.lsp.config('perlnavigator', {
+    cmd = { 'perlnavigator', '--stdio' },
+    filetypes = { 'perl' },
+    root_markers = {
+        'Makefile.PL',
+        'Build.PL',
+        'cpanfile',
+        'META.json',
+        'META.yml',
+    },
+    settings = {
+        perlnavigator = {
+            -- perltidyProfile = '',
+            -- perlcriticProfile = '',
+            enableWarnings = true,
+            includePaths = { 'lib', 'dev/lib', 't/lib' },
+            logging = false,
+            perlcriticEnabled = true,
+            perlimportsLintEnabled = true,
+            perlimportsTidyEnabled = true,
+            perlPath = 'perl',
+        },
+    },
+    on_new_config = function(new_config, new_root)
+        local f = new_root .. '/.teamcity/pom.xml'
+        local nav = new_config.settings.perlnavigator
+        if vim.fn.filereadable(f) == 1 then
+            nav.perlPath = 'mm-perl'
+            nav.perlcriticProfile =
+                table.concat({ new_root, '.perlcriticrc' }, '/')
+            nav.perltidyProfile =
+                table.concat({ new_root, '.perltidyallrc' }, '/')
+        end
+    end,
+})
+
+-- Rust Analyzer
+vim.lsp.config('rust_analyzer', {
+    cmd = { 'rust-analyzer' },
+    filetypes = { 'rust' },
+    root_markers = { 'Cargo.toml', 'rust-project.json' },
+    settings = {
+        ['rust-analyzer'] = {
+            imports = {
+                granularity = {
+                    group = 'module',
+                },
+                prefix = 'self',
+            },
+            cargo = {
+                buildScripts = {
+                    enable = true,
+                },
+            },
+            procMacro = {
+                enable = true,
+            },
+        },
+    },
+})
+
+-- Python LSP Server
+vim.lsp.config('pylsp', {
+    cmd = { 'pylsp' },
+    filetypes = { 'python' },
+    root_markers = {
+        'pyproject.toml',
+        'setup.py',
+        'setup.cfg',
+        'requirements.txt',
+        'Pipfile',
+    },
+    settings = {
+        pylsp = {
+            plugins = {
+                pycodestyle = {
+                    ignore = { 'W391' },
+                    maxLineLength = 100,
+                },
+            },
+        },
+    },
+})
+
+-- Enable the servers
+vim.lsp.enable({
+    'ansiblels',
+    'bashls',
+    'docker_compose_language_service',
+    'eslint',
+    'lua_ls',
+    'ts_ls',
+    'yamlls',
+    'gopls',
+    'perlnavigator',
+    'rust_analyzer',
+    'pylsp',
+})
+
 -- Global mappings.
 -- See `:help vim.diagnostic.*` for documentation on any of the below functions
 vim.keymap.set('n', '<space>e', vim.diagnostic.open_float)
@@ -114,20 +316,41 @@ vim.api.nvim_create_autocmd('LspAttach', {
     callback = function(args)
         local bufnr = args.buf
         local client_id = args.data.client_id
+        ---@type table?
         local client = vim.lsp.get_client_by_id(client_id)
-        -- vim.notify(client.name .. ' (attached)', vim.log.levels.INFO)
+
+        if not client then
+            return
+        end
+
+        -- vim.notify((client.name or 'unknown') .. ' (attached)', vim.log.levels.INFO)
         if
-            client.server_capabilities.inlayHintProvider
+            client.server_capabilities
+            and client.server_capabilities.inlayHintProvider
+            and client.name
             and not vim.tbl_contains(no_inlay_hints, client.name)
         then
             vim.notify(
                 client.name .. ' (inlay hints enabled)',
                 vim.log.levels.INFO
             )
-            vim.lsp.inlay_hint.enable(true)
+            vim.lsp.inlay_hint.enable(true, { bufnr = bufnr })
         end
         -- Enable completion triggered by <c-x><c-o>
         vim.bo[args.buf].omnifunc = 'v:lua.vim.lsp.omnifunc'
+
+        -- Enable auto-formatting on save for ESLint
+        if client.name == 'eslint' then
+            vim.api.nvim_create_autocmd('BufWritePre', {
+                buffer = bufnr,
+                callback = function()
+                    vim.lsp.buf.code_action({
+                        context = { only = { 'source.fixAll.eslint' } },
+                        apply = true,
+                    })
+                end,
+            })
+        end
 
         -- Buffer local mappings.
         -- See `:help vim.lsp.*` for documentation on any of the below functions
@@ -165,94 +388,6 @@ vim.api.nvim_create_autocmd('LspAttach', {
             vim.lsp.buf.format({ async = true })
         end, opts)
     end,
-})
--- end copied from https://github.com/neovim/nvim-lspconfig
-
-lspconfig.gopls.setup({
-    settings = {
-        gopls = {
-            analyses = {
-                shadow = true,
-                useany = true,
-                unusedparams = true,
-                unusedvariable = true,
-            },
-            staticcheck = true,
-            gofumpt = true,
-            usePlaceholders = true,
-            hints = { functionTypeParameters = true },
-            -- root_dir = root_pattern("go.mod", ".git"),
-        },
-    },
-    flags = {
-        debounce_text_changes = 3000,
-    },
-    -- on_attach = function(client, bufnr)
-    --     print(vim.inspect(client.server_capabilities))
-    -- end,
-})
-
--- After setting up mason-lspconfig you may set up servers via lspconfig
--- See server/src/server.ts in PerlNavigator for a list of available settings
-lspconfig.perlnavigator.setup({
-    settings = {
-        perlnavigator = {
-            -- perltidyProfile = '',
-            -- perlcriticProfile = '',
-            enableWarnings = true,
-            includePaths = { 'lib', 'dev/lib', 't/lib' },
-            logging = false,
-            perlcriticEnabled = true,
-            perlimportsLintEnabled = true,
-            perlimportsTidyEnabled = true,
-            perlPath = 'perl',
-        },
-    },
-    on_new_config = function(new_config, new_root)
-        local f = new_root .. '/.teamcity/pom.xml'
-        local nav = new_config.settings.perlnavigator
-        if vim.fn.filereadable(f) == 1 then
-            nav.perlPath = 'mm-perl'
-            nav.perlcriticProfile =
-                table.concat({ new_root, '.perlcriticrc' }, '/')
-            nav.perltidyProfile =
-                table.concat({ new_root, '.perltidyallrc' }, '/')
-        end
-    end,
-})
-
-lspconfig.rust_analyzer.setup({
-    settings = {
-        ['rust-analyzer'] = {
-            imports = {
-                granularity = {
-                    group = 'module',
-                },
-                prefix = 'self',
-            },
-            cargo = {
-                buildScripts = {
-                    enable = true,
-                },
-            },
-            procMacro = {
-                enable = true,
-            },
-        },
-    },
-})
-
-lspconfig.pylsp.setup({
-    settings = {
-        pylsp = {
-            plugins = {
-                pycodestyle = {
-                    ignore = { 'W391' },
-                    maxLineLength = 100,
-                },
-            },
-        },
-    },
 })
 
 -- begin
