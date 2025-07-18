@@ -542,6 +542,10 @@ require('lazy').setup({
                 -- > #url:https://example.com
                 context = 'buffer',
                 model = 'claude-sonnet-4',
+                mcp = {
+                    enabled = true,
+                    servers = { 'github' },
+                },
                 prompts = {
                     GoTest = '> /COPILOT_GENERATE\n\n'
                         .. 'Write tests for the selected Go.\n'
@@ -578,6 +582,22 @@ require('lazy').setup({
                         .. '* Have any tests been deleted in Perl but not ported to Go?\n'
                         .. '* Are there any differences between the old and the new tests?\n'
                         .. "* If there's a chance of some loss of test coverage, where is a good place to start looking?\n",
+
+                    ReviewPR = {
+                        prompt = '/COPILOT_GENERATE Please review the current pull request using the GitHub MCP server. Focus on code quality, security, and best practices.',
+                        mapping = '<leader>ccr',
+                        description = 'Review current PR with Copilot',
+                    },
+                    ExplainPR = {
+                        prompt = '/COPILOT_GENERATE Use the GitHub MCP server to get PR details and explain what changes were made and why.',
+                        mapping = '<leader>cce',
+                        description = 'Explain PR changes',
+                    },
+                    SecurityCheck = {
+                        prompt = '/COPILOT_GENERATE Check this repository for security alerts and vulnerabilities using the GitHub MCP server.',
+                        mapping = '<leader>ccs',
+                        description = 'Security check with Copilot',
+                    },
                 },
                 -- or select model via $ in chat
                 sticky = {
@@ -1152,7 +1172,43 @@ require('lazy').setup({
                 'nvim-lua/plenary.nvim',
             },
             config = function()
-                require('mcphub').setup()
+                require('mcphub').setup({
+                    -- GitHub MCP Server configuration
+                    servers = {
+                        github = {
+                            name = 'github',
+                            description = 'GitHub API integration for code reviews and repository management',
+                            command = 'podman',
+                            args = {
+                                'run',
+                                '-i',
+                                '--rm',
+                                '-e',
+                                'GITHUB_TOKEN',
+                                'ghcr.io/github/github-mcp-server',
+                            },
+                            env = {
+                                GITHUB_TOKEN = vim.fn.getenv(
+                                    'GH_ENTERPRISE_TOKEN'
+                                ) or '',
+                                -- For GitHub Enterprise, uncomment and set your host:
+                                -- GITHUB_HOST = "github.your-company.com",
+                                GITHUB_TOOLSETS = 'repos,issues,pull_requests,code_security',
+                            },
+                            -- Specific toolsets for code review workflows
+                            toolsets = {
+                                'pull_requests', -- Essential for PR reviews
+                                'repos', -- Repository operations
+                                'code_security', -- Security scanning alerts
+                                'issues', -- Issue management
+                            },
+                        },
+                    },
+                    -- Auto-start the GitHub MCP server when needed
+                    auto_start = true,
+                    -- Log level for debugging
+                    log_level = 'info',
+                })
             end,
         },
 
