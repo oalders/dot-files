@@ -1,5 +1,14 @@
 {
   "mcpServers": {
+    "git": {
+      "args": [
+        "mcp-server-git",
+        "--repository",
+        "."
+      ],
+      "command": "uvx",
+      "disabled": false
+    },
     "github": {
       "args": [
         "run",
