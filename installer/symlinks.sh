@@ -10,6 +10,7 @@ prefix=~/dot-files
 directories=(
     "$(bat --config-dir)"
     ~/.config/oh-my-posh/themes
+    ~/.config/mcphub
     ~/.config/perlimports
     ~/.config/sqlfluff
     ~/.config/wezterm
@@ -75,6 +76,7 @@ done
 ln -sf $prefix/bat/config "$(bat --config-file)"
 ln -sf $prefix/cpanreporter/config.ini ~/.cpanreporter/config.ini
 ln -sf $prefix/oh-my-posh/themes/local.omp.json ~/.config/oh-my-posh/themes/local.omp.json
+ln -sf $prefix/mcphub/servers.json ~/.config/mcphub/servers.json
 ln -sf $prefix/perlimports/perlimports.toml ~/.config/perlimports/perlimports.toml
 ln -sf $prefix/config/sqlfluff ~/.config/sqlfluff/.sqlfluff
 ln -sf $prefix/re.pl/repl.rc ~/.re.pl/repl.rc

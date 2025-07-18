@@ -1,0 +1,38 @@
+{
+  "mcpServers": {
+    "github": {
+      "args": [
+        "run",
+        "-i",
+        "--rm",
+        "-e",
+        "GITHUB_PERSONAL_ACCESS_TOKEN",
+        "-e",
+        "GITHUB_TOOLSETS",
+        "ghcr.io/github/github-mcp-server"
+      ],
+      "autoApprove": [],
+      "auto_approve": [
+        "get_me",
+        "get_pull_request",
+        "get_pull_request_files",
+        "get_pull_request_comments",
+        "get_pull_request_reviews",
+        "get_issue",
+        "list_issues",
+        "get_file_contents",
+        "list_commits"
+      ],
+      "auto_start": true,
+      "command": "podman",
+      "description": "GitHub API integration for code reviews and repository management",
+      "env": {
+        "GITHUB_HOST": "https://${GH_HOST}/api/v3",
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "${GH_ENTERPRISE_TOKEN}",
+        "GITHUB_TOOLSETS": "repos,issues,pull_requests,code_security"
+      },
+      "name": "GitHub",
+      "stderr": "inherit"
+    }
+  }
+}
