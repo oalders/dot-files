@@ -82,7 +82,12 @@ require('lazy').setup({
                 },
                 image = {},
                 input = { enabled = true, style = 'fancy' },
-                notifier = { enabled = true },
+                notifier = {
+                    enabled = true,
+                    timeout = 3000,
+                    height = { min = 2, max = 0.8 },
+                    width = { min = 40, max = 0.8 },
+                },
                 terminal = { enabled = true },
                 toggle = {},
             },
