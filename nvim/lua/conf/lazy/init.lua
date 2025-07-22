@@ -546,11 +546,11 @@ require('lazy').setup({
                 -- > #git:staged
                 -- > #url:https://example.com
                 context = 'buffer',
-                model = 'claude-sonnet-4',
                 mcp = {
                     enabled = true,
                     servers = { 'github' },
                 },
+                model = 'claude-3.5-sonnet', -- default to my personal account limits
                 prompts = {
                     GoTest = '> /COPILOT_GENERATE\n\n'
                         .. 'Write tests for the selected Go.\n'
