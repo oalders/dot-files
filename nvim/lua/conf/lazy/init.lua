@@ -590,17 +590,17 @@ require('lazy').setup({
 
                     ReviewPR = {
                         prompt = '/COPILOT_GENERATE Please review the current pull request using the GitHub MCP server. Focus on code quality, security, and best practices.',
-                        mapping = '<leader>ccr',
+                        -- mapping = '<leader>ccr',
                         description = 'Review current PR with Copilot',
                     },
                     ExplainPR = {
                         prompt = '/COPILOT_GENERATE Use the GitHub MCP server to get PR details and explain what changes were made and why.',
-                        mapping = '<leader>cce',
+                        -- mapping = '<leader>cce',
                         description = 'Explain PR changes',
                     },
                     SecurityCheck = {
                         prompt = '/COPILOT_GENERATE Check this repository for security alerts and vulnerabilities using the GitHub MCP server.',
-                        mapping = '<leader>ccs',
+                        -- mapping = '<leader>ccs',
                         description = 'Security check with Copilot',
                     },
                 },
