@@ -79,13 +79,17 @@ if is os name eq darwin; then
     LINK_FLAG="-hF"
 
     # Not sure if this is needed in the longer term
-    export TERM=xterm-256color
+    TERM=xterm-256color
 
     alias vi="nvim"
     alias vim="nvim"
 
 elif is os name eq linux; then
     LINK_FLAG="-T"
+fi
+
+if is var TMUX set; then
+    TERM=tmux-256color
 fi
 
 IS_GITHUB=false
@@ -338,3 +342,4 @@ export IS_MM
 export IS_SUDOER
 export LINK_FLAG
 export RIPGREP_CONFIG_PATH
+export TERM
