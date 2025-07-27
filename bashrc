@@ -56,10 +56,10 @@ alias show-merged-branches='git branch --no-color --merged | grep -v "\*" | grep
 alias ssh-fingerprints='ls ~/.ssh/*.pub | safe_xargs -L 1 ssh-keygen -l -f'
 # https://stackoverflow.com/a/19280187/406224
 alias takeover="tmux detach -a"
-alias wat='ps --sort=-pcpu -aux|head -10'
 alias xpasswd='perl -MCrypt::XkcdPassword -E "say Crypt::XkcdPassword->make_password"'
 
 if is os name eq darwin; then
+    alias wat="ps aux | sort -nr -k3 | head -10"
     alias updatedb="sudo /usr/libexec/locate.updatedb"
 
     # python scripts via pip install --user
@@ -80,6 +80,8 @@ if is os name eq darwin; then
     add_path "/opt/homebrew/sbin"
 
     add_path "/Applications/WezTerm.app/Contents/MacOS"
+else
+    alias wat='ps --sort=-pcpu -aux | head -10'
 fi
 
 if is there nvim; then
