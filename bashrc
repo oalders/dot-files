@@ -46,7 +46,6 @@ alias grep='grep --color=auto --exclude-dir=.git'
 alias l='ls -lAtr'
 alias l.='ls -ldF .[a-zA-Z0-9]* --color=tty' #only show dotfiles
 alias linebreaks="perl -pi -e 's/\r/\n/g'"
-alias ls=eza
 alias lsd='ls --group-directories-first'
 alias octal_perms='stat -c "%a %n"'
 alias pine=alpine
@@ -80,7 +79,13 @@ if is os name eq darwin; then
     add_path "/opt/homebrew/sbin"
 
     add_path "/Applications/WezTerm.app/Contents/MacOS"
+
+    # no build for older Macs
+    if is os version-codename ne "ventura"; then
+        alias ls=eza
+    fi
 else
+    alias ls=eza
     alias wat='ps --sort=-pcpu -aux | head -10'
 fi
 
