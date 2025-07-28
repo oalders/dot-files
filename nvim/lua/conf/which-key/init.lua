@@ -218,6 +218,12 @@ wk.add({
         mode = 'v',
     },
     {
+        '<leader>ca',
+        '<cmd>lua vim.lsp.buf.code_action()<cr>',
+        desc = 'Code Action (LSP)',
+        mode = 'n',
+    },
+    {
         '<leader>cc',
         '<cmd>CopilotChatToggle<cr>',
         desc = 'CopilotChat toggle',
