@@ -81,7 +81,7 @@ if is os name eq darwin; then
     add_path "/Applications/WezTerm.app/Contents/MacOS"
 
     # no build for older Macs
-    if is os version-codename ne "ventura"; then
+    if is there eza; then
         alias ls=eza
     fi
 else
