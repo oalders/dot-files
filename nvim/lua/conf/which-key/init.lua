@@ -161,6 +161,7 @@ wk.add({
         ':FzfLua lsp_document_symbols<cr>',
         desc = 'List symbols in document',
     },
+    { '<leader>sp', "'[V']", desc = 'Select last paste' },
     {
         '<leader>ot',
         function()
