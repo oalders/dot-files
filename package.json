@@ -39,5 +39,8 @@
     "urijs": ">=1.19.11",
     "ws": "^8.18.3",
     "zod": "^4.0.17"
+  },
+  "devDependencies": {
+    "@anthropic-ai/claude-code": "^1.0.77"
   }
 }
