@@ -6,4 +6,3 @@ set -eux
 
 brew install hugo
 brew install sass/sass/sass
-brew install dart-sass-embedded
