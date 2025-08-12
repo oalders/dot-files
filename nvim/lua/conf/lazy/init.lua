@@ -557,7 +557,7 @@ require('lazy').setup({
                     enabled = true,
                     servers = { 'github' },
                 },
-                model = 'claude-3.5-sonnet', -- default to my personal account limits
+                model = 'claude-sonnet-4',
                 prompts = {
                     GoTest = '> /COPILOT_GENERATE\n\n'
                         .. 'Write tests for the selected Go.\n'
