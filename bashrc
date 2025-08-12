@@ -121,6 +121,10 @@ if [[ $IS_MM = false && ! -d ~/.plenv && -d $localperlbin ]]; then
     [ "$SHLVL" -eq 1 ] && eval "$(perl -I "$HOME/perl5/lib/perl5" -Mlocal::lib)"
 
     add_path $localperlbin
+elif [[ $IS_MM = true ]]; then
+    add_path "$HOME"/dot-files/local/bin
+    PERL5OPT="-I$HOME/dot-files/local/lib/perl6"
+    export PERL5OPT
 fi
 
 whosonport() {
