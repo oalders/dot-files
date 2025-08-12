@@ -79,6 +79,7 @@ if is os name eq darwin; then
     add_path "/opt/homebrew/sbin"
 
     add_path "/Applications/WezTerm.app/Contents/MacOS"
+    add_path "/Applications/Docker.app/Contents/Resources/bin"
 
     # no build for older Macs
     if is there eza; then
