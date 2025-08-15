@@ -124,7 +124,7 @@ if [[ $IS_MM = false && ! -d ~/.plenv && -d $localperlbin ]]; then
     add_path $localperlbin
 elif [[ $IS_MM = true ]]; then
     add_path "$HOME"/dot-files/local/bin
-    PERL5OPT="-I$HOME/dot-files/local/lib/perl6"
+    PERL5OPT="-I$HOME/dot-files/local/lib/perl5"
     export PERL5OPT
 fi
 
