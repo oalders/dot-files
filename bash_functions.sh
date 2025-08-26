@@ -88,7 +88,7 @@ elif is os name eq linux; then
     LINK_FLAG="-T"
 fi
 
-if is var TMUX set; then
+if is var TMUX set && is os version-codename ne 'ventura'; then
     TERM=tmux-256color
 fi
 
