@@ -143,14 +143,14 @@ source ~/dot-files/bash_functions.sh
 # Requires git-lfs to have been installed
 if ! is there git-lfs; then
     if is os name eq linux; then
-        if is var IS_SUDOER eq true; then
+        if is var IS_SUDOER true; then
             sudo apt-get install git-lfs || git lfs update --force
         fi
     fi
     git lfs install
 fi
 
-if is var IS_MM eq true; then
+if is var IS_MM true; then
     git config --global --unset-all remote.origin.fetch
 fi
 

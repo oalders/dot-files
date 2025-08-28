@@ -58,7 +58,7 @@ fi
 
 echo "done nvim install"
 
-if is var IS_GITHUB eq true; then
+if is var IS_GITHUB true; then
     ldd --version
 else
     # nvim --headless "+Lazy! sync" +qa

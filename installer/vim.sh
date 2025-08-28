@@ -13,7 +13,7 @@ if is there vim; then
     exit 0
 fi
 
-if is var IS_SUDOER eq false; then
+if is var IS_SUDOER false; then
     exit 0
 fi
 
