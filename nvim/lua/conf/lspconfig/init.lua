@@ -189,10 +189,13 @@ vim.lsp.config('gopls', {
             gofumpt = true,
             usePlaceholders = true,
             hints = { functionTypeParameters = true },
+            -- Reduce diagnostics frequency
+            diagnosticsDelay = '2s',
         },
     },
     flags = {
-        debounce_text_changes = 3000,
+        -- Increase debounce time to 5 seconds (5000ms)
+        debounce_text_changes = 5000,
     },
 })
 
