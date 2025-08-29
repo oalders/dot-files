@@ -289,7 +289,7 @@ vim.lsp.enable({
     'ansiblels',
     'bashls',
     'docker_compose_language_service',
-    'eslint',
+    -- 'eslint',
     'lua_ls',
     'ts_ls',
     'yamlls',
