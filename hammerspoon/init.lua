@@ -242,6 +242,7 @@ local bellTV = 'https://tv.bell.ca'
 local github = 'https://github.com/notifications'
 local gmail = 'https://mail.google.com/'
 local ircCloud = 'https://www.irccloud.com/irc/'
+local slack = 'https://app.slack.com/'
 
 hs.hotkey.bind(my_hotkeys, 'a', cpanAuthorLink)
 hs.hotkey.bind(my_hotkeys, 'b', cpanDocumentationLink)
@@ -253,7 +254,7 @@ hs.hotkey.bind(
     chrome_tab_action(gmail, gmail .. 'mail/u/0/#all')
 )
 hs.hotkey.bind(my_hotkeys, 'i', nil, open_app_action('wezterm'))
-hs.hotkey.bind(my_hotkeys, 'l', nil, open_app_action('Slack'))
+hs.hotkey.bind(my_hotkeys, 'l', nil, chrome_tab_action(slack,slack))
 hs.hotkey.bind(my_hotkeys, 'n', nil, chrome_tab_action(github, github))
 hs.hotkey.bind(
     my_hotkeys,
@@ -278,19 +279,6 @@ hs.hotkey.bind(
     chrome_tab_action(ircCloud, ircCloud .. 'magnet/channel/metacpan')
 )
 hs.hotkey.bind(hyper, 'q', slackifyName)
-
-local open_slack_threads = function(name)
-    return function()
-        hs.application.launchOrFocus(name)
-        hs.eventtap.event.newKeyEvent(hs.keycodes.map.shift, true):post()
-        hs.eventtap.event.newKeyEvent(hs.keycodes.map.cmd, true):post()
-        hs.eventtap.event.newKeyEvent('T', true):post()
-        hs.eventtap.event.newKeyEvent('T', false):post()
-        hs.eventtap.event.newKeyEvent(hs.keycodes.map.cmd, false):post()
-        hs.eventtap.event.newKeyEvent(hs.keycodes.map.shift, false):post()
-    end
-end
-hs.hotkey.bind(hyper, 't', nil, open_slack_threads('Slack'))
 
 -- Stolen from Lukas https://stackoverflow.com/a/58662204/406224
 hs.hotkey.bind(hyper, 'n', function()
