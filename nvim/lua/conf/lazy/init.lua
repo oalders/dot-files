@@ -282,8 +282,8 @@ require('lazy').setup({
 
         --  <leader>td (doc) <leader>tw (workspace)
         {
-            'folke/trouble.nvim',
-            event = 'LspAttach',
+            'h-michael/trouble.nvim',
+            branch = 'fix/decoration-provider-api',
             opts = {}, -- for default options, refer to the configuration section for custom setup.
             cmd = 'Trouble',
             keys = {
