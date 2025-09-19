@@ -54,7 +54,7 @@ fi
 
 # posh handling
 posh_me() {
-    eval "$(oh-my-posh prompt init bash --config ~/.config/oh-my-posh/themes/local.omp.json)"
+    eval "$(oh-my-posh init bash --config ~/.config/oh-my-posh/themes/local.omp.json)"
 }
 
 toggle_posh() {
