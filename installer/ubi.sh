@@ -17,7 +17,7 @@ if [[ ! "$(command -v curl)" && "$(command -v apt-get)" ]]; then
     if [[ ! "$(command -v sudo)" ]]; then
         apt-get update && apt-get install sudo --autoremove -y
     fi
-    apt-get install curl --autoremove -y
+    sudo apt-get install curl --autoremove -y
 fi
 
 maybe_install() {
@@ -38,6 +38,7 @@ fi
 # to debounce debounce
 db 1 d ubi --project oalders/debounce --in "$in"
 
+maybe_install air-verse/air
 maybe_install atanunq/viu
 maybe_install bensadeh/tailspin --exe tspin
 maybe_install charmbracelet/gum
