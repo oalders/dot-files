@@ -26,17 +26,8 @@ else
 fi
 
 git pull --rebase origin "$base_branch" || true
-file=/tmp/diff.txt
-
-echo '```' >$file
 
 script=diff-lockfiles
-
-$script \
-    --format table \
-    "$remote"/"$base_branch" "$remote/$branch" >>/tmp/diff.txt
-
-echo '```' >>$file
 
 $script \
     --format table \
@@ -46,6 +37,11 @@ $script \
 read -n 1 -t 30 -s -r -p "Approve PR? Press y to continue, r to rebase, n to exit." input
 
 if [[ $input == "y" ]]; then
+    file=$(mktemp)
+    $script \
+        --format markdown \
+        "$remote"/"$base_branch" "$remote/$branch" >$file
+
     gh pr review --approve "$branch" -F $file
     gh pr merge --merge "$branch" || gh pr --merge "$branch" --auto
 elif [[ $input == "r" ]]; then
