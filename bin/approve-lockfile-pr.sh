@@ -1,15 +1,25 @@
 #!/usr/bin/env bash
 
-set -e -u -o pipefail -x
+set -eu -o pipefail
 
-if [ $# -ne 2 ]; then
-    echo "Usage: $0 <remote> <branch>"
-    echo "Example: $0 origin dependabot/npm_and_yarn/lodash-4.17.21"
+author=${1:-"app/dependabot"}
+label=${2:-""}
+
+gh_command="gh pr list --author \"$author\" --json headRefName"
+if [ -n "$label" ]; then
+    gh_command="$gh_command --label \"$label\""
+fi
+
+# Select branch with fzf
+branch=$(eval "$gh_command" | jq -r '.[].headRefName' | fzf)
+
+if [ -z "$branch" ]; then
+    echo "No branch selected. Exiting."
     exit 1
 fi
 
-remote=$1
-branch=$2
+# Merged functionality from approve-lockfile-pr.sh
+remote="origin"
 
 gh pr view "$branch"
 gh pr checks "$branch"
