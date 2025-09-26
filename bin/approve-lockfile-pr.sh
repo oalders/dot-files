@@ -24,10 +24,6 @@ remote="origin"
 gh pr view "$branch"
 gh pr checks "$branch"
 
-gh repo sync
-gh repo sync -b "$branch" --force
-git fetch origin || true
-
 # Check if main branch exists, otherwise use master
 if git show-ref --verify --quiet refs/heads/main; then
     base_branch="main"
@@ -35,9 +31,17 @@ else
     base_branch="master"
 fi
 
-git pull --rebase origin "$base_branch" || true
+# Fetch only the specific branches we need for diffing
+echo "Fetching branches for comparison..."
+git fetch origin "$base_branch" "$branch" || true
 
 script=diff-lockfiles
+
+# Check if diff-lockfiles command exists
+is there $script || {
+    echo "Error: $script command not found. Please install it first."
+    exit 1
+}
 
 $script \
     --format table \
@@ -53,7 +57,7 @@ if [[ $input == "y" ]]; then
         "$remote"/"$base_branch" "$remote/$branch" >$file
 
     gh pr review --approve "$branch" -F $file
-    gh pr merge --merge "$branch" || gh pr --merge "$branch" --auto
+    gh pr merge "$branch" || gh pr merge "$branch" --auto
 elif [[ $input == "r" ]]; then
     dependabot-rebase.sh "$branch"
 else
