@@ -51,7 +51,8 @@ else
         ripgrep \
         shellcheck \
         tig \
-        tree
+        tree \
+        trurl
 fi
 
 if ! is there go; then
