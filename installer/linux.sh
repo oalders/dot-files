@@ -45,6 +45,8 @@ else
         locate \
         luarocks \
         pandoc \
+        pipx \
+        python3-pip \
         python3-setuptools \
         ripgrep \
         shellcheck \
