@@ -96,9 +96,9 @@ wezterm.on('update-status', function(window)
     }))
 end)
 
--- fit more text on Chromebook's small screen
-if wezterm.hostname():match('penguin') then
-    config.font_size = 11.0
+-- fit more text on MacBuntu's small screen
+if os.getenv('XDG_SESSION_TYPE'):match('wayland') then
+    config.font_size = 10.0
     config.window_decorations = 'INTEGRATED_BUTTONS'
 end
 
