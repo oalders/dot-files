@@ -100,6 +100,7 @@ end)
 if os.getenv('XDG_SESSION_TYPE'):match('wayland') then
     config.font_size = 10.0
     config.window_decorations = 'INTEGRATED_BUTTONS'
+    config.window_frame.font_size = 9.0
 end
 
 -- required for folke/zen-mode.nvim
