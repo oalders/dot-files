@@ -38,8 +38,6 @@ config.front_end = 'OpenGL'
 config.window_decorations = 'RESIZE'
 -- Sets the font for the window frame (tab bar)
 config.window_frame = {
-    -- Berkeley Mono for me again, though an idea could be to try a
-    -- serif font here instead of monospace for a nicer look?
     -- font = wezterm.font({ weight = 'Bold' }),
     font_size = 12,
 }
