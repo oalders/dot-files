@@ -71,7 +71,7 @@ config.keys = {
 wezterm.on('update-status', function(window)
     -- Grab the utf8 character for the "powerline" left facing
     -- solid arrow.
-    local SOLID_LEFT_ARROW = utf8.char(0xe0b2)
+    local SOLID_LEFT_ARROW = wezterm.utf8.char(0xe0b2)
 
     -- Grab the current window's configuration, and from it the
     -- palette (this is the combination of your chosen colour scheme
