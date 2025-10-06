@@ -57,7 +57,7 @@ if [[ $input == "y" ]]; then
         "$remote"/"$base_branch" "$remote/$branch" >$file
 
     gh pr review --approve "$branch" -F $file
-    gh pr merge "$branch" || gh pr merge "$branch" --auto
+    gh pr merge --merge --delete-branch "$branch" || gh pr merge "$branch" --auto
 elif [[ $input == "r" ]]; then
     dependabot-rebase.sh "$branch"
 else
