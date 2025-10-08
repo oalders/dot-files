@@ -66,6 +66,16 @@ config.keys = {
         mods = 'ALT',
         action = wezterm.action.CloseCurrentTab({ confirm = true }),
     },
+    {
+        key = 'c',
+        mods = 'ALT',
+        action = wezterm.action.CopyTo('Clipboard'),
+    },
+    {
+        key = 'v',
+        mods = 'ALT',
+        action = wezterm.action.PasteFrom('Clipboard'),
+    },
 }
 
 wezterm.on('update-status', function(window)
