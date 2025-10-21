@@ -36,9 +36,13 @@ worktree_dir="$all_worktrees/$repo_name/$branch_name"
 git worktree add "$worktree_dir" -b "$branch_name"
 
 cd "$worktree_dir" || exit 1
+if [[ -f package.json ]]; then
+    npm i
+fi
 
 if [[ -n $(pgrep tmux) ]]; then
     . ~/dot-files/bash_functions.sh
+
     tmux_session_name # exports $SESSION_NAME
     tmux new -s "$SESSION_NAME"
 fi
