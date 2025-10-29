@@ -1,0 +1,25 @@
+#!/bin/bash
+# Fix Docker permissions on Ubuntu so you don't need sudo
+
+set -e
+
+echo "Fixing Docker permissions..."
+
+# Create docker group if it doesn't exist
+if ! getent group docker > /dev/null 2>&1; then
+    echo "Creating docker group..."
+    sudo groupadd docker
+fi
+
+# Add current user to docker group
+echo "Adding $USER to docker group..."
+sudo usermod -aG docker "$USER"
+
+# Update docker group permissions
+echo "Updating docker socket permissions..."
+sudo chown root:docker /var/run/docker.sock
+sudo chmod 660 /var/run/docker.sock
+
+echo ""
+echo "Done! You need to log out and log back in (or restart your session) for changes to take effect."
+echo "After logging back in, you can verify with: docker ps"
