@@ -35,8 +35,19 @@ if is os name eq darwin && [[ ! -d /opt/homebrew ]]; then
     fi
     # Install Net::SSLeay on MacOS
     export OPENSSL_PREFIX
-elif ! test -d /usr/include/openssl && is os id eq debian && is user sudoer; then
-    sudo apt-get -y install libssl-dev
+elif (is os id eq debian || is os id eq ubuntu) && is user sudoer; then
+    # Install development headers on Debian/Ubuntu if not already installed
+    packages_to_install=""
+    if ! dpkg -l | grep -q libssl-dev; then
+        packages_to_install="$packages_to_install libssl-dev"
+    fi
+    if ! dpkg -l | grep -q zlib1g-dev; then
+        packages_to_install="$packages_to_install zlib1g-dev"
+    fi
+    if [[ -n "$packages_to_install" ]]; then
+        sudo apt-get -y update
+        sudo apt-get -y install $packages_to_install
+    fi
 fi
 
 cpm install -g --verbose --show-build-log-on-failure --cpanfile cpan/cli.cpanfile
