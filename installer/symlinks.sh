@@ -63,12 +63,23 @@ files=(
     "shellcheckrc"
     "sqliterc"
     "tigrc"
-    "npmrc"
 )
 
 for file in "${files[@]}"; do
     ln -sf "$prefix/$file" ~/.$file
 done
+
+# Copy npmrc instead of symlinking so npm can add auth tokens without affecting the repo
+# If it's a symlink from previous installations, convert it to a regular file
+if [ -L ~/.npmrc ]; then
+    # Preserve the content before removing the symlink
+    cp ~/.npmrc ~/.npmrc.tmp
+    rm ~/.npmrc
+    mv ~/.npmrc.tmp ~/.npmrc
+elif [ ! -f ~/.npmrc ]; then
+    # File doesn't exist, create it from template
+    cp "$prefix/npmrc" ~/.npmrc
+fi
 
 ln -sf $prefix/bat/config "$(bat --config-file)"
 ln -sf $prefix/cpanreporter/config.ini ~/.cpanreporter/config.ini
