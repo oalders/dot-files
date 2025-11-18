@@ -4,13 +4,43 @@ set -eu
 
 in="$HOME/local/bin"
 
-# shellcheck source=bash_functions.sh
-source ~/dot-files/bash_functions.sh
+# shellcheck source=path_functions.sh
+source ~/dot-files/path_functions.sh
 
 test -d "$in" || mkdir -p "$in"
 add_path "$in"
 
 # set -x
+
+# Simplified debounce function for bootstrapping (before "is" is available)
+# Hardcoded to check if file is older than 1 day
+db() {
+    if [ $# -lt 1 ]; then
+        echo "🤬 Not enough arguments provided. Usage: db something"
+        return
+    fi
+
+    # exit as early as possible if we can't create the cache dir
+    # test -d appears to be slightly faster (3ms?) than mkdir -p
+    cache_dir=~/.cache/debounce
+    test -d $cache_dir || mkdir -p $cache_dir
+
+    # everything is runnable
+    target="$*"
+
+    # file is $target with slashes converted to dashes
+    file=$(echo "$target" | tr / -)
+
+    debounce="$cache_dir/$file"
+
+    # Check if file exists and is less than 1 day old
+    if [ -f "$debounce" ] && find "$debounce" -mtime -1 2>/dev/null | grep -q .; then
+        echo "🚥 will not run $target more than once per day"
+        return
+    fi
+
+    "$@" && touch "$debounce"
+}
 
 # can't use "is" here as we may not yet have it
 if [[ ! "$(command -v curl)" && "$(command -v apt-get)" ]]; then
@@ -23,7 +53,7 @@ fi
 maybe_install() {
     project="$1"
     shift
-    command debounce 1 d ubi --project "$project" --in "$in" "$@"
+    db ubi --project "$project" --in "$in" "$@"
 }
 
 if [ ! -f "$in/ubi" ]; then
@@ -31,12 +61,12 @@ if [ ! -f "$in/ubi" ]; then
         https://raw.githubusercontent.com/houseabsolute/ubi/master/bootstrap/bootstrap-ubi.sh |
         TARGET=$in sh
 else
-    db 1 d "$in/ubi" --self-upgrade
+    db "$in/ubi" --self-upgrade
 fi
 
 # there's a bit of a bootstrapping issue here, so we'll use the bash function
 # to debounce debounce
-db 1 d ubi --project oalders/debounce --in "$in"
+db ubi --project oalders/debounce --in "$in"
 
 maybe_install air-verse/air
 maybe_install atanunq/viu
@@ -97,9 +127,9 @@ if is there gh && ! gh extension list | grep --quiet copilot; then
 fi
 
 if is there gh && ! gh extension list | grep --quiet gh-dash; then
-    debounce 1 d gh extension install dlvhdr/gh-dash || true
+    db gh extension install dlvhdr/gh-dash || true
 fi
 
 # ensure is completions are up to date
 # shellcheck disable=SC2016
-debounce 1 d bash -c 'eval "$(is install-completions)"'
+db bash -c 'eval "$(is install-completions)"'

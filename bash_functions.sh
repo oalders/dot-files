@@ -1,33 +1,7 @@
 # shellcheck shell=bash
 
-# path handling
-# http://superuser.com/questions/39751/add-directory-to-path-if-its-not-already-there
-add_path() {
-    if [ -d "$1" ] && [[ ":$PATH:" != *":$1:"* ]]; then
-        PATH="$1:$PATH"
-        export PATH
-    fi
-}
-
-remove_path() {
-    PATH=$(tr : '\n' <<<"$PATH" | grep -v "^$1$" | paste -sd ':' -)
-    export PATH
-}
-
-echo_path() {
-    echo "path..."
-    tr : '\n' <<<"$PATH"
-}
-
-clean_path() {
-    # shellcheck disable=SC1001
-    tr : '\n' <<<"$PATH" | awk '!x[$0]++' | grep \/ | grep -v game | paste -sd ":" -
-}
-
-reset_path() {
-    PATH=$(clean_path)
-    export PATH
-}
+# shellcheck source=path_functions.sh
+source ~/dot-files/path_functions.sh
 
 add_path "/usr/local/go/bin"
 add_path "$HOME/local/bin"
@@ -272,37 +246,6 @@ tmux_session_name() {
     SESSION_NAME=${SESSION_NAME//./-}
     SESSION_NAME=${SESSION_NAME//oalders/OA}
     export SESSION_NAME
-}
-
-db() {
-    if [ $# -lt 3 ]; then
-        echo "🤬 Not enough arguments provided. Usage: debounce 6 h something"
-        return
-    fi
-
-    # exit as early as possible if we can't create the cache dir
-    # test -d appears to be slightly faster (3ms?) than mkdir -p
-    cache_dir=~/.cache/debounce
-    test -d $cache_dir || mkdir -p $cache_dir
-
-    number=$1
-    units=$2
-    shift 2
-
-    # everything remaining is runnable
-    target="$*"
-
-    # file is $target with slashes converted to dashes
-    file=$(echo "$target" | tr / -)
-
-    debounce="$cache_dir/$file"
-
-    if [ -f "$debounce" ] && is fso age "$debounce" lt "$number" "$units"; then
-        echo "🚥 will not run $target more than once every $number $units"
-        return
-    fi
-
-    "$@" && touch "$debounce"
 }
 
 function clone_or_update_repo() {
