@@ -10,10 +10,6 @@ source ~/dot-files/bash_functions.sh
 
 set -x
 
-if is var IS_MM true; then
-    exit 0
-fi
-
 perl --version
 
 # Set up some ENV vars so that global installs go to ~/perl5

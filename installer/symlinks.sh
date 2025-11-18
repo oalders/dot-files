@@ -63,11 +63,8 @@ files=(
     "shellcheckrc"
     "sqliterc"
     "tigrc"
+    "npmrc"
 )
-
-if [ "$IS_MM" = false ]; then
-    files+=("npmrc")
-fi
 
 for file in "${files[@]}"; do
     ln -sf "$prefix/$file" ~/.$file

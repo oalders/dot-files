@@ -150,8 +150,4 @@ if ! is there git-lfs; then
     git lfs install
 fi
 
-if is var IS_MM true; then
-    git config --global --unset-all remote.origin.fetch
-fi
-
 exit 0

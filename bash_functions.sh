@@ -97,27 +97,13 @@ if is var GITHUB_WORKSPACE set; then
     IS_GITHUB=true
 fi
 
-if [[ ! ${IS_MM-} ]]; then
-    if [[ -e /usr/local/bin/mm-perl ]]; then
-        IS_MM=true
-    else
-        IS_MM=false
-    fi
-fi
-
 if [[ ! ${IS_SUDOER-} ]]; then
-    if [[ $IS_MM == true ]]; then
-        # Don't try to sudo on MM machines
-        IS_SUDOER="${IS_SUDOER:=false}"
-
+    # The sudo -n gets misinterpreted by shellcheck
+    # shellcheck disable=SC2143
+    if [[ $(sudo -n true 2>&1 | grep 'password') ]]; then
+        IS_SUDOER=false
     else
-        # The sudo -n gets misinterpreted by shellcheck
-        # shellcheck disable=SC2143
-        if [[ $(sudo -n true 2>&1 | grep 'password') ]]; then
-            IS_SUDOER=false
-        else
-            IS_SUDOER=true
-        fi
+        IS_SUDOER=true
     fi
 fi
 
@@ -338,7 +324,6 @@ export GO111MODULE
 export GOPATH
 export HARNESS_OPTIONS
 export IS_GITHUB
-export IS_MM
 export IS_SUDOER
 export LINK_FLAG
 export RIPGREP_CONFIG_PATH

@@ -35,9 +35,6 @@ brew unlink md5sha1sum
 rm -rf /usr/local/etc/luarocks
 rm -rf /usr/local/etc/luarocks51
 brew remove truncate
-
-if is var IS_MM eq false; then
-    brew remove virtualbox
-fi
+brew remove virtualbox
 
 brew untap caskroom/cask
