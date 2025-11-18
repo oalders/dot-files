@@ -32,12 +32,12 @@ fi
 
 cd "$git_dir/.." || exit 1
 
-repo_name="$(basename "$(pwd)")"
+repo_root="$(pwd)"
 
-all_worktrees="$HOME/.worktree"
+all_worktrees="$repo_root/.worktrees"
 mkdir -p "$all_worktrees"
 
-worktree_dir="$all_worktrees/$repo_name/$branch_name"
+worktree_dir="$all_worktrees/$branch_name"
 
 if [[ -n "$pr_number" ]]; then
     # For PR checkouts, create worktree without -b flag (gh pr checkout will create the branch)
