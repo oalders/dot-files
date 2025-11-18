@@ -8,6 +8,12 @@ if [ $# -ne 1 ]; then
 fi
 
 branch_name="$1"
+pr_number=""
+
+# Check if this is a PR checkout (gh-XXX format)
+if [[ "$branch_name" == gh-* ]]; then
+    pr_number="${branch_name#gh-}"
+fi
 
 set -x
 
@@ -33,9 +39,19 @@ mkdir -p "$all_worktrees"
 
 worktree_dir="$all_worktrees/$repo_name/$branch_name"
 
-git worktree add "$worktree_dir" -b "$branch_name"
+if [[ -n "$pr_number" ]]; then
+    # For PR checkouts, create worktree without -b flag (gh pr checkout will create the branch)
+    git worktree add "$worktree_dir"
+else
+    git worktree add "$worktree_dir" -b "$branch_name"
+fi
 
 cd "$worktree_dir" || exit 1
+
+# If this is a PR, checkout the PR using gh
+if [[ -n "$pr_number" ]]; then
+    gh pr checkout "$pr_number"
+fi
 if [[ -f package.json ]]; then
     npm i
 fi
