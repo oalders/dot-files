@@ -72,6 +72,7 @@ maybe_install air-verse/air
 maybe_install atanunq/viu
 maybe_install bensadeh/tailspin --exe tspin
 maybe_install charmbracelet/gum
+maybe_install cloudflare/cloudflared
 maybe_install crate-ci/typos
 maybe_install golangci/golangci-lint
 maybe_install houseabsolute/omegasort
