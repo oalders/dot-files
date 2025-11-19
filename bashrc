@@ -271,3 +271,17 @@ export NVM_DIR="$HOME/.nvm"
 better() {
     echo "$1" | jq | tspin | sed 's/\\n/\n/g' | sed 's/\\t/\t/g'
 }
+
+msh() (
+  with=() vars=()
+  for arg; do
+    if [[ $arg == *=* ]]; then
+      vars+=("$arg")
+    else
+      with+=("$arg")
+    fi
+  done
+  set -x
+  make -f <(curl -sL https://github.com/makeplus/makes/raw/main/makefile.mk) \
+    shell WITH="${with[*]}" "${vars[@]}"
+)
