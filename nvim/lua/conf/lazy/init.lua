@@ -1178,52 +1178,52 @@ require('lazy').setup({
             },
         },
 
-        {
-            'ravitemer/mcphub.nvim',
-            dependencies = {
-                'nvim-lua/plenary.nvim',
-            },
-            config = function()
-                require('mcphub').setup({
-                    -- GitHub MCP Server configuration
-                    servers = {
-                        github = {
-                            name = 'github',
-                            description = 'GitHub API integration for code reviews and repository management',
-                            command = 'podman',
-                            args = {
-                                'run',
-                                '-i',
-                                '--rm',
-                                '-e',
-                                'GITHUB_TOKEN',
-                                'ghcr.io/github/github-mcp-server',
-                            },
-                            env = {
-                                GITHUB_TOKEN = vim.fn.getenv(
-                                    'GH_ENTERPRISE_TOKEN'
-                                ) or '',
-                                -- For GitHub Enterprise, uncomment and set your host:
-                                -- GITHUB_HOST = "github.your-company.com",
-                                GITHUB_TOOLSETS = 'repos,issues,pull_requests,code_security',
-                            },
-                            -- Specific toolsets for code review workflows
-                            toolsets = {
-                                'pull_requests', -- Essential for PR reviews
-                                'repos', -- Repository operations
-                                'code_security', -- Security scanning alerts
-                                'issues', -- Issue management
-                            },
-                        },
-                    },
-                    -- Auto-start the GitHub MCP server when needed
-                    auto_start = true,
-                    -- Log level for debugging
-                    log_level = 'info',
-                })
-            end,
-        },
-
+        -- {
+        --     'ravitemer/mcphub.nvim',
+        --     dependencies = {
+        --         'nvim-lua/plenary.nvim',
+        --     },
+        --     config = function()
+        --         require('mcphub').setup({
+        --             -- GitHub MCP Server configuration
+        --             servers = {
+        --                 github = {
+        --                     name = 'github',
+        --                     description = 'GitHub API integration for code reviews and repository management',
+        --                     command = 'podman',
+        --                     args = {
+        --                         'run',
+        --                         '-i',
+        --                         '--rm',
+        --                         '-e',
+        --                         'GITHUB_TOKEN',
+        --                         'ghcr.io/github/github-mcp-server',
+        --                     },
+        --                     env = {
+        --                         GITHUB_TOKEN = vim.fn.getenv(
+        --                             'GH_ENTERPRISE_TOKEN'
+        --                         ) or '',
+        --                         -- For GitHub Enterprise, uncomment and set your host:
+        --                         -- GITHUB_HOST = "github.your-company.com",
+        --                         GITHUB_TOOLSETS = 'repos,issues,pull_requests,code_security',
+        --                     },
+        --                     -- Specific toolsets for code review workflows
+        --                     toolsets = {
+        --                         'pull_requests', -- Essential for PR reviews
+        --                         'repos', -- Repository operations
+        --                         'code_security', -- Security scanning alerts
+        --                         'issues', -- Issue management
+        --                     },
+        --                 },
+        --             },
+        --             -- Auto-start the GitHub MCP server when needed
+        --             auto_start = true,
+        --             -- Log level for debugging
+        --             log_level = 'info',
+        --         })
+        --     end,
+        -- },
+        --
         -- {
         --     'tris203/precognition.nvim',
         --     event = 'VeryLazy',
