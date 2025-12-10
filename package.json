@@ -31,7 +31,7 @@
     "markdownlint-cli": "^0.46.0",
     "mcp-hub": "^4.2.1",
     "normalize-url": "^8.1.0",
-    "npm": "^11.6.4",
+    "npm": "^11.7.0",
     "prettier": "^3.7.4",
     "tree-sitter-cli": "^0.25.10",
     "typescript": "^5.9.3",
