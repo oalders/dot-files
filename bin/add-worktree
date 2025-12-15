@@ -32,9 +32,10 @@ fi
 
 cd "$git_dir/.." || exit 1
 
-repo_root="$(pwd)"
+repo_name="$(basename "$(pwd)")"
+date_stamp="$(date +%Y-%m-%d)"
 
-all_worktrees="$repo_root/.worktrees"
+all_worktrees="$HOME/.worktree/$repo_name/$date_stamp"
 mkdir -p "$all_worktrees"
 
 worktree_dir="$all_worktrees/$branch_name"
