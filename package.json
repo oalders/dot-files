@@ -38,7 +38,7 @@
     "underscore": "^1.13.7",
     "urijs": ">=1.19.11",
     "ws": "^8.18.3",
-    "zod": "^4.1.13"
+    "zod": "^4.2.0"
   },
   "devDependencies": {
     "@anthropic-ai/claude-code": "^2.0.67"
