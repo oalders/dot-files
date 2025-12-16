@@ -9,6 +9,7 @@ prefix=~/dot-files
 
 directories=(
     "$(bat --config-dir)"
+    ~/.claude/skills
     ~/.config/oh-my-posh/themes
     ~/.config/mcphub
     ~/.config/perlimports
@@ -82,6 +83,7 @@ elif [ ! -f ~/.npmrc ]; then
 fi
 
 ln -sf $prefix/bat/config "$(bat --config-file)"
+ln -sf $prefix/claude/skills/auditing-shareable-content ~/.claude/skills/auditing-shareable-content
 ln -sf $prefix/cpanreporter/config.ini ~/.cpanreporter/config.ini
 ln -sf $prefix/oh-my-posh/themes/local.omp.json ~/.config/oh-my-posh/themes/local.omp.json
 ln -sf $prefix/mcphub/servers.json ~/.config/mcphub/servers.json
