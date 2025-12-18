@@ -41,6 +41,6 @@
     "zod": "^4.2.1"
   },
   "devDependencies": {
-    "@anthropic-ai/claude-code": "^2.0.71"
+    "@anthropic-ai/claude-code": "^2.0.72"
   }
 }
