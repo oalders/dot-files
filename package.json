@@ -30,7 +30,7 @@
     "markdownlint": "^0.40.0",
     "markdownlint-cli": "^0.47.0",
     "mcp-hub": "^4.2.1",
-    "normalize-url": "^8.1.0",
+    "normalize-url": "^8.1.1",
     "npm": "^11.7.0",
     "prettier": "^3.7.4",
     "tree-sitter-cli": "^0.26.3",
