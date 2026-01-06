@@ -37,7 +37,7 @@
     "typescript": "^5.9.3",
     "underscore": "^1.13.7",
     "urijs": ">=1.19.11",
-    "ws": "^8.18.3",
+    "ws": "^8.19.0",
     "zod": "^4.3.5"
   },
   "devDependencies": {
