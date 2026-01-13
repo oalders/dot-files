@@ -152,6 +152,51 @@ change_git_origin() {
     git remote add origin "$git"
 }
 
+get_github_display_name() {
+    local branch="$1"
+    local number=""
+    local type=""
+
+    # Pattern matching
+    if [[ $branch =~ ^fix-([0-9]+)$ ]]; then
+        number="${BASH_REMATCH[1]}"
+        type="issue"
+    elif [[ $branch =~ ^gh-([0-9]+)$ ]]; then
+        number="${BASH_REMATCH[1]}"
+        type="pr"
+    else
+        echo "$branch"
+        return 0
+    fi
+
+    # Fetch title from GitHub
+    local title
+    if [[ $type == "issue" ]]; then
+        title=$(gh issue view "$number" --json title --jq .title 2>/dev/null)
+    else
+        title=$(gh pr view "$number" --json title --jq .title 2>/dev/null)
+    fi
+
+    # Fallback on error
+    if [[ -z $title ]]; then
+        echo "$branch"
+        return 0
+    fi
+
+    # Remove special characters that tmux doesn't like
+    title=${title//[.:]/}
+
+    # Truncate at 45 characters, avoiding mid-word cuts
+    if [[ ${#title} -gt 45 ]]; then
+        title="${title:0:45}"
+        # Remove partial word at the end
+        title="${title% *}"
+    fi
+
+    # Return formatted name
+    echo "${title}"
+}
+
 tmux_session_name() {
     inside_git_repo="$(git rev-parse --is-inside-work-tree 2>/dev/null)"
     padding=60
@@ -159,6 +204,7 @@ tmux_session_name() {
     if [ "$inside_git_repo" ]; then
 
         branch=$(git rev-parse --abbrev-ref HEAD)
+        display_name=$(get_github_display_name "$branch")
         current_dir=${PWD##*/}
         current_dir=$(printf "%-18s" "$current_dir")
 
@@ -234,7 +280,7 @@ tmux_session_name() {
                 break
             fi
         done
-        SESSION_NAME="$prefix  $current_dir   $branch"
+        SESSION_NAME="$prefix  $current_dir   $display_name"
     else
         SESSION_NAME=$(pwd)
         strip="$HOME/"
