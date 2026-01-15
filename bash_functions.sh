@@ -169,32 +169,51 @@ get_github_display_name() {
         return 0
     fi
 
-    # Fetch title from GitHub
-    local title
+    # Fetch title and labels from GitHub
+    local json_data title labels
     if [[ $type == "issue" ]]; then
-        title=$(gh issue view "$number" --json title --jq .title 2>/dev/null)
+        json_data=$(gh issue view "$number" --json title,labels 2>/dev/null)
     else
-        title=$(gh pr view "$number" --json title --jq .title 2>/dev/null)
+        json_data=$(gh pr view "$number" --json title,labels 2>/dev/null)
     fi
 
     # Fallback on error
-    if [[ -z $title ]]; then
+    if [[ -z $json_data ]]; then
         echo "$branch"
         return 0
     fi
 
+    title=$(echo "$json_data" | jq -r '.title')
+    labels=$(echo "$json_data" | jq -r '.labels[].name' 2>/dev/null)
+
     # Remove special characters that tmux doesn't like
     title=${title//[.:]/}
 
-    # Truncate at 45 characters, avoiding mid-word cuts
+    # Check for blocked label (prefix) and collect other labels (suffixes)
+    local prefix="" suffix=""
+    while IFS= read -r label; do
+        [[ -z $label ]] && continue
+        if [[ $label == "blocked" ]]; then
+            prefix=" 🚫 "
+        else
+            # Add other labels as suffixes
+            if [[ -n $suffix ]]; then
+                suffix="$suffix [$label]"
+            else
+                suffix=" [$label]"
+            fi
+        fi
+    done <<< "$labels"
+
+    # Truncate title at 45 characters, avoiding mid-word cuts
     if [[ ${#title} -gt 45 ]]; then
         title="${title:0:45}"
         # Remove partial word at the end
         title="${title% *}"
     fi
 
-    # Return formatted name
-    echo "${title}"
+    # Return formatted name with prefix and suffix
+    echo "${prefix}${title}${suffix}"
 }
 
 tmux_session_name() {
