@@ -243,6 +243,7 @@ tmux_session_name() {
             # configuration
             ["dot-files"]=""
             ["local-dot-files"]=""
+            ["my-mind-is-racing"]="👟"
 
             # markdown -- nvim devicons doesn't have an icon for hugo
             ["freelancer-theme"]="󰍔"
@@ -266,6 +267,7 @@ tmux_session_name() {
         keys=(
             "dot-files"
             "local-dot-files"
+            "my-mind-is-racing"
             "www-olafalders-dot-com"
             "dist.ini"
             "cpanfile"
@@ -294,7 +296,7 @@ tmux_session_name() {
             topDir=$(basename "$PWD")
         fi
         for file in "${keys[@]}"; do
-            if [[ $topDir == "$file" ]] || [[ -f $file ]]; then
+            if [[ $topDir == "$file" ]] || [[ -f $file ]] || [[ $PWD == *"$file"* ]]; then
                 prefix="${fileToPrefix[$file]}"
                 break
             fi
