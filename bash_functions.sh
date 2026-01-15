@@ -261,6 +261,8 @@ tmux_session_name() {
 
             # node
             ["package.json"]=""
+            # claude
+            [".claude-plugin"]="🤖"
         )
 
         # We can't preserve the order of the keys in associative array above
@@ -281,6 +283,7 @@ tmux_session_name() {
             "docker-compose.yml"
             "package.json"
             "freelancer-theme"
+            ".claude-plugin"
         )
 
         prefix='⁉️'
@@ -296,7 +299,7 @@ tmux_session_name() {
             topDir=$(basename "$PWD")
         fi
         for file in "${keys[@]}"; do
-            if [[ $topDir == "$file" ]] || [[ -f $file ]] || [[ $PWD == *"$file"* ]]; then
+            if [[ $topDir == "$file" ]] || [[ -f $file ]] || [[ -d $file ]] || [[ $PWD == *"$file"* ]]; then
                 prefix="${fileToPrefix[$file]}"
                 break
             fi
