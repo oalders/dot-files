@@ -51,7 +51,11 @@ cd "$worktree_dir" || exit 1
 
 # If this is a PR, checkout the PR using gh
 if [[ -n "$pr_number" ]]; then
-    gh pr checkout "$pr_number"
+    if [[ "$branch_name" == gh-* ]]; then
+        gh pr checkout "$pr_number"
+    else
+        gh issue edit "$pr_number" --add-label "in progress"
+    fi
 fi
 if [[ -f package.json ]]; then
     npm i
