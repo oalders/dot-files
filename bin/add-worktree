@@ -8,11 +8,16 @@ if [ $# -ne 1 ]; then
 fi
 
 branch_name="$1"
-pr_number=""
+number=""
+type=""
 
-# Check if this is a PR checkout (gh-XXX format)
-if [[ "$branch_name" == gh-* ]]; then
-    pr_number="${branch_name#gh-}"
+# Pattern matching for GitHub issues and PRs
+if [[ $branch_name =~ ^fix-([0-9]+)$ ]]; then
+    number="${BASH_REMATCH[1]}"
+    type="issue"
+elif [[ $branch_name =~ ^gh-([0-9]+)$ ]]; then
+    number="${BASH_REMATCH[1]}"
+    type="pr"
 fi
 
 set -x
@@ -40,7 +45,7 @@ mkdir -p "$all_worktrees"
 
 worktree_dir="$all_worktrees/$branch_name"
 
-if [[ -n "$pr_number" ]]; then
+if [[ "$type" == "pr" ]]; then
     # For PR checkouts, create worktree without -b flag (gh pr checkout will create the branch)
     git worktree add "$worktree_dir"
 else
@@ -49,16 +54,14 @@ fi
 
 cd "$worktree_dir" || exit 1
 
-# If this is a PR, checkout the PR using gh
-if [[ -n "$pr_number" ]]; then
-    if [[ "$branch_name" == gh-* ]]; then
-        gh pr checkout "$pr_number"
-    else
-        gh issue edit "$pr_number" --add-label "in progress"
-    fi
+# Handle GitHub PRs and issues
+if [[ "$type" == "pr" ]]; then
+    gh pr checkout "$number"
+elif [[ "$type" == "issue" ]]; then
+    gh issue edit "$number" --add-label "in progress"
 fi
 if [[ -f package.json ]]; then
-    npm i
+    npm i && git co package-lock.json
 fi
 
 bash ~/dot-files/bin/claude-mcp
