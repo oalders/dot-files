@@ -42,6 +42,6 @@
   },
   "devDependencies": {
     "@anthropic-ai/claude-code": "^2.1.14",
-    "opencode-ai": "^1.1.26"
+    "opencode-ai": "^1.1.28"
   }
 }
