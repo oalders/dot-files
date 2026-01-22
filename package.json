@@ -32,7 +32,7 @@
     "mcp-hub": "^4.2.1",
     "normalize-url": "^8.1.1",
     "npm": "^11.8.0",
-    "prettier": "^3.8.0",
+    "prettier": "^3.8.1",
     "tree-sitter-cli": "^0.26.3",
     "typescript": "^5.9.3",
     "underscore": "^1.13.7",
