@@ -29,6 +29,7 @@ set -o vi
 alias bytes_human='perl -MNumber::Bytes::Human -e "print Number::Bytes::Human::format_bytes shift"'
 alias c="clear && { [ -n \"\$TMUX\" ] && tmux clear-history; }"
 alias cdr='cd $(git root)'
+alias clean-the-sink='rm -rf ~/.claude/plugins/cache/kitchen-sink'
 alias date='date +"%a %d %b %Y %T %Z"'
 alias delete-merged-branches='show-merged-branches | safe_xargs -n 1 git branch -d'
 alias dangling-dockers='docker rmi -f $(docker images -f "dangling=true" -q)'
