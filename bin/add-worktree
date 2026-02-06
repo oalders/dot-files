@@ -73,5 +73,9 @@ if [[ -n $(pgrep tmux) ]]; then
     . ~/dot-files/bash_functions.sh
 
     tmux_session_name # exports $SESSION_NAME
-    tmux new -s "$SESSION_NAME"
+    if [[ -n $(pgrep tmux) ]]; then
+        tmux new -s "$SESSION_NAME"
+    else
+        tmux new -s "$SESSION_NAME" -d
+    fi
 fi
