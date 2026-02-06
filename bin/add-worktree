@@ -63,6 +63,9 @@ fi
 if [[ -f package.json ]]; then
     npm i && git co package-lock.json
 fi
+if [[ -f bin/init.sh ]]; then
+    ./bin/init.sh
+fi
 
 bash ~/dot-files/bin/claude-mcp
 
