@@ -41,6 +41,6 @@
     "zod": "^4.3.6"
   },
   "devDependencies": {
-    "opencode-ai": "^1.2.6"
+    "opencode-ai": "^1.2.9"
   }
 }
