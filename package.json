@@ -35,7 +35,7 @@
     "prettier": "^3.8.1",
     "tree-sitter-cli": "^0.26.5",
     "typescript": "^5.9.3",
-    "underscore": "^1.13.7",
+    "underscore": "^1.13.8",
     "urijs": ">=1.19.11",
     "ws": "^8.19.0",
     "zod": "^4.3.6"
