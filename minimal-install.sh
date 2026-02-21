@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-set -eu -o pipefail
+set -euxo pipefail
 
 ./installer/ubi.sh
 
