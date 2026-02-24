@@ -11,6 +11,7 @@ curl --silent --location \
     TARGET="$in" sh
 
 projects=(
+    air-verse/air
     eza-community/eza
     houseabsolute/omegasort
     houseabsolute/precious
