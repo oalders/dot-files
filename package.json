@@ -33,7 +33,7 @@
     "normalize-url": "^9.0.0",
     "npm": "^11.10.1",
     "prettier": "^3.8.1",
-    "tree-sitter-cli": "^0.26.5",
+    "tree-sitter-cli": "^0.26.6",
     "typescript": "^5.9.3",
     "underscore": "^1.13.8",
     "urijs": ">=1.19.11",
