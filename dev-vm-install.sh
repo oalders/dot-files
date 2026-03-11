@@ -18,6 +18,8 @@ curl --silent --location \
 projects=(
     air-verse/air
     eza-community/eza
+    # hashicorp/terraform
+    # hetznercloud/cli
     houseabsolute/omegasort
     houseabsolute/precious
     JanDeDobbeleer/oh-my-posh
