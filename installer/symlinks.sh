@@ -104,6 +104,7 @@ if is os name eq darwin; then
 fi
 
 ln -sf $prefix/bin/add-worktree "$HOME/local/bin/add-worktree"
+ln -sf $prefix/bin/dev "$HOME/local/bin/dev"
 ln -sf $prefix/bin/remove-worktree "$HOME/local/bin/remove-worktree"
 ln -sf $prefix/bin/tm "$HOME/local/bin/tm"
 
