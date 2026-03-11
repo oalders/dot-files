@@ -67,8 +67,6 @@ if [[ -f bin/init.sh ]]; then
     ./bin/init.sh
 fi
 
-bash ~/dot-files/bin/claude-mcp
-
 if [[ -n $(pgrep tmux) ]]; then
     . ~/dot-files/bash_functions.sh
 
