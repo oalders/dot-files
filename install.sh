@@ -68,7 +68,7 @@ if is os name eq darwin; then
         brew install --cask rectangle
         defaults write com.knollsoft.Rectangle launchOnLogin -bool true
     fi
-    ps x | grep sketchybar | grep -v grep && brew services restart sketchybar
+    defaults write com.knollsoft.Rectangle screenEdgeGapTop -int 0
     debounce 30 d ./configure/screenshots.sh
 fi
 
