@@ -1,7 +1,16 @@
 #!/usr/bin/env bash
 
-set -e -u -x -o pipefail
+set -eu -o pipefail
 
-branch=$1
+if [ $# -gt 0 ]; then
+    branch=$1
+else
+    branch=$(gh pr list --author "app/dependabot" --json headRefName | jq -r '.[].headRefName' | fzf)
 
-gh pr comment $branch -b '@dependabot rebase'
+    if [ -z "$branch" ]; then
+        echo "No branch selected. Exiting."
+        exit 1
+    fi
+fi
+
+gh pr comment "$branch" -b '@dependabot rebase'

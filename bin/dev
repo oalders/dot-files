@@ -89,6 +89,7 @@ container_build() {
         -f "${DOTFILES_DIR}/Dockerfile.dev" \
         -t "${IMAGE_NAME}" \
         --progress=plain \
+        --network=host \
         --secret id=github_token,env=GITHUB_TOKEN \
         --build-arg "AGENT_UID=$(id -u)" \
         --build-arg "AGENT_GID=$(id -g)" \
