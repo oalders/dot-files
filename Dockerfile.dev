@@ -1,0 +1,154 @@
+# Universal dev container for running Claude Code in isolation.
+# Build:  dev build
+# Run:    dev claude
+# Shell:  dev shell
+
+FROM ubuntu:latest
+
+# System dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    ca-certificates \
+    curl \
+    git \
+    less \
+    locales \
+    man-db \
+    openssh-client \
+    perl \
+    python3 \
+    ripgrep \
+    sqlite3 \
+    sudo \
+    vim \
+    wget && \
+    sed -i '/en_US.UTF-8/s/^# //' /etc/locale.gen && \
+    locale-gen && \
+    printf 'LANG=en_US.UTF-8\nLC_ALL=en_US.UTF-8\n' > /etc/default/locale
+# Note: apt lists intentionally kept so dotfiles installer can use them
+
+# Node.js 24.x (needed for Claude plugins, TypeScript LSP, npm packages)
+RUN curl -sL https://deb.nodesource.com/setup_24.x | bash - && \
+    apt-get install -y nodejs
+
+# Go (needed for gopls, goimports, staticcheck, golangci-lint)
+RUN ARCH="$(dpkg --print-architecture)" && \
+    curl -sL "https://go.dev/dl/go1.24.1.linux-${ARCH}.tar.gz" | tar -C /usr/local -xz
+ENV PATH="/usr/local/go/bin:${PATH}"
+
+# Non-root user matching host UID/GID.
+# Claude Code refuses --dangerously-skip-permissions when running as root.
+# AGENT_UID/GID are passed at build time from the host user's id.
+ARG AGENT_UID=1000
+ARG AGENT_GID=1000
+RUN userdel -r ubuntu 2>/dev/null || true && \
+    groupadd -f -g "${AGENT_GID}" agent && \
+    useradd -m -u "${AGENT_UID}" -g "${AGENT_GID}" -s /bin/bash agent && \
+    echo "agent ALL=(ALL) NOPASSWD:SETENV:ALL" >> /etc/sudoers
+
+# Playwright + Chromium
+# Install browsers as root, then move to shared location and chown to agent.
+# Done after user creation so chown stays in this layer (not re-run on dotfiles change).
+RUN npx --yes playwright install --with-deps chromium && \
+    mv /root/.cache/ms-playwright /opt/ms-playwright && \
+    chown -R agent:agent /opt/ms-playwright && \
+    mkdir -p /opt/google/chrome && \
+    ln -s /opt/ms-playwright/chromium-*/chrome-linux64/chrome /opt/google/chrome/chrome && \
+    ln -s /opt/ms-playwright/chromium-*/chrome-linux64/chrome /usr/local/bin/chromium && \
+    ln -s /opt/ms-playwright/chromium-*/chrome-linux64/chrome /usr/local/bin/chrome && \
+    ln -s /opt/ms-playwright/chromium-*/chrome-linux64/chrome /usr/local/bin/google-chrome && \
+    ln -s /opt/ms-playwright/chromium-*/chrome-linux64/chrome /usr/bin/google-chrome && \
+    ln -s /opt/ms-playwright/chromium-*/chrome-linux64/chrome /usr/bin/chromium-browser && \
+    ln -s /opt/ms-playwright/chromium-*/chrome-linux64/chrome /usr/bin/chromium
+ENV PLAYWRIGHT_BROWSERS_PATH=/opt/ms-playwright
+# Chrome sandbox requires SYS_ADMIN capability which containers don't have.
+ENV PLAYWRIGHT_MCP_SANDBOX=false
+
+# Ensure ~/.local/bin is always in PATH for login shells.
+# docker exec doesn't start a login shell so these aren't sourced from dotfiles.
+RUN echo 'export PATH="${HOME}/.local/bin:${HOME}/local/bin:${PATH}"' \
+    > /etc/profile.d/local-bin.sh
+
+# Copy dotfiles from host (passed as --build-context dotfiles=~/dot-files at build time).
+# Avoids a GitHub clone and always uses your local working copy.
+# GITHUB_TOKEN injected via BuildKit secret (never stored in image history).
+COPY --from=dotfiles . /home/agent/dot-files
+RUN --mount=type=secret,id=github_token \
+    chown -R agent:agent /home/agent/dot-files && \
+    rm -f /home/agent/.bashrc /home/agent/.bash_profile /home/agent/.profile && \
+    cd /home/agent/dot-files && \
+    export GH_TOKEN="$(cat /run/secrets/github_token 2>/dev/null)" && \
+    sudo -u agent \
+        GH_TOKEN="$GH_TOKEN" \
+        GITHUB_TOKEN="$GH_TOKEN" \
+        DEBIAN_FRONTEND=noninteractive \
+        HOME=/home/agent \
+        bash dev-vm-install.sh
+
+# Kubernetes tools: kubectl, helm, cloudfleet CLI, dig (dnsutils)
+RUN apt-get install -y --no-install-recommends gnupg dnsutils && \
+    wget -qO /tmp/k8s.gpg https://pkgs.k8s.io/core:/stable:/v1.32/deb/Release.key && \
+    gpg --dearmor -o /usr/share/keyrings/kubernetes-apt-keyring.gpg < /tmp/k8s.gpg && \
+    echo "deb [signed-by=/usr/share/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.32/deb/ /" > /etc/apt/sources.list.d/kubernetes.list && \
+    wget -qO /tmp/helm.asc https://baltocdn.com/helm/signing.asc && \
+    gpg --dearmor -o /usr/share/keyrings/helm-apt-keyring.gpg < /tmp/helm.asc && \
+    echo "deb [signed-by=/usr/share/keyrings/helm-apt-keyring.gpg] https://baltocdn.com/helm/stable/debian/ all main" > /etc/apt/sources.list.d/helm.list && \
+    wget -qO /usr/share/keyrings/cloudfleet-archive-keyring.gpg https://downloads.cloudfleet.ai/apt/pubkey.gpg && \
+    echo "deb [signed-by=/usr/share/keyrings/cloudfleet-archive-keyring.gpg] https://downloads.cloudfleet.ai/apt stable main" > /etc/apt/sources.list.d/cloudfleet.list && \
+    rm -f /tmp/k8s.gpg /tmp/helm.asc && \
+    apt-get update && apt-get install -y --no-install-recommends \
+    kubectl \
+    helm \
+    cloudfleet
+
+USER agent
+
+# Go dev tools:
+#   gopls      - Go language server (Serena)
+#   goimports  - import sorting (precious tidy)
+#   staticcheck - Go static analysis
+#   golangci-lint - Go linting (precious lint)
+# CGO_ENABLED=0 for golangci-lint since gcc is not in the image.
+RUN GOTOOLCHAIN=auto GOPATH=/home/agent/go /usr/local/go/bin/go install golang.org/x/tools/gopls@latest && \
+    GOTOOLCHAIN=auto GOPATH=/home/agent/go /usr/local/go/bin/go install golang.org/x/tools/cmd/goimports@latest && \
+    GOTOOLCHAIN=auto GOPATH=/home/agent/go /usr/local/go/bin/go install honnef.co/go/tools/cmd/staticcheck@latest && \
+    GOTOOLCHAIN=auto CGO_ENABLED=0 GOPATH=/home/agent/go /usr/local/go/bin/go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@latest && \
+    npm install --prefix /home/agent/.local -g cc-pulse
+
+# Pre-warm the uvx cache for Serena so the MCP server starts within Claude's
+# connection timeout. First run clones and installs from git — too slow live.
+RUN /home/agent/.local/bin/uvx --from git+https://github.com/oraios/serena serena --help || true
+
+# Claude Code marketplaces and plugins (baked into image, not mounted from host).
+# GH_TOKEN avoids GitHub API rate limits during plugin installation.
+RUN --mount=type=secret,id=github_token \
+    export GH_TOKEN="$(cat /run/secrets/github_token 2>/dev/null)" && \
+    export HOME=/home/agent && \
+    export PATH="/home/agent/local/bin:/home/agent/.local/bin:${PATH}" && \
+    claude plugin marketplace add obra/superpowers-marketplace && \
+    claude plugin marketplace add anthropics/claude-code && \
+    claude plugin marketplace add anthropics/claude-plugins-official && \
+    claude plugin marketplace add oalders/talk-about-us && \
+    claude plugin marketplace add oalders/kitchen-sink && \
+    claude plugin install superpowers@superpowers-marketplace && \
+    claude plugin install superpowers-chrome@superpowers-marketplace && \
+    claude plugin install superpowers-lab@superpowers-marketplace && \
+    claude plugin install elements-of-style@superpowers-marketplace && \
+    claude plugin install superpowers-developing-for-claude-code@superpowers-marketplace && \
+    claude plugin install code-review@claude-code-plugins && \
+    claude plugin install frontend-design@claude-code-plugins && \
+    claude plugin install pr-review-toolkit@claude-code-plugins && \
+    claude plugin install commit-commands@claude-code-plugins && \
+    claude plugin install serena@claude-plugins-official && \
+    claude plugin install gopls-lsp@claude-plugins-official && \
+    claude plugin install typescript-lsp@claude-plugins-official && \
+    claude plugin install frontend-design@claude-plugins-official && \
+    claude plugin install playwright@claude-plugins-official && \
+    claude plugin install talk-about-us@talk-about-us && \
+    claude plugin install kitchen-sink@kitchen-sink
+
+# Locale and PATH for user-installed tools.
+# docker exec doesn't start a login shell so these aren't sourced from dotfiles.
+ENV LANG=en_US.UTF-8
+ENV LC_ALL=en_US.UTF-8
+ENV PATH="/home/agent/go/bin:/home/agent/local/bin:/home/agent/.local/bin:${PATH}"
+WORKDIR /workspace

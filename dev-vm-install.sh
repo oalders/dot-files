@@ -18,6 +18,8 @@ curl --silent --location \
 projects=(
     air-verse/air
     eza-community/eza
+    # hashicorp/terraform
+    # hetznercloud/cli
     houseabsolute/omegasort
     houseabsolute/precious
     JanDeDobbeleer/oh-my-posh
@@ -28,13 +30,26 @@ projects=(
     sharkdp/bat
 )
 
+retry_ubi() {
+    local max_attempts=3
+    for attempt in $(seq 1 $max_attempts); do
+        if ubi "$@"; then
+            return 0
+        fi
+        echo "ubi failed (attempt $attempt/$max_attempts): $*"
+        sleep 5
+    done
+    echo "ubi gave up after $max_attempts attempts: $*"
+    return 1
+}
+
 for project in "${projects[@]}"; do
-    ubi --project "$project" --in "$in"
+    retry_ubi --project "$project" --in "$in"
 done
 
-ubi --project cli/cli --exe gh --in "$in"
+retry_ubi --project cli/cli --exe gh --in "$in"
 
-ubi --project hetznercloud/cli --exe hcloud --in "$in"
+retry_ubi --project hetznercloud/cli --exe hcloud --in "$in"
 
 ./installer/claude.sh
 ./installer/symlinks.sh

@@ -1,0 +1,39 @@
+{
+  "compact": true,
+  "components": {
+    "context": {
+      "style": "detailed",
+      "thresholds": {
+        "warn": 60,
+        "critical": 80,
+        "danger": 95
+      }
+    },
+    "cost": {
+      "enabled": false
+    },
+    "cwd": {
+      "style": "short",
+      "maxLength": 30
+    },
+    "mcp": {
+      "showOnlyProblems": true
+    },
+    "hooks": {
+      "showNames": false,
+      "showCount": true
+    },
+    "skills": {
+      "showNames": false,
+      "showCount": true
+    },
+    "session": {
+      "showDuration": true,
+      "showId": false
+    }
+  },
+  "lines": {
+    "hooks": { "enabled": false },
+    "skills": { "enabled": false }
+  }
+}

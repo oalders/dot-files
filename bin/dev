@@ -1,0 +1,274 @@
+#!/usr/bin/env bash
+# Universal dev container launcher for Claude Code.
+# Runs Claude in an isolated Docker container from any project directory.
+#
+# Usage:
+#   dev build [--no-cache]   Build the dev-env image
+#   dev start                Start container with workspace mounted
+#   dev shell                Interactive bash shell in container
+#   dev claude [args...]     Run claude --dangerously-skip-permissions
+#   dev reclaude [args...]   Stop and restart with claude
+#   dev stop                 Stop and remove container
+#   dev status               Show container status
+
+set -euo pipefail
+
+DOTFILES_DIR="${HOME}/dot-files"
+IMAGE_NAME="dev-env:latest"
+HOST_CLAUDE_DIR="${HOME}/.claude"
+
+# Container name: <repo>-<branch> (unique across projects and worktrees)
+REPO="$(basename "$(git rev-parse --show-toplevel 2>/dev/null)" 2>/dev/null || echo "dev")"
+BRANCH="$(git rev-parse --abbrev-ref HEAD 2>/dev/null | tr '/' '-' || echo "main")"
+CONTAINER_NAME="${REPO}-${BRANCH}"
+BRANCH_CLAUDE_DIR="${HOME}/.claude-containers/${CONTAINER_NAME}"
+
+# Color output
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+NC='\033[0m'
+
+error() { echo -e "${RED}ERROR: $1${NC}" >&2; exit 1; }
+info()  { echo -e "${GREEN}>>> $1${NC}"; }
+warn()  { echo -e "${YELLOW}>>> $1${NC}"; }
+
+check_requirements() {
+    command -v docker >/dev/null 2>&1 || error "docker not found. Install from https://docs.docker.com/get-docker/"
+}
+
+build_env_flags() {
+    local -n _flags=$1
+
+    # ANTHROPIC_API_KEY is intentionally NOT passed. Claude authenticates via the
+    # ~/.claude.json session token which is bind-mounted from the host. Passing an
+    # API key alongside a session token causes a conflict.
+
+    # GitHub token: prefer gh auth token, fall back to GITHUB_TOKEN env var
+    local gh_token=""
+    if command -v gh >/dev/null 2>&1; then
+        gh_token=$(gh auth token 2>/dev/null || true)
+    fi
+    if [[ -z "$gh_token" ]]; then
+        gh_token="${GITHUB_TOKEN:-}"
+    fi
+    if [[ -n "$gh_token" ]]; then
+        _flags+=(-e "GH_TOKEN=${gh_token}")
+        _flags+=(-e "GITHUB_TOKEN=${gh_token}")
+    else
+        warn "No GitHub token found - gh CLI will be unauthenticated"
+    fi
+
+    # Suppress oh-my-posh decorations inside container
+    _flags+=(-e "TINY_POSH=1")
+}
+
+container_build() {
+    check_requirements
+
+    local no_cache=""
+    if [[ "${1:-}" == "--no-cache" ]]; then
+        no_cache="--no-cache"
+    fi
+
+    [[ -d "${DOTFILES_DIR}" ]] || error "dot-files not found at ${DOTFILES_DIR}"
+
+    local github_token=""
+    if command -v gh >/dev/null 2>&1; then
+        github_token=$(gh auth token 2>/dev/null || true)
+    fi
+    if [[ -z "$github_token" ]]; then
+        github_token="${GITHUB_TOKEN:-}"
+    fi
+    if [[ -z "$github_token" ]]; then
+        warn "No GitHub token available - ubi may hit API rate limits"
+    fi
+
+    info "Building image '${IMAGE_NAME}'..."
+    GITHUB_TOKEN="${github_token}" docker build \
+        -f "${DOTFILES_DIR}/Dockerfile.dev" \
+        -t "${IMAGE_NAME}" \
+        --progress=plain \
+        --network=host \
+        --secret id=github_token,env=GITHUB_TOKEN \
+        --build-arg "AGENT_UID=$(id -u)" \
+        --build-arg "AGENT_GID=$(id -g)" \
+        --build-context "dotfiles=${DOTFILES_DIR}" \
+        ${no_cache} \
+        "${DOTFILES_DIR}"
+    info "Build complete: ${IMAGE_NAME}"
+}
+
+container_start() {
+    check_requirements
+
+    docker image inspect "${IMAGE_NAME}" >/dev/null 2>&1 \
+        || error "Image '${IMAGE_NAME}' not found. Run: dev build"
+
+    if docker ps --filter "name=^${CONTAINER_NAME}$" --format '{{.Names}}' | grep -q "^${CONTAINER_NAME}$"; then
+        warn "Container '${CONTAINER_NAME}' is already running"
+        return 0
+    fi
+
+    # Remove stopped container with same name
+    if docker ps -a --filter "name=^${CONTAINER_NAME}$" --format '{{.Names}}' | grep -q "^${CONTAINER_NAME}$"; then
+        info "Removing stopped container '${CONTAINER_NAME}'..."
+        docker rm "${CONTAINER_NAME}" >/dev/null
+    fi
+
+    # Ensure host dirs exist (Docker bind mounts require the source to exist)
+    mkdir -p "${BRANCH_CLAUDE_DIR}"
+    touch "${BRANCH_CLAUDE_DIR}/history.jsonl"
+
+    info "Starting container '${CONTAINER_NAME}'..."
+
+    local env_flags=()
+    build_env_flags env_flags
+
+    # Mount workspace and per-container session data.
+    # Plugins and MCP config come from the image; only session history is on the host.
+    local volume_flags=(
+        --volume "$(pwd):/workspace"
+        --volume "${BRANCH_CLAUDE_DIR}:/home/agent/.claude/projects"
+        --volume "${BRANCH_CLAUDE_DIR}/history.jsonl:/home/agent/.claude/history.jsonl"
+    )
+    [[ -f "${HOME}/.claude.json" ]] && \
+        volume_flags+=(--volume "${HOME}/.claude.json:/home/agent/.claude.json")
+    [[ -f "${HOST_CLAUDE_DIR}/.credentials.json" ]] && \
+        volume_flags+=(--volume "${HOST_CLAUDE_DIR}/.credentials.json:/home/agent/.claude/.credentials.json")
+    [[ -f "${HOST_CLAUDE_DIR}/settings.json" ]] && \
+        volume_flags+=(--volume "${HOST_CLAUDE_DIR}/settings.json:/home/agent/.claude/settings.json")
+
+    # Git worktree support: mount main .git dir at same absolute path so the
+    # worktree's .git file gitdir pointer resolves without rewriting.
+    local git_common_dir
+    git_common_dir=$(git -C "$(pwd)" rev-parse --git-common-dir 2>/dev/null || true)
+    if [[ -n "${git_common_dir}" && "${git_common_dir}" != ".git" ]]; then
+        git_common_dir=$(cd "${git_common_dir}" && pwd)
+        volume_flags+=(--volume "${git_common_dir}:${git_common_dir}")
+    fi
+
+    docker run -d \
+        --name "${CONTAINER_NAME}" \
+        --hostname dev-agent \
+        --add-host host.docker.internal:host-gateway \
+        "${volume_flags[@]}" \
+        --workdir /workspace \
+        "${env_flags[@]}" \
+        "${IMAGE_NAME}" \
+        sleep infinity
+
+    info "Container started. Run: dev claude"
+}
+
+_ensure_running() {
+    if ! docker ps --filter "name=^${CONTAINER_NAME}$" --format '{{.Names}}' | grep -q "^${CONTAINER_NAME}$"; then
+        info "Container not running, starting it..."
+        container_start
+    fi
+}
+
+container_shell() {
+    check_requirements
+    _ensure_running
+    info "Opening shell in '${CONTAINER_NAME}'..."
+    docker exec -it "${CONTAINER_NAME}" bash -l
+}
+
+container_claude() {
+    check_requirements
+    _ensure_running
+
+    info "Starting Claude Code in container..."
+    docker exec -it "${CONTAINER_NAME}" bash -l -c \
+        "claude --dangerously-skip-permissions $(printf '%q ' "$@")" || true
+    info "Claude session ended. Container still running. Use 'dev stop' to remove."
+}
+
+container_stop() {
+    check_requirements
+
+    local is_running is_stopped
+    is_running=$(docker ps    --filter "name=^${CONTAINER_NAME}$" --format '{{.Names}}')
+    is_stopped=$(docker ps -a --filter "name=^${CONTAINER_NAME}$" --format '{{.Names}}')
+
+    if [[ -z "$is_stopped" ]]; then
+        info "Container '${CONTAINER_NAME}' does not exist"
+        return 0
+    fi
+
+    if [[ -n "$is_running" ]]; then
+        info "Stopping container '${CONTAINER_NAME}'..."
+        docker stop "${CONTAINER_NAME}" >/dev/null
+    fi
+    docker rm "${CONTAINER_NAME}" >/dev/null
+    info "Container '${CONTAINER_NAME}' removed"
+    info "Session history preserved at ${BRANCH_CLAUDE_DIR}"
+}
+
+container_status() {
+    check_requirements
+
+    echo ""
+    echo "Container:  ${CONTAINER_NAME}"
+    echo "Image:      ${IMAGE_NAME}"
+    echo "Repo:       ${REPO}"
+    echo "Branch:     ${BRANCH}"
+    echo ""
+
+    if docker ps --filter "name=^${CONTAINER_NAME}$" --format '{{.Names}}' | grep -q "^${CONTAINER_NAME}$"; then
+        local created
+        created=$(docker inspect "${CONTAINER_NAME}" --format '{{.Created}}' 2>/dev/null | cut -dT -f1)
+        echo -e "Status:    ${GREEN}running${NC} (started ${created})"
+        echo ""
+        echo "Commands:"
+        echo "  dev shell   - Interactive shell"
+        echo "  dev claude  - Start Claude session"
+        echo "  dev stop    - Stop and remove"
+    elif docker ps -a --filter "name=^${CONTAINER_NAME}$" --format '{{.Names}}' | grep -q "^${CONTAINER_NAME}$"; then
+        echo -e "Status:    ${YELLOW}stopped${NC}"
+        echo ""
+        echo "Commands:"
+        echo "  dev start   - Start container"
+    else
+        echo -e "Status:    ${RED}not created${NC}"
+        echo ""
+        echo "Commands:"
+        echo "  dev build   - Build image"
+        echo "  dev start   - Start container"
+    fi
+
+    echo ""
+    if [[ -d "${BRANCH_CLAUDE_DIR}" ]]; then
+        echo -e "Session dir: ${GREEN}exists${NC} (${BRANCH_CLAUDE_DIR})"
+    else
+        echo -e "Session dir: ${YELLOW}not created yet${NC}"
+    fi
+    echo ""
+}
+
+case "${1:-}" in
+    build)   shift; container_build "$@" ;;
+    start)   container_start ;;
+    shell)   container_shell ;;
+    claude)  shift; container_claude "$@" ;;
+    reclaude) shift; container_stop; container_claude "$@" ;;
+    stop)    container_stop ;;
+    status)  container_status ;;
+    *)
+        echo "Usage: dev {build|start|shell|claude|reclaude|stop|status}"
+        echo ""
+        echo "Commands:"
+        echo "  build [--no-cache]   Build the dev-env image"
+        echo "  start                Start container with workspace mounted"
+        echo "  shell                Interactive bash shell in container"
+        echo "  claude [args...]     Run claude --dangerously-skip-permissions"
+        echo "  reclaude [args...]   Stop and restart with claude"
+        echo "  stop                 Stop and remove container"
+        echo "  status               Show container status"
+        echo ""
+        echo "Container: ${CONTAINER_NAME} (per repo+branch)"
+        echo "Sessions:  ~/.claude-containers/${CONTAINER_NAME}/"
+        exit 1
+        ;;
+esac
