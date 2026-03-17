@@ -11,6 +11,7 @@ directories=(
     "$(bat --config-dir)"
     ~/.claude/skills
     ~/.config/oh-my-posh/themes
+    ~/.config/claude-pulse
     ~/.config/mcphub
     ~/.config/perlimports
     ~/.config/sqlfluff
@@ -86,6 +87,7 @@ ln -sf $prefix/bat/config "$(bat --config-file)"
 ln -sf $prefix/claude/skills/auditing-shareable-content ~/.claude/skills/auditing-shareable-content
 ln -sf $prefix/cpanreporter/config.ini ~/.cpanreporter/config.ini
 ln -sf $prefix/oh-my-posh/themes/local.omp.json ~/.config/oh-my-posh/themes/local.omp.json
+ln -sf $prefix/claude-pulse/config.json ~/.config/claude-pulse/config.json
 ln -sf $prefix/mcphub/servers.json ~/.config/mcphub/servers.json
 ln -sf $prefix/perlimports/perlimports.toml ~/.config/perlimports/perlimports.toml
 ln -sf $prefix/config/sqlfluff ~/.config/sqlfluff/.sqlfluff
