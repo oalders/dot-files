@@ -84,6 +84,22 @@ RUN --mount=type=secret,id=github_token \
         HOME=/home/agent \
         bash dev-vm-install.sh
 
+# Kubernetes tools: kubectl, helm, cloudfleet CLI, dig (dnsutils)
+RUN apt-get install -y --no-install-recommends gnupg dnsutils && \
+    wget -qO /tmp/k8s.gpg https://pkgs.k8s.io/core:/stable:/v1.32/deb/Release.key && \
+    gpg --dearmor -o /usr/share/keyrings/kubernetes-apt-keyring.gpg < /tmp/k8s.gpg && \
+    echo "deb [signed-by=/usr/share/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.32/deb/ /" > /etc/apt/sources.list.d/kubernetes.list && \
+    wget -qO /tmp/helm.asc https://baltocdn.com/helm/signing.asc && \
+    gpg --dearmor -o /usr/share/keyrings/helm-apt-keyring.gpg < /tmp/helm.asc && \
+    echo "deb [signed-by=/usr/share/keyrings/helm-apt-keyring.gpg] https://baltocdn.com/helm/stable/debian/ all main" > /etc/apt/sources.list.d/helm.list && \
+    wget -qO /usr/share/keyrings/cloudfleet-archive-keyring.gpg https://downloads.cloudfleet.ai/apt/pubkey.gpg && \
+    echo "deb [signed-by=/usr/share/keyrings/cloudfleet-archive-keyring.gpg] https://downloads.cloudfleet.ai/apt stable main" > /etc/apt/sources.list.d/cloudfleet.list && \
+    rm -f /tmp/k8s.gpg /tmp/helm.asc && \
+    apt-get update && apt-get install -y --no-install-recommends \
+    kubectl \
+    helm \
+    cloudfleet
+
 USER agent
 
 # Go dev tools:
