@@ -37,7 +37,8 @@ fi
 
 cd "$git_dir/.." || exit 1
 
-repo_name="$(basename "$(pwd)")"
+repo_root="$(pwd)"
+repo_name="$(basename "$repo_root")"
 date_stamp="$(date +%Y-%m-%d)"
 
 all_worktrees="$HOME/.worktree/$repo_name/$date_stamp"
@@ -72,7 +73,23 @@ if [[ -n $(pgrep tmux) ]]; then
 
     tmux_session_name # exports $SESSION_NAME
     if [[ -n $(pgrep tmux) ]]; then
-        tmux new -s "$SESSION_NAME"
+        tmux new -s "$SESSION_NAME" -d
+        tmux_start=""
+        if [[ -f .tmux-start ]]; then
+            tmux_start=".tmux-start"
+        elif [[ -f "$repo_root/.tmux-start" ]]; then
+            tmux_start="$repo_root/.tmux-start"
+        fi
+        if [[ -n $tmux_start ]]; then
+            while IFS= read -r cmd; do
+                if [[ $cmd == rename-window\ * ]]; then
+                    tmux rename-window -t "$SESSION_NAME" "${cmd#rename-window }"
+                else
+                    tmux send-keys -t "$SESSION_NAME" "$cmd" Enter
+                fi
+            done <"$tmux_start"
+        fi
+        tmux attach -t "$SESSION_NAME"
     else
         tmux new -s "$SESSION_NAME" -d
     fi
