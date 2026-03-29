@@ -10,6 +10,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     ca-certificates \
     curl \
     git \
+    iptables \
+    ipset \
+    jq \
     less \
     locales \
     man-db \
@@ -101,6 +104,9 @@ RUN apt-get install -y --no-install-recommends gnupg dnsutils && \
     cloudfleet
 
 USER agent
+
+# Firewall script for restricting container network access
+RUN sudo ln -s /home/agent/dot-files/bin/claude-firewall.sh /usr/local/bin/claude-firewall.sh
 
 # Go dev tools:
 #   gopls      - Go language server (Serena)
