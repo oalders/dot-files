@@ -15,13 +15,12 @@ set -euo pipefail
 
 DOTFILES_DIR="${HOME}/dot-files"
 IMAGE_NAME="dev-env:latest"
-HOST_CLAUDE_DIR="${HOME}/.claude"
 
 # Container name: <repo>-<branch> (unique across projects and worktrees)
 REPO="$(basename "$(git rev-parse --show-toplevel 2>/dev/null)" 2>/dev/null || echo "dev")"
 BRANCH="$(git rev-parse --abbrev-ref HEAD 2>/dev/null | tr '/' '-' || echo "main")"
 CONTAINER_NAME="${REPO}-${BRANCH}"
-BRANCH_CLAUDE_DIR="${HOME}/.claude-containers/${CONTAINER_NAME}"
+VOLUME_NAME="dev-${REPO}-${BRANCH}-sessions"
 
 # Color output
 RED='\033[0;31m'
@@ -130,6 +129,7 @@ container_start() {
 
     local volume_flags=(
         --volume "$(pwd):/workspace"
+        --volume "${VOLUME_NAME}:/home/agent/.claude"
     )
 
     # Git worktree support: mount main .git dir at same absolute path so the
@@ -145,11 +145,15 @@ container_start() {
         --name "${CONTAINER_NAME}" \
         --hostname dev-agent \
         --add-host host.docker.internal:host-gateway \
+        --cap-add=NET_ADMIN \
         "${volume_flags[@]}" \
         --workdir /workspace \
         "${env_flags[@]}" \
         "${IMAGE_NAME}" \
         sleep infinity
+
+    # Seed baked-in settings into the named volume on first run
+    docker exec "${CONTAINER_NAME}" bash /home/agent/dot-files/claude/init-claude-dir.sh
 
     info "Container started. Run: dev claude"
 }
@@ -196,7 +200,7 @@ container_stop() {
     fi
     docker rm "${CONTAINER_NAME}" >/dev/null
     info "Container '${CONTAINER_NAME}' removed"
-    info "Session history preserved at ${BRANCH_CLAUDE_DIR}"
+    info "Session data preserved in volume '${VOLUME_NAME}'"
 }
 
 container_status() {
@@ -232,10 +236,10 @@ container_status() {
     fi
 
     echo ""
-    if [[ -d "${BRANCH_CLAUDE_DIR}" ]]; then
-        echo -e "Session dir: ${GREEN}exists${NC} (${BRANCH_CLAUDE_DIR})"
+    if docker volume inspect "${VOLUME_NAME}" >/dev/null 2>&1; then
+        echo -e "Session vol: ${GREEN}exists${NC} (${VOLUME_NAME})"
     else
-        echo -e "Session dir: ${YELLOW}not created yet${NC}"
+        echo -e "Session vol: ${YELLOW}not created yet${NC}"
     fi
     echo ""
 }
@@ -261,7 +265,7 @@ case "${1:-}" in
         echo "  status               Show container status"
         echo ""
         echo "Container: ${CONTAINER_NAME} (per repo+branch)"
-        echo "Sessions:  ~/.claude-containers/${CONTAINER_NAME}/"
+        echo "Sessions:  Docker volume ${VOLUME_NAME}"
         exit 1
         ;;
 esac
