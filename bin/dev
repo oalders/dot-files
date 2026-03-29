@@ -176,9 +176,9 @@ container_claude() {
     check_requirements
     _ensure_running
 
-    info "Starting Claude Code in container..."
+    info "Enabling firewall and starting Claude Code..."
     docker exec -it "${CONTAINER_NAME}" bash -l -c \
-        "claude --dangerously-skip-permissions $(printf '%q ' "$@")" || true
+        "sudo /usr/local/bin/claude-firewall.sh && claude --dangerously-skip-permissions $(printf '%q ' "$@")" || true
     info "Claude session ended. Container still running. Use 'dev stop' to remove."
 }
 
