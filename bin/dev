@@ -123,28 +123,14 @@ container_start() {
         docker rm "${CONTAINER_NAME}" >/dev/null
     fi
 
-    # Ensure host dirs exist (Docker bind mounts require the source to exist)
-    mkdir -p "${BRANCH_CLAUDE_DIR}"
-    touch "${BRANCH_CLAUDE_DIR}/history.jsonl"
-
     info "Starting container '${CONTAINER_NAME}'..."
 
     local env_flags=()
     build_env_flags env_flags
 
-    # Mount workspace and per-container session data.
-    # Plugins and MCP config come from the image; only session history is on the host.
     local volume_flags=(
         --volume "$(pwd):/workspace"
-        --volume "${BRANCH_CLAUDE_DIR}:/home/agent/.claude/projects"
-        --volume "${BRANCH_CLAUDE_DIR}/history.jsonl:/home/agent/.claude/history.jsonl"
     )
-    [[ -f "${HOME}/.claude.json" ]] && \
-        volume_flags+=(--volume "${HOME}/.claude.json:/home/agent/.claude.json")
-    [[ -f "${HOST_CLAUDE_DIR}/.credentials.json" ]] && \
-        volume_flags+=(--volume "${HOST_CLAUDE_DIR}/.credentials.json:/home/agent/.claude/.credentials.json")
-    [[ -f "${HOST_CLAUDE_DIR}/settings.json" ]] && \
-        volume_flags+=(--volume "${HOST_CLAUDE_DIR}/settings.json:/home/agent/.claude/settings.json")
 
     # Git worktree support: mount main .git dir at same absolute path so the
     # worktree's .git file gitdir pointer resolves without rewriting.
