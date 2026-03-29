@@ -40,9 +40,16 @@ check_requirements() {
 build_env_flags() {
     local -n _flags=$1
 
-    # ANTHROPIC_API_KEY is intentionally NOT passed. Claude authenticates via the
-    # ~/.claude.json session token which is bind-mounted from the host. Passing an
-    # API key alongside a session token causes a conflict.
+    # Claude auth: CLAUDE_CODE_OAUTH_TOKEN env var or ~/.claude-token file
+    local claude_token="${CLAUDE_CODE_OAUTH_TOKEN:-}"
+    if [[ -z "$claude_token" && -f "${HOME}/.claude-token" ]]; then
+        claude_token="$(cat "${HOME}/.claude-token")"
+    fi
+    if [[ -n "$claude_token" ]]; then
+        _flags+=(-e "CLAUDE_CODE_OAUTH_TOKEN=${claude_token}")
+    else
+        error "No Claude token found. Set CLAUDE_CODE_OAUTH_TOKEN env var or save token to ~/.claude-token (generate with: claude setup-token)"
+    fi
 
     # GitHub token: prefer gh auth token, fall back to GITHUB_TOKEN env var
     local gh_token=""
