@@ -9,6 +9,7 @@
 #   dev claude [args...]     Run claude --dangerously-skip-permissions
 #   dev reclaude [args...]   Stop and restart with claude
 #   dev stop                 Stop and remove container
+#   dev clean [--all]        Remove session volume(s)
 #   dev status               Show container status
 
 set -euo pipefail
@@ -244,6 +245,42 @@ container_status() {
     echo ""
 }
 
+container_clean() {
+    check_requirements
+
+    if [[ "${1:-}" == "--all" ]]; then
+        info "Removing all dev session volumes..."
+        # Stop any containers using dev volumes first
+        local containers
+        containers=$(docker ps -a --filter "name=^dev-" --format '{{.Names}}' || true)
+        if [[ -n "$containers" ]]; then
+            echo "$containers" | while read -r ctr; do
+                docker rm -f "$ctr" >/dev/null 2>&1 || true
+            done
+            info "Removed associated containers"
+        fi
+        local volumes
+        volumes=$(docker volume ls --format '{{.Name}}' | grep '^dev-.*-sessions$' || true)
+        if [[ -z "$volumes" ]]; then
+            info "No dev session volumes found"
+            return 0
+        fi
+        echo "$volumes" | while read -r vol; do
+            docker volume rm "$vol" >/dev/null
+            info "Removed volume: $vol"
+        done
+    else
+        # Stop container if running (volume can't be removed while in use)
+        container_stop 2>/dev/null || true
+        if docker volume inspect "${VOLUME_NAME}" >/dev/null 2>&1; then
+            docker volume rm "${VOLUME_NAME}" >/dev/null
+            info "Removed session volume: ${VOLUME_NAME}"
+        else
+            info "No session volume '${VOLUME_NAME}' found"
+        fi
+    fi
+}
+
 case "${1:-}" in
     build)   shift; container_build "$@" ;;
     start)   container_start ;;
@@ -251,15 +288,17 @@ case "${1:-}" in
     claude)  shift; container_claude "$@" ;;
     reclaude) shift; container_stop; container_claude "$@" ;;
     stop)    container_stop ;;
+    clean)   shift; container_clean "$@" ;;
     status)  container_status ;;
     *)
-        echo "Usage: dev {build|start|shell|claude|reclaude|stop|status}"
+        echo "Usage: dev {build|start|shell|claude|reclaude|stop|clean|status}"
         echo ""
         echo "Commands:"
         echo "  build [--no-cache]   Build the dev-env image"
         echo "  start                Start container with workspace mounted"
         echo "  shell                Interactive bash shell in container"
-        echo "  claude [args...]     Run claude --dangerously-skip-permissions"
+        echo "  claude [args...]     Run claude with firewall enabled"
+        echo "  clean [--all]        Remove session volume(s)"
         echo "  reclaude [args...]   Stop and restart with claude"
         echo "  stop                 Stop and remove container"
         echo "  status               Show container status"
