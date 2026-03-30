@@ -40,17 +40,6 @@ check_requirements() {
 build_env_flags() {
     local -n _flags=$1
 
-    # Claude auth: CLAUDE_CODE_OAUTH_TOKEN env var or ~/.claude-token file
-    local claude_token="${CLAUDE_CODE_OAUTH_TOKEN:-}"
-    if [[ -z "$claude_token" && -f "${HOME}/.claude-token" ]]; then
-        claude_token="$(cat "${HOME}/.claude-token")"
-    fi
-    if [[ -n "$claude_token" ]]; then
-        _flags+=(-e "CLAUDE_CODE_OAUTH_TOKEN=${claude_token}")
-    else
-        error "No Claude token found. Set CLAUDE_CODE_OAUTH_TOKEN env var or save token to ~/.claude-token (generate with: claude setup-token)"
-    fi
-
     # GitHub token: prefer gh auth token, fall back to GITHUB_TOKEN env var
     local gh_token=""
     if command -v gh >/dev/null 2>&1; then
@@ -156,6 +145,16 @@ container_start() {
     # Seed baked-in settings into the named volume on first run
     docker exec "${CONTAINER_NAME}" bash /home/agent/dot-files/claude/init-claude-dir.sh
 
+    # Copy host credentials and onboarding state into the volume so the first
+    # run in a new project doesn't require re-authentication.
+    if [[ -f "${HOME}/.claude/.credentials.json" ]]; then
+        docker cp "${HOME}/.claude/.credentials.json" "${CONTAINER_NAME}:/home/agent/.claude/.credentials.json"
+        docker exec "${CONTAINER_NAME}" chmod 600 /home/agent/.claude/.credentials.json
+    fi
+    if [[ -f "${HOME}/.claude.json" ]]; then
+        docker cp "${HOME}/.claude.json" "${CONTAINER_NAME}:/home/agent/.claude/claude.json.bak"
+    fi
+
     info "Container started. Run: dev claude"
 }
 
@@ -177,9 +176,13 @@ container_claude() {
     check_requirements
     _ensure_running
 
-    info "Enabling firewall and starting Claude Code..."
+    info "Starting Claude Code..."
     docker exec -it "${CONTAINER_NAME}" bash -l -c \
-        "sudo /usr/local/bin/claude-firewall.sh && claude --dangerously-skip-permissions $(printf '%q ' "$@")" || true
+        "cp /home/agent/.claude/claude.json.bak /home/agent/.claude.json 2>/dev/null; claude --dangerously-skip-permissions $(printf '%q ' "$@")" || true
+
+    # Persist ~/.claude.json into the named volume so onboarding state survives container recreation
+    docker exec "${CONTAINER_NAME}" bash -c \
+        'cp /home/agent/.claude.json /home/agent/.claude/claude.json.bak 2>/dev/null || true'
     info "Claude session ended. Container still running. Use 'dev stop' to remove."
 }
 

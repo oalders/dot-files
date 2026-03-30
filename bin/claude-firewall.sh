@@ -51,9 +51,9 @@ for domain in \
     fi
 done
 
-# Fetch and add GitHub IP ranges
+# Fetch and add GitHub IP ranges (short timeout — DNS-resolved IPs above suffice if this fails)
 echo "  Fetching GitHub IP ranges..."
-gh_ranges=$(curl -s https://api.github.com/meta 2>/dev/null || true)
+gh_ranges=$(curl -s --connect-timeout 3 --max-time 5 https://api.github.com/meta 2>/dev/null || true)
 if [ -n "$gh_ranges" ] && echo "$gh_ranges" | jq -e '.web' >/dev/null 2>&1; then
     while read -r cidr; do
         [ -n "$cidr" ] && ipset add allowed-domains "$cidr" 2>/dev/null || true
