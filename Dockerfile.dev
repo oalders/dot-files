@@ -12,6 +12,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     git \
     iptables \
     ipset \
+    iproute2 \
     jq \
     less \
     locales \
@@ -51,7 +52,8 @@ RUN userdel -r ubuntu 2>/dev/null || true && \
 # Playwright + Chromium
 # Install browsers as root, then move to shared location and chown to agent.
 # Done after user creation so chown stays in this layer (not re-run on dotfiles change).
-RUN npx --yes playwright install --with-deps chromium && \
+RUN npm install -g @playwright/test && \
+    npx playwright install --with-deps chromium && \
     mv /root/.cache/ms-playwright /opt/ms-playwright && \
     chown -R agent:agent /opt/ms-playwright && \
     mkdir -p /opt/google/chrome && \
@@ -87,26 +89,13 @@ RUN --mount=type=secret,id=github_token \
         HOME=/home/agent \
         bash dev-vm-install.sh
 
-# Kubernetes tools: kubectl, helm, cloudfleet CLI, dig (dnsutils)
-RUN apt-get install -y --no-install-recommends gnupg dnsutils && \
-    wget -qO /tmp/k8s.gpg https://pkgs.k8s.io/core:/stable:/v1.32/deb/Release.key && \
-    gpg --dearmor -o /usr/share/keyrings/kubernetes-apt-keyring.gpg < /tmp/k8s.gpg && \
-    echo "deb [signed-by=/usr/share/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.32/deb/ /" > /etc/apt/sources.list.d/kubernetes.list && \
-    wget -qO /tmp/helm.asc https://baltocdn.com/helm/signing.asc && \
-    gpg --dearmor -o /usr/share/keyrings/helm-apt-keyring.gpg < /tmp/helm.asc && \
-    echo "deb [signed-by=/usr/share/keyrings/helm-apt-keyring.gpg] https://baltocdn.com/helm/stable/debian/ all main" > /etc/apt/sources.list.d/helm.list && \
-    wget -qO /usr/share/keyrings/cloudfleet-archive-keyring.gpg https://downloads.cloudfleet.ai/apt/pubkey.gpg && \
-    echo "deb [signed-by=/usr/share/keyrings/cloudfleet-archive-keyring.gpg] https://downloads.cloudfleet.ai/apt stable main" > /etc/apt/sources.list.d/cloudfleet.list && \
-    rm -f /tmp/k8s.gpg /tmp/helm.asc && \
-    apt-get update && apt-get install -y --no-install-recommends \
-    kubectl \
-    helm \
-    cloudfleet
+# dnsutils needed by claude-firewall.sh (dig), gnupg kept for future repo additions
+RUN apt-get install -y --no-install-recommends gnupg dnsutils
 
 USER agent
 
 # Firewall script for restricting container network access
-RUN sudo ln -s /home/agent/dot-files/bin/claude-firewall.sh /usr/local/bin/claude-firewall.sh
+COPY --chmod=755 --from=dotfiles bin/claude-firewall.sh /usr/local/bin/claude-firewall.sh
 
 # Go dev tools:
 #   gopls      - Go language server (Serena)
