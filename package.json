@@ -42,6 +42,6 @@
   },
   "devDependencies": {
     "cc-pulse": "^1.6.1",
-    "opencode-ai": "^1.3.7"
+    "opencode-ai": "^1.3.9"
   }
 }
