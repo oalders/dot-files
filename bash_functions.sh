@@ -333,6 +333,20 @@ function clone_or_update_repo() {
     fi
 }
 
+gh-merge() {
+    local branch
+    branch=$(git branch --show-current)
+    local unpushed
+    unpushed=$(git log --oneline "origin/${branch}..${branch}" 2>/dev/null)
+    if [ -n "$unpushed" ]; then
+        echo "ERROR: Unpushed local commits on ${branch}:"
+        echo "$unpushed"
+        echo "Push first, then merge."
+        return 1
+    fi
+    gh pr merge "$@"
+}
+
 export GO111MODULE
 export GOPATH
 export HARNESS_OPTIONS
