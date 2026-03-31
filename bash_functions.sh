@@ -203,7 +203,7 @@ get_github_display_name() {
                 suffix=" [$label]"
             fi
         fi
-    done <<< "$labels"
+    done <<<"$labels"
 
     # Truncate title at 45 characters, avoiding mid-word cuts
     if [[ ${#title} -gt 45 ]]; then
