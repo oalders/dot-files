@@ -30,3 +30,8 @@ claude plugin install frontend-design@claude-plugins-official
 claude plugin install playwright@claude-plugins-official
 claude plugin install talk-about-us@talk-about-us
 claude plugin install kitchen-sink@kitchen-sink
+
+# Configure status line
+settings_file="$HOME/.claude/settings.json"
+input=$([ -f "$settings_file" ] && cat "$settings_file" || echo '{}')
+echo "$input" | jq '. + {"statusLine": {"type": "command", "command": "cc-pulse"}}' >"$settings_file"
