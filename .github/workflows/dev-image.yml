@@ -1,0 +1,43 @@
+---
+name: Dev Image
+
+on:
+  schedule:
+    - cron: '0 6 * * *' # 06:00 UTC daily
+  workflow_dispatch: # allow manual trigger
+
+permissions:
+  packages: write
+
+env:
+  IMAGE: ghcr.io/oalders/dot-files/dev-env
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push
+        run: |
+          GITHUB_TOKEN="${{ secrets.GITHUB_TOKEN }}" docker build \
+            -f Dockerfile.dev \
+            -t "${IMAGE}:latest" \
+            --progress=plain \
+            --network=host \
+            --secret id=github_token,env=GITHUB_TOKEN \
+            --build-arg "AGENT_UID=1000" \
+            --build-arg "AGENT_GID=1000" \
+            --build-context "dotfiles=." \
+            .
+
+          docker push "${IMAGE}:latest"

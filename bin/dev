@@ -4,6 +4,7 @@
 #
 # Usage:
 #   dev build [--no-cache]   Build the dev-env image
+#   dev pull                 Pull latest image from GHCR
 #   dev start                Start container with workspace mounted
 #   dev shell                Interactive bash shell in container
 #   dev claude [args...]     Run claude --dangerously-skip-permissions
@@ -16,6 +17,7 @@ set -euo pipefail
 
 DOTFILES_DIR="${HOME}/dot-files"
 IMAGE_NAME="dev-env:latest"
+GHCR_IMAGE="ghcr.io/oalders/dot-files/dev-env:latest"
 
 # Container name: <repo>-<branch> (unique across projects and worktrees)
 REPO="$(basename "$(git rev-parse --show-toplevel 2>/dev/null)" 2>/dev/null || echo "dev")"
@@ -95,11 +97,22 @@ container_build() {
     info "Build complete: ${IMAGE_NAME}"
 }
 
+container_pull() {
+    check_requirements
+
+    info "Pulling image '${GHCR_IMAGE}'..."
+    docker pull "${GHCR_IMAGE}"
+    docker tag "${GHCR_IMAGE}" "${IMAGE_NAME}"
+    info "Pull complete: ${IMAGE_NAME}"
+}
+
 container_start() {
     check_requirements
 
-    docker image inspect "${IMAGE_NAME}" >/dev/null 2>&1 \
-        || error "Image '${IMAGE_NAME}' not found. Run: dev build"
+    if ! docker image inspect "${IMAGE_NAME}" >/dev/null 2>&1; then
+        info "Image '${IMAGE_NAME}' not found, pulling from GHCR..."
+        container_pull
+    fi
 
     if docker ps --filter "name=^${CONTAINER_NAME}$" --format '{{.Names}}' | grep -q "^${CONTAINER_NAME}$"; then
         warn "Container '${CONTAINER_NAME}' is already running"
@@ -286,6 +299,7 @@ container_clean() {
 
 case "${1:-}" in
     build)   shift; container_build "$@" ;;
+    pull)    container_pull ;;
     start)   container_start ;;
     shell)   container_shell ;;
     claude)  shift; container_claude "$@" ;;
@@ -294,10 +308,11 @@ case "${1:-}" in
     clean)   shift; container_clean "$@" ;;
     status)  container_status ;;
     *)
-        echo "Usage: dev {build|start|shell|claude|reclaude|stop|clean|status}"
+        echo "Usage: dev {build|pull|start|shell|claude|reclaude|stop|clean|status}"
         echo ""
         echo "Commands:"
         echo "  build [--no-cache]   Build the dev-env image"
+        echo "  pull                 Pull latest image from GHCR"
         echo "  start                Start container with workspace mounted"
         echo "  shell                Interactive bash shell in container"
         echo "  claude [args...]     Run claude with firewall enabled"
