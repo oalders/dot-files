@@ -128,9 +128,9 @@ if is os id eq almalinux; then
     exit
 fi
 
-if is there gh && ! gh extension list | grep --quiet copilot; then
-    gh extension install github/gh-copilot || true
-fi
+# if is there gh && ! gh extension list | grep --quiet copilot; then
+#     gh extension install github/gh-copilot || true
+# fi
 
 if is there gh && ! gh extension list | grep --quiet gh-dash; then
     db gh extension install dlvhdr/gh-dash || true
