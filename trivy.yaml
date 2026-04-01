@@ -1,2 +1,10 @@
 secret:
-  config: trivy-secret.yaml
+  allow-rules:
+    - id: gcp-service-account
+      description: gosec contains regex patterns for detecting secrets, not actual secrets
+      paths:
+        - "*/securego/gosec/**"
+    - id: private-key
+      description: Go toolchain test PEM key
+      paths:
+        - "*/golang.org/toolchain/**"
