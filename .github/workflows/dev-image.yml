@@ -50,6 +50,7 @@ jobs:
           scanners: secret
           exit-code: 1
           severity: CRITICAL,HIGH,MEDIUM,LOW
+          trivy-config: trivy.yaml
 
       - name: Push
         run: docker push "${IMAGE}:latest"
