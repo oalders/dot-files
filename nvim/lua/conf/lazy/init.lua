@@ -445,6 +445,29 @@ require('lazy').setup({
         {
             'nvim-treesitter/nvim-treesitter',
             build = ':TSUpdate | :TSInstall diff',
+            opts = {
+                ensure_installed = {
+                    'bash',
+                    'diff',
+                    'dockerfile',
+                    'go',
+                    'html',
+                    'javascript',
+                    'lua',
+                    'markdown',
+                    'markdown_inline',
+                    'perl',
+                    'pod',
+                    'python',
+                    'regex',
+                    'ruby',
+                    'rust',
+                    'sql',
+                    'typescript',
+                    'vim',
+                    'yaml',
+                },
+            },
         }, -- recommend updating parsers on update
         -- { 'olimorris/persisted.nvim',        opts = {} },           -- session management
         -- session management
