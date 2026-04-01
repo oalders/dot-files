@@ -31,6 +31,7 @@ run_general_installers() {
         ./installer/maintenance.sh
         ./configure/git.sh
         ./configure/ssh.sh
+        ./installer/npm.sh # linters that Mason installs
         ./installer/nvim.sh
         ./configure/vim.sh
         ./configure/tmux.sh
