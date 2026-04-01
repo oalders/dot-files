@@ -50,6 +50,11 @@ if [[ ! "$(command -v curl)" && "$(command -v apt-get)" ]]; then
     sudo apt-get install curl --autoremove -y
 fi
 
+if [ -z "${GITHUB_TOKEN:-}" ] && command -v gh &>/dev/null && gh auth token &>/dev/null; then
+    GITHUB_TOKEN="$(gh auth token)"
+    export GITHUB_TOKEN
+fi
+
 maybe_install() {
     project="$1"
     shift
@@ -68,7 +73,7 @@ fi
 # to debounce debounce
 db ubi --project oalders/debounce --in "$in"
 
-maybe_install air-verse/air
+# maybe_install air-verse/air
 maybe_install atanunq/viu
 maybe_install bensadeh/tailspin --exe tspin
 maybe_install charmbracelet/gum
