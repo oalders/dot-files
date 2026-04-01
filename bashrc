@@ -10,6 +10,8 @@ export HISTFILESIZE=500000000
 export HISTSIZE=50000000
 export HISTTIMEFORMAT="%Y-%m-%d %H:%M:%S  "
 
+export CLAUDE_CODE_DISABLE_1M_CONTEXT=1
+
 export LANG=en_US.UTF-8
 export LSCOLORS=exfxcxdxbxegedabagacad
 
