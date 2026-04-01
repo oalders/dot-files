@@ -3,7 +3,7 @@
 # Run:    dev claude
 # Shell:  dev shell
 
-FROM ubuntu:latest
+FROM ubuntu:24.04@sha256:186072bba1b2f436cbb91ef2567abca677337cfc786c86e107d25b7072feef0c
 
 # System dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -52,7 +52,7 @@ RUN userdel -r ubuntu 2>/dev/null || true && \
 # Playwright + Chromium
 # Install browsers as root, then move to shared location and chown to agent.
 # Done after user creation so chown stays in this layer (not re-run on dotfiles change).
-RUN npm install -g @playwright/test && \
+RUN npm install -g @playwright/test@1.59.0 && \
     npx playwright install --with-deps chromium && \
     mv /root/.cache/ms-playwright /opt/ms-playwright && \
     chown -R agent:agent /opt/ms-playwright && \
@@ -103,15 +103,15 @@ COPY --chmod=755 --from=dotfiles bin/claude-firewall.sh /usr/local/bin/claude-fi
 #   staticcheck - Go static analysis
 #   golangci-lint - Go linting (precious lint)
 # CGO_ENABLED=0 for golangci-lint since gcc is not in the image.
-RUN GOTOOLCHAIN=auto GOPATH=/home/agent/go /usr/local/go/bin/go install golang.org/x/tools/gopls@latest && \
-    GOTOOLCHAIN=auto GOPATH=/home/agent/go /usr/local/go/bin/go install golang.org/x/tools/cmd/goimports@latest && \
-    GOTOOLCHAIN=auto GOPATH=/home/agent/go /usr/local/go/bin/go install honnef.co/go/tools/cmd/staticcheck@latest && \
-    GOTOOLCHAIN=auto CGO_ENABLED=0 GOPATH=/home/agent/go /usr/local/go/bin/go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@latest && \
-    npm install --prefix /home/agent/.local -g cc-pulse
+RUN GOTOOLCHAIN=auto GOPATH=/home/agent/go /usr/local/go/bin/go install golang.org/x/tools/gopls@v0.21.1 && \
+    GOTOOLCHAIN=auto GOPATH=/home/agent/go /usr/local/go/bin/go install golang.org/x/tools/cmd/goimports@v0.43.0 && \
+    GOTOOLCHAIN=auto GOPATH=/home/agent/go /usr/local/go/bin/go install honnef.co/go/tools/cmd/staticcheck@v0.7.0 && \
+    GOTOOLCHAIN=auto CGO_ENABLED=0 GOPATH=/home/agent/go /usr/local/go/bin/go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@v2.11.4 && \
+    npm install --prefix /home/agent/.local -g cc-pulse@1.6.1
 
 # Pre-warm the uvx cache for Serena so the MCP server starts within Claude's
 # connection timeout. First run clones and installs from git — too slow live.
-RUN /home/agent/.local/bin/uvx --from git+https://github.com/oraios/serena serena --help || true
+RUN /home/agent/.local/bin/uvx --from git+https://github.com/oraios/serena@v0.1.4 serena --help || true
 
 # Claude Code marketplaces and plugins (baked into image, not mounted from host).
 # GH_TOKEN avoids GitHub API rate limits during plugin installation.

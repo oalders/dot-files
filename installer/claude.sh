@@ -15,5 +15,5 @@ fi
 export PATH="$HOME/.local/bin:$PATH"
 
 if ! is there serena; then
-    uv tool install git+https://github.com/oraios/serena
+    uv tool install git+https://github.com/oraios/serena@v0.1.4
 fi

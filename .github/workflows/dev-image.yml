@@ -8,6 +8,7 @@ on:
 
 permissions:
   packages: write
+  id-token: write # cosign keyless signing
 
 env:
   IMAGE: ghcr.io/oalders/dot-files/dev-env
@@ -27,9 +28,11 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build and push
+      - name: Build
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          GITHUB_TOKEN="${{ secrets.GITHUB_TOKEN }}" docker build \
+          docker build \
             -f Dockerfile.dev \
             -t "${IMAGE}:latest" \
             --progress=plain \
@@ -40,4 +43,17 @@ jobs:
             --build-context "dotfiles=." \
             .
 
-          docker push "${IMAGE}:latest"
+      - name: Scan image for secrets
+        uses: aquasecurity/trivy-action@57a97c7e7821a5776cebc9bb87c984fa69cba8f1 # master
+        with:
+          image-ref: ${{ env.IMAGE }}:latest
+          scanners: secret
+          exit-code: 1
+          severity: CRITICAL,HIGH,MEDIUM,LOW
+
+      - name: Push
+        run: docker push "${IMAGE}:latest"
+
+      - name: Sign image
+        uses: sigstore/cosign-installer@v3
+      - run: cosign sign --yes "${IMAGE}:latest"
