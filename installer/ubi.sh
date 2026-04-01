@@ -98,7 +98,7 @@ if is cli output stdout hostname eq wolfblitzer; then
         ubi --url https://github.com/dandavison/delta/releases/download/${delta_version}/git-delta_${delta_version}_amd64.deb --in /tmp/ubi
         sudo dpkg -i /tmp/ubi/delta
     fi
-elif is os name eq darwin; then
+elif is os name eq darwin || is os id eq ubuntu; then
     maybe_install dandavison/delta
 else
     maybe_install dandavison/delta --matching musl
