@@ -2,6 +2,9 @@
 
 set -eu -o pipefail
 
+source ~/dot-files/bash_functions.sh
+add_path "$HOME/.local/bin"
+
 # Install Claude Code plugin marketplaces and plugins.
 # Called from Dockerfile.dev and can be run standalone to sync plugins.
 
