@@ -2,8 +2,14 @@
 
 set -e -u -o pipefail
 
+force=""
+if [[ "${1:-}" == "-f" ]]; then
+    force="-f"
+    shift
+fi
+
 if [ $# -ne 1 ]; then
-    echo "Usage: add-worktree branch-name"
+    echo "Usage: add-worktree [-f] branch-name"
     exit
 fi
 
@@ -48,9 +54,9 @@ worktree_dir="$all_worktrees/$branch_name"
 
 if [[ "$type" == "pr" ]]; then
     # For PR checkouts, create worktree without -b flag (gh pr checkout will create the branch)
-    git worktree add "$worktree_dir"
+    git worktree add $force "$worktree_dir"
 else
-    git worktree add "$worktree_dir" -b "$branch_name"
+    git worktree add $force "$worktree_dir" -b "$branch_name"
 fi
 
 cd "$worktree_dir" || exit 1
