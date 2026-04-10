@@ -1,45 +1,110 @@
-set expandtab
-set number
-set showmatch " matching brackets
+" Vim filetype plugin file
+" Language:      Perl
+" Maintainer:    vim-perl <vim-perl@googlegroups.com>
+" Homepage:      https://github.com/vim-perl/vim-perl
+" Bugs/requests: https://github.com/vim-perl/vim-perl/issues
+" License:       Vim License (see :help license)
+" Last Change:   {{LAST_CHANGE}}
 
-vnoremap <silent> = :!perltidy -q<CR>
-nnoremap <Leader>p <Esc>:!prove -It/lib -lv %<CR>
+if exists("b:did_ftplugin") | finish | endif
+let b:did_ftplugin = 1
 
-" https://stackoverflow.com/questions/2345519/how-can-i-script-vim-to-run-perltidy-on-a-buffer
+" Make sure the continuation lines below do not cause problems in
+" compatibility mode.
+let s:save_cpo = &cpo
+set cpo-=C
 
-"define :Tidy command to run perltidy on visual selection || entire buffer"
-command! -range=% -nargs=* PTidy <line1>,<line2>!perltidy -q
+setlocal formatoptions-=t
+setlocal formatoptions+=crqol
+setlocal keywordprg=perldoc\ -f
 
-"run :PTidy on entire buffer and return cursor to (approximate) original position"
-" Not sure why I'm getting warnings that it already exists
-fun! DoPerlTidy()
-    let l:line = line('.')
-    let l:column = col('.')
-    :PTidy
-    call cursor(l:line, l:column)
-endfun
+setlocal comments=:#
+setlocal commentstring=#%s
 
-vnoremap <silent> = :!perltidy -q<CR>
+" Provided by Ned Konz <ned at bike-nomad dot com>
+"---------------------------------------------
+setlocal include=\\<\\(use\\\|require\\)\\>
+" '+' is removed to support plugins in Catalyst or DBIx::Class
+" where the leading plus indicates a fully-qualified module name.
+setlocal includeexpr=substitute(substitute(substitute(substitute(v:fname,'+','',''),'::','/','g'),'->\*','',''),'$','.pm','')
+setlocal define=[^A-Za-z_]
+setlocal iskeyword+=:
 
-"shortcut for normal mode to run on entire buffer then return to current line"
-nnoremap = :call DoPerlTidy()<CR>
+" The following line changes a global variable but is necessary to make
+" gf and similar commands work. Thanks to Andrew Pimlott for pointing
+" out the problem.
+let s:old_isfname = &isfname
+set isfname+=:
+let s:new_isfname = &isfname
 
-set keywordprg=perldoc\ -f
+augroup perl_global_options
+  au!
+  exe "au BufEnter * if &filetype == 'perl' | let &isfname = '" . s:new_isfname . "' | endif"
+  exe "au BufLeave * if &filetype == 'perl' | let &isfname = '" . s:old_isfname . "' | endif"
+augroup END
 
-map ,mmi o__PACKAGE__->meta->make_immutable;<CR>1;<ESC>
-map ,ddp ouse DDP;<CR>p( );<ESC>
-map ,perl :set paste<CR>O#!/usr/bin/env perl;<CR><CR>use strict;<CR>use warnings;<CR>use feature qw( say );<CR><ESC>
-map ,moose Opackage Foo::Bar;<CR><CR>use Moose;<CR><CR>use MooseX::StrictConstructor;<CR><CR>__PACKAGE__->meta->make_immutable;<CR>1;<ESC>
+" Undo the stuff we changed.
+let b:undo_ftplugin = "setlocal fo< kp< com< cms< inc< inex< def< isk<" .
+      \               " | let &isfname = '" .  s:old_isfname . "'"
 
-" convert a file path to a Perl module name
-" ie Foo/Bar/Baz.pm => Foo::Bar::Baz
-map ,2mod :s/\.pm//<CR>gv:s/\//::/g<CR>
+if get(g:, 'perl_fold', 0)
+  setlocal foldmethod=syntax
+  let b:undo_ftplugin .= " | setlocal fdm<"
+endif
 
-" Try to install missing Perl modules
-nnoremap <leader>lz :!perl -Mlazy -c %:p
+" Set this once, globally.
+if !exists("perlpath")
+    " safety check: don't execute perl from current directory
+    if executable("perl") && fnamemodify(exepath("perl"), ":p:h") != getcwd()
+      try
+	if &shellxquote == '"'
+	    let perlpath = system('perl -e "print join(q/,/,@INC)"')
+	else
+	    let perlpath = system("perl -e 'print join(q/,/,@INC)'")
+	endif
+	let perlpath = substitute(perlpath,',.$',',,','')
+      catch /E145:/
+	let perlpath = ".,,"
+      endtry
+    else
+	" If we can't call perl to get its path, just default to using the
+	" current directory and the directory of the current file.
+	let perlpath = ".,,"
+    endif
+endif
 
-" Try to fix module imports
-:vnoremap <silent> im :!perlimports
-  \ --cache
-  \ --read-stdin
-  \ --filename '%:p'<CR>
+" Append perlpath to the existing path value, if it is set.  Since we don't
+" use += to do it because of the commas in perlpath, we have to handle the
+" global / local settings, too.
+if &l:path == ""
+    if &g:path == ""
+        let &l:path=perlpath
+    else
+        let &l:path=&g:path.",".perlpath
+    endif
+else
+    let &l:path=&l:path.",".perlpath
+endif
+
+let b:undo_ftplugin .= " | setlocal pa<"
+"---------------------------------------------
+
+" Change the browse dialog to show mainly Perl-related files
+if (has("gui_win32") || has("gui_gtk")) && !exists("b:browsefilter")
+    let b:browsefilter = "Perl Source Files (*.pl)\t*.pl\n" .
+		       \ "Perl Modules (*.pm)\t*.pm\n" .
+		       \ "Perl Documentation Files (*.pod)\t*.pod\n" .
+		       \ "All Files (*.*)\t*.*\n"
+    let b:undo_ftplugin .= " | unlet! b:browsefilter"
+endif
+
+" Proper matching for matchit plugin
+if exists("loaded_matchit") && !exists("b:match_words")
+    let b:match_skip = 's:comment\|string\|perlQQ\|perlShellCommand\|perlHereDoc\|perlSubstitution\|perlTranslation\|perlMatch\|perlFormatField'
+    let b:match_words = '\<if\>:\<elsif\>:\<else\>'
+    let b:undo_ftplugin .= " | unlet! b:match_words b:match_skip"
+endif
+
+" Restore the saved compatibility options.
+let &cpo = s:save_cpo
+unlet s:save_cpo s:old_isfname s:new_isfname
