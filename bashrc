@@ -3,7 +3,9 @@ export CLICOLOR=1
 
 # don't put duplicate lines in the history. See bash(1) for more options
 # http://www.linuxjournal.com/content/using-bash-history-more-efficiently-histcontrol
-export HISTCONTROL=ignoreboth
+# Deliberately omit `ignorespace` so pasted commands with leading whitespace
+# still land in history (avoids constant re-pasting).
+export HISTCONTROL=ignoredups
 
 # for setting history length see HISTSIZE and HISTFILESIZE in bash(1)
 export HISTFILESIZE=500000000
