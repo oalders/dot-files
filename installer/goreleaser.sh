@@ -2,4 +2,4 @@
 
 set -eux
 
-go install github.com/goreleaser/goreleaser@latest
+go install github.com/goreleaser/goreleaser@v2.15.3

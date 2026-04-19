@@ -2,4 +2,4 @@
 
 set -eux
 
-go install github.com/justjanne/powerline-go@latest
+go install github.com/justjanne/powerline-go@v1.26
