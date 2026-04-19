@@ -13,7 +13,7 @@ NAME=ddclient
 REPO="$NAME.git"
 rm -rf $NAME
 
-git clone "git@github.com:ddclient/$REPO"
+git clone --branch "v$VERSION" --depth 1 "git@github.com:ddclient/$REPO"
 cd $NAME || exit 1
 
 ./autogen
