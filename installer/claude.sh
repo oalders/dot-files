@@ -3,13 +3,19 @@
 set -euxo pipefail
 
 if ! is there claude; then
-    curl -fsSL https://claude.ai/install.sh | bash
+    tmpscript=$(mktemp)
+    trap 'rm -f "$tmpscript"' EXIT
+    curl -fsSL -o "$tmpscript" https://claude.ai/install.sh
+    bash "$tmpscript"
 else
     claude install
 fi
 
 if ! is there uv; then
-    curl -LsSf https://astral.sh/uv/install.sh | sh
+    tmpscript=$(mktemp)
+    trap 'rm -f "$tmpscript"' EXIT
+    curl -LsSf -o "$tmpscript" https://astral.sh/uv/install.sh
+    sh "$tmpscript"
 fi
 
 export PATH="$HOME/.local/bin:$PATH"

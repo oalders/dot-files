@@ -18,7 +18,10 @@ if [[ ! -v PLENV_SHELL ]]; then
 fi
 
 if ! is there cpm; then
-    curl -fsSL --compressed https://raw.githubusercontent.com/skaji/cpm/v0.999.0/cpm | perl - install --global App::cpm
+    tmpscript=$(mktemp)
+    trap 'rm -f "$tmpscript"' EXIT
+    curl -fsSL --compressed -o "$tmpscript" https://raw.githubusercontent.com/skaji/cpm/v0.999.0/cpm
+    perl "$tmpscript" install --global App::cpm
 fi
 
 if is os name eq darwin && [[ ! -d /opt/homebrew ]]; then

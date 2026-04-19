@@ -63,9 +63,12 @@ maybe_install() {
 
 UBI_VERSION=v0.9.0
 if [ ! -f "$in/ubi" ]; then
+    tmpscript=$(mktemp)
+    trap 'rm -f "$tmpscript"' EXIT
     curl --silent --location \
-        "https://raw.githubusercontent.com/houseabsolute/ubi/$UBI_VERSION/bootstrap/bootstrap-ubi.sh" |
-        TARGET=$in sh
+        -o "$tmpscript" \
+        "https://raw.githubusercontent.com/houseabsolute/ubi/$UBI_VERSION/bootstrap/bootstrap-ubi.sh"
+    TARGET=$in sh "$tmpscript"
 else
     db "$in/ubi" --self-upgrade
 fi

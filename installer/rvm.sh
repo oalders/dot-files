@@ -8,7 +8,10 @@ if is os name ne darwin; then
     exit 0
 fi
 
-\curl -sSL https://get.rvm.io | bash
+tmpscript=$(mktemp)
+trap 'rm -f "$tmpscript"' EXIT
+\curl -sSL -o "$tmpscript" https://get.rvm.io
+bash "$tmpscript"
 
 # Possibly:
 # brew link --overwrite coreutils

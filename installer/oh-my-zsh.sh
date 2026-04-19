@@ -2,6 +2,9 @@
 
 set -eu -o pipefail
 
-sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+tmpscript=$(mktemp)
+trap 'rm -f "$tmpscript"' EXIT
+curl -fsSL -o "$tmpscript" https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh
+sh "$tmpscript"
 
 exit 0
