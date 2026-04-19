@@ -321,15 +321,24 @@ tmux_session_name() {
 function clone_or_update_repo() {
     local dir="$1"
     local repo="$2"
+    local tag="${3:-}"
     local src="$HOME/dot-files/src"
 
     mkdir -p "$src"
     cd "$src" || exit 1
 
     if [[ -d $dir ]]; then
-        git -C "$dir" pull --rebase
+        if [[ -n $tag ]]; then
+            git -C "$dir" fetch --tags && git -C "$dir" checkout "$tag"
+        else
+            git -C "$dir" pull --rebase
+        fi
     else
-        git clone "$repo" "$dir"
+        if [[ -n $tag ]]; then
+            git clone --branch "$tag" --depth 1 "$repo" "$dir"
+        else
+            git clone "$repo" "$dir"
+        fi
     fi
 }
 
