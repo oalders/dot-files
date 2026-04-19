@@ -9,4 +9,4 @@ set -eu -o pipefail
 # yard server --reload
 # open http://0.0.0.0:8808/
 
-gem install rubocop yard
+gem install rubocop -v 1.86.1 yard -v 0.9.43
