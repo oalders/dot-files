@@ -3,9 +3,9 @@
 # vint: required by ALE
 # yamllint: required by ALE
 # ansible-lint segfaults on Linux
-future
-neovim
-pipx
-sqlparse
-vim-vint
-yamllint
+future==1.0.0
+neovim==0.6.0
+pipx==1.11.1
+sqlparse==0.5.5
+vim-vint==0.3.21
+yamllint==1.38.0
