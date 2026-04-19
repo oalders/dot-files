@@ -18,11 +18,12 @@ set -x
 
 ln -sf $PREFIX/tmux.conf ~/.tmux.conf
 
+TPM_VERSION=v3.1.0
 LOCALCHECKOUT=~/.tmux/plugins/tpm
 if [ ! -d $LOCALCHECKOUT ]; then
-    git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
+    git clone --branch $TPM_VERSION --depth 1 https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
 else
-    (cd $LOCALCHECKOUT && git pull origin master)
+    (cd $LOCALCHECKOUT && git fetch --tags && git checkout $TPM_VERSION)
 fi
 
 # tmux needs to be running in order to source a config file etc
