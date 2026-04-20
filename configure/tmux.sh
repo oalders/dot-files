@@ -43,7 +43,6 @@ tmux ls
 tmux source ~/.tmux.conf
 
 "$TPACK_DIR/bin/install_plugins"
-"$TPACK_DIR/bin/update_plugins" all
 "$TPACK_DIR/bin/clean_plugins"
 
 tmux kill-session -t $session_name
