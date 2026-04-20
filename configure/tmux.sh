@@ -18,12 +18,17 @@ set -x
 
 ln -sf $PREFIX/tmux.conf ~/.tmux.conf
 
-TPM_VERSION=v3.1.0
-LOCALCHECKOUT=~/.tmux/plugins/tpm
-if [ ! -d $LOCALCHECKOUT ]; then
-    git clone --branch $TPM_VERSION --depth 1 https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
-else
-    (cd $LOCALCHECKOUT && git fetch --tags && git checkout $TPM_VERSION)
+# tpack is a drop-in replacement for TPM with proper version pin support.
+# It uses the same ~/.tmux/plugins/tpm directory for backward compatibility.
+TPACK_DIR=~/.tmux/plugins/tpm
+TPACK_REPO=https://github.com/tmuxpack/tpack
+if [ ! -d $TPACK_DIR ]; then
+    git clone --depth 1 "$TPACK_REPO" "$TPACK_DIR"
+elif ! git -C "$TPACK_DIR" remote get-url origin | grep -q tmuxpack/tpack; then
+    # Migrate from TPM to tpack by swapping the remote
+    git -C "$TPACK_DIR" remote set-url origin "$TPACK_REPO"
+    git -C "$TPACK_DIR" fetch origin
+    git -C "$TPACK_DIR" reset --hard origin/main
 fi
 
 # tmux needs to be running in order to source a config file etc
@@ -37,9 +42,9 @@ tmux ls
 
 tmux source ~/.tmux.conf
 
-~/.tmux/plugins/tpm/bin/install_plugins
-~/.tmux/plugins/tpm/bin/update_plugins all
-~/.tmux/plugins/tpm/bin/clean_plugins
+"$TPACK_DIR/bin/install_plugins"
+"$TPACK_DIR/bin/update_plugins" all
+"$TPACK_DIR/bin/clean_plugins"
 
 tmux kill-session -t $session_name
 
