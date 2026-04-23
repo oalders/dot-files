@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+
+set -eu -o pipefail
+
+# Enable "delete branch on merge" for all repos you have admin access to.
+# Optionally pass an org name to target that org's repos instead of your own.
+
+owner=${1:-}
+
+if [ -n "$owner" ]; then
+    args=(--owner "$owner")
+else
+    args=()
+fi
+
+gh repo list "${args[@]}" --limit 1000 --json nameWithOwner --jq '.[].nameWithOwner' | \
+    while IFS= read -r repo; do
+        echo "Setting delete_branch_on_merge: $repo"
+        gh api "repos/$repo" -X PATCH -f delete_branch_on_merge=true --silent
+    done
+
+echo "Done."
