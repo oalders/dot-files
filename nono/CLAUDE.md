@@ -20,6 +20,10 @@ Dropped from the gist:
 
 Added for Linux:
 - `NO_PROXY=localhost,127.0.0.1` reset inside `nn` before claude launches. Nono injects `network.allow_domain` entries into the sandbox's `NO_PROXY`, which makes HTTP clients bypass the nono proxy — and Landlock then blocks the direct TCP. Resetting forces traffic through the proxy, where `allow_domain` actually takes effect.
+- `filesystem.allow: ["/tmp/claude-1000"]`. The base profile grants `/tmp` write-only; Claude Code's Bash tool writes output files to `/tmp/claude-$UID/<project>/...` and then reads them back, so the subtree needs r+w. Hardcoded to UID 1000; bump if the account's UID ever changes.
+- `filesystem.read_file: ["/etc/gitconfig"]`. The base `git_config` group covers `~/.gitconfig` and `~/.config/git/ignore` but not the system-wide gitconfig. Without it, every `git` invocation fails with `fatal: unknown error occurred while reading the configuration files`.
+- `filesystem.read: ["~/.config/gh"]`. Needed for `git push` over HTTPS when gh is the credential helper — gh reads `config.yml` and `hosts.yml` (OAuth token) to answer git's username/password prompt. Read-only is enough for pushes; bump to `allow` if a workflow needs gh to update its own state.
+- `nn` passes `--allow $(git rev-parse --git-common-dir)` when cwd is a git worktree. The worktree's `.git` lives under the main repo (`<main>/.git/worktrees/<name>`), outside cwd — so `--allow-cwd` alone leaves git unable to read objects/refs.
 
 ## Kernel requirement
 
@@ -42,9 +46,10 @@ When claude or an MCP server can't reach something:
 
 ### Common extensions (paths to add when you need them)
 
-- **superpowers-chrome** (Chrome DevTools automation): `read` on `/opt/google/chrome`, `/etc/chromium`; maybe `network.open_port` for the CDP debug port.
-- **Node/npm MCPs** using global installs: `read` on specific `~/.nvm/versions/node/<v>` paths or `~/.local/lib/node_modules`.
-- **Playwright**: `read` on `~/.cache/ms-playwright`, `allow` on `/dev/shm`.
-- **Serena** (uv-installed Python venv): `read` on `~/.serena-venv`, `~/.serena`, `~/.cache/uv`.
+MCP-related grants already in `oalders.json` (from `installer/serena-mcp.sh`, `installer/playwright-mcp.sh`, `installer/chrome.sh`):
+
+- **Serena**: `read` on `~/.local/bin` (uvx wrapper + serena-mcp-server), `~/.local/share/uv` (uv-tool install); `allow` on `~/.serena` (config + logs + memories).
+- **Playwright**: `read` on `~/.npm-packages` (playwright-mcp binary), `~/.cache/ms-playwright` (chromium bundle); `allow` on `/dev/shm` (browser IPC).
+- **superpowers-chrome**: `read` on `/opt/google/chrome` (browser binary); `allow` on `~/.cache/superpowers` (browser session dirs).
 
 See `claude-nono/Makefile` in this repo for the maximalist reference set.

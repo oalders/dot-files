@@ -9,7 +9,22 @@
     "read": [
       "~/dot-files/nono",
       "~/local/bin",
-      "/usr/local/"
+      "/usr/local/",
+      "~/.config/gh",
+      "~/.local/bin",
+      "~/.local/share/uv",
+      "~/.npm-packages",
+      "~/.cache/ms-playwright",
+      "/opt/google/chrome"
+    ],
+    "allow": [
+      "/tmp/claude-1000",
+      "~/.serena",
+      "~/.cache/superpowers",
+      "/dev/shm"
+    ],
+    "read_file": [
+      "/etc/gitconfig"
     ]
   },
   "network": {

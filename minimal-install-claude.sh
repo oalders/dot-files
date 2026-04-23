@@ -38,6 +38,9 @@ run_general_installers() {
         ./installer/oh-my-posh.sh
         ./installer/claude.sh
         ./configure/claude.sh
+        ./installer/serena-mcp.sh
+        ./installer/playwright-mcp.sh
+        ./installer/chrome.sh
     )
 
     run_installers "${installers[@]}"

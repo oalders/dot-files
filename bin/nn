@@ -2,10 +2,19 @@
 
 set -eu -o pipefail
 
+# When launched from a git worktree, the worktree's git dir lives under the
+# main repo's .git/worktrees/<name> — outside cwd, so --allow-cwd doesn't
+# cover it. Resolve the common git dir and grant it. No-op for regular repos
+# (where common-dir == <cwd>/.git, already covered).
+extra_allow=()
+if common_dir=$(git rev-parse --path-format=absolute --git-common-dir 2>/dev/null); then
+    extra_allow=(--allow "$common_dir")
+fi
+
 # nono's allow_domain entries are injected into NO_PROXY inside the sandbox,
 # which makes HTTP clients bypass the nono proxy — and Landlock then blocks
 # the direct connection. Reset NO_PROXY to just loopback so HTTPS traffic
 # goes through the proxy, where allow_domain actually takes effect.
-exec nono run --profile oalders --allow-cwd --workdir . -- \
+exec nono run --profile oalders --allow-cwd --workdir . "${extra_allow[@]}" -- \
     sh -c 'NO_PROXY="localhost,127.0.0.1" no_proxy="localhost,127.0.0.1" exec claude --settings ~/.config/nono/claude-settings.json --dangerously-skip-permissions "$@"' \
     nn "$@"
