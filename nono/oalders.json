@@ -1,0 +1,22 @@
+{
+  "extends": "claude-code",
+  "security": {
+    "signal_mode": "allow_same_sandbox",
+    "process_info_mode": "allow_same_sandbox",
+    "ipc_mode": "full"
+  },
+  "filesystem": {
+    "read": [
+      "~/dot-files/nono",
+      "~/local/bin",
+      "/usr/local/"
+    ]
+  },
+  "network": {
+    "allow_domain": [
+      "api.anthropic.com",
+      "*.github.com",
+      "github.com"
+    ]
+  }
+}

@@ -13,6 +13,7 @@ directories=(
     ~/.config/oh-my-posh/themes
     ~/.config/claude-pulse
     ~/.config/mcphub
+    ~/.config/nono/profiles
     ~/.config/perlimports
     ~/.config/sqlfluff
     ~/.config/wezterm
@@ -89,6 +90,8 @@ ln -sf $prefix/cpanreporter/config.ini ~/.cpanreporter/config.ini
 ln -sf $prefix/oh-my-posh/themes/local.omp.json ~/.config/oh-my-posh/themes/local.omp.json
 ln -sf $prefix/claude-pulse/config.json ~/.config/claude-pulse/config.json
 ln -sf $prefix/mcphub/servers.json ~/.config/mcphub/servers.json
+ln -sf $prefix/nono/oalders.json ~/.config/nono/profiles/oalders.json
+ln -sf $prefix/nono/claude-settings.json ~/.config/nono/claude-settings.json
 ln -sf $prefix/perlimports/perlimports.toml ~/.config/perlimports/perlimports.toml
 ln -sf $prefix/config/sqlfluff ~/.config/sqlfluff/.sqlfluff
 ln -sf $prefix/re.pl/repl.rc ~/.re.pl/repl.rc
@@ -107,6 +110,7 @@ fi
 
 ln -sf $prefix/bin/add-worktree "$HOME/local/bin/add-worktree"
 ln -sf $prefix/bin/dev "$HOME/local/bin/dev"
+ln -sf $prefix/bin/nn "$HOME/local/bin/nn"
 ln -sf $prefix/bin/remove-worktree "$HOME/local/bin/remove-worktree"
 ln -sf $prefix/bin/tm "$HOME/local/bin/tm"
 

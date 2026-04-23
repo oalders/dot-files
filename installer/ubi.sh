@@ -78,6 +78,7 @@ fi
 db ubi --project oalders/debounce --in "$in"
 
 # maybe_install air-verse/air
+maybe_install always-further/nono
 maybe_install atanunq/viu
 maybe_install bensadeh/tailspin --exe tspin
 maybe_install charmbracelet/gum
