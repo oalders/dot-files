@@ -11,9 +11,13 @@ in=~/local/bin
 mkdir -p "$in"
 export PATH="$PATH:$in"
 
+UBI_VERSION=v0.9.0
+tmpscript=$(mktemp)
+trap 'rm -f "$tmpscript"' EXIT
 curl --silent --location \
-    https://raw.githubusercontent.com/houseabsolute/ubi/master/bootstrap/bootstrap-ubi.sh |
-    TARGET="$in" sh
+    -o "$tmpscript" \
+    "https://raw.githubusercontent.com/houseabsolute/ubi/$UBI_VERSION/bootstrap/bootstrap-ubi.sh"
+TARGET="$in" sh "$tmpscript"
 
 projects=(
     air-verse/air

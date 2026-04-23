@@ -31,14 +31,21 @@ if [[ ! -d $fonts_dir ]]; then
     mkdir -p "$fonts_dir"
 fi
 
+base_url="https://github.com/ryanoasis/nerd-fonts/releases/download/v${version}"
+
+# Download the SHA-256 checksums file
+curl --fail --location -O "$base_url/SHA-256.txt"
+
 for font in "${fonts[@]}"; do
     zip_file="${font}.zip"
-    download_url="https://github.com/ryanoasis/nerd-fonts/releases/download/v${version}/${zip_file}"
-    echo "Downloading $download_url"
-    wget "$download_url"
+    echo "Downloading $base_url/$zip_file"
+    curl --fail --location -O "$base_url/$zip_file"
+    grep "$zip_file" SHA-256.txt | sha256sum --check --strict
     unzip "$zip_file" -d "$fonts_dir"
     rm "$zip_file"
 done
+
+rm -f SHA-256.txt
 
 find "$fonts_dir" -name '*Windows Compatible*' -delete
 

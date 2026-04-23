@@ -6,7 +6,7 @@ if is os name ne darwin; then
     exit 0
 fi
 
-git clone https://github.com/powerline/fonts.git --depth=1
+git clone --branch 2015-12-04 --depth=1 https://github.com/powerline/fonts.git
 cd fonts
 ./install.sh
 cd ..

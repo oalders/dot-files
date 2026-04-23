@@ -13,5 +13,6 @@ file=SpoonInstall.spoon.zip
 
 rm -f $file
 rm -rf SpoonInstall.spoon
-curl --location -O "https://github.com/Hammerspoon/Spoons/raw/master/Spoons/$file"
+# Pin to a specific commit to avoid pulling unexpected changes
+curl --location -O "https://github.com/Hammerspoon/Spoons/raw/5c20bcecc380acff5f0f5df7a718c5679aaaf62a/Spoons/$file"
 open $file

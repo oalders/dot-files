@@ -12,7 +12,10 @@ if is os name ne darwin; then
 fi
 
 if ! is there brew; then
-    /usr/bin/env bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+    tmpscript=$(mktemp)
+    trap 'rm -f "$tmpscript"' EXIT
+    curl -fsSL -o "$tmpscript" https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh
+    /usr/bin/env bash "$tmpscript"
     add_path "/opt/homebrew/bin"
 fi
 

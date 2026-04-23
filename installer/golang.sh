@@ -23,6 +23,14 @@ filename="go$version.$os-$arch.tar.gz"
 url="https://go.dev/dl/$filename"
 
 curl --location -O "$url"
+curl --location -O "https://go.dev/dl/$filename.sha256"
+
+if command -v sha256sum &>/dev/null; then
+    echo "$(cat "$filename.sha256")  $filename" | sha256sum --check --strict
+elif command -v shasum &>/dev/null; then
+    echo "$(cat "$filename.sha256")  $filename" | shasum -a 256 --check
+fi
+rm -f "$filename.sha256"
 
 target=~/local/bin
 rm -rf "$target/go"

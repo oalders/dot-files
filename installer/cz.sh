@@ -16,7 +16,7 @@ fi
 
 set -x
 
-curl -sS https://raw.githubusercontent.com/apathor/cz/master/cz -o ~/local/bin/cz
+curl -sS https://raw.githubusercontent.com/apathor/cz/v0.9.4/cz -o ~/local/bin/cz
 chmod +x ~/local/bin/cz
 
 exit 0

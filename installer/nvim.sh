@@ -43,6 +43,15 @@ else
 fi
 
 curl -LO --fail -z $download_file "$URL$download_file"
+if curl -LO --fail -z "$download_file.sha256sum" "$URL$download_file.sha256sum"; then
+    if is there sha256sum; then
+        sha256sum --check --strict "$download_file.sha256sum"
+    elif is there shasum; then
+        shasum -a 256 --check "$download_file.sha256sum"
+    fi
+else
+    echo "WARNING: could not download checksum file for $download_file -- skipping verification" >&2
+fi
 
 if is os name eq darwin; then
     tar xzvf $download_file

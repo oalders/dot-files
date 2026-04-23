@@ -31,7 +31,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # Note: apt lists intentionally kept so dotfiles installer can use them
 
 # Node.js 24.x (needed for Claude plugins, TypeScript LSP, npm packages)
-RUN curl -sL https://deb.nodesource.com/setup_24.x | bash - && \
+RUN curl -sL -o /tmp/nodesource_setup.sh https://deb.nodesource.com/setup_24.x && \
+    bash /tmp/nodesource_setup.sh && rm -f /tmp/nodesource_setup.sh && \
     apt-get install -y nodejs
 
 # Go (needed for gopls, goimports, staticcheck, golangci-lint)

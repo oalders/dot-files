@@ -61,10 +61,14 @@ maybe_install() {
     db ubi --project "$project" --in "$in" "$@"
 }
 
+UBI_VERSION=v0.9.0
 if [ ! -f "$in/ubi" ]; then
+    tmpscript=$(mktemp)
+    trap 'rm -f "$tmpscript"' EXIT
     curl --silent --location \
-        https://raw.githubusercontent.com/houseabsolute/ubi/master/bootstrap/bootstrap-ubi.sh |
-        TARGET=$in sh
+        -o "$tmpscript" \
+        "https://raw.githubusercontent.com/houseabsolute/ubi/$UBI_VERSION/bootstrap/bootstrap-ubi.sh"
+    TARGET=$in sh "$tmpscript"
 else
     db "$in/ubi" --self-upgrade
 fi
@@ -116,7 +120,7 @@ fi
 
 maybe_install cli/cli --exe gh
 
-url=https://raw.githubusercontent.com/junegunn/fzf/refs/heads/master/bin/fzf-tmux
+url=https://raw.githubusercontent.com/junegunn/fzf/v0.71.0/bin/fzf-tmux
 target="$HOME/local/bin/fzf-tmux"
 
 if ! is there fzf-tmux; then

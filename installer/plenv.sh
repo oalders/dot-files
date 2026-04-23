@@ -7,7 +7,7 @@ if [[ -d "$HOME/.plenv/.git" ]]; then
 else
     # Might be an older install not using a Git checkout
     rm -rf "$HOME/.plenv"
-    git clone https://github.com/tokuhirom/plenv.git ~/.plenv
+    git clone --branch v1.6.0 --depth 1 https://github.com/tokuhirom/plenv.git ~/.plenv
 fi
 
 # shellcheck source=bash_functions.sh
@@ -18,7 +18,7 @@ if [[ -d $my_perl_build_dir ]]; then
     cd "$my_perl_build_dir" || exit 1
     git from
 else
-    git clone https://github.com/tokuhirom/Perl-Build.git "$my_perl_build_dir"
+    git clone --branch 1.34 --depth 1 https://github.com/tokuhirom/Perl-Build.git "$my_perl_build_dir"
 fi
 
 perl_version=5.42.0
