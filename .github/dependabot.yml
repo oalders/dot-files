@@ -4,14 +4,21 @@ updates:
   - package-ecosystem: 'github-actions'
     directory: '/'
     schedule:
-      # Check for updates to GitHub Actions every week
-      interval: 'weekly'
+      interval: 'monthly'
+    groups:
+      github-actions:
+        patterns:
+          - '*'
   - package-ecosystem: npm
     directory: '/'
     schedule:
-      interval: daily
+      interval: monthly
       time: '10:00'
     open-pull-requests-limit: 10
+    groups:
+      npm:
+        patterns:
+          - '*'
     ignore:
       - dependency-name: acorn
         versions:
