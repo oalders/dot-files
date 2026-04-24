@@ -6,7 +6,7 @@ set -eux
 cpm install ExtUtils::MakeMaker
 
 # shellcheck disable=SC2038
-find cpan/* | xargs -n 1 cpm install -g --cpanfile
+find cpan/*cpanfile | xargs -n 1 cpm install -g --verbose --show-build-log-on-failure --cpanfile
 
 if is there plenv; then
     plenv rehash
