@@ -49,7 +49,7 @@ When claude or an MCP server can't reach something:
 MCP-related grants already in `oalders.json` (from `installer/serena-mcp.sh`, `installer/playwright-mcp.sh`, `installer/chrome.sh`):
 
 - **Serena**: `read` on `~/.local/bin` (uvx wrapper + serena-mcp-server), `~/.local/share/uv` (uv-tool install); `allow` on `~/.serena` (config + logs + memories).
-- **Playwright**: `read` on `~/.npm-packages` (playwright-mcp binary), `~/.cache/ms-playwright` (chromium bundle); `allow` on `/dev/shm` (browser IPC).
+- **Playwright**: `read` on `~/.npm-packages` (playwright-mcp binary), `~/.cache/ms-playwright` (chromium bundle), `~/dot-files/bin` (npx wrapper that intercepts `@playwright/mcp@latest` — lives here so it sits ahead of `~/dot-files/node_modules/.bin/npx` in PATH); `allow` on `/dev/shm` (browser IPC).
 - **superpowers-chrome**: `read` on `/opt/google/chrome` (browser binary); `allow` on `~/.cache/superpowers` (browser session dirs).
 
 See `claude-nono/Makefile` in this repo for the maximalist reference set.

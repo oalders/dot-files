@@ -3,9 +3,11 @@
 set -eu -o pipefail
 
 # Installs @playwright/mcp globally plus the chromium it drives, and sets up
-# an npx wrapper at ~/local/bin/npx that intercepts @playwright/mcp calls so
-# the plugin's `npx @playwright/mcp@latest` invocation doesn't hit the npm
-# registry on every MCP launch.
+# an npx wrapper at ~/dot-files/bin/npx that intercepts @playwright/mcp
+# calls so the plugin's `npx @playwright/mcp@latest` invocation doesn't hit
+# the npm registry on every MCP launch. ~/dot-files/bin is ahead of
+# ~/dot-files/node_modules/.bin in PATH, so the wrapper wins over the
+# npm-installed npx without having to reorder PATH.
 
 if ! command -v npm >/dev/null; then
     echo "npm not in PATH — install node first" >&2
@@ -26,10 +28,7 @@ if [[ ! -x $pw_mcp_bin ]]; then
     exit 1
 fi
 
-# ~/local/bin is ahead of system paths in dotfiles' PATH, so this wrapper
-# takes priority over /usr/bin/npx without touching system files.
-npx_bin="$HOME/local/bin/npx"
-mkdir -p "$(dirname "$npx_bin")"
+npx_bin="$HOME/dot-files/bin/npx"
 
 cat >"$npx_bin" <<EOF
 #!/bin/bash

@@ -8,6 +8,7 @@
   "filesystem": {
     "read": [
       "~/dot-files/nono",
+      "~/dot-files/bin",
       "~/local/bin",
       "/usr/local/",
       "~/.config/gh",
