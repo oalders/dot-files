@@ -47,6 +47,9 @@ sudo install -m 0755 "$SRC/lid-closed-poweroff.sh" /usr/local/sbin/lid-closed-po
 sudo install -m 0644 "$SRC/lid-closed-poweroff.service" /etc/systemd/system/lid-closed-poweroff.service
 sudo install -m 0644 "$SRC/lid-closed-poweroff.timer" /etc/systemd/system/lid-closed-poweroff.timer
 
+# Don't restart systemd-logind here: doing it from a running graphical
+# session tears down the session bus and locks the user out of GDM until
+# the next boot. The logind drop-in is read at startup, so the lid-close
+# override takes effect on the next reboot.
 sudo systemctl daemon-reload
 sudo systemctl enable --now lid-closed-poweroff.timer
-sudo systemctl restart systemd-logind
