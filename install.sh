@@ -42,6 +42,7 @@ run_mac_installers() {
 run_general_installers() {
     local installers=(
         ./installer/linux.sh
+        ./configure/touchpad-dwt.sh
         ./installer/wezterm.sh
         ./configure/git.sh
         ./configure/ssh.sh
