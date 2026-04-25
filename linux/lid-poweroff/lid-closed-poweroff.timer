@@ -1,0 +1,10 @@
+[Unit]
+Description=Check lid-closed duration every minute
+
+[Timer]
+OnBootSec=2min
+OnUnitActiveSec=1min
+AccuracySec=15s
+
+[Install]
+WantedBy=timers.target

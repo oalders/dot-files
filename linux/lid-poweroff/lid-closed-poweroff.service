@@ -1,0 +1,6 @@
+[Unit]
+Description=Power off if lid closed too long
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/sbin/lid-closed-poweroff.sh
