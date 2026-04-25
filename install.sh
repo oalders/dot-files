@@ -43,6 +43,7 @@ run_general_installers() {
     local installers=(
         ./installer/linux.sh
         ./configure/lid-poweroff.sh
+        ./configure/power-profile.sh
         ./configure/touchpad-dwt.sh
         ./installer/wezterm.sh
         ./configure/git.sh
