@@ -22,17 +22,23 @@
       "/tmp/claude-1000",
       "~/.serena",
       "~/.cache/superpowers",
+      "~/.cache/go-build",
+      "~/go/pkg/mod",
       "/dev/shm"
     ],
     "read_file": [
-      "/etc/gitconfig"
+      "/etc/gitconfig",
+      "~/.docker/config.json"
     ]
   },
   "network": {
     "allow_domain": [
       "api.anthropic.com",
       "*.github.com",
-      "github.com"
-    ]
+      "github.com",
+      "proxy.golang.org",
+      "sum.golang.org"
+    ],
+    "open_port": [80, 5000, 5001, 8080]
   }
 }

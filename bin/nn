@@ -11,10 +11,16 @@ if common_dir=$(git rev-parse --path-format=absolute --git-common-dir 2>/dev/nul
     extra_allow=(--allow "$common_dir")
 fi
 
+# Worktree-local scratch dir for $TMPDIR. Tools that honor TMPDIR (mktemp,
+# Python tempfile, Perl File::Temp, gh, gnupg, etc.) will write here instead
+# of /tmp, which keeps transient state inside --allow-cwd and out of the
+# shared /tmp namespace.
+mkdir -p .tmp
+
 # nono's allow_domain entries are injected into NO_PROXY inside the sandbox,
 # which makes HTTP clients bypass the nono proxy — and Landlock then blocks
 # the direct connection. Reset NO_PROXY to just loopback so HTTPS traffic
 # goes through the proxy, where allow_domain actually takes effect.
 exec nono run --profile oalders --allow-cwd --workdir . "${extra_allow[@]}" -- \
-    sh -c 'NO_PROXY="localhost,127.0.0.1" no_proxy="localhost,127.0.0.1" exec claude --settings ~/.config/nono/claude-settings.json --dangerously-skip-permissions "$@"' \
+    sh -c 'NO_PROXY="localhost,127.0.0.1" no_proxy="localhost,127.0.0.1" TMPDIR="$PWD/.tmp" exec claude --settings ~/.config/nono/claude-settings.json --dangerously-skip-permissions "$@"' \
     nn "$@"
