@@ -24,6 +24,7 @@ if ! is there apt; then
         chafa \
         cpanminus \
         curl \
+        expat-devel \
         fd-find \
         jq \
         npm \
@@ -41,6 +42,7 @@ else
         cpanminus \
         curl \
         jq \
+        libexpat1-dev \
         libnet-ssleay-perl \
         locate \
         luarocks \
