@@ -36,6 +36,7 @@ if ! is there apt; then
     exit 0
 else
 
+    debounce 12 h sudo apt-get update -q
     sudo apt-get install -y -q --no-install-recommends --autoremove \
         build-essential \
         chafa \
