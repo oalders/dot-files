@@ -25,6 +25,26 @@ Added for Linux:
 - `filesystem.read: ["~/.config/gh"]`. Needed for `git push` over HTTPS when gh is the credential helper — gh reads `config.yml` and `hosts.yml` (OAuth token) to answer git's username/password prompt. Read-only is enough for pushes; bump to `allow` if a workflow needs gh to update its own state.
 - `nn` passes `--allow $(git rev-parse --git-common-dir)` when cwd is a git worktree. The worktree's `.git` lives under the main repo (`<main>/.git/worktrees/<name>`), outside cwd — so `--allow-cwd` alone leaves git unable to read objects/refs.
 
+## Why `network_profile` is set to `null`
+
+The `claude-code` network bundle (`network.network_profile`) sets up nono's reverse proxy and injects `ANTHROPIC_BASE_URL=http://127.0.0.1:<port>/anthropic`. The `anthropic` route demands `env://ANTHROPIC_API_KEY`; Max/OAuth users have no API key, so the proxy returns `407 Proxy Authentication Required` with body `{"error":"Proxy Authentication Required"}`. The startup `WARN ... requests will proceed without credential injection` is misleading — actual behavior is hard-reject.
+
+Surfaced 2026-04-30 after claude auto-updated to a version that respects `ANTHROPIC_BASE_URL`. Earlier claude went to `api.anthropic.com` directly and tunneled through `HTTPS_PROXY`, dodging the intercept.
+
+Workaround: set `"network_profile": null` in `oalders.json` and replace the curated bundle with an explicit `allow_domain` list (Anthropic, GitHub, npm, Go module proxy). The explicit `null` is the documented opt-out pattern — see nono's `docs/cli/clients/claude-code.mdx` (`claude-code-netopen` example). Today the parent `claude-code` profile doesn't set `network_profile`, so omitting the field would also work, but `null` is defensive against a future nono release adding it back.
+
+Upstream to watch:
+- https://github.com/always-further/nono/issues/793 — exec-sourced credentials (covers `apiKeyHelper` shape)
+- https://github.com/always-further/nono/issues/770 — refreshable credential backend
+- https://github.com/always-further/nono/issues/724 — 3rd-party provider profiles
+
+Re-test on each nono release: temporarily flip `"network_profile": null` to `"claude-code"` in `oalders.json` and run from `/tmp`:
+```
+nono run --profile oalders --allow-cwd -- curl -s -o /dev/null -w "%{http_code}\n" \
+  -X POST "$ANTHROPIC_BASE_URL/v1/messages" -d '{}'
+```
+Non-407 means the route became OAuth-aware and you can re-adopt the curated bundle. While `network_profile` is null, the `NO_PROXY` reset in `bin/nn` is vestigial (no proxy is started) but harmless — it re-becomes load-bearing the moment the curated bundle is restored.
+
 ## Kernel requirement
 
 `signal_mode: allow_same_sandbox` (and `process_info_mode`) require **Landlock ABI V6**, which landed in Linux **6.12**. Ubuntu 24.04 defaults to 6.8; install `linux-generic-hwe-24.04` to get 6.17+. See `bin/upgrade-to-hwe-kernel.sh`.

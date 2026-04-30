@@ -35,10 +35,19 @@
     ]
   },
   "network": {
-    "network_profile": "claude-code",
+    "network_profile": null,
     "allow_domain": [
       "proxy.golang.org",
-      "sum.golang.org"
+      "sum.golang.org",
+      "api.anthropic.com",
+      "*.anthropic.com",
+      "claude.ai",
+      "*.claude.ai",
+      "github.com",
+      "*.github.com",
+      "*.githubusercontent.com",
+      "registry.npmjs.org",
+      "*.npmjs.org"
     ],
     "open_port": [80, 5000, 5001, 8080]
   }
