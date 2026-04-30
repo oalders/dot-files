@@ -41,9 +41,11 @@ else
         chafa \
         cpanminus \
         curl \
+        gnome-keyring \
         jq \
         libexpat1-dev \
         libnet-ssleay-perl \
+        libsecret-tools \
         locate \
         luarocks \
         pandoc \
