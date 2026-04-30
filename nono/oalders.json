@@ -32,10 +32,8 @@
     ]
   },
   "network": {
+    "network_profile": "claude-code",
     "allow_domain": [
-      "api.anthropic.com",
-      "*.github.com",
-      "github.com",
       "proxy.golang.org",
       "sum.golang.org"
     ],
