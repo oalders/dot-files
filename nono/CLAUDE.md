@@ -7,6 +7,12 @@ Wraps Claude Code in the [nono](https://nono.sh/) sandbox. Invoke via `nn` (from
 - `oalders.json` — nono profile, symlinked to `~/.config/nono/profiles/oalders.json`
 - `claude-settings.json` — `{"sandbox": {"enabled": false}}` passed to claude via `--settings`, symlinked to `~/.config/nono/claude-settings.json` (so claude's built-in sandbox stays off while nono does the real work)
 
+## Per-project profiles
+
+`nn` walks up from cwd to the git toplevel looking for `.nono/profile.json`. If found, it's passed to `nono run --profile <path>` instead of the global `oalders` profile. Falls back to `oalders` when no local profile exists, or stays at cwd-only when not in a git repo.
+
+Project-local profiles can `"extends": "oalders"` to layer additional grants on top, or stand alone for a tighter sandbox.
+
 ## Divergences from the macOS gist
 
 Source: https://gist.github.com/ranguard/66d3a7ea4bba428c0a9ff7d1cba86536

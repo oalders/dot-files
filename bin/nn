@@ -11,16 +11,36 @@ if common_dir=$(git rev-parse --path-format=absolute --git-common-dir 2>/dev/nul
     extra_allow=(--allow "$common_dir")
 fi
 
+# Prefer a project-local profile at .nono/profile.json over the global
+# oalders profile. Walk up from cwd to the git toplevel (or stay at cwd if
+# not in a repo) so the profile is picked up from any subdirectory.
+profile="oalders"
+stop_at=$(git rev-parse --show-toplevel 2>/dev/null || echo "$PWD")
+dir="$PWD"
+while :; do
+    if [[ -f "$dir/.nono/profile.json" ]]; then
+        profile="$dir/.nono/profile.json"
+        break
+    fi
+    [[ "$dir" == "$stop_at" || "$dir" == "/" ]] && break
+    dir=$(dirname "$dir")
+done
+
 # Worktree-local scratch dir for $TMPDIR. Tools that honor TMPDIR (mktemp,
 # Python tempfile, Perl File::Temp, gh, gnupg, etc.) will write here instead
 # of /tmp, which keeps transient state inside --allow-cwd and out of the
 # shared /tmp namespace.
 mkdir -p .tmp
 
+echo "nn: using profile $profile" >&2
+
 # nono's allow_domain entries are injected into NO_PROXY inside the sandbox,
 # which makes HTTP clients bypass the nono proxy — and Landlock then blocks
 # the direct connection. Reset NO_PROXY to just loopback so HTTPS traffic
-# goes through the proxy, where allow_domain actually takes effect.
-exec nono run --profile oalders --allow-cwd --workdir . "${extra_allow[@]}" -- \
-    sh -c 'NO_PROXY="localhost,127.0.0.1" no_proxy="localhost,127.0.0.1" TMPDIR="$PWD/.tmp" exec claude --settings ~/.config/nono/claude-settings.json --dangerously-skip-permissions "$@"' \
-    nn "$@"
+# goes through the proxy, where allow_domain actually takes effect. Set
+# via `env` so it lands after nono's injection (calling-shell assignment
+# would be overwritten by nono before claude launches).
+exec nono run --profile "$profile" --allow-cwd --workdir . "${extra_allow[@]}" -- \
+    env NO_PROXY=localhost,127.0.0.1 no_proxy=localhost,127.0.0.1 TMPDIR="$PWD/.tmp" \
+    claude --settings "$HOME/.config/nono/claude-settings.json" \
+    --dangerously-skip-permissions "$@"
