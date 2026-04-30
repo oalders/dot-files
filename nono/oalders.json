@@ -13,14 +13,17 @@
       "/usr/local/",
       "~/.config/gh",
       "~/.local/bin",
+      "~/.local/share/nvim/mason",
       "~/.local/share/uv",
       "~/.npm-packages",
       "~/.cache/ms-playwright",
-      "/opt/google/chrome"
+      "/opt/google/chrome",
+      "/usr/libexec/gcc"
     ],
     "allow": [
       "/tmp/claude-1000",
       "~/.serena",
+      "~/.cache/golangci-lint",
       "~/.cache/superpowers",
       "~/.cache/go-build",
       "~/go/pkg/mod",
