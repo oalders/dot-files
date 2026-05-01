@@ -7,28 +7,28 @@
   },
   "filesystem": {
     "read": [
-      "~/dot-files/nono",
-      "~/dot-files/bin",
-      "~/local/bin",
+      "/opt/google/chrome",
+      "/usr/libexec/gcc",
       "/usr/local/",
+      "~/.cache/ms-playwright",
       "~/.config/gh",
       "~/.local/bin",
       "~/.local/share/nvim/mason",
       "~/.local/share/uv",
       "~/.npm-packages",
-      "~/.cache/ms-playwright",
-      "/opt/google/chrome",
       "~/.plenv",
-      "/usr/libexec/gcc"
+      "~/dot-files/bin",
+      "~/dot-files/nono",
+      "~/local/bin"
     ],
     "allow": [
+      "/dev/shm",
       "/tmp/claude-1000",
-      "~/.serena",
+      "~/.cache/go-build",
       "~/.cache/golangci-lint",
       "~/.cache/superpowers",
-      "~/.cache/go-build",
-      "~/go/pkg/mod",
-      "/dev/shm"
+      "~/.serena",
+      "~/go/pkg/mod"
     ],
     "read_file": [
       "/etc/gitconfig",
@@ -38,17 +38,17 @@
   "network": {
     "network_profile": null,
     "allow_domain": [
-      "proxy.golang.org",
-      "sum.golang.org",
-      "api.anthropic.com",
       "*.anthropic.com",
-      "claude.ai",
       "*.claude.ai",
-      "github.com",
       "*.github.com",
       "*.githubusercontent.com",
+      "*.npmjs.org",
+      "api.anthropic.com",
+      "claude.ai",
+      "github.com",
+      "proxy.golang.org",
       "registry.npmjs.org",
-      "*.npmjs.org"
+      "sum.golang.org"
     ],
     "open_port": [80, 5000, 5001, 8080]
   }
