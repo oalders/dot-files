@@ -356,6 +356,10 @@ gh-merge() {
     gh pr merge "$@"
 }
 
+unset_perl5_local_lib() {
+    unset PERL_CPANM_OPT PERL_MB_OPT PERL_MM_OPT PERL_LOCAL_LIB_ROOT PERL5LIB
+}
+
 export GO111MODULE
 export GOPATH
 export HARNESS_OPTIONS
