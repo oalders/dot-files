@@ -1,5 +1,7 @@
 bin/npx
 brew/*.lock.json
+.claude/scheduled_tasks.lock
+.claude/settings.local.json
 .ds_store
 hammerspoon/Spoons/
 nvim/lazy-lock.json
