@@ -32,8 +32,9 @@ done
 # shared /tmp namespace.
 mkdir -p .tmp
 
-echo "nn: using profile $profile" >&2
+echo "🗯️nn: using profile $profile" >&2
 
+set -x
 # nono's allow_domain entries are injected into NO_PROXY inside the sandbox,
 # which makes HTTP clients bypass the nono proxy — and Landlock then blocks
 # the direct connection. Reset NO_PROXY to just loopback so HTTPS traffic
