@@ -18,6 +18,7 @@
       "~/.npm-packages",
       "~/.cache/ms-playwright",
       "/opt/google/chrome",
+      "~/.plenv",
       "/usr/libexec/gcc"
     ],
     "allow": [
