@@ -1,8 +1,5 @@
 {
   "extends": "oalders",
-  "security": {
-    "capability_elevation": true
-  },
   "filesystem": {
     "allow_file": [
       "~/dot-files/bashrc",
