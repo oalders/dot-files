@@ -12,6 +12,7 @@
       "/usr/local/",
       "~/.cache/ms-playwright",
       "~/.config/gh",
+      "~/.gitconfig",
       "~/.local/bin",
       "~/.local/share/nvim/mason",
       "~/.local/share/uv",
