@@ -1,0 +1,20 @@
+{
+  "extends": "oalders",
+  "security": {
+    "capability_elevation": true
+  },
+  "filesystem": {
+    "allow_file": [
+      "~/dot-files/bashrc",
+      "~/dot-files/bash_profile",
+      "~/dot-files/profile"
+    ]
+  },
+  "policy": {
+    "override_deny": [
+      "~/dot-files/bashrc",
+      "~/dot-files/bash_profile",
+      "~/dot-files/profile"
+    ]
+  }
+}
