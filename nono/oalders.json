@@ -17,9 +17,11 @@
       "~/.local/share/uv",
       "~/.npm-packages",
       "~/.plenv",
+      "~/.proverc",
       "~/dot-files/bin",
       "~/dot-files/nono",
-      "~/local/bin"
+      "~/local/bin",
+      "~/perl5"
     ],
     "allow": [
       "/dev/shm",
