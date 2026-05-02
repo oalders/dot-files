@@ -24,7 +24,7 @@
     "bash-language-server": "^5.6.0",
     "bats": "^1.13.0",
     "diff-lockfiles": "^1.2.1",
-    "eslint": "^10.2.1",
+    "eslint": "^10.3.0",
     "fixjson": "^1.1.2",
     "lua-fmt": "^2.6.0",
     "markdownlint": "^0.40.0",
@@ -38,7 +38,7 @@
     "underscore": "^1.13.8",
     "urijs": ">=1.19.11",
     "ws": "^8.20.0",
-    "zod": "^4.3.6"
+    "zod": "^4.4.2"
   },
   "overrides": {
     "editorconfig": {
@@ -46,6 +46,6 @@
     }
   },
   "devDependencies": {
-    "opencode-ai": "^1.14.20"
+    "opencode-ai": "^1.14.31"
   }
 }
