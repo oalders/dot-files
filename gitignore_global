@@ -49,3 +49,7 @@ perltidy.ERR
 node_modules/
 # Perl's Carton
 /local/
+
+# Per-worktree state created by bin/nn #
+########################################
+.serena-home/
