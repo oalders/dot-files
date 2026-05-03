@@ -32,6 +32,18 @@ done
 # shared /tmp namespace.
 mkdir -p .tmp
 
+# Worktree-local serena home. Two problems we're working around:
+#   1. Without SERENA_HOME, serena reads ~/.serena's host-wide
+#      registered_projects on startup and crashes on any path outside the
+#      sandbox (Permission denied on project.yml).
+#   2. Serena's default config sets web_dashboard: true, which tries to bind
+#      a port from 24282 upward — Landlock blocks listen(), so serena exits
+#      with "No free ports found". The dashboard's also pointless headless.
+# Always overwrite with the seed: keeps the per-worktree registry empty and
+# the dashboard disabled, single source of truth in nono/serena_config.yml.
+mkdir -p .serena-home
+cp "$HOME/.config/nono/serena_config.yml" .serena-home/serena_config.yml
+
 echo "🗯️nn: using profile $profile" >&2
 
 set -x
@@ -43,5 +55,6 @@ set -x
 # would be overwritten by nono before claude launches).
 exec nono run --profile "$profile" --allow-cwd --workdir . "${extra_allow[@]}" -- \
     env NO_PROXY=localhost,127.0.0.1 no_proxy=localhost,127.0.0.1 TMPDIR="$PWD/.tmp" \
+    SERENA_HOME="$PWD/.serena-home" \
     claude --settings "$HOME/.config/nono/claude-settings.json" \
     --dangerously-skip-permissions "$@"

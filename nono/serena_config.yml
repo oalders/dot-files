@@ -1,0 +1,19 @@
+# Per-worktree serena seed config. Symlinked to ~/.config/nono/serena_config.yml
+# and copied into $PWD/.serena-home/serena_config.yml by bin/nn on every launch.
+#
+# Kept minimal because the sandbox imposes two constraints that diverge from
+# serena's out-of-the-box defaults:
+#   * web_dashboard must be false — Landlock blocks listen() in the sandbox,
+#     so serena's startup port-bind walk (24282 upward) finds nothing free
+#     and crashes with "No free ports found".
+#   * projects must stay empty — serena reads every entry on init and opens
+#     each project.yml; any path outside --allow-cwd triggers Permission
+#     denied and crashes the MCP server before activation. Keeping the list
+#     empty per launch is the whole point of the per-worktree SERENA_HOME.
+#
+# Everything else falls back to serena's built-in defaults (language_backend,
+# line_ending, log_level, etc.) — listing only what we override keeps drift
+# with upstream serena minimal.
+web_dashboard: false
+gui_log_window: false
+projects: []

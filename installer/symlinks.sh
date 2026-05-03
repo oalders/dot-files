@@ -93,6 +93,7 @@ ln -sf $prefix/mcphub/servers.json ~/.config/mcphub/servers.json
 ln -sf $prefix/nono/go-cgo-dev.json ~/.config/nono/profiles/go-cgo-dev.json
 ln -sf $prefix/nono/oalders.json ~/.config/nono/profiles/oalders.json
 ln -sf $prefix/nono/claude-settings.json ~/.config/nono/claude-settings.json
+ln -sf $prefix/nono/serena_config.yml ~/.config/nono/serena_config.yml
 ln -sf $prefix/perlimports/perlimports.toml ~/.config/perlimports/perlimports.toml
 ln -sf $prefix/config/sqlfluff ~/.config/sqlfluff/.sqlfluff
 ln -sf $prefix/re.pl/repl.rc ~/.re.pl/repl.rc
