@@ -1,0 +1,17 @@
+{
+  "meta": {
+    "name": "go-cgo-dev",
+    "description": "Go SDK development with cgo support (system C headers and pkg-config)"
+  },
+  "extends": "go-dev",
+  "policy": {
+    "add_allow_read": [
+      "/usr/include",
+      "/usr/local/include",
+      "/Library/Developer/CommandLineTools",
+      "/opt/homebrew/include",
+      "/opt/homebrew/lib/pkgconfig",
+      "/opt/homebrew/share/pkgconfig"
+    ]
+  }
+}
