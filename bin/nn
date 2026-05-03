@@ -42,7 +42,16 @@ mkdir -p .tmp
 # Always overwrite with the seed: keeps the per-worktree registry empty and
 # the dashboard disabled, single source of truth in nono/serena_config.yml.
 mkdir -p .serena-home
-cp "$HOME/.config/nono/serena_config.yml" .serena-home/serena_config.yml
+seed="$HOME/.config/nono/serena_config.yml"
+if [[ ! -e $seed ]]; then
+    # installer/symlinks.sh creates this, but self-heal here so a fresh
+    # `git pull` doesn't require re-running the installer before the next
+    # nn launch. bin/nn runs outside the sandbox, so writing under
+    # ~/.config/nono is allowed.
+    mkdir -p "$(dirname "$seed")"
+    ln -sf "$HOME/dot-files/nono/serena_config.yml" "$seed"
+fi
+cp "$seed" .serena-home/serena_config.yml
 
 echo "🗯️nn: using profile $profile" >&2
 
