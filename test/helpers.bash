@@ -28,3 +28,27 @@ EOF
     printf '%s\n' "$body" >>"$STUB_DIR/$name"
     chmod +x "$STUB_DIR/$name"
 }
+
+# Set up a fresh git repo with an initial commit in BATS_TEST_TMPDIR/repo
+# and cd into it. After this, HEAD is on a branch with one commit and
+# no remote configured.
+setup_git_repo() {
+    REPO_DIR="$BATS_TEST_TMPDIR/repo"
+    mkdir -p "$REPO_DIR"
+    cd "$REPO_DIR"
+    git init -q -b main
+    git config user.email "test@example.com"
+    git config user.name "Test"
+    echo "x" >file
+    git add file
+    git -c commit.gpgsign=false commit -q -m "init"
+}
+
+# Set up a "bare upstream" simulating a remote, and configure tracking.
+# After this, the current branch is pushed to "origin" and tracking is set.
+setup_upstream() {
+    UPSTREAM_DIR="$BATS_TEST_TMPDIR/upstream.git"
+    git init --bare -q "$UPSTREAM_DIR"
+    git remote add origin "$UPSTREAM_DIR"
+    git push -q -u origin HEAD
+}

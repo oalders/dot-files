@@ -36,3 +36,29 @@ setup() {
     [ "$status" -eq 2 ]
     [[ "$output" == *"refusing --auto"* ]]
 }
+
+@test "pre-flight: refuses when not in a git work tree" {
+    cd "$BATS_TEST_TMPDIR"
+    # Stop git from walking up into a parent repo (relevant when TMPDIR
+    # itself lives inside a git work tree, e.g. some sandboxed CI envs).
+    # Ceiling must be a strict ancestor of CWD, so use the tmpdir's parent.
+    GIT_CEILING_DIRECTORIES="$(dirname "$BATS_TEST_TMPDIR")" run "$MERGE_PR"
+    [ "$status" -eq 1 ]
+    [[ "$output" == *"not inside a git work tree"* ]]
+}
+
+@test "pre-flight: refuses when branch has no upstream" {
+    setup_git_repo
+    run "$MERGE_PR"
+    [ "$status" -eq 1 ]
+    [[ "$output" == *"has no upstream"* ]]
+}
+
+@test "pre-flight: refuses when branch has unpushed commits" {
+    setup_git_repo
+    setup_upstream
+    git -c commit.gpgsign=false commit -q --allow-empty -m "extra"
+    run "$MERGE_PR"
+    [ "$status" -eq 1 ]
+    [[ "$output" == *"unpushed commit"* ]]
+}

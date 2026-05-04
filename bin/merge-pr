@@ -44,3 +44,24 @@ for arg in "$@"; do
             ;;
     esac
 done
+
+# Pre-flight: must be inside a git work tree.
+if ! git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+    echo "merge-pr: not inside a git work tree" >&2
+    exit 1
+fi
+
+branch=$(git rev-parse --abbrev-ref HEAD)
+
+# Pre-flight: branch must have an upstream.
+if ! git rev-parse --abbrev-ref --symbolic-full-name '@{u}' >/dev/null 2>&1; then
+    echo "merge-pr: branch '$branch' has no upstream — push first" >&2
+    exit 1
+fi
+
+# Pre-flight: no unpushed commits.
+unpushed=$(git rev-list --count '@{u}..HEAD')
+if [[ "$unpushed" -ne 0 ]]; then
+    echo "merge-pr: branch '$branch' has $unpushed unpushed commit(s) — push first" >&2
+    exit 1
+fi
