@@ -1,9 +1,12 @@
 {
   "meta": {
     "name": "go-cgo-dev",
-    "description": "Go SDK development with cgo support (system C headers and pkg-config)"
+    "description": "Go SDK + cgo development on top of oalders (Go toolchain, system C headers, pkg-config)"
   },
-  "extends": "go-dev",
+  "extends": "oalders",
+  "security": {
+    "groups": ["go_runtime"]
+  },
   "policy": {
     "add_allow_read": [
       "/usr/include",
