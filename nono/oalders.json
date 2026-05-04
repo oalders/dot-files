@@ -20,6 +20,7 @@
       "~/.plenv",
       "~/.proverc",
       "~/dot-files/bin",
+      "~/dot-files/gitignore_global",
       "~/dot-files/nono",
       "~/local/bin",
       "~/perl5"
