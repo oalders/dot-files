@@ -1,0 +1,46 @@
+#!/usr/bin/env bash
+
+set -eu -o pipefail
+
+usage() {
+    cat <<'EOF'
+Usage: merge-pr [-f|--force] [gh pr merge args...]
+
+Merges the current branch's PR via `gh pr merge`, then removes the
+worktree, deletes the local branch, and kills the tmux session for the
+worktree. Run from inside the worktree's tmux session.
+
+Options:
+  -f, --force   Pass --force to `git worktree remove` (discards
+                uncommitted changes in the worktree).
+                May appear anywhere in the argument list.
+
+Refuses:
+  --auto, --auto-merge   gh pr merge would exit 0 while the PR stays
+                         OPEN, and our cleanup would tear down the
+                         worktree before the merge actually happens.
+EOF
+}
+
+# Parse our own --force/-f from anywhere in the argument list.
+# Refuse --auto / --auto-merge.
+force=""
+gh_args=()
+for arg in "$@"; do
+    case "$arg" in
+        -f | --force)
+            force="--force"
+            ;;
+        --auto | --auto-merge)
+            echo "merge-pr: refusing $arg — cleanup would run before the merge completes" >&2
+            exit 2
+            ;;
+        -h | --help)
+            usage
+            exit 0
+            ;;
+        *)
+            gh_args+=("$arg")
+            ;;
+    esac
+done
