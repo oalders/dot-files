@@ -1,6 +1,6 @@
 {
   "meta": {
-    "name": "go-cgo-dev",
+    "name": "oalders-go-cgo-dev",
     "description": "Go SDK + cgo development on top of oalders (Go toolchain, system C headers, pkg-config)"
   },
   "extends": "oalders",

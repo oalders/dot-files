@@ -2,7 +2,7 @@
 
 set -eu -o pipefail
 
-nono run --profile go-cgo-dev -- bash -c '
+nono run --profile oalders-go-cgo-dev -- bash -c '
 set -eu -o pipefail
 d=$(mktemp -d cgo-test.XXXXXX)
 trap "rm -rf \"$d\"" EXIT

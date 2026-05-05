@@ -1,0 +1,148 @@
+#!/usr/bin/env bash
+
+set -eu -o pipefail
+
+usage() {
+    cat <<'EOF'
+Usage: merge-pr [-f|--force] [gh pr merge args...]
+
+Merges the current branch's PR via `gh pr merge`, then removes the
+worktree, deletes the local branch, and kills the tmux session for the
+worktree. Run from inside the worktree's tmux session.
+
+Options:
+  -f, --force   Pass --force to `git worktree remove` (discards
+                uncommitted changes in the worktree).
+                May appear anywhere in the argument list.
+
+Refuses:
+  --auto, --auto-merge   gh pr merge would exit 0 while the PR stays
+                         OPEN, and our cleanup would tear down the
+                         worktree before the merge actually happens.
+EOF
+}
+
+# Parse our own --force/-f from anywhere in the argument list.
+# Refuse --auto / --auto-merge.
+force=""
+gh_args=()
+for arg in "$@"; do
+    case "$arg" in
+        -f | --force)
+            force="--force"
+            ;;
+        --auto | --auto-merge)
+            echo "merge-pr: refusing $arg — cleanup would run before the merge completes" >&2
+            exit 2
+            ;;
+        -h | --help)
+            usage
+            exit 0
+            ;;
+        *)
+            gh_args+=("$arg")
+            ;;
+    esac
+done
+
+# Pre-flight: must be inside a git work tree.
+if ! git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+    echo "merge-pr: not inside a git work tree" >&2
+    exit 1
+fi
+
+branch=$(git rev-parse --abbrev-ref HEAD)
+
+if [[ "$branch" == "HEAD" ]]; then
+    echo "merge-pr: detached HEAD — check out a branch first" >&2
+    exit 1
+fi
+
+# Pre-flight: branch must have an upstream.
+if ! git rev-parse --abbrev-ref --symbolic-full-name '@{u}' >/dev/null 2>&1; then
+    echo "merge-pr: branch '$branch' has no upstream — push first" >&2
+    exit 1
+fi
+
+# Pre-flight: no unpushed commits.
+unpushed=$(git rev-list --count '@{u}..HEAD')
+if [[ "$unpushed" -ne 0 ]]; then
+    echo "merge-pr: branch '$branch' has $unpushed unpushed commit(s) — push first" >&2
+    exit 1
+fi
+
+# State capture (before any mutation).
+worktree_path=$(git rev-parse --show-toplevel)
+git_common_dir=$(git rev-parse --git-common-dir)
+# In a linked worktree, --git-common-dir returns the main repo's .git;
+# its parent is the main repo working directory.
+main_repo=$(cd "$git_common_dir" && cd .. && pwd)
+
+# PR lookup: state + baseRefName in a single call.
+if ! pr_info=$(gh pr view --json state,baseRefName -q '[.state, .baseRefName] | @tsv' 2>/dev/null); then
+    echo "merge-pr: no PR found for branch '$branch'" >&2
+    exit 1
+fi
+pr_state=$(echo "$pr_info" | cut -f1)
+pr_base=$(echo "$pr_info" | cut -f2)
+
+# Pre-flight (deferred from Task 3): current branch must not be the PR's base.
+if [[ "$branch" == "$pr_base" ]]; then
+    echo "merge-pr: refusing to merge from base branch '$pr_base'" >&2
+    exit 1
+fi
+
+# Tmux session resolution. Done before mutation so a later cd doesn't
+# affect the lookup. Empty string means "no session to kill".
+session=""
+if [[ -n "${TMUX:-}" ]]; then
+    session=$(tmux display-message -p '#S')
+elif command -v tmux >/dev/null 2>&1 && tmux list-panes -a >/dev/null 2>&1; then
+    # Fallback: find a pane whose start-path matches the worktree.
+    # We use pane_start_path (not session_path or pane_current_path)
+    # because it reflects where tmux launched the pane and doesn't
+    # drift if the user cd's.
+    session=$(
+        tmux list-panes -a -F '#{session_name}	#{pane_start_path}' |
+            awk -F '\t' -v wp="$worktree_path" '$2 == wp {print $1; exit}'
+    )
+fi
+
+# Dispatch on PR state.
+case "$pr_state" in
+    OPEN)
+        gh pr merge "${gh_args[@]}"
+        ;;
+    MERGED)
+        echo "merge-pr: PR already MERGED — proceeding to cleanup"
+        ;;
+    *)
+        echo "merge-pr: refusing to act on PR in state '$pr_state'" >&2
+        exit 1
+        ;;
+esac
+
+# Cleanup. Order matters:
+#   1. cd out of the worktree before removing it.
+#   2. Remove the worktree.
+#   3. Delete the local branch (forced because squash/rebase merges
+#      aren't recognized as merged by `git branch -d`).
+#   4. Kill the tmux session LAST — when invoked from inside that
+#      session, this terminates the script. Nothing may follow.
+cd "$main_repo"
+
+# shellcheck disable=SC2086
+# $force is intentionally unquoted: empty string must expand to nothing,
+# matching the pattern used in bin/add-worktree.
+if ! git worktree remove $force "$worktree_path"; then
+    echo "" >&2
+    echo "merge-pr: worktree has uncommitted changes." >&2
+    echo "          Re-run with: merge-pr --force" >&2
+    exit 1
+fi
+
+git branch -D "$branch"
+
+if [[ -n "$session" ]]; then
+    tmux kill-session -t "$session"
+fi

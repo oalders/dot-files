@@ -4,7 +4,7 @@
   "description": "https://github.com/Homebrew/homebrew-bundle",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "bats test/"
   },
   "repository": {
     "type": "git",
