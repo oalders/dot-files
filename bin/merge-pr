@@ -92,6 +92,22 @@ if [[ "$branch" == "$pr_base" ]]; then
     exit 1
 fi
 
+# Tmux session resolution. Done before mutation so a later cd doesn't
+# affect the lookup. Empty string means "no session to kill".
+session=""
+if [[ -n "${TMUX:-}" ]]; then
+    session=$(tmux display-message -p '#S')
+elif command -v tmux >/dev/null 2>&1 && tmux list-panes -a >/dev/null 2>&1; then
+    # Fallback: find a pane whose start-path matches the worktree.
+    # We use pane_start_path (not session_path or pane_current_path)
+    # because it reflects where tmux launched the pane and doesn't
+    # drift if the user cd's.
+    session=$(
+        tmux list-panes -a -F '#{session_name}	#{pane_start_path}' |
+            awk -F '\t' -v wp="$worktree_path" '$2 == wp {print $1; exit}'
+    )
+fi
+
 # Dispatch on PR state.
 case "$pr_state" in
     OPEN)
