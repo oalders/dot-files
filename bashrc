@@ -215,9 +215,8 @@ tmux() {
 
 add_path "$GOPATH/bin"
 
-# shellcheck disable=SC2153
-if test "$SSH_AUTH_SOCK" && test "$TMUX" && [ "$SSH_AUTH_SOCK" != "$HOME/.ssh/ssh_auth_sock" ]; then
-    export SSH_AUTH_SOCK=$SOCK
+if [ -S "$HOME/.ssh/ssh_auth_sock" ]; then
+    export SSH_AUTH_SOCK="$HOME/.ssh/ssh_auth_sock"
 fi
 
 # Unset manpath so we can inherit from /etc/manpath via the `manpath` command
