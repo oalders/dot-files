@@ -70,8 +70,8 @@ fi
 if [[ -f package.json ]]; then
     npm i && git co package-lock.json
 fi
-if [[ -f bin/init.sh ]]; then
-    ./bin/init.sh
+if [[ -f scripts/init.sh ]]; then
+    ./scripts/init.sh
 fi
 
 if [[ -n $(pgrep tmux) ]]; then
