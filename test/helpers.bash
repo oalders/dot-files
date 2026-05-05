@@ -45,6 +45,7 @@ setup_git_repo() {
 }
 
 # Set up a "bare upstream" simulating a remote, and configure tracking.
+# Caller must already be inside a repo (run setup_git_repo first).
 # After this, the current branch is pushed to "origin" and tracking is set.
 setup_upstream() {
     UPSTREAM_DIR="$BATS_TEST_TMPDIR/upstream.git"

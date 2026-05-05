@@ -5,6 +5,12 @@ load 'helpers.bash'
 setup() {
     setup_sandbox
     MERGE_PR="$BIN_DIR/merge-pr"
+    # Stop git from walking past BATS_TEST_TMPDIR's parent. Without
+    # this, when the developer's TMPDIR sits inside a git repo, tests
+    # that expect "no surrounding repo" silently inherit the outer
+    # one. See test "pre-flight: refuses when not in a git work tree".
+    export GIT_CEILING_DIRECTORIES
+    GIT_CEILING_DIRECTORIES="$(dirname "$BATS_TEST_TMPDIR")"
 }
 
 @test "merge-pr -h prints usage and exits 0" {
@@ -39,10 +45,7 @@ setup() {
 
 @test "pre-flight: refuses when not in a git work tree" {
     cd "$BATS_TEST_TMPDIR"
-    # Stop git from walking up into a parent repo (relevant when TMPDIR
-    # itself lives inside a git work tree, e.g. some sandboxed CI envs).
-    # Ceiling must be a strict ancestor of CWD, so use the tmpdir's parent.
-    GIT_CEILING_DIRECTORIES="$(dirname "$BATS_TEST_TMPDIR")" run "$MERGE_PR"
+    run "$MERGE_PR"
     [ "$status" -eq 1 ]
     [[ "$output" == *"not inside a git work tree"* ]]
 }
@@ -61,4 +64,13 @@ setup() {
     run "$MERGE_PR"
     [ "$status" -eq 1 ]
     [[ "$output" == *"unpushed commit"* ]]
+}
+
+@test "pre-flight: refuses on detached HEAD" {
+    setup_git_repo
+    setup_upstream
+    git checkout -q --detach HEAD
+    run "$MERGE_PR"
+    [ "$status" -eq 1 ]
+    [[ "$output" == *"detached HEAD"* ]]
 }

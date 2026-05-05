@@ -53,6 +53,11 @@ fi
 
 branch=$(git rev-parse --abbrev-ref HEAD)
 
+if [[ "$branch" == "HEAD" ]]; then
+    echo "merge-pr: detached HEAD — check out a branch first" >&2
+    exit 1
+fi
+
 # Pre-flight: branch must have an upstream.
 if ! git rev-parse --abbrev-ref --symbolic-full-name '@{u}' >/dev/null 2>&1; then
     echo "merge-pr: branch '$branch' has no upstream — push first" >&2
