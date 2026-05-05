@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
 # https://werat.github.io/2017/02/04/tmux-ssh-agent-forwarding.html
-if [ ! -z "$SSH_CLIENT" ] && [ ! -S ~/.ssh/ssh_auth_sock ] && [ ! -z "$SSH_AUTH_SOCK" ] && [ -S "$SSH_AUTH_SOCK" ]; then
-    ln -sf $SSH_AUTH_SOCK ~/.ssh/ssh_auth_sock
+if [ -n "$SSH_CLIENT" ] && [ -n "$SSH_AUTH_SOCK" ] && [ -S "$SSH_AUTH_SOCK" ]; then
+    ln -snf "$SSH_AUTH_SOCK" "$HOME/.ssh/ssh_auth_sock"
 fi
