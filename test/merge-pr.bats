@@ -74,3 +74,45 @@ setup() {
     [ "$status" -eq 1 ]
     [[ "$output" == *"detached HEAD"* ]]
 }
+
+# Helper: set up a git repo with upstream so pre-flight passes.
+_ready_repo() {
+    setup_git_repo
+    setup_upstream
+}
+
+@test "pr lookup: refuses when gh pr view fails" {
+    _ready_repo
+    stub_command gh 'exit 1'
+    run "$MERGE_PR"
+    [ "$status" -eq 1 ]
+    [[ "$output" == *"no PR found for branch 'main'"* ]]
+}
+
+@test "pr lookup: refuses when current branch is the PR's base" {
+    _ready_repo
+    stub_command gh 'printf "OPEN\tmain\n"'
+    run "$MERGE_PR"
+    [ "$status" -eq 1 ]
+    [[ "$output" == *"refusing to merge from base branch 'main'"* ]]
+}
+
+@test "pr state: refuses CLOSED state" {
+    _ready_repo
+    git checkout -q -b feature
+    git push -q -u origin feature
+    stub_command gh 'printf "CLOSED\tmain\n"'
+    run "$MERGE_PR"
+    [ "$status" -eq 1 ]
+    [[ "$output" == *"refusing to act on PR in state 'CLOSED'"* ]]
+}
+
+@test "pr state: refuses DRAFT state" {
+    _ready_repo
+    git checkout -q -b feature
+    git push -q -u origin feature
+    stub_command gh 'printf "DRAFT\tmain\n"'
+    run "$MERGE_PR"
+    [ "$status" -eq 1 ]
+    [[ "$output" == *"refusing to act on PR in state 'DRAFT'"* ]]
+}

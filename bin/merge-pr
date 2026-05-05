@@ -70,3 +70,38 @@ if [[ "$unpushed" -ne 0 ]]; then
     echo "merge-pr: branch '$branch' has $unpushed unpushed commit(s) — push first" >&2
     exit 1
 fi
+
+# State capture (before any mutation).
+worktree_path=$(git rev-parse --show-toplevel)
+git_common_dir=$(git rev-parse --git-common-dir)
+# In a linked worktree, --git-common-dir returns the main repo's .git;
+# its parent is the main repo working directory.
+main_repo=$(cd "$git_common_dir" && cd .. && pwd)
+
+# PR lookup: state + baseRefName in a single call.
+if ! pr_info=$(gh pr view --json state,baseRefName -q '[.state, .baseRefName] | @tsv' 2>/dev/null); then
+    echo "merge-pr: no PR found for branch '$branch'" >&2
+    exit 1
+fi
+pr_state=$(echo "$pr_info" | cut -f1)
+pr_base=$(echo "$pr_info" | cut -f2)
+
+# Pre-flight (deferred from Task 3): current branch must not be the PR's base.
+if [[ "$branch" == "$pr_base" ]]; then
+    echo "merge-pr: refusing to merge from base branch '$pr_base'" >&2
+    exit 1
+fi
+
+# Dispatch on PR state.
+case "$pr_state" in
+    OPEN)
+        gh pr merge "${gh_args[@]}"
+        ;;
+    MERGED)
+        echo "merge-pr: PR already MERGED — proceeding to cleanup"
+        ;;
+    *)
+        echo "merge-pr: refusing to act on PR in state '$pr_state'" >&2
+        exit 1
+        ;;
+esac
