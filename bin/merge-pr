@@ -121,3 +121,28 @@ case "$pr_state" in
         exit 1
         ;;
 esac
+
+# Cleanup. Order matters:
+#   1. cd out of the worktree before removing it.
+#   2. Remove the worktree.
+#   3. Delete the local branch (forced because squash/rebase merges
+#      aren't recognized as merged by `git branch -d`).
+#   4. Kill the tmux session LAST — when invoked from inside that
+#      session, this terminates the script. Nothing may follow.
+cd "$main_repo"
+
+# shellcheck disable=SC2086
+# $force is intentionally unquoted: empty string must expand to nothing,
+# matching the pattern used in bin/add-worktree.
+if ! git worktree remove $force "$worktree_path"; then
+    echo "" >&2
+    echo "merge-pr: worktree has uncommitted changes." >&2
+    echo "          Re-run with: merge-pr --force" >&2
+    exit 1
+fi
+
+git branch -D "$branch"
+
+if [[ -n "$session" ]]; then
+    tmux kill-session -t "$session"
+fi
