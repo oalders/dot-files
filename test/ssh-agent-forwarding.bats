@@ -65,6 +65,14 @@ s.bind(sys.argv[1])
     [ ! -e "$FAKE_HOME/.ssh/ssh_auth_sock" ]
 }
 
+@test "ssh/rc: no-op when SSH_CLIENT and SSH_AUTH_SOCK are completely unset" {
+    run env -i HOME="$FAKE_HOME" PATH="$PATH" \
+        bash "$SSH_RC"
+    [ "$status" -eq 0 ]
+
+    [ ! -e "$FAKE_HOME/.ssh/ssh_auth_sock" ]
+}
+
 @test "ssh/rc: no-op when SSH_AUTH_SOCK is not a socket" {
     not_a_sock="$SOCK_DIR/regular_file"
     : >"$not_a_sock"
