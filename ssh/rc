@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
-set -eu -o pipefail
+# sshd runs this via /bin/sh (dash on Linux), ignoring the shebang — keep it
+# POSIX. Don't add `-o pipefail`; dash rejects it (and there are no pipes).
+set -eu
 
 # https://werat.github.io/2017/02/04/tmux-ssh-agent-forwarding.html
 if [ -n "${SSH_CLIENT-}" ] && [ -n "${SSH_AUTH_SOCK-}" ] && [ -S "${SSH_AUTH_SOCK}" ]; then

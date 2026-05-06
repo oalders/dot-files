@@ -32,7 +32,7 @@ s.bind(sys.argv[1])
     make_socket "$sock"
 
     run env HOME="$FAKE_HOME" SSH_CLIENT="1.2.3.4 22 22" SSH_AUTH_SOCK="$sock" \
-        bash "$SSH_RC"
+        sh "$SSH_RC"
     [ "$status" -eq 0 ]
 
     [ -L "$FAKE_HOME/.ssh/ssh_auth_sock" ]
@@ -48,7 +48,7 @@ s.bind(sys.argv[1])
     ln -s "$old_sock" "$FAKE_HOME/.ssh/ssh_auth_sock"
 
     run env HOME="$FAKE_HOME" SSH_CLIENT="1.2.3.4 22 22" SSH_AUTH_SOCK="$new_sock" \
-        bash "$SSH_RC"
+        sh "$SSH_RC"
     [ "$status" -eq 0 ]
 
     [ "$(readlink "$FAKE_HOME/.ssh/ssh_auth_sock")" = "$new_sock" ]
@@ -59,7 +59,7 @@ s.bind(sys.argv[1])
     make_socket "$sock"
 
     run env HOME="$FAKE_HOME" SSH_CLIENT="" SSH_AUTH_SOCK="$sock" \
-        bash "$SSH_RC"
+        sh "$SSH_RC"
     [ "$status" -eq 0 ]
 
     [ ! -e "$FAKE_HOME/.ssh/ssh_auth_sock" ]
@@ -67,7 +67,7 @@ s.bind(sys.argv[1])
 
 @test "ssh/rc: no-op when SSH_CLIENT and SSH_AUTH_SOCK are completely unset" {
     run env -i HOME="$FAKE_HOME" PATH="$PATH" \
-        bash "$SSH_RC"
+        sh "$SSH_RC"
     [ "$status" -eq 0 ]
 
     [ ! -e "$FAKE_HOME/.ssh/ssh_auth_sock" ]
@@ -78,7 +78,7 @@ s.bind(sys.argv[1])
     : >"$not_a_sock"
 
     run env HOME="$FAKE_HOME" SSH_CLIENT="1.2.3.4 22 22" SSH_AUTH_SOCK="$not_a_sock" \
-        bash "$SSH_RC"
+        sh "$SSH_RC"
     [ "$status" -eq 0 ]
 
     [ ! -e "$FAKE_HOME/.ssh/ssh_auth_sock" ]
