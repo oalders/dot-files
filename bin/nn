@@ -30,7 +30,7 @@ done
 # Python tempfile, Perl File::Temp, gh, gnupg, etc.) will write here instead
 # of /tmp, which keeps transient state inside --allow-cwd and out of the
 # shared /tmp namespace.
-mkdir -p .tmp
+mkdir -p .tmp/cache
 
 # Worktree-local serena home. Two problems we're working around:
 #   1. Without SERENA_HOME, serena reads ~/.serena's host-wide
@@ -64,6 +64,7 @@ set -x
 # would be overwritten by nono before claude launches).
 exec nono run --profile "$profile" --allow-cwd --workdir . "${extra_allow[@]}" -- \
     env NO_PROXY=localhost,127.0.0.1 no_proxy=localhost,127.0.0.1 TMPDIR="$PWD/.tmp" \
+    XDG_CACHE_HOME="$PWD/.tmp/cache" \
     SERENA_HOME="$PWD/.serena-home" \
     claude --settings "$HOME/.config/nono/claude-settings.json" \
     --dangerously-skip-permissions "$@"
