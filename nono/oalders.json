@@ -46,6 +46,7 @@
       "*.claude.ai",
       "*.github.com",
       "*.githubusercontent.com",
+      "*.metacpan.org",
       "*.npmjs.org",
       "api.anthropic.com",
       "claude.ai",
