@@ -14,5 +14,12 @@
       "Grep"
     ],
     "deny": []
+  },
+  "skillOverrides": {
+    "superpowers:brainstorm": "off",
+    "superpowers:write-plan": "off",
+    "superpowers:execute-plan": "off",
+    "superpowers:using-git-worktrees": "off",
+    "superpowers-lab:windows-vm": "off"
   }
 }
