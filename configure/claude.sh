@@ -18,7 +18,6 @@ claude plugin install superpowers-chrome@superpowers-marketplace
 claude plugin install superpowers-lab@superpowers-marketplace
 claude plugin install elements-of-style@superpowers-marketplace
 claude plugin install superpowers-developing-for-claude-code@superpowers-marketplace
-claude plugin install code-review@claude-plugins-official
 claude plugin install commit-commands@claude-plugins-official
 claude plugin install frontend-design@claude-plugins-official
 claude plugin install gopls-lsp@claude-plugins-official
