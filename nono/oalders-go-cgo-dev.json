@@ -4,11 +4,11 @@
     "description": "Go SDK + cgo development on top of oalders (Go toolchain, system C headers, pkg-config)"
   },
   "extends": "oalders",
-  "security": {
-    "groups": ["go_runtime"]
+  "groups": {
+    "include": ["go_runtime"]
   },
-  "policy": {
-    "add_allow_read": [
+  "filesystem": {
+    "read": [
       "/usr/include",
       "/usr/local/include",
       "/Library/Developer/CommandLineTools",
