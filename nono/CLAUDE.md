@@ -46,9 +46,9 @@ Upstream to watch:
 - https://github.com/always-further/nono/issues/770 — refreshable credential backend
 - https://github.com/always-further/nono/issues/724 — 3rd-party provider profiles
 
-Re-test on each nono release: temporarily flip `"network_profile": null` to `"claude-code"` in `oalders.json` and run from `/tmp`:
+Re-test on each nono release: temporarily flip `"network_profile": null` to `"claude-code"` in `oalders.json` and run from `$TMPDIR`:
 ```
-nono run --profile oalders --allow-cwd -- curl -s -o /dev/null -w "%{http_code}\n" \
+cd "${TMPDIR:-/tmp}" && nono run --profile oalders --allow-cwd -- curl -s -o /dev/null -w "%{http_code}\n" \
   -X POST "$ANTHROPIC_BASE_URL/v1/messages" -d '{}'
 ```
 Non-407 means the route became OAuth-aware and you can re-adopt the curated bundle. While `network_profile` is null, the `NO_PROXY` reset in `bin/nn` is vestigial (no proxy is started) but harmless — it re-becomes load-bearing the moment the curated bundle is restored.
@@ -68,7 +68,7 @@ When claude or an MCP server can't reach something:
    - `filesystem.read_file` / `allow_file` — single files
    - `network.allow_domain` — HTTPS hosts (wildcards like `*.github.com` OK)
 3. Validate: `nono policy validate ~/.config/nono/profiles/oalders.json`
-4. Smoke-test from `/tmp`, not `~/dot-files`. `--allow-cwd` inside this repo triggers the `deny_shell_configs` group's overlap on `~/dot-files/bashrc` etc.: `cd /tmp && nono run --profile oalders --allow-cwd -- true`
+4. Smoke-test from `$TMPDIR`, not `~/dot-files`. `--allow-cwd` inside this repo still triggers the `deny_shell_configs` group's overlap on the remaining shell configs (`bash_profile`, `profile`, etc.): `cd "${TMPDIR:-/tmp}" && nono run --profile oalders --allow-cwd -- true`. `bashrc` itself is exempted via `filesystem.bypass_protection` so `nono shell` and `nono run`-with-rc don't error on `~/.bashrc` → `~/dot-files/bashrc` — safe here because this repo is public and scanned for secrets.
 
 **Avoid broad allows on `~`, `~/.config`, `~/.local`, `~/.cache`** — they'll bring back the deny-overlap problem. Prefer specific subpaths.
 
