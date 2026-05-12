@@ -85,6 +85,7 @@ elif [ ! -f ~/.npmrc ]; then
 fi
 
 ln -sf $prefix/bat/config "$(bat --config-file)"
+ln -sf $prefix/claude/CLAUDE.md ~/.claude/CLAUDE.md
 ln -sf $prefix/claude/skills/auditing-shareable-content ~/.claude/skills/auditing-shareable-content
 ln -sf $prefix/cpanreporter/config.ini ~/.cpanreporter/config.ini
 ln -sf $prefix/oh-my-posh/themes/local.omp.json ~/.config/oh-my-posh/themes/local.omp.json
