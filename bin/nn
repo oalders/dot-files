@@ -16,7 +16,7 @@ fi
 # not in a repo) so the profile is picked up from any subdirectory.
 profile=""
 profile_label=""
-stop_at=$(git rev-parse --show-toplevel 2>/dev/null || echo "$PWD")
+project_root=$(git rev-parse --show-toplevel 2>/dev/null || echo "$PWD")
 dir="$PWD"
 while :; do
     if [[ -f "$dir/.nono/profile.json" ]]; then
@@ -24,7 +24,7 @@ while :; do
         profile_label="$profile"
         break
     fi
-    [[ "$dir" == "$stop_at" || "$dir" == "/" ]] && break
+    [[ "$dir" == "$project_root" || "$dir" == "/" ]] && break
     dir=$(dirname "$dir")
 done
 
@@ -39,23 +39,23 @@ done
 # don't need to live here.
 if [[ -z "$profile" ]]; then
     mixins=()
-    if [[ -f "$stop_at/cpanfile" || -f "$stop_at/Makefile.PL" || -f "$stop_at/dist.ini" ]]; then
+    if [[ -f "$project_root/cpanfile" || -f "$project_root/Makefile.PL" || -f "$project_root/dist.ini" ]]; then
         mixins+=("oalders-perl")
     fi
-    if [[ -f "$stop_at/package.json" ]]; then
+    if [[ -f "$project_root/package.json" ]]; then
         mixins+=("oalders-node")
     fi
-    if [[ -f "$stop_at/go.mod" ]]; then
+    if [[ -f "$project_root/go.mod" ]]; then
         mixins+=("oalders-go")
     fi
     if (( ${#mixins[@]} > 0 )); then
-        mkdir -p "$stop_at/.nono"
+        mkdir -p "$project_root/.nono"
         extends='"oalders"'
         for m in "${mixins[@]}"; do
             extends="$extends, \"$m\""
         done
-        printf '{"extends": [%s]}\n' "$extends" > "$stop_at/.nono/profile.json"
-        profile="$stop_at/.nono/profile.json"
+        printf '{"extends": [%s]}\n' "$extends" > "$project_root/.nono/profile.json"
+        profile="$project_root/.nono/profile.json"
         profile_label="$profile (auto: oalders + ${mixins[*]})"
     else
         profile="oalders"
