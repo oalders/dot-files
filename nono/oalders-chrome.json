@@ -1,0 +1,14 @@
+{
+  "meta": {
+    "name": "oalders-chrome",
+    "description": "superpowers-chrome MCP: Chrome browser binary and session cache"
+  },
+  "filesystem": {
+    "read": [
+      "/opt/google/chrome"
+    ],
+    "allow": [
+      "~/.cache/superpowers"
+    ]
+  }
+}

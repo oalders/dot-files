@@ -1,0 +1,11 @@
+{
+  "meta": {
+    "name": "oalders-uv",
+    "description": "uv runtime: location used by uv-installed tools (uvx, uv tool install)"
+  },
+  "filesystem": {
+    "read": [
+      "~/.local/share/uv"
+    ]
+  }
+}

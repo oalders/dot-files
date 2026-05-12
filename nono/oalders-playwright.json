@@ -1,0 +1,14 @@
+{
+  "meta": {
+    "name": "oalders-playwright",
+    "description": "Playwright MCP: Chromium bundle and browser IPC shared-memory"
+  },
+  "filesystem": {
+    "read": [
+      "~/.cache/ms-playwright"
+    ],
+    "allow": [
+      "/dev/shm"
+    ]
+  }
+}

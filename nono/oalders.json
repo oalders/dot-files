@@ -1,5 +1,11 @@
 {
-  "extends": "claude-code",
+  "extends": [
+    "claude-code",
+    "oalders-uv",
+    "oalders-serena",
+    "oalders-playwright",
+    "oalders-chrome"
+  ],
   "security": {
     "signal_mode": "allow_same_sandbox",
     "process_info_mode": "allow_same_sandbox",
@@ -7,36 +13,31 @@
   },
   "filesystem": {
     "read": [
-      "/opt/google/chrome",
       "/usr/libexec/gcc",
       "/usr/local/",
-      "~/.cache/ms-playwright",
       "~/.config/gh",
       "~/.gitconfig",
       "~/.local/bin",
       "~/.local/share/nvim/mason",
-      "~/.local/share/uv",
       "~/.npm-packages",
-      "~/.plenv",
-      "~/.proverc",
       "~/dot-files/bin",
       "~/dot-files/gitignore_global",
       "~/dot-files/nono",
-      "~/local/bin",
-      "~/perl5"
+      "~/local/bin"
     ],
     "allow": [
-      "/dev/shm",
-      "/tmp/claude-1000",
-      "~/.cache/go-build",
-      "~/.cache/golangci-lint",
-      "~/.cache/superpowers",
-      "~/.serena",
-      "~/go/pkg/mod"
+      "/tmp/claude-1000"
     ],
     "read_file": [
+      "/etc/bash.bashrc",
       "/etc/gitconfig",
-      "~/.docker/config.json"
+      "~/.bashrc",
+      "~/.docker/config.json",
+      "~/dot-files/bashrc"
+    ],
+    "bypass_protection": [
+      "~/.bashrc",
+      "~/dot-files/bashrc"
     ]
   },
   "network": {
@@ -46,14 +47,9 @@
       "*.claude.ai",
       "*.github.com",
       "*.githubusercontent.com",
-      "*.metacpan.org",
-      "*.npmjs.org",
       "api.anthropic.com",
       "claude.ai",
-      "github.com",
-      "proxy.golang.org",
-      "registry.npmjs.org",
-      "sum.golang.org"
+      "github.com"
     ],
     "open_port": [80, 5000, 5001, 8080]
   }

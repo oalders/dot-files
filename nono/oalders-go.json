@@ -1,0 +1,30 @@
+{
+  "meta": {
+    "name": "oalders-go",
+    "description": "Go development: module/build/linter caches, module proxy + checksum DB, system C headers and pkg-config for cgo"
+  },
+  "groups": {
+    "include": ["go_runtime"]
+  },
+  "filesystem": {
+    "read": [
+      "/Library/Developer/CommandLineTools",
+      "/opt/homebrew/include",
+      "/opt/homebrew/lib/pkgconfig",
+      "/opt/homebrew/share/pkgconfig",
+      "/usr/include",
+      "/usr/local/include"
+    ],
+    "allow": [
+      "~/.cache/go-build",
+      "~/.cache/golangci-lint",
+      "~/go/pkg/mod"
+    ]
+  },
+  "network": {
+    "allow_domain": [
+      "proxy.golang.org",
+      "sum.golang.org"
+    ]
+  }
+}

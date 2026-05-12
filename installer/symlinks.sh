@@ -91,7 +91,13 @@ ln -sf $prefix/cpanreporter/config.ini ~/.cpanreporter/config.ini
 ln -sf $prefix/oh-my-posh/themes/local.omp.json ~/.config/oh-my-posh/themes/local.omp.json
 ln -sf $prefix/claude-pulse/config.json ~/.config/claude-pulse/config.json
 ln -sf $prefix/mcphub/servers.json ~/.config/mcphub/servers.json
-ln -sf $prefix/nono/oalders-go-cgo-dev.json ~/.config/nono/profiles/oalders-go-cgo-dev.json
+ln -sf $prefix/nono/oalders-chrome.json ~/.config/nono/profiles/oalders-chrome.json
+ln -sf $prefix/nono/oalders-go.json ~/.config/nono/profiles/oalders-go.json
+ln -sf $prefix/nono/oalders-node.json ~/.config/nono/profiles/oalders-node.json
+ln -sf $prefix/nono/oalders-perl.json ~/.config/nono/profiles/oalders-perl.json
+ln -sf $prefix/nono/oalders-playwright.json ~/.config/nono/profiles/oalders-playwright.json
+ln -sf $prefix/nono/oalders-serena.json ~/.config/nono/profiles/oalders-serena.json
+ln -sf $prefix/nono/oalders-uv.json ~/.config/nono/profiles/oalders-uv.json
 ln -sf $prefix/nono/oalders.json ~/.config/nono/profiles/oalders.json
 ln -sf $prefix/nono/claude-settings.json ~/.config/nono/claude-settings.json
 ln -sf $prefix/nono/serena_config.yml ~/.config/nono/serena_config.yml

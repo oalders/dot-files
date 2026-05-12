@@ -13,6 +13,51 @@ Wraps Claude Code in the [nono](https://nono.sh/) sandbox. Invoke via `nn` (from
 
 Project-local profiles can `"extends": "oalders"` to layer additional grants on top, or stand alone for a tighter sandbox.
 
+## Sibling profiles
+
+`oalders.json` is a lean composition root. Tool- and stack-specific grants live in standalone sibling profiles (`oalders-<topic>.json`) that do **not** `extends: "oalders"` — they're meant to be composed via `extends: [...]`, not stacked into a single inheritance chain.
+
+`extends` accepting a list comes from nono PR #399; sibling profiles must therefore live as named profiles in `~/.config/nono/profiles/` so the lookup resolves.
+
+### Always-on (mixed in via `oalders.json`'s own `extends`)
+
+These are global infrastructure — MCP servers Claude relies on, and their runtimes — so they go in `oalders.json`'s `extends` list rather than per-repo detection.
+
+| Profile             | Owns                                                                                   |
+| ------------------- | -------------------------------------------------------------------------------------- |
+| `oalders-uv`        | `~/.local/share/uv` (uv runtime — used by `uvx` and `uv tool install`)                 |
+| `oalders-serena`    | `~/.serena` (serena MCP config/logs/memories)                                          |
+| `oalders-playwright`| `~/.cache/ms-playwright` (Chromium bundle), `/dev/shm` (browser IPC)                   |
+| `oalders-chrome`    | `/opt/google/chrome` (browser binary), `~/.cache/superpowers` (browser session dirs)   |
+
+### Project-detected (mixed in by `nn`)
+
+`nn` scans the repo top when no `.nono/profile.json` exists yet, and writes a wrapper composing `oalders` with any matching sibling.
+
+| Profile         | Markers at repo root                  | Owns                                                                               |
+| --------------- | ------------------------------------- | ---------------------------------------------------------------------------------- |
+| `oalders-perl`  | `cpanfile`, `Makefile.PL`, `dist.ini` | plenv (`~/.plenv`), local::lib (`~/perl5`), Dist::Zilla (`~/.dzil`, `~/dot-files/dzil`), prove (`~/.proverc`), CPAN/MagPie network |
+| `oalders-node`  | `package.json`                        | `*.npmjs.org`, `registry.npmjs.org` (npm registry network access for installs)     |
+| `oalders-go`    | `go.mod`                              | Go toolchain (`go_runtime` group), build/module/lint caches (`~/.cache/go-build`, `~/.cache/golangci-lint`, `~/go/pkg/mod`), module proxy + checksum DB (`proxy.golang.org`, `sum.golang.org`), and cgo system headers (`/usr/include`, `/usr/local/include`, `/opt/homebrew/include`, pkg-config dirs, `/Library/Developer/CommandLineTools`) |
+
+Example wrapper for a Node + Perl repo (`package.json` + `cpanfile` at top):
+
+```json
+{"extends": ["oalders", "oalders-perl", "oalders-node"]}
+```
+
+### Adding a new sibling
+
+1. Write `nono/oalders-<topic>.json` standalone (no `extends`).
+2. Add a symlink line in `installer/symlinks.sh` for `~/.config/nono/profiles/oalders-<topic>.json`.
+3. If it should be always-on, append `"oalders-<topic>"` to `oalders.json`'s `extends`. If it's per-project, add a detection block in `bin/nn` that appends `"oalders-<topic>"` to `mixins`.
+
+### Wrapper lifecycle
+
+The wrapper at `<toplevel>/.nono/profile.json` is generated only once per repo (when that file is absent). To re-detect after the project changes stacks — e.g. a `cpanfile` was added to a previously bare repo — `rm .nono/profile.json` and re-run `nn`. Hand-authored `.nono/profile.json` files are never overwritten; the walk-up finds them first and exits before detection runs.
+
+`.nono/profile.json` is not gitignored globally — choose per repo whether to commit it (share team sandbox config) or add `.nono/profile.json` to that repo's `.gitignore`.
+
 ## Divergences from the macOS gist
 
 Source: https://gist.github.com/ranguard/66d3a7ea4bba428c0a9ff7d1cba86536
@@ -31,7 +76,7 @@ Added for Linux:
 - `filesystem.read: ["~/.config/gh"]`. Needed for `git push` over HTTPS when gh is the credential helper — gh reads `config.yml` and `hosts.yml` (OAuth token) to answer git's username/password prompt. Read-only is enough for pushes; bump to `allow` if a workflow needs gh to update its own state.
 - `nn` passes `--allow $(git rev-parse --git-common-dir)` when cwd is a git worktree. The worktree's `.git` lives under the main repo (`<main>/.git/worktrees/<name>`), outside cwd — so `--allow-cwd` alone leaves git unable to read objects/refs.
 - `SERENA_HOME=$PWD/.serena-home` set inside `nn` before claude launches. Serena's `SerenaConfig.from_config_file()` reads every entry in `~/.serena/serena_config.yml`'s `registered_projects` on startup; if any path is outside the sandbox the MCP server crashes with `Permission denied` before the requested project is even activated. Pointing `SERENA_HOME` at a worktree-local dir (covered by `--allow-cwd`) gives each session a fresh, empty registry. Trade-off: serena's memories/logs no longer persist across worktrees — acceptable since the registry pollution was the actual problem and per-worktree scoping is desirable anyway.
-- `nono/serena_config.yml` is the seed config that `nn` copies into `$PWD/.serena-home/serena_config.yml` on every launch. It sets `web_dashboard: false` (Landlock blocks the dashboard's port-bind walk from 24282 upward, crashing serena with `No free ports found starting from 24282`) and `projects: []` (re-enforced each launch so the per-worktree registry can never accumulate stale entries). Single source of truth for both settings; everything else falls back to serena defaults. Once this is in place, the `~/.serena` grant under "Serena" below is dead weight for sandboxed sessions — left in for now since non-sandboxed tooling may still touch it.
+- `nono/serena_config.yml` is the seed config that `nn` copies into `$PWD/.serena-home/serena_config.yml` on every launch. It sets `web_dashboard: false` (Landlock blocks the dashboard's port-bind walk from 24282 upward, crashing serena with `No free ports found starting from 24282`) and `projects: []` (re-enforced each launch so the per-worktree registry can never accumulate stale entries). Single source of truth for both settings; everything else falls back to serena defaults. Once this is in place, the `~/.serena` grant in `oalders-serena.json` is dead weight for sandboxed sessions — left in for now since non-sandboxed tooling may still touch it.
 
 ## Why `network_profile` is set to `null`
 
@@ -62,22 +107,28 @@ Non-407 means the route became OAuth-aware and you can re-adopt the curated bund
 When claude or an MCP server can't reach something:
 
 1. Confirm the block: `nono why --path <path> --op read --profile oalders` (or `--host <hostname>` for network).
-2. Add the minimal grant to `oalders.json`:
+2. Add the minimal grant to the right file:
+   - **Stack-specific** (only useful in Perl/Node/Go/etc. projects) → the matching `oalders-<stack>.json` sibling. If the stack doesn't have a sibling yet, see "Language sibling profiles" above for how to add one.
+   - **Cross-cutting** (needed across all projects) → `oalders.json`.
+
+   Grant kinds:
    - `filesystem.read` — read-only directories
    - `filesystem.allow` — read+write directories
    - `filesystem.read_file` / `allow_file` — single files
    - `network.allow_domain` — HTTPS hosts (wildcards like `*.github.com` OK)
-3. Validate: `nono policy validate ~/.config/nono/profiles/oalders.json`
+3. Validate: `nono policy validate ~/.config/nono/profiles/<file>.json`
 4. Smoke-test from `$TMPDIR`, not `~/dot-files`. `--allow-cwd` inside this repo still triggers the `deny_shell_configs` group's overlap on the remaining shell configs (`bash_profile`, `profile`, etc.): `cd "${TMPDIR:-/tmp}" && nono run --profile oalders --allow-cwd -- true`. `bashrc` itself is exempted via `filesystem.bypass_protection` so `nono shell` and `nono run`-with-rc don't error on `~/.bashrc` → `~/dot-files/bashrc` — safe here because this repo is public and scanned for secrets.
 
 **Avoid broad allows on `~`, `~/.config`, `~/.local`, `~/.cache`** — they'll bring back the deny-overlap problem. Prefer specific subpaths.
 
-### Common extensions (paths to add when you need them)
+### Cross-cutting bits that stay in `oalders.json`
 
-MCP-related grants already in `oalders.json` (from `installer/serena-mcp.sh`, `installer/playwright-mcp.sh`, `installer/chrome.sh`):
+These don't belong to any single tool or stack, so they live in the base:
 
-- **Serena**: `read` on `~/.local/bin` (uvx wrapper + serena-mcp-server), `~/.local/share/uv` (uv-tool install); `allow` on `~/.serena` (config + logs + memories).
-- **Playwright**: `read` on `~/.npm-packages` (playwright-mcp binary), `~/.cache/ms-playwright` (chromium bundle), `~/dot-files/bin` (npx wrapper that intercepts `@playwright/mcp@latest` — lives here so it sits ahead of `~/dot-files/node_modules/.bin/npx` in PATH); `allow` on `/dev/shm` (browser IPC).
-- **superpowers-chrome**: `read` on `/opt/google/chrome` (browser binary); `allow` on `~/.cache/superpowers` (browser session dirs).
+- `read` on `~/.local/bin` (uvx wrapper, serena-mcp-server, generic user-installed scripts — used across siblings) and `~/.npm-packages` (npm-installed binaries: playwright-mcp consumer + standalone npx use).
+- `read` on `~/dot-files/bin` (npx wrapper that intercepts `@playwright/mcp@latest` so it sits ahead of `~/dot-files/node_modules/.bin/npx` in PATH).
+- `read` on `~/.config/gh` (git push over HTTPS via gh credential helper).
+- `read_file` on `/etc/gitconfig` (system-wide gitconfig outside the base `git_config` group's coverage).
+- `bypass_protection` on `~/.bashrc` → `~/dot-files/bashrc` (so `nono shell` and rc-loading don't trip the `deny_shell_configs` overlap; safe since this repo is public and scanned for secrets).
 
 See `claude-nono/Makefile` in this repo for the maximalist reference set.

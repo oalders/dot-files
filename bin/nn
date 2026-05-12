@@ -14,17 +14,54 @@ fi
 # Prefer a project-local profile at .nono/profile.json over the global
 # oalders profile. Walk up from cwd to the git toplevel (or stay at cwd if
 # not in a repo) so the profile is picked up from any subdirectory.
-profile="oalders"
+profile=""
+profile_label=""
 stop_at=$(git rev-parse --show-toplevel 2>/dev/null || echo "$PWD")
 dir="$PWD"
 while :; do
     if [[ -f "$dir/.nono/profile.json" ]]; then
         profile="$dir/.nono/profile.json"
+        profile_label="$profile"
         break
     fi
     [[ "$dir" == "$stop_at" || "$dir" == "/" ]] && break
     dir=$(dirname "$dir")
 done
+
+# No project-local profile found. Detect language stacks at the repo top
+# and, if any match, drop a wrapper at <toplevel>/.nono/profile.json that
+# composes oalders with the matching oalders-<stack> sibling(s). The next
+# nn run picks it up via the same walk-up. Add new stacks by appending a
+# detection block + mixin name. Delete .nono/profile.json to force a
+# re-detect (e.g. after adding a new cpanfile to a previously bare repo).
+# Tool-level always-on siblings (oalders-uv, oalders-serena, oalders-playwright,
+# oalders-chrome) are pulled in via oalders.json's own extends list, so they
+# don't need to live here.
+if [[ -z "$profile" ]]; then
+    mixins=()
+    if [[ -f "$stop_at/cpanfile" || -f "$stop_at/Makefile.PL" || -f "$stop_at/dist.ini" ]]; then
+        mixins+=("oalders-perl")
+    fi
+    if [[ -f "$stop_at/package.json" ]]; then
+        mixins+=("oalders-node")
+    fi
+    if [[ -f "$stop_at/go.mod" ]]; then
+        mixins+=("oalders-go")
+    fi
+    if (( ${#mixins[@]} > 0 )); then
+        mkdir -p "$stop_at/.nono"
+        extends='"oalders"'
+        for m in "${mixins[@]}"; do
+            extends="$extends, \"$m\""
+        done
+        printf '{"extends": [%s]}\n' "$extends" > "$stop_at/.nono/profile.json"
+        profile="$stop_at/.nono/profile.json"
+        profile_label="$profile (auto: oalders + ${mixins[*]})"
+    else
+        profile="oalders"
+        profile_label="oalders"
+    fi
+fi
 
 # Worktree-local scratch dir for $TMPDIR. Tools that honor TMPDIR (mktemp,
 # Python tempfile, Perl File::Temp, gh, gnupg, etc.) will write here instead
@@ -53,7 +90,7 @@ if [[ ! -e $seed ]]; then
 fi
 cp "$seed" .serena-home/serena_config.yml
 
-echo "🗯️nn: using profile $profile" >&2
+echo "🗯️nn: using profile $profile_label" >&2
 
 set -x
 # nono's allow_domain entries are injected into NO_PROXY inside the sandbox,

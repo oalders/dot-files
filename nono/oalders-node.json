@@ -1,0 +1,12 @@
+{
+  "meta": {
+    "name": "oalders-node",
+    "description": "Node/npm project mixin: npm registry network access for installs"
+  },
+  "network": {
+    "allow_domain": [
+      "*.npmjs.org",
+      "registry.npmjs.org"
+    ]
+  }
+}

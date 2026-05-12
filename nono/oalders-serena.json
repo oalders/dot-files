@@ -1,0 +1,11 @@
+{
+  "meta": {
+    "name": "oalders-serena",
+    "description": "Serena MCP server: config, logs, memories"
+  },
+  "filesystem": {
+    "allow": [
+      "~/.serena"
+    ]
+  }
+}
