@@ -162,6 +162,7 @@ set -x
 exec nono run --profile "$profile" --allow-cwd --workdir . "${extra_allow[@]}" -- \
     env NO_PROXY=localhost,127.0.0.1 no_proxy=localhost,127.0.0.1 TMPDIR="$PWD/.tmp" \
     XDG_CACHE_HOME="$PWD/.tmp/cache" \
+    NPM_CONFIG_CACHE="$PWD/.tmp/cache/npm" \
     SERENA_HOME="$PWD/.serena-home" \
     claude --settings "$session_settings" \
     --dangerously-skip-permissions "$@"
