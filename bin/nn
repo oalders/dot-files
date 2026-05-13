@@ -2,6 +2,21 @@
 
 set -eu -o pipefail
 
+# Parse nn-specific flags out of $@ before forwarding the rest to claude.
+# --chrome enables the superpowers-chrome MCP for this session only.
+# --playwright force-enables the playwright MCP regardless of e2e/ markers.
+chrome_enabled=0
+playwright_forced=0
+forwarded_args=()
+for arg in "$@"; do
+    case "$arg" in
+        --chrome) chrome_enabled=1 ;;
+        --playwright) playwright_forced=1 ;;
+        *) forwarded_args+=("$arg") ;;
+    esac
+done
+set -- "${forwarded_args[@]+"${forwarded_args[@]}"}"
+
 # When launched from a git worktree, the worktree's git dir lives under the
 # main repo's .git/worktrees/<name> — outside cwd, so --allow-cwd doesn't
 # cover it. Resolve the common git dir and grant it. No-op for regular repos
@@ -90,7 +105,52 @@ if [[ ! -e $seed ]]; then
 fi
 cp "$seed" .serena-home/serena_config.yml
 
+# Decide which browser MCPs to enable for this session:
+#   - superpowers-chrome: only when --chrome was passed (general-purpose web,
+#     opt-in per-session so idle sandboxes don't spawn Chromium MCPs).
+#   - playwright: auto-enabled when e2e markers exist at repo top, or forced
+#     via --playwright for repos without markers yet.
+playwright_enabled=$playwright_forced
+if ((!playwright_enabled)); then
+    for marker in \
+        "$project_root/e2e" \
+        "$project_root/tests/e2e" \
+        "$project_root/playwright.config.js" \
+        "$project_root/playwright.config.ts" \
+        "$project_root/playwright.config.mjs"; do
+        [[ -e $marker ]] && {
+            playwright_enabled=1
+            break
+        }
+    done
+fi
+
+# Layer plugin toggles on top of the static base settings
+# ({"sandbox":{"enabled":false}}). Worktree-local so it's covered by
+# --allow-cwd and regenerates on every launch.
+base_settings="$HOME/.config/nono/claude-settings.json"
+session_settings="$PWD/.tmp/claude-settings.json"
+chrome_json=$( ((chrome_enabled)) && echo true || echo false)
+playwright_json=$( ((playwright_enabled)) && echo true || echo false)
+jq --argjson chrome "$chrome_json" --argjson pw "$playwright_json" \
+    '. + {
+        enabledPlugins: ((.enabledPlugins // {}) + {
+            "playwright@claude-plugins-official": $pw,
+            "superpowers-chrome@superpowers-marketplace": $chrome
+        })
+    }' "$base_settings" >"$session_settings"
+
+enabled_mcps=()
+((chrome_enabled)) && enabled_mcps+=("chrome")
+((playwright_enabled)) && enabled_mcps+=("playwright")
+if ((${#enabled_mcps[@]} > 0)); then
+    settings_label="$session_settings (enabled: ${enabled_mcps[*]})"
+else
+    settings_label="$session_settings (browser MCPs disabled)"
+fi
+
 echo "🗯️nn: using profile $profile_label" >&2
+echo "🗯️nn: using settings $settings_label" >&2
 
 set -x
 # nono's allow_domain entries are injected into NO_PROXY inside the sandbox,
@@ -103,5 +163,5 @@ exec nono run --profile "$profile" --allow-cwd --workdir . "${extra_allow[@]}" -
     env NO_PROXY=localhost,127.0.0.1 no_proxy=localhost,127.0.0.1 TMPDIR="$PWD/.tmp" \
     XDG_CACHE_HOME="$PWD/.tmp/cache" \
     SERENA_HOME="$PWD/.serena-home" \
-    claude --settings "$HOME/.config/nono/claude-settings.json" \
+    claude --settings "$session_settings" \
     --dangerously-skip-permissions "$@"
