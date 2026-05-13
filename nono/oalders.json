@@ -22,6 +22,7 @@
       "~/.npm-packages",
       "~/dot-files/bin",
       "~/dot-files/gitignore_global",
+      "~/dot-files/node_modules",
       "~/dot-files/nono",
       "~/local/bin"
     ],
