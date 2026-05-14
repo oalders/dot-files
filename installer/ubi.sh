@@ -84,6 +84,7 @@ maybe_install bensadeh/tailspin --exe tspin
 maybe_install charmbracelet/gum
 maybe_install cloudflare/cloudflared
 maybe_install crate-ci/typos
+maybe_install gohugoio/hugo --matching extended
 maybe_install golangci/golangci-lint
 maybe_install houseabsolute/omegasort
 maybe_install houseabsolute/precious
