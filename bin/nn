@@ -63,6 +63,15 @@ if [[ -z "$profile" ]]; then
     if [[ -f "$project_root/go.mod" ]]; then
         mixins+=("oalders-go")
     fi
+    # Hugo: modern config names (hugo.toml/yaml/json) OR legacy config.toml
+    # paired with themes/ (themes/ guards against false positives on any other
+    # TOML-using project). Pulls in oalders-snap because Hugo on Linux is
+    # typically installed via snap, which needs /snap, /var/lib/snapd, and
+    # /etc/fstab readable to clear snapd's startup checks.
+    if [[ -f "$project_root/hugo.toml" || -f "$project_root/hugo.yaml" || -f "$project_root/hugo.json" ||
+        (-f "$project_root/config.toml" && -d "$project_root/themes") ]]; then
+        mixins+=("oalders-snap" "oalders-hugo")
+    fi
     if (( ${#mixins[@]} > 0 )); then
         mkdir -p "$project_root/.nono"
         extends='"oalders"'

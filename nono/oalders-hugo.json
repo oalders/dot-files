@@ -1,0 +1,11 @@
+{
+  "meta": {
+    "name": "oalders-hugo",
+    "description": "Hugo static site generator: cache directory"
+  },
+  "filesystem": {
+    "allow": [
+      "~/.cache/hugo_cache"
+    ]
+  }
+}
