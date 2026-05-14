@@ -16,7 +16,6 @@
       "/usr/libexec/gcc",
       "/usr/local/",
       "~/.config/gh",
-      "~/.gitconfig",
       "~/.local/bin",
       "~/.local/share/nvim/mason",
       "~/.npm-packages",
@@ -34,6 +33,7 @@
       "/etc/gitconfig",
       "~/.bashrc",
       "~/.docker/config.json",
+      "~/.gitconfig",
       "~/dot-files/bashrc"
     ],
     "bypass_protection": [
