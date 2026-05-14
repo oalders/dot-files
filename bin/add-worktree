@@ -67,6 +67,11 @@ if [[ "$type" == "pr" ]]; then
 elif [[ "$type" == "issue" ]]; then
     gh issue edit "$number" --add-label "in progress"
 fi
+
+# Initialize submodules. Silent no-op on repos without submodules; uses the
+# main repo's cached objects so no network fetch is needed for known revs.
+git submodule update --init --recursive
+
 if [[ -f package.json ]]; then
     npm i && git co package-lock.json
 fi
