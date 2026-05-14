@@ -1,0 +1,15 @@
+{
+  "meta": {
+    "name": "oalders-snap",
+    "description": "Reusable mixin for snap-confined binaries: reads under /snap, snapd state, and the system mount table"
+  },
+  "filesystem": {
+    "read": [
+      "/snap",
+      "/var/lib/snapd"
+    ],
+    "read_file": [
+      "/etc/fstab"
+    ]
+  }
+}
