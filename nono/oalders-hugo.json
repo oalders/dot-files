@@ -1,7 +1,7 @@
 {
   "meta": {
     "name": "oalders-hugo",
-    "description": "Hugo static site generator: cache directory. Compose with oalders-snap when Hugo is installed via snap."
+    "description": "Hugo static site generator: cache directory"
   },
   "filesystem": {
     "allow": [
