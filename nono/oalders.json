@@ -36,6 +36,9 @@
       "~/.gitconfig",
       "~/dot-files/bashrc"
     ],
+    "allow_file": [
+      "~/.claude/.credentials.json"
+    ],
     "bypass_protection": [
       "~/.bashrc",
       "~/dot-files/bashrc"
