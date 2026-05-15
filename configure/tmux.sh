@@ -31,6 +31,14 @@ elif ! git -C "$TPACK_DIR" remote get-url origin | grep -q tmuxpack/tpack; then
     git -C "$TPACK_DIR" reset --hard origin/main
 fi
 
+# The in-place TPM→tpack migration has been seen to leave the working tree
+# full of 0-byte files. The `tpm` shim being empty means `run '.../tpm'` in
+# tmux.conf silently no-ops and no plugins load. Reclone if so.
+if [ ! -s "$TPACK_DIR/tpm" ]; then
+    rm -rf "$TPACK_DIR"
+    git clone --depth 1 "$TPACK_REPO" "$TPACK_DIR"
+fi
+
 # tmux needs to be running in order to source a config file etc
 # Also clean up an old CI sessions
 session_name='CI'
