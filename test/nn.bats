@@ -31,6 +31,9 @@ setup() {
 }
 
 @test "bin/nn detects Hugo via the modular config/_default/ layout" {
+    # Detection keys on the config/_default/ directory existing, not on the
+    # file inside it; the hugo.toml here just mirrors a real modular-layout
+    # site so the fixture reads true to what it represents.
     mkdir -p config/_default
     echo 'baseURL = "https://example.com/"' > config/_default/hugo.toml
     run "$NN"
