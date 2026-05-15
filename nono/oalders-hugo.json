@@ -7,5 +7,12 @@
     "allow": [
       "~/.cache/hugo_cache"
     ]
+  },
+  "network": {
+    "allow_domain": [
+      "api.openverse.org",
+      "openverse.org",
+      "www.flickr.com"
+    ]
   }
 }
