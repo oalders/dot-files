@@ -4,6 +4,9 @@
     "description": "Perl development mixin: plenv, local::lib (~/perl5), Dist::Zilla, prove, MetaCPAN, perl-cpm, common rc files"
   },
   "filesystem": {
+    "allow": [
+      "~/.plenv/shims"
+    ],
     "read": [
       "~/.dzil",
       "~/.perl-cpm",
