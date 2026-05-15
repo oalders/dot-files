@@ -53,7 +53,9 @@
       "*.githubusercontent.com",
       "api.anthropic.com",
       "claude.ai",
-      "github.com"
+      "datatracker.ietf.org",
+      "github.com",
+      "www.rfc-editor.org"
     ],
     "open_port": [80, 5000, 5001, 8080]
   }
