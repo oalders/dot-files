@@ -29,3 +29,24 @@ setup() {
     [ "$status" -eq 0 ]
     grep -Fxq "NPM_CONFIG_CACHE=$BATS_TEST_TMPDIR/work/.tmp/cache/npm" "$BATS_TEST_TMPDIR/nono-argv"
 }
+
+@test "bin/nn detects Hugo via the modular config/_default/ layout" {
+    # Detection keys on the config/_default/ directory existing, not on the
+    # file inside it; the hugo.toml here just mirrors a real modular-layout
+    # site so the fixture reads true to what it represents.
+    mkdir -p config/_default
+    echo 'baseURL = "https://example.com/"' > config/_default/hugo.toml
+    run "$NN"
+    [ "$status" -eq 0 ]
+    [ -f .nono/profile.json ]
+    grep -Fq '"oalders-hugo"' .nono/profile.json
+    grep -Fq '"oalders-snap"' .nono/profile.json
+}
+
+@test "bin/nn does not detect Hugo when no config is present" {
+    run "$NN"
+    [ "$status" -eq 0 ]
+    # No stack detected: bin/nn falls back to the bare oalders profile and
+    # writes no .nono/profile.json wrapper.
+    [ ! -f .nono/profile.json ]
+}
