@@ -68,9 +68,23 @@ elif [[ "$type" == "issue" ]]; then
     gh issue edit "$number" --add-label "in progress"
 fi
 
-# Initialize submodules. Silent no-op on repos without submodules; uses the
-# main repo's cached objects so no network fetch is needed for known revs.
-git submodule update --init --recursive
+# `submodule.alternateLocation=superproject` is supposed to share objects with
+# the parent repo, but it's unreliable in worktrees: git computes the alternate
+# path off the worktree gitdir, misses the modules dir, and silently falls back
+# to a network clone. Passing --reference per submodule sidesteps that.
+if [[ -f .gitmodules ]]; then
+    while IFS= read -r section; do
+        name="${section#submodule.}"
+        name="${name%.path}"
+        sm_path="$(git config -f .gitmodules --get "submodule.$name.path")"
+        ref_gitdir="$repo_root/.git/modules/$name"
+        if [[ -d "$ref_gitdir" ]]; then
+            git submodule update --init --recursive --reference "$ref_gitdir" -- "$sm_path"
+        else
+            git submodule update --init --recursive -- "$sm_path"
+        fi
+    done < <(git config -f .gitmodules --name-only --get-regexp '^submodule\..*\.path$')
+fi
 
 if [[ -f package.json ]]; then
     npm i && git co package-lock.json

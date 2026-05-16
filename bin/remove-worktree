@@ -29,5 +29,16 @@ fi
 git_dir=$(git rev-parse --git-common-dir) || ( echo "cannot find --git-common-dir. are we inside a git repository?" && exit 1)
 cd "$git_dir/.." || ( echo "cannot chdir to $git_dir/.." && exit 1)
 
-git worktree remove "$@" "$branch_name"
+# `add-worktree gh-N` creates a dir named `gh-N` but `gh pr checkout` then
+# switches it to the PR's branch, so dir name ≠ branch name. Resolve to the
+# worktree path before removing.
+worktree_path=$(git worktree list --porcelain | awk -v ref="refs/heads/$branch_name" '
+    /^worktree / { wt=$2 }
+    $0 == "branch " ref { print wt; exit }
+')
+if [[ -z $worktree_path ]]; then
+    worktree_path="$branch_name"
+fi
+
+git worktree remove "$@" "$worktree_path"
 git branch -D "$@" "$branch_name"
