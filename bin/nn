@@ -138,19 +138,24 @@ if ((!playwright_enabled)); then
     done
 fi
 
-# Layer plugin toggles on top of the static base settings
+# Layer plugin toggles and the statusline on top of the static base settings
 # ({"sandbox":{"enabled":false}}). Worktree-local so it's covered by
-# --allow-cwd and regenerates on every launch.
+# --allow-cwd and regenerates on every launch. The statusLine block isn't
+# inherited from ~/.claude/settings.json because the sandbox can't read it,
+# so it's injected here; the script itself is granted via oalders.json's
+# filesystem.read_file.
 base_settings="$HOME/.config/nono/claude-settings.json"
 session_settings="$PWD/.tmp/claude-settings.json"
 chrome_json=$( ((chrome_enabled)) && echo true || echo false)
 playwright_json=$( ((playwright_enabled)) && echo true || echo false)
 jq --argjson chrome "$chrome_json" --argjson pw "$playwright_json" \
+    --arg statusline "bash $HOME/dot-files/claude/statusline-command.sh" \
     '. + {
         enabledPlugins: ((.enabledPlugins // {}) + {
             "playwright@claude-plugins-official": $pw,
             "superpowers-chrome@superpowers-marketplace": $chrome
-        })
+        }),
+        statusLine: { type: "command", command: $statusline }
     }' "$base_settings" >"$session_settings"
 
 enabled_mcps=()
