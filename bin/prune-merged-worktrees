@@ -1,0 +1,146 @@
+#!/usr/bin/env bash
+#
+# prune-merged-worktrees.sh - remove git worktrees whose branch is already merged.
+#
+# Scans a directory tree of linked git worktrees (default: ~/.worktree) and, for
+# each one, decides whether its branch is "merged":
+#   * its HEAD is already contained in the repo's default branch, OR
+#   * its branch has a MERGED pull request on GitHub (checked via `gh`, if installed).
+#
+# Worktrees with uncommitted changes are skipped, EXCEPT when the only changes
+# live under a `.nono/` directory (sandbox tooling artifacts), which are treated
+# as disposable.
+#
+# Default mode is a DRY RUN. Pass --delete to actually remove anything.
+
+set -uo pipefail
+
+usage() {
+  cat <<'EOF'
+Usage: prune-merged-worktrees.sh [options] [root-dir]
+
+Options:
+  --delete            Remove merged worktrees (default: dry run / report only).
+  --delete-branches   Also `git branch -D` the merged branch in its main repo.
+  --force             Also remove merged worktrees that have real uncommitted
+                      changes (those changes are discarded).
+  -h, --help          Show this help.
+
+root-dir defaults to $WORKTREE_ROOT, or ~/.worktree if that is unset.
+EOF
+}
+
+root="${WORKTREE_ROOT:-$HOME/.worktree}"
+do_delete=0
+del_branches=0
+force=0
+
+while [ $# -gt 0 ]; do
+  case "$1" in
+    --delete)          do_delete=1 ;;
+    --delete-branches) del_branches=1 ;;
+    --force)           force=1 ;;
+    -h|--help)         usage; exit 0 ;;
+    -*)                echo "unknown option: $1" >&2; usage >&2; exit 2 ;;
+    *)                 root="$1" ;;
+  esac
+  shift
+done
+
+[ -d "$root" ] || { echo "no such directory: $root" >&2; exit 1; }
+have_gh=0; command -v gh >/dev/null 2>&1 && have_gh=1
+
+removed=0 skipped=0 kept=0
+
+# Print porcelain status lines that are NOT under .nono/ (empty == clean enough).
+real_dirt() {
+  git -C "$1" status --porcelain 2>/dev/null \
+    | awk '{ p = substr($0, 4); if (p !~ /^\.nono\//) print }'
+}
+
+# Echo the default remote branch ref for a worktree, e.g. "origin/main".
+default_ref() {
+  local r
+  r=$(git -C "$1" symbolic-ref --quiet refs/remotes/origin/HEAD 2>/dev/null)
+  if [ -n "$r" ]; then echo "${r#refs/remotes/}"; return; fi
+  for c in origin/main origin/master; do
+    git -C "$1" rev-parse --verify --quiet "$c" >/dev/null 2>&1 && { echo "$c"; return; }
+  done
+}
+
+row() { printf '%-46s %-28s %-9s %s\n' "$1" "$2" "$3" "$4"; }
+row WORKTREE BRANCH STATUS ACTION
+
+while IFS= read -r gitfile; do
+  # A linked worktree's .git file points into ".../.git/worktrees/<name>".
+  # Skip submodules, whose gitdir target instead contains "/modules/".
+  target=$(sed -n 's/^gitdir: //p' "$gitfile" 2>/dev/null)
+  case "$target" in
+    *"/modules/"*)    continue ;;  # submodule (possibly nested in a worktree)
+    *"/worktrees/"*)  ;;           # linked worktree - this is what we want
+    *)                continue ;;  # main repo or something else
+  esac
+  wt="${gitfile%/.git}"
+  rel="${wt#"$root"/}"
+
+  branch=$(git -C "$wt" branch --show-current 2>/dev/null)
+  main=$(dirname "$(git -C "$wt" rev-parse --git-common-dir 2>/dev/null)")
+
+  if [ -z "$branch" ]; then
+    row "$rel" "(detached HEAD)" "-" "keep"
+    kept=$((kept + 1)); continue
+  fi
+
+  merged=0
+  def=$(default_ref "$wt")
+  if [ -n "$def" ] && git -C "$wt" merge-base --is-ancestor HEAD "$def" 2>/dev/null; then
+    merged=1
+  elif [ "$have_gh" = 1 ]; then
+    state=$(gh pr view "$branch" \
+      --repo "$(git -C "$wt" remote get-url origin 2>/dev/null)" \
+      --json state -q .state 2>/dev/null)
+    [ "$state" = "MERGED" ] && merged=1
+  fi
+
+  if [ "$merged" != 1 ]; then
+    row "$rel" "$branch" "unmerged" "keep"
+    kept=$((kept + 1)); continue
+  fi
+
+  if [ -n "$(real_dirt "$wt")" ] && [ "$force" != 1 ]; then
+    row "$rel" "$branch" "merged" "SKIP (uncommitted changes; use --force)"
+    skipped=$((skipped + 1)); continue
+  fi
+
+  if [ "$do_delete" != 1 ]; then
+    row "$rel" "$branch" "merged" "would remove"
+    removed=$((removed + 1)); continue
+  fi
+
+  if git -C "$main" worktree remove "$wt" 2>/dev/null \
+     || git -C "$main" worktree remove --force "$wt" 2>/dev/null; then
+    action="removed"
+    if [ "$del_branches" = 1 ]; then
+      git -C "$main" branch -D "$branch" >/dev/null 2>&1 && action="$action + branch deleted"
+    fi
+    row "$rel" "$branch" "merged" "$action"
+    removed=$((removed + 1))
+  else
+    row "$rel" "$branch" "merged" "FAILED to remove"
+    skipped=$((skipped + 1))
+  fi
+done < <(find "$root" -type f -name .git 2>/dev/null | sort)
+
+# Tidy up empty leftover directories (never hidden top-level dirs).
+if [ "$do_delete" = 1 ]; then
+  find "$root" -mindepth 2 -depth -type d -empty -delete 2>/dev/null
+  find "$root" -mindepth 1 -maxdepth 1 -type d -empty -not -name '.*' -delete 2>/dev/null
+fi
+
+echo
+if [ "$do_delete" = 1 ]; then
+  echo "Done: $removed removed, $skipped skipped, $kept kept."
+else
+  echo "Dry run: $removed would be removed, $skipped skipped (uncommitted), $kept kept."
+  echo "Re-run with --delete to apply (add --delete-branches to also delete branches)."
+fi
