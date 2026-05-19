@@ -11,8 +11,8 @@ worktree, deletes the local branch, and kills the tmux session for the
 worktree. Run from inside the worktree's tmux session.
 
 Options:
-  -f, --force   Pass --force to `git worktree remove` (discards
-                uncommitted changes in the worktree).
+  -f, --force   Discard uncommitted changes in the worktree when
+                removing it.
                 May appear anywhere in the argument list.
 
 Refuses:
@@ -141,13 +141,30 @@ else
     echo "merge-pr: warning: kill-worktree-procs not found; skipping process cleanup" >&2
 fi
 
-# shellcheck disable=SC2086
-# $force is intentionally unquoted: empty string must expand to nothing,
-# matching the pattern used in bin/add-worktree.
-if ! git worktree remove $force "$worktree_path"; then
+# `git worktree remove` rejects a worktree containing submodules unless
+# --force is given TWICE; a single --force only suffices to discard
+# ordinary uncommitted changes. A clean worktree should always be
+# removable, so escalate to two --force flags when the worktree has
+# submodules. Real uncommitted work is never discarded without an
+# explicit --force from the user.
+if [[ -n "$(git -C "$worktree_path" status --porcelain)" && -z "$force" ]]; then
     echo "" >&2
     echo "merge-pr: worktree has uncommitted changes." >&2
     echo "          Re-run with: merge-pr --force" >&2
+    exit 1
+fi
+
+remove_force="$force"
+if [[ -f "$worktree_path/.gitmodules" ]]; then
+    remove_force="--force --force"
+fi
+
+# shellcheck disable=SC2086
+# $remove_force is intentionally unquoted: an empty string must expand
+# to nothing, matching the pattern used in bin/add-worktree.
+if ! git worktree remove $remove_force "$worktree_path"; then
+    echo "" >&2
+    echo "merge-pr: failed to remove worktree '$worktree_path'." >&2
     exit 1
 fi
 
