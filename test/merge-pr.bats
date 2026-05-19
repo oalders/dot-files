@@ -161,3 +161,33 @@ _ready_repo() {
     [[ "$output" == *"uncommitted changes"* ]]
     [ -d "$WORKTREE_DIR" ]
 }
+
+# Uncommitted work inside a submodule must count as dirty, even when the
+# repo configures diff.ignoreSubmodules to hide it from a plain status.
+@test "cleanup: refuses a dirty submodule despite diff.ignoreSubmodules=all" {
+    _ready_repo
+    setup_feature_worktree --with-submodule
+    unset TMUX
+    stub_command tmux 'exit 0'
+    stub_command gh 'printf "MERGED\tmain\n"'
+    git config diff.ignoreSubmodules all
+    echo "dirty" >>sub/subfile
+
+    run "$MERGE_PR"
+    [ "$status" -eq 1 ]
+    [[ "$output" == *"uncommitted changes"* ]]
+    [ -d "$WORKTREE_DIR" ]
+}
+
+@test "cleanup: --force removes a worktree with a dirty submodule" {
+    _ready_repo
+    setup_feature_worktree --with-submodule
+    unset TMUX
+    stub_command tmux 'exit 0'
+    stub_command gh 'printf "MERGED\tmain\n"'
+    echo "dirty" >>sub/subfile
+
+    run "$MERGE_PR" --force
+    [ "$status" -eq 0 ]
+    [ ! -d "$WORKTREE_DIR" ]
+}
