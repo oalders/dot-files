@@ -40,5 +40,15 @@ if [[ -z $worktree_path ]]; then
     worktree_path="$branch_name"
 fi
 
+# Kill any agent process trees (nono/claude/serena) still running inside
+# the worktree before we remove it. tmux kill-session above only SIGHUPs
+# the pane shell; sandboxed claude trees often survive that.
+killer="$(dirname "${BASH_SOURCE[0]}")/kill-worktree-procs"
+if [ -x "$killer" ]; then
+    "$killer" "$worktree_path" || true
+else
+    echo "remove-worktree: warning: kill-worktree-procs not found; skipping process cleanup" >&2
+fi
+
 git worktree remove "$@" "$worktree_path"
 git branch -D "$@" "$branch_name"

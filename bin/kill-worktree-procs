@@ -1,0 +1,167 @@
+#!/usr/bin/env bash
+#
+# kill-worktree-procs - terminate agent process trees running in a worktree.
+#
+# Given a worktree path, finds every `nono`/`claude` process tree whose
+# working directory is inside that path and kills it: SIGTERM first, then
+# SIGKILL for anything that has not exited after ~5s.
+#
+# Why this exists: removing a git worktree (via merge-pr, remove-worktree
+# or prune-merged-worktrees) does NOT stop the Claude Code agent sessions
+# running inside it. The session tree is `nono -> claude -> serena-mcp-server`.
+# Left behind, those trees accumulate over days, exhaust RAM and cause
+# load-average spikes. The worktree-removal scripts call this helper just
+# before `git worktree remove` so the processes go away with the worktree.
+#
+# Safety:
+#   * Only trees rooted at a `nono` or `claude` process are touched, so an
+#     interactive shell sitting in the worktree is never killed.
+#   * The process tree this script itself runs inside is always spared,
+#     so an agent that runs `merge-pr` does not kill itself mid-script.
+
+set -u
+
+usage() {
+    cat <<'EOF'
+Usage: kill-worktree-procs [-n|--dry-run] WORKTREE_PATH
+
+Kills nono/claude process trees whose cwd is inside WORKTREE_PATH.
+
+  -n, --dry-run   Report what would be killed; do not signal anything.
+  -h, --help      Show this help.
+EOF
+}
+
+dry=0
+while [ $# -gt 0 ]; do
+    case "$1" in
+    -n | --dry-run)
+        dry=1
+        shift
+        ;;
+    -h | --help)
+        usage
+        exit 0
+        ;;
+    -*)
+        echo "kill-worktree-procs: unknown option: $1" >&2
+        exit 2
+        ;;
+    *) break ;;
+    esac
+done
+
+wt="${1:-}"
+if [ -z "$wt" ]; then
+    usage >&2
+    exit 2
+fi
+wt="${wt%/}"
+# Resolve symlinks if the worktree still exists. Callers run us before
+# `git worktree remove`, so it normally does; if not, the readlink-based
+# match below still handles the "(deleted)" cwd suffix.
+if [ -d "$wt" ]; then
+    wt="$(cd "$wt" && pwd -P)"
+fi
+
+# Echo every descendant PID of $1, recursively.
+descendants() {
+    local child
+    for child in $(pgrep -P "$1" 2>/dev/null); do
+        echo "$child"
+        descendants "$child"
+    done
+}
+
+# Echo the topmost `nono`/`claude` ancestor of $1 (walking up the process
+# tree), or nothing if there is none. This is how a session is identified:
+# walking up stops naturally at the tmux pane shell, which is not matched.
+session_root() {
+    local p="$1" root="" comm ppid i
+    for i in $(seq 1 20); do
+        comm="$(ps -o comm= -p "$p" 2>/dev/null)" || break
+        case "$comm" in
+        nono | claude) root="$p" ;;
+        esac
+        ppid="$(ps -o ppid= -p "$p" 2>/dev/null | tr -d ' ')"
+        [ -z "$ppid" ] && break
+        p="$ppid"
+        [ "$p" -le 1 ] && break
+    done
+    echo "$root"
+}
+
+# Processes we must never kill: this script, its launcher, and — if this
+# script is itself running inside a nono/claude session — that whole
+# session tree.
+protected=" $$ ${PPID} "
+self_root="$(session_root "$$")"
+if [ -n "$self_root" ]; then
+    protected+=" $self_root $(descendants "$self_root" | tr '\n' ' ') "
+fi
+
+# Collect the session root of every process whose cwd is at or under $wt.
+roots=""
+for d in /proc/[0-9]*; do
+    pid="${d#/proc/}"
+    cwd="$(readlink "$d/cwd" 2>/dev/null)" || continue
+    cwd="${cwd% (deleted)}"
+    case "$cwd" in
+    "$wt" | "$wt"/*)
+        r="$(session_root "$pid")"
+        [ -n "$r" ] && roots="$roots $r"
+        ;;
+    esac
+done
+roots="$(echo "$roots" | tr ' ' '\n' | grep -E '^[0-9]+$' | sort -un)"
+
+if [ -z "$roots" ]; then
+    echo "kill-worktree-procs: no agent sessions under $wt"
+    exit 0
+fi
+
+# Expand each session root to its full tree, dropping protected PIDs.
+victims=""
+for r in $roots; do
+    for pid in "$r" $(descendants "$r"); do
+        case "$protected" in
+        *" $pid "*) continue ;;
+        esac
+        victims="$victims $pid"
+    done
+done
+victims="$(echo "$victims" | tr ' ' '\n' | grep -E '^[0-9]+$' | sort -un)"
+
+if [ -z "$victims" ]; then
+    echo "kill-worktree-procs: sessions under $wt are all protected; nothing to kill"
+    exit 0
+fi
+
+count="$(echo "$victims" | wc -l | tr -d ' ')"
+
+if [ "$dry" = 1 ]; then
+    echo "kill-worktree-procs: DRY RUN - would kill $count process(es) under $wt:"
+    ps -o pid,ppid,comm,etime -p "$(echo "$victims" | paste -sd,)" 2>/dev/null
+    exit 0
+fi
+
+echo "kill-worktree-procs: SIGTERM $count process(es) under $wt"
+# shellcheck disable=SC2046
+kill -TERM $(echo "$victims" | tr '\n' ' ') 2>/dev/null
+
+# Wait up to ~5s for graceful exit, then SIGKILL whatever remains.
+alive=""
+for _ in $(seq 1 10); do
+    alive=""
+    for pid in $victims; do
+        kill -0 "$pid" 2>/dev/null && alive="$alive $pid"
+    done
+    [ -z "${alive// /}" ] && break
+    sleep 0.5
+done
+if [ -n "${alive// /}" ]; then
+    echo "kill-worktree-procs: SIGKILL straggler(s):$alive"
+    # shellcheck disable=SC2086
+    kill -KILL $alive 2>/dev/null
+fi
+echo "kill-worktree-procs: done"

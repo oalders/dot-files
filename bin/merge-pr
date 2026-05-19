@@ -131,6 +131,16 @@ esac
 #      session, this terminates the script. Nothing may follow.
 cd "$main_repo"
 
+# Kill any agent process trees (nono/claude/serena) still running inside
+# the worktree before we remove it. Otherwise they live on with cwd
+# "(deleted)", accumulate over days, exhaust RAM and spike load average.
+killer="$(dirname "${BASH_SOURCE[0]}")/kill-worktree-procs"
+if [ -x "$killer" ]; then
+    "$killer" "$worktree_path" || true
+else
+    echo "merge-pr: warning: kill-worktree-procs not found; skipping process cleanup" >&2
+fi
+
 # shellcheck disable=SC2086
 # $force is intentionally unquoted: empty string must expand to nothing,
 # matching the pattern used in bin/add-worktree.

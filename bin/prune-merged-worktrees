@@ -117,6 +117,17 @@ while IFS= read -r gitfile; do
     removed=$((removed + 1)); continue
   fi
 
+  # Kill any agent process trees (nono/claude/serena) still running inside
+  # this worktree before removing it. This script previously did no process
+  # cleanup at all, which was the primary leak source: worktrees pruned
+  # while their claude/nono trees kept running with cwd "(deleted)".
+  killer="$(dirname "${BASH_SOURCE[0]}")/kill-worktree-procs"
+  if [ -x "$killer" ]; then
+    "$killer" "$wt" || true
+  else
+    echo "prune-merged-worktrees: warning: kill-worktree-procs not found" >&2
+  fi
+
   if git -C "$main" worktree remove "$wt" 2>/dev/null \
      || git -C "$main" worktree remove --force "$wt" 2>/dev/null; then
     action="removed"
