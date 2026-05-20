@@ -6,12 +6,17 @@
   "filesystem": {
     "allow": [
       "~/.cache/hugo_cache"
+    ],
+    "read": [
+      "/etc/magic",
+      "~/Downloads"
     ]
   },
   "network": {
     "allow_domain": [
       "api.openverse.org",
       "openverse.org",
+      "*.staticflickr.com",
       "www.flickr.com"
     ]
   }
