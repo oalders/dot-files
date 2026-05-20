@@ -34,6 +34,7 @@ run_mac_installers() {
         #./configure/dock.sh
         ./configure/macos.sh
         ./installer/spoon-installer.sh
+        ./installer/tailscale.sh
     )
 
     run_installers "${mac_installers[@]}"

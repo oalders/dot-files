@@ -5,14 +5,38 @@ set -eu -o pipefail
 # shellcheck source=bash_functions.sh
 source ~/dot-files/bash_functions.sh
 
-# Tailscale, installed from the official apt repo (pkgs.tailscale.com) rather
-# than the snap. The apt package runs unconfined and can read/write anywhere
-# the daemon's user can, which the snap's confinement prevents.
+# Tailscale installer.
+#
+# On macOS: the standalone "macsys" build, not the sandboxed App Store variant --
+# needed for full CLI/exit-node/subnet-router behavior. The app auto-updates
+# itself once installed, so this script just bootstraps and then no-ops.
+#
+# On Linux: installed from the official apt repo (pkgs.tailscale.com) rather than
+# the snap. The apt package runs unconfined and can read/write anywhere the
+# daemon's user can, which the snap's confinement prevents.
 # Instructions: https://tailscale.com/download/linux
 #
-# Not wired into install.sh on purpose -- run this script directly. Switching
-# from the snap drops any active tailnet session, so re-run `sudo tailscale up`
-# to authenticate afterwards.
+# Not wired into install.sh on purpose -- run this script directly. On Linux,
+# switching from the snap drops any active tailnet session, so re-run
+# `sudo tailscale up` to authenticate afterwards.
+
+if is os name eq darwin; then
+    if [[ -d /Applications/Tailscale.app ]]; then
+        exit 0
+    fi
+
+    # macOS `installer` requires a .pkg extension, so download into a temp dir.
+    workdir="$(mktemp -d "${TMPDIR:-/tmp}/tailscale-install.XXXXXX")"
+    trap 'rm -rf "$workdir"' EXIT
+    pkg="$workdir/tailscale.pkg"
+
+    curl --fail --silent --show-error --location \
+        -o "$pkg" \
+        https://pkgs.tailscale.com/stable/Tailscale-latest-macos.pkg
+
+    sudo installer -pkg "$pkg" -target /
+    exit 0
+fi
 
 if is os name ne linux; then
     echo "skipping. this is $(is known os name)"
