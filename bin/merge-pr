@@ -11,8 +11,8 @@ worktree, deletes the local branch, and kills the tmux session for the
 worktree. Run from inside the worktree's tmux session.
 
 Options:
-  -f, --force   Pass --force to `git worktree remove` (discards
-                uncommitted changes in the worktree).
+  -f, --force   Discard uncommitted changes in the worktree when
+                removing it.
                 May appear anywhere in the argument list.
 
 Refuses:
@@ -141,13 +141,36 @@ else
     echo "merge-pr: warning: kill-worktree-procs not found; skipping process cleanup" >&2
 fi
 
-# shellcheck disable=SC2086
-# $force is intentionally unquoted: empty string must expand to nothing,
-# matching the pattern used in bin/add-worktree.
-if ! git worktree remove $force "$worktree_path"; then
+# `git worktree remove` refuses a worktree that contains submodules
+# unless --force is given — even when the worktree is perfectly clean.
+# Since --force also discards uncommitted changes, first refuse a dirty
+# worktree unless the user opted in with --force. --ignore-submodules=none
+# makes the check count uncommitted work *inside* a submodule as dirty
+# even when the repo sets diff.ignoreSubmodules or a per-submodule
+# `ignore`, either of which would otherwise hide it.
+if [[ -n "$(git -C "$worktree_path" status --porcelain --ignore-submodules=none)" && -z "$force" ]]; then
     echo "" >&2
     echo "merge-pr: worktree has uncommitted changes." >&2
     echo "          Re-run with: merge-pr --force" >&2
+    exit 1
+fi
+
+# Escalate to --force for a worktree with submodules (see above). A
+# single --force suffices; the .gitmodules check over-approximates (an
+# uninitialized submodule needs no --force) but forcing an
+# already-removable clean worktree is harmless.
+remove_force="$force"
+if [[ -f "$worktree_path/.gitmodules" ]]; then
+    remove_force="--force"
+fi
+
+# shellcheck disable=SC2086
+# $remove_force is intentionally unquoted: an empty string must expand
+# to nothing, matching the pattern used in bin/add-worktree.
+if ! git worktree remove $remove_force "$worktree_path"; then
+    echo "" >&2
+    echo "merge-pr: failed to remove worktree '$worktree_path' (see git error above)." >&2
+    echo "          To remove it manually: git worktree remove --force --force '$worktree_path'" >&2
     exit 1
 fi
 

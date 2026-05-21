@@ -116,3 +116,93 @@ _ready_repo() {
     [ "$status" -eq 1 ]
     [[ "$output" == *"refusing to act on PR in state 'DRAFT'"* ]]
 }
+
+# Cleanup path. A MERGED PR skips the actual merge and goes straight to
+# worktree removal. tmux is stubbed inert so session resolution (which
+# runs under `set -e`) doesn't abort the script.
+@test "cleanup: removes a clean worktree containing a submodule" {
+    _ready_repo
+    setup_feature_worktree --with-submodule
+    unset TMUX
+    stub_command tmux 'exit 0'
+    stub_command gh 'printf "MERGED\tmain\n"'
+
+    run "$MERGE_PR"
+    [ "$status" -eq 0 ]
+    [ ! -d "$WORKTREE_DIR" ]
+    run git -C "$REPO_DIR" branch --list feature
+    [ -z "$output" ]
+}
+
+@test "cleanup: removes a clean worktree without submodules" {
+    _ready_repo
+    setup_feature_worktree
+    unset TMUX
+    stub_command tmux 'exit 0'
+    stub_command gh 'printf "MERGED\tmain\n"'
+
+    run "$MERGE_PR"
+    [ "$status" -eq 0 ]
+    [ ! -d "$WORKTREE_DIR" ]
+    run git -C "$REPO_DIR" branch --list feature
+    [ -z "$output" ]
+}
+
+@test "cleanup: refuses a dirty worktree without --force" {
+    _ready_repo
+    setup_feature_worktree
+    unset TMUX
+    stub_command tmux 'exit 0'
+    stub_command gh 'printf "MERGED\tmain\n"'
+    echo "dirty" >>file
+
+    run "$MERGE_PR"
+    [ "$status" -eq 1 ]
+    [[ "$output" == *"uncommitted changes"* ]]
+    [ -d "$WORKTREE_DIR" ]
+}
+
+# Uncommitted work inside a submodule must count as dirty, even when the
+# repo configures diff.ignoreSubmodules to hide it from a plain status.
+@test "cleanup: refuses a dirty submodule despite diff.ignoreSubmodules=all" {
+    _ready_repo
+    setup_feature_worktree --with-submodule
+    unset TMUX
+    stub_command tmux 'exit 0'
+    stub_command gh 'printf "MERGED\tmain\n"'
+    git config diff.ignoreSubmodules all
+    echo "dirty" >>sub/subfile
+
+    run "$MERGE_PR"
+    [ "$status" -eq 1 ]
+    [[ "$output" == *"uncommitted changes"* ]]
+    [ -d "$WORKTREE_DIR" ]
+}
+
+@test "cleanup: refuses a dirty submodule despite a per-submodule ignore=all" {
+    _ready_repo
+    setup_feature_worktree --with-submodule
+    unset TMUX
+    stub_command tmux 'exit 0'
+    stub_command gh 'printf "MERGED\tmain\n"'
+    git config submodule.sub.ignore all
+    echo "dirty" >>sub/subfile
+
+    run "$MERGE_PR"
+    [ "$status" -eq 1 ]
+    [[ "$output" == *"uncommitted changes"* ]]
+    [ -d "$WORKTREE_DIR" ]
+}
+
+@test "cleanup: --force removes a worktree with a dirty submodule" {
+    _ready_repo
+    setup_feature_worktree --with-submodule
+    unset TMUX
+    stub_command tmux 'exit 0'
+    stub_command gh 'printf "MERGED\tmain\n"'
+    echo "dirty" >>sub/subfile
+
+    run "$MERGE_PR" --force
+    [ "$status" -eq 0 ]
+    [ ! -d "$WORKTREE_DIR" ]
+}
