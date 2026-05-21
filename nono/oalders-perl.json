@@ -1,13 +1,15 @@
 {
   "meta": {
     "name": "oalders-perl",
-    "description": "Perl development mixin: plenv, local::lib (~/perl5), Dist::Zilla, prove, MetaCPAN, perl-cpm, common rc files"
+    "description": "Perl development mixin: plenv, local::lib (~/perl5), Dist::Zilla, prove, MetaCPAN, perl-cpm, common rc files, system C headers for XS"
   },
   "filesystem": {
     "allow": [
       "~/.plenv/shims"
     ],
     "read": [
+      "/usr/include",
+      "/usr/local/include",
       "~/.dzil",
       "~/.perl-cpm",
       "~/.plenv",
