@@ -177,10 +177,13 @@ set -x
 # goes through the proxy, where allow_domain actually takes effect. Set
 # via `env` so it lands after nono's injection (calling-shell assignment
 # would be overwritten by nono before claude launches).
+#
+# DISABLE_AUTOUPDATER=1 stops claude from auto-updating, pinning the version.
 exec nono run --profile "$profile" --allow-cwd --workdir . "${extra_allow[@]}" -- \
     env NO_PROXY=localhost,127.0.0.1 no_proxy=localhost,127.0.0.1 TMPDIR="$PWD/.tmp" \
     XDG_CACHE_HOME="$PWD/.tmp/cache" \
     NPM_CONFIG_CACHE="$PWD/.tmp/cache/npm" \
     SERENA_HOME="$PWD/.serena-home" \
+    DISABLE_AUTOUPDATER=1 \
     claude --settings "$session_settings" \
     --dangerously-skip-permissions "$@"
