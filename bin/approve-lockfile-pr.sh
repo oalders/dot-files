@@ -22,7 +22,10 @@ fi
 remote="origin"
 
 gh pr view "$branch"
-gh pr checks "$branch"
+if ! gh pr checks "$branch"; then
+    read -n 1 -s -r -p "Checks failed. Press any key to continue or Ctrl-C to abort." _
+    echo
+fi
 
 # Check if main branch exists, otherwise use master
 if git show-ref --verify --quiet refs/heads/main; then
