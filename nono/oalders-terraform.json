@@ -1,0 +1,17 @@
+{
+  "meta": {
+    "name": "oalders-terraform",
+    "description": "Terraform CLI: read-only user config dirs, registry network for `terraform init`"
+  },
+  "filesystem": {
+    "read": [
+      "~/.terraform.d",
+      "~/.terraformrc"
+    ]
+  },
+  "network": {
+    "allow_domain": [
+      "registry.terraform.io"
+    ]
+  }
+}
