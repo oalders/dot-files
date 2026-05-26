@@ -11,6 +11,7 @@
   },
   "network": {
     "allow_domain": [
+      "api.hetzner.cloud",
       "registry.terraform.io"
     ]
   }
