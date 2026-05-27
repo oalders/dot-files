@@ -48,6 +48,20 @@ Example wrapper for a Node + Perl repo (`package.json` + `cpanfile` at top):
 {"extends": ["oalders", "oalders-perl", "oalders-node"]}
 ```
 
+### Opt-in only (no auto-detection)
+
+These siblings are symlinked into `~/.config/nono/profiles/` but aren't mixed in by `oalders.json` or `bin/nn` — a repo that wants them lists them in its own `.nono/profile.json`. Use when the tool's marker would produce too many false positives (e.g. `*.tf` files can show up in non-IaC repos as fixtures), or the use case is rare enough that auto-detect overhead isn't worth it.
+
+| Profile             | Owns                                                                                  |
+| ------------------- | ------------------------------------------------------------------------------------- |
+| `oalders-terraform` | `~/.terraform.d`, `~/.terraformrc` (read-only); `registry.terraform.io` (network)     |
+
+Opt-in via per-repo `.nono/profile.json`:
+
+```json
+{"extends": ["oalders", "oalders-terraform"]}
+```
+
 ### Adding a new sibling
 
 1. Write `nono/oalders-<topic>.json` standalone (no `extends`).
