@@ -15,8 +15,10 @@
   "network": {
     "allow_domain": [
       "api.openverse.org",
+      "flickr.com",
       "fosstodon.org",
       "*.fosstodon.org",
+      "media.licdn.com",
       "openverse.org",
       "*.staticflickr.com",
       "www.flickr.com"
