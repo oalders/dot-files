@@ -57,6 +57,63 @@ setup() {
     [[ "$output" == *"has no upstream"* ]]
 }
 
+# #935: when @{u} fails but the branch IS on origin (only the local
+# tracking config is wrong), don't misdiagnose it as "push first".
+@test "pre-flight: misconfigured tracking is not reported as 'push first'" {
+    setup_git_repo
+    setup_upstream
+    break_tracking_config
+    run "$MERGE_PR" </dev/null
+    [ "$status" -eq 1 ]
+    [[ "$output" != *"push first"* ]]
+    [[ "$output" == *"is on origin"* ]]
+    [[ "$output" == *"--set-upstream-to=origin/main"* ]]
+}
+
+# Declining the repair prompt (empty input / no) leaves tracking untouched.
+@test "pre-flight: declining the tracking-repair prompt aborts without changes" {
+    setup_git_repo
+    setup_upstream
+    break_tracking_config
+    run "$MERGE_PR" <<<"n"
+    [ "$status" -eq 1 ]
+    [[ "$output" == *"aborted"* ]]
+    run git config "branch.main.remote"
+    [[ "$output" == "$UPSTREAM_DIR" ]]
+}
+
+# Accepting the repair prompt rewrites tracking to origin and proceeds past
+# the upstream pre-flight (then fails later at PR lookup — far enough to
+# prove the repair worked).
+@test "pre-flight: accepting the tracking-repair prompt sets upstream to origin" {
+    setup_git_repo
+    setup_upstream
+    break_tracking_config
+    stub_command gh 'exit 1'
+    run "$MERGE_PR" <<<"y"
+    # Repair succeeded, so the upstream pre-flight passed and we reached
+    # PR lookup (which the gh stub fails).
+    [ "$status" -eq 1 ]
+    [[ "$output" == *"no PR found"* ]]
+    run git config "branch.main.remote"
+    [[ "$output" == "origin" ]]
+}
+
+# A genuinely unpushed branch whose name is a path suffix of an existing
+# remote branch (e.g. local "foo" vs remote "feature/foo") must still get
+# "push first", not the repair prompt. Guards against ls-remote tail-match.
+@test "pre-flight: unpushed branch sharing a suffix with a remote branch says 'push first'" {
+    setup_git_repo
+    setup_upstream
+    git checkout -q -b feature/foo
+    git push -q -u origin feature/foo
+    git checkout -q -b foo main
+    run "$MERGE_PR" </dev/null
+    [ "$status" -eq 1 ]
+    [[ "$output" == *"push first"* ]]
+    [[ "$output" != *"is on origin"* ]]
+}
+
 @test "pre-flight: refuses when branch has unpushed commits" {
     setup_git_repo
     setup_upstream

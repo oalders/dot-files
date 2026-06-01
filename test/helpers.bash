@@ -54,6 +54,18 @@ setup_upstream() {
     git push -q -u origin HEAD
 }
 
+# Break the current branch's tracking config so `@{u}` no longer resolves,
+# while the branch remains pushed to origin. Simulates the bug in #935:
+# branch.<name>.remote set to a clone URL instead of "origin". Caller must
+# already be inside a repo with the branch pushed (run setup_git_repo and
+# setup_upstream first).
+break_tracking_config() {
+    local branch
+    branch=$(git rev-parse --abbrev-ref HEAD)
+    git config "branch.$branch.remote" "$UPSTREAM_DIR"
+    git config "branch.$branch.merge" "refs/heads/$branch"
+}
+
 # Set up a feature worktree linked to the repo created by setup_git_repo +
 # setup_upstream, ready for merge-pr's cleanup path.
 # Usage: setup_feature_worktree [--with-submodule]
