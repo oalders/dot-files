@@ -9,6 +9,7 @@ model=$(echo "$input" | jq -r '.model.display_name // "unknown"')
 cwd=$(echo "$input" | jq -r '.workspace.current_dir // .cwd // ""')
 folder=$(basename "$cwd")
 used_pct=$(echo "$input" | jq -r '.context_window.used_percentage // empty')
+session_id=$(echo "$input" | jq -r '.session_id // empty')
 
 # ── Tokyo Night colour codes ──────────────────────────────────────────────────
 RESET="\033[0m"
@@ -31,6 +32,13 @@ folder_str=$(printf "${COMMENT}%s${RESET}" "$folder")
 
 # ── Pipe separator in comment colour ─────────────────────────────────────────
 SEP=$(printf "${COMMENT}|${RESET}")
+
+# ── Dimmed session segment (UUID truncated to 8 chars) ───────────────────────
+# Only built when session_id is present, so an absent id renders no segment.
+session_str=""
+if [ -n "$session_id" ]; then
+    session_str=$(printf "${COMMENT}session: %s${RESET}" "${session_id:0:8}")
+fi
 
 # ── Build context bar section ─────────────────────────────────────────────────
 if [ -n "$used_pct" ]; then
@@ -57,7 +65,7 @@ if [ -n "$used_pct" ]; then
     for i in $(seq 1 "$filled"); do filled_bar="${filled_bar}█"; done
 
     empty_bar=""
-    for i in $(seq 1 "$empty");  do empty_bar="${empty_bar}░"; done
+    for i in $(seq 1 "$empty"); do empty_bar="${empty_bar}░"; done
 
     bar="${COLOR}${filled_bar}${RESET}${BAR_EMPTY}${empty_bar}${RESET}"
 
@@ -67,7 +75,15 @@ if [ -n "$used_pct" ]; then
         bar_str=$(printf "%b %b${scaled}%%%b" "$bar" "$COLOR" "$RESET")
     fi
 
-    printf "%b %b %b %b %b\n" "$model_str" "$SEP" "$folder_str" "$SEP" "$bar_str"
+    if [ -n "$session_str" ]; then
+        printf "%b %b %b %b %b %b %b\n" "$model_str" "$SEP" "$folder_str" "$SEP" "$bar_str" "$SEP" "$session_str"
+    else
+        printf "%b %b %b %b %b\n" "$model_str" "$SEP" "$folder_str" "$SEP" "$bar_str"
+    fi
 else
-    printf "%b %b %b\n" "$model_str" "$SEP" "$folder_str"
+    if [ -n "$session_str" ]; then
+        printf "%b %b %b %b %b\n" "$model_str" "$SEP" "$folder_str" "$SEP" "$session_str"
+    else
+        printf "%b %b %b\n" "$model_str" "$SEP" "$folder_str"
+    fi
 fi
