@@ -1,5 +1,139 @@
 {
   "enabledPlugins": {
     "superpowers-chrome@superpowers-marketplace": false
+  },
+  "hooks": {
+    "Notification": [
+      {
+        "hooks": [
+          {
+            "command": "is there clodhopper && clodhopper ingest --source-app dot-files 2>/dev/null || true",
+            "timeout": 5,
+            "type": "command"
+          }
+        ]
+      }
+    ],
+    "PermissionRequest": [
+      {
+        "hooks": [
+          {
+            "command": "is there clodhopper && clodhopper ingest --source-app dot-files 2>/dev/null || true",
+            "timeout": 5,
+            "type": "command"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "hooks": [
+          {
+            "command": "is there clodhopper && clodhopper ingest --source-app dot-files 2>/dev/null || true",
+            "timeout": 5,
+            "type": "command"
+          }
+        ]
+      }
+    ],
+    "PostToolUseFailure": [
+      {
+        "hooks": [
+          {
+            "command": "is there clodhopper && clodhopper ingest --source-app dot-files 2>/dev/null || true",
+            "timeout": 5,
+            "type": "command"
+          }
+        ]
+      }
+    ],
+    "PreCompact": [
+      {
+        "hooks": [
+          {
+            "command": "is there clodhopper && clodhopper ingest --source-app dot-files 2>/dev/null || true",
+            "timeout": 5,
+            "type": "command"
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "hooks": [
+          {
+            "command": "is there clodhopper && clodhopper ingest --source-app dot-files 2>/dev/null || true",
+            "timeout": 5,
+            "type": "command"
+          }
+        ]
+      }
+    ],
+    "SessionEnd": [
+      {
+        "hooks": [
+          {
+            "command": "is there clodhopper && clodhopper ingest --source-app dot-files 2>/dev/null || true",
+            "timeout": 5,
+            "type": "command"
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "command": "is there clodhopper && clodhopper ingest --source-app dot-files 2>/dev/null || true",
+            "timeout": 5,
+            "type": "command"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "command": "is there clodhopper && clodhopper ingest --source-app dot-files 2>/dev/null || true",
+            "timeout": 5,
+            "type": "command"
+          }
+        ]
+      }
+    ],
+    "SubagentStart": [
+      {
+        "hooks": [
+          {
+            "command": "is there clodhopper && clodhopper ingest --source-app dot-files 2>/dev/null || true",
+            "timeout": 5,
+            "type": "command"
+          }
+        ]
+      }
+    ],
+    "SubagentStop": [
+      {
+        "hooks": [
+          {
+            "command": "is there clodhopper && clodhopper ingest --source-app dot-files 2>/dev/null || true",
+            "timeout": 5,
+            "type": "command"
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "command": "is there clodhopper && clodhopper ingest --source-app dot-files 2>/dev/null || true",
+            "timeout": 5,
+            "type": "command"
+          }
+        ]
+      }
+    ]
   }
 }
