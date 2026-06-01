@@ -59,9 +59,40 @@ if [[ "$branch" == "HEAD" ]]; then
 fi
 
 # Pre-flight: branch must have an upstream.
+#
+# `@{u}` fails both when the branch is genuinely unpushed AND when it is
+# already on origin but its local tracking config is wrong (e.g.
+# branch.<name>.remote points at a clone URL instead of "origin"). In the
+# latter case "push first" misdiagnoses the problem — the branch is pushed;
+# only the tracking config needs repair. Distinguish the two by asking
+# origin directly.
 if ! git rev-parse --abbrev-ref --symbolic-full-name '@{u}' >/dev/null 2>&1; then
-    echo "merge-pr: branch '$branch' has no upstream — push first" >&2
-    exit 1
+    # Query the full ref path, not a bare name: `ls-remote origin foo`
+    # tail-matches path components and would also match `refs/heads/x/foo`,
+    # false-flagging a genuinely unpushed branch. The output is a single
+    # line, so `grep -q` consuming it before ls-remote blocks keeps the
+    # pipe safe under pipefail — don't widen this query.
+    if git ls-remote origin "refs/heads/$branch" 2>/dev/null | grep -q .; then
+        echo "merge-pr: branch '$branch' is on origin, but local tracking config" >&2
+        echo "          is wrong, so '@{u}' does not resolve. The branch is" >&2
+        echo "          already pushed — this is a config issue, not a missing push." >&2
+        printf "merge-pr: repair with 'git branch --set-upstream-to=origin/%s' and continue? [y/N] " "$branch" >&2
+        # Default to bailing: empty input (just Enter), EOF, or a
+        # non-interactive stdin all leave tracking untouched.
+        read -r reply || reply=""
+        case "$reply" in
+            [Yy]*)
+                git branch --set-upstream-to="origin/$branch" >&2
+                ;;
+            *)
+                echo "merge-pr: aborted — fix tracking config and re-run." >&2
+                exit 1
+                ;;
+        esac
+    else
+        echo "merge-pr: branch '$branch' has no upstream — push first" >&2
+        exit 1
+    fi
 fi
 
 # Pre-flight: no unpushed commits.
