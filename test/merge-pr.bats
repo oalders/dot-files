@@ -205,7 +205,7 @@ _ready_repo() {
     [ -z "$output" ]
 }
 
-@test "cleanup: refuses a dirty worktree without --force" {
+@test "pre-flight: refuses a dirty worktree without --force" {
     _ready_repo
     setup_feature_worktree
     unset TMUX
@@ -221,7 +221,7 @@ _ready_repo() {
 
 # Uncommitted work inside a submodule must count as dirty, even when the
 # repo configures diff.ignoreSubmodules to hide it from a plain status.
-@test "cleanup: refuses a dirty submodule despite diff.ignoreSubmodules=all" {
+@test "pre-flight: refuses a dirty submodule despite diff.ignoreSubmodules=all" {
     _ready_repo
     setup_feature_worktree --with-submodule
     unset TMUX
@@ -236,7 +236,7 @@ _ready_repo() {
     [ -d "$WORKTREE_DIR" ]
 }
 
-@test "cleanup: refuses a dirty submodule despite a per-submodule ignore=all" {
+@test "pre-flight: refuses a dirty submodule despite a per-submodule ignore=all" {
     _ready_repo
     setup_feature_worktree --with-submodule
     unset TMUX
