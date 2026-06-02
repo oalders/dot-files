@@ -251,6 +251,48 @@ _ready_repo() {
     [ -d "$WORKTREE_DIR" ]
 }
 
+# #940: a dirty worktree must bail *before* the merge runs, not after.
+# The gh stub distinguishes `pr view` (state lookup) from `pr merge`
+# (the actual merge), recording a marker file iff merge was invoked.
+@test "pre-flight: dirty worktree bails before merging an OPEN PR" {
+    _ready_repo
+    setup_feature_worktree
+    unset TMUX
+    stub_command tmux 'exit 0'
+    stub_command gh '
+case "$2" in
+    view) printf "OPEN\tmain\n" ;;
+    merge) : >"$BATS_TEST_TMPDIR/merge-was-called" ;;
+esac
+'
+    echo "dirty" >>file
+
+    run "$MERGE_PR"
+    [ "$status" -eq 1 ]
+    [[ "$output" == *"uncommitted changes"* ]]
+    [ ! -e "$BATS_TEST_TMPDIR/merge-was-called" ]
+    [ -d "$WORKTREE_DIR" ]
+}
+
+@test "pre-flight: --force merges and cleans up a dirty worktree" {
+    _ready_repo
+    setup_feature_worktree
+    unset TMUX
+    stub_command tmux 'exit 0'
+    stub_command gh '
+case "$2" in
+    view) printf "OPEN\tmain\n" ;;
+    merge) : >"$BATS_TEST_TMPDIR/merge-was-called" ;;
+esac
+'
+    echo "dirty" >>file
+
+    run "$MERGE_PR" --force
+    [ "$status" -eq 0 ]
+    [ -e "$BATS_TEST_TMPDIR/merge-was-called" ]
+    [ ! -d "$WORKTREE_DIR" ]
+}
+
 @test "cleanup: --force removes a worktree with a dirty submodule" {
     _ready_repo
     setup_feature_worktree --with-submodule
