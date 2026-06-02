@@ -205,7 +205,7 @@ _ready_repo() {
     [ -z "$output" ]
 }
 
-@test "cleanup: refuses a dirty worktree without --force" {
+@test "pre-flight: refuses a dirty worktree without --force" {
     _ready_repo
     setup_feature_worktree
     unset TMUX
@@ -221,7 +221,7 @@ _ready_repo() {
 
 # Uncommitted work inside a submodule must count as dirty, even when the
 # repo configures diff.ignoreSubmodules to hide it from a plain status.
-@test "cleanup: refuses a dirty submodule despite diff.ignoreSubmodules=all" {
+@test "pre-flight: refuses a dirty submodule despite diff.ignoreSubmodules=all" {
     _ready_repo
     setup_feature_worktree --with-submodule
     unset TMUX
@@ -236,7 +236,7 @@ _ready_repo() {
     [ -d "$WORKTREE_DIR" ]
 }
 
-@test "cleanup: refuses a dirty submodule despite a per-submodule ignore=all" {
+@test "pre-flight: refuses a dirty submodule despite a per-submodule ignore=all" {
     _ready_repo
     setup_feature_worktree --with-submodule
     unset TMUX
@@ -249,6 +249,48 @@ _ready_repo() {
     [ "$status" -eq 1 ]
     [[ "$output" == *"uncommitted changes"* ]]
     [ -d "$WORKTREE_DIR" ]
+}
+
+# #940: a dirty worktree must bail *before* the merge runs, not after.
+# The gh stub distinguishes `pr view` (state lookup) from `pr merge`
+# (the actual merge), recording a marker file iff merge was invoked.
+@test "pre-flight: dirty worktree bails before merging an OPEN PR" {
+    _ready_repo
+    setup_feature_worktree
+    unset TMUX
+    stub_command tmux 'exit 0'
+    stub_command gh '
+case "$2" in
+    view) printf "OPEN\tmain\n" ;;
+    merge) : >"$BATS_TEST_TMPDIR/merge-was-called" ;;
+esac
+'
+    echo "dirty" >>file
+
+    run "$MERGE_PR"
+    [ "$status" -eq 1 ]
+    [[ "$output" == *"uncommitted changes"* ]]
+    [ ! -e "$BATS_TEST_TMPDIR/merge-was-called" ]
+    [ -d "$WORKTREE_DIR" ]
+}
+
+@test "pre-flight: --force merges and cleans up a dirty worktree" {
+    _ready_repo
+    setup_feature_worktree
+    unset TMUX
+    stub_command tmux 'exit 0'
+    stub_command gh '
+case "$2" in
+    view) printf "OPEN\tmain\n" ;;
+    merge) : >"$BATS_TEST_TMPDIR/merge-was-called" ;;
+esac
+'
+    echo "dirty" >>file
+
+    run "$MERGE_PR" --force
+    [ "$status" -eq 0 ]
+    [ -e "$BATS_TEST_TMPDIR/merge-was-called" ]
+    [ ! -d "$WORKTREE_DIR" ]
 }
 
 @test "cleanup: --force removes a worktree with a dirty submodule" {

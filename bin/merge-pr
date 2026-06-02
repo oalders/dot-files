@@ -19,6 +19,8 @@ Refuses:
   --auto, --auto-merge   gh pr merge would exit 0 while the PR stays
                          OPEN, and our cleanup would tear down the
                          worktree before the merge actually happens.
+  dirty worktree         Bails before merging when there are uncommitted
+                         changes, unless --force is given.
 EOF
 }
 
@@ -102,6 +104,20 @@ if [[ "$unpushed" -ne 0 ]]; then
     exit 1
 fi
 
+# Pre-flight: refuse a dirty worktree *before* merging. This runs up front
+# (before `gh pr merge`) so we never merge a PR and then strand the user
+# with uncommitted work we can't safely clean up. --force is the opt-in to
+# discard those changes during cleanup, so it suppresses this bail.
+# cwd is the worktree here (the script is run from inside it), so a plain
+# `git status` suffices. --ignore-submodules=none counts uncommitted work
+# *inside* a submodule as dirty even when the repo sets diff.ignoreSubmodules
+# or a per-submodule `ignore`, either of which would otherwise hide it.
+if [[ -z "$force" && -n "$(git status --porcelain --ignore-submodules=none)" ]]; then
+    echo "merge-pr: worktree has uncommitted changes — commit or stash first," >&2
+    echo "          or re-run with: merge-pr --force" >&2
+    exit 1
+fi
+
 # State capture (before any mutation).
 worktree_path=$(git rev-parse --show-toplevel)
 git_common_dir=$(git rev-parse --git-common-dir)
@@ -174,18 +190,9 @@ fi
 
 # `git worktree remove` refuses a worktree that contains submodules
 # unless --force is given — even when the worktree is perfectly clean.
-# Since --force also discards uncommitted changes, first refuse a dirty
-# worktree unless the user opted in with --force. --ignore-submodules=none
-# makes the check count uncommitted work *inside* a submodule as dirty
-# even when the repo sets diff.ignoreSubmodules or a per-submodule
-# `ignore`, either of which would otherwise hide it.
-if [[ -n "$(git -C "$worktree_path" status --porcelain --ignore-submodules=none)" && -z "$force" ]]; then
-    echo "" >&2
-    echo "merge-pr: worktree has uncommitted changes." >&2
-    echo "          Re-run with: merge-pr --force" >&2
-    exit 1
-fi
-
+# A dirty tree was already refused up front (unless --force), so by here
+# the worktree is clean or the user opted in to discarding changes.
+#
 # Escalate to --force for a worktree with submodules (see above). A
 # single --force suffices; the .gitmodules check over-approximates (an
 # uninitialized submodule needs no --force) but forcing an
