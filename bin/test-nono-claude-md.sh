@@ -18,12 +18,17 @@ repo_root=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
 profile="$repo_root/nono/oalders.json"
 path="$HOME/.claude/CLAUDE.md"
 
-verdict=$(nono why --path "$path" --op read --profile "$profile" 2>&1 | head -1)
+# Capture once (stdout+stderr) so the failure path can echo the full output
+# without a second invocation. nono why exits 0 for both ALLOWED and DENIED,
+# so the verdict is read from the output: grab the first ALLOWED/DENIED line
+# rather than head -1, so a stray stderr warning can't masquerade as it.
+output=$(nono why --path "$path" --op read --profile "$profile" 2>&1)
+verdict=$(printf '%s\n' "$output" | grep -m1 -E '^(ALLOWED|DENIED)' || true)
 
 if [[ $verdict == ALLOWED* ]]; then
     echo "ok: $profile grants read on $path"
 else
     echo "FAIL: $profile does not grant read on $path" >&2
-    nono why --path "$path" --op read --profile "$profile" >&2
+    printf '%s\n' "$output" >&2
     exit 1
 fi
