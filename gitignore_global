@@ -54,3 +54,5 @@ node_modules/
 ########################################
 .serena-home/
 .tmp/
+
+**/.claude/settings.local.json
