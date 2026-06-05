@@ -35,6 +35,7 @@
       "~/.docker/config.json",
       "~/.gitconfig",
       "~/dot-files/bashrc",
+      "~/dot-files/claude/CLAUDE.md",
       "~/dot-files/claude/statusline-command.sh"
     ],
     "allow_file": [
