@@ -19,11 +19,22 @@ setup() {
 # Bind a unix-domain socket at $1. The bind survives the python exit
 # (the socket inode persists until explicit unlink), giving us a real
 # AF_UNIX socket file for the [ -S ] tests in ssh/rc.
+#
+# Bind via a path relative to the socket's directory: the string passed to
+# bind() must fit in struct sockaddr_un.sun_path (108 bytes on Linux), and
+# $BATS_TEST_TMPDIR nests under $TMPDIR, which the nono sandbox points at a
+# deep worktree path that overflows the limit (issue #946). chdir-ing first
+# keeps the bound name short ("agent.sock") while the socket file still lands
+# at the intended absolute path. The [ -S ] / readlink checks in ssh/rc stat
+# that absolute path (no length limit) rather than connect(), so this is safe.
 make_socket() {
     python3 -c '
-import socket, sys
+import os, socket, sys
+directory, name = os.path.split(sys.argv[1])
+if directory:
+    os.chdir(directory)
 s = socket.socket(socket.AF_UNIX)
-s.bind(sys.argv[1])
+s.bind(name)
 ' "$1"
 }
 
