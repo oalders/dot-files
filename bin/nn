@@ -5,13 +5,17 @@ set -eu -o pipefail
 # Parse nn-specific flags out of $@ before forwarding the rest to claude.
 # --chrome enables the superpowers-chrome MCP for this session only.
 # --playwright force-enables the playwright MCP regardless of e2e/ markers.
+# --clodhopper wires clodhopper's hooks into .claude/settings.local.json
+# (gitignored) for this session, so shared project repos stay clean.
 chrome_enabled=0
 playwright_forced=0
+clodhopper_enabled=0
 forwarded_args=()
 for arg in "$@"; do
     case "$arg" in
         --chrome) chrome_enabled=1 ;;
         --playwright) playwright_forced=1 ;;
+        --clodhopper) clodhopper_enabled=1 ;;
         *) forwarded_args+=("$arg") ;;
     esac
 done
@@ -169,6 +173,19 @@ fi
 
 echo "🗯️nn: using profile $profile_label" >&2
 echo "🗯️nn: using settings $settings_label" >&2
+
+# Opt-in clodhopper wiring. clodhopper init --local writes the hooks into
+# .claude/settings.local.json (gitignored). --settings adds a settings source;
+# it doesn't replace the project hierarchy, so claude still loads
+# settings.local.json alongside it. Runs outside the sandbox, same as the rest
+# of this setup, so it can write under cwd freely. Failing here aborts the
+# launch (set -e) by design: --clodhopper is an explicit opt-in for session
+# observability, so a wiring failure should surface, not silently launch
+# unwired.
+if ((clodhopper_enabled)); then
+    echo "🗯️nn: wiring clodhopper into .claude/settings.local.json" >&2
+    clodhopper init --local
+fi
 
 set -x
 # nono's allow_domain entries are injected into NO_PROXY inside the sandbox,

@@ -50,3 +50,38 @@ setup() {
     # writes no .nono/profile.json wrapper.
     [ ! -f .nono/profile.json ]
 }
+
+@test "bin/nn --clodhopper runs clodhopper init --local" {
+    # Stub clodhopper to record its argv so we can assert how it was invoked.
+    stub_command clodhopper 'printf "%s\n" "$@" > "$BATS_TEST_TMPDIR/clodhopper-argv"'
+    run "$NN" --clodhopper
+    [ "$status" -eq 0 ]
+    [ -f "$BATS_TEST_TMPDIR/clodhopper-argv" ]
+    grep -Fxq -- "init" "$BATS_TEST_TMPDIR/clodhopper-argv"
+    grep -Fxq -- "--local" "$BATS_TEST_TMPDIR/clodhopper-argv"
+}
+
+@test "bin/nn --clodhopper is consumed, not forwarded to claude" {
+    stub_command clodhopper 'true'
+    run "$NN" --clodhopper
+    [ "$status" -eq 0 ]
+    # The nn-specific flag must be parsed out of $@, not passed through to claude.
+    ! grep -Fxq -- "--clodhopper" "$BATS_TEST_TMPDIR/nono-argv"
+}
+
+@test "bin/nn --clodhopper is parsed out independently of forwarded args" {
+    stub_command clodhopper 'true'
+    run "$NN" --clodhopper --resume
+    [ "$status" -eq 0 ]
+    # The nn-specific flag is consumed; the unrelated arg still reaches claude.
+    ! grep -Fxq -- "--clodhopper" "$BATS_TEST_TMPDIR/nono-argv"
+    grep -Fxq -- "--resume" "$BATS_TEST_TMPDIR/nono-argv"
+}
+
+@test "bin/nn does not run clodhopper without the flag" {
+    # If clodhopper were invoked, this stub would fail the test by exiting 1.
+    stub_command clodhopper 'echo "clodhopper should not run" >&2; exit 1'
+    run "$NN"
+    [ "$status" -eq 0 ]
+    [ ! -f "$BATS_TEST_TMPDIR/clodhopper-argv" ]
+}
