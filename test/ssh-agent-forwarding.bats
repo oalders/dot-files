@@ -21,12 +21,13 @@ setup() {
 # AF_UNIX socket file for the [ -S ] tests in ssh/rc.
 #
 # Bind via a path relative to the socket's directory: the string passed to
-# bind() must fit in struct sockaddr_un.sun_path (108 bytes on Linux), and
-# $BATS_TEST_TMPDIR nests under $TMPDIR, which the nono sandbox points at a
-# deep worktree path that overflows the limit (issue #946). chdir-ing first
-# keeps the bound name short ("agent.sock") while the socket file still lands
-# at the intended absolute path. The [ -S ] / readlink checks in ssh/rc stat
-# that absolute path (no length limit) rather than connect(), so this is safe.
+# bind() must fit in struct sockaddr_un.sun_path (108 bytes on Linux, 104 on
+# macOS), and $BATS_TEST_TMPDIR nests under $TMPDIR, which the nono sandbox
+# points at a deep worktree path that overflows the limit (issue #946).
+# chdir-ing first keeps the bound name short ("agent.sock") while the socket
+# file still lands at the intended absolute path. The [ -S ] / readlink checks
+# in ssh/rc stat that absolute path (no length limit) rather than connect(),
+# so this is safe.
 make_socket() {
     python3 -c '
 import os, socket, sys
