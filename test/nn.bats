@@ -111,13 +111,21 @@ setup() {
 }
 
 @test "bin/nn injects nothing for an empty marker but still consumes it" {
+    # Baseline: the claude argv with no marker at all.
+    run "$NN"
+    [ "$status" -eq 0 ]
+    cp "$BATS_TEST_TMPDIR/nono-argv" "$BATS_TEST_TMPDIR/nono-argv.baseline"
+
+    # An empty marker holds no prompt: the `[[ -n $pending_prompt ]]` guard
+    # must suppress injection so the claude invocation is byte-for-byte the
+    # baseline (no stray empty positional appended) — yet the one-shot
+    # marker is still consumed. Comparing full argv (not just grepping for
+    # the slash command) is what catches an empty-string arg leaking through.
     mkdir -p .tmp
     : >.tmp/fix-gh-issue.pending
     run "$NN"
     [ "$status" -eq 0 ]
-    # An empty marker holds no prompt, so nothing is injected, but the
-    # one-shot marker is consumed all the same.
-    ! grep -Fxq '/kitchen-sink:fix-gh-issue' "$BATS_TEST_TMPDIR/nono-argv"
+    diff "$BATS_TEST_TMPDIR/nono-argv" "$BATS_TEST_TMPDIR/nono-argv.baseline"
     [ ! -f .tmp/fix-gh-issue.pending ]
 }
 
