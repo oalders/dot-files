@@ -70,6 +70,22 @@ setup() {
     [ ! -f "$worktree/.gitmodules" ]
 }
 
+@test "add-worktree accepts -f and creates the worktree" {
+    # Exercises the non-empty force=(-f) array branch: -f must reach
+    # `git worktree add` as a real flag, and an empty force must not inject
+    # a stray empty arg (covered by the other tests' default path).
+    setup_git_repo
+    run "$ADD_WORKTREE" -f feature-branch
+    [ "$status" -eq 0 ]
+
+    local date_stamp repo_name worktree
+    date_stamp="$(date +%Y-%m-%d)"
+    repo_name="$(basename "$REPO_DIR")"
+    worktree="$HOME/.worktree/$repo_name/$date_stamp/feature-branch"
+
+    [ -d "$worktree" ]
+}
+
 @test "add-worktree queues fix-gh-issue for fix-<n> branches" {
     setup_git_repo
     # fix-<n> is an issue branch: it must take the marker path, never the
