@@ -14,8 +14,8 @@ setup() {
     # tries to start one if tmux is around. Force neither path.
     export MY_INSIDE_TMUX=false
     stub_command pgrep 'exit 1'
-    # Tests use generic branch names so the gh- branches that call
-    # `gh pr checkout` aren't exercised; stub anyway.
+    # Tests use generic branch names so the fix-/gh- branches that call
+    # `gh issue edit` / `gh pr checkout` aren't exercised; stub anyway.
     stub_command gh 'exit 0'
     export GIT_CEILING_DIRECTORIES
     GIT_CEILING_DIRECTORIES="$(dirname "$BATS_TEST_TMPDIR")"
@@ -88,11 +88,15 @@ setup() {
 
 @test "add-worktree queues fix-gh-issue for fix-<n> branches" {
     setup_git_repo
-    # fix-<n> is an issue branch: it must take the marker path, never the
-    # `gh pr checkout` path (that's for gh-<n> PR branches). Fail loud if gh
-    # is invoked, so the marker write can't silently coexist with a stray
-    # checkout.
-    stub_command gh 'echo "gh must not be called for issue branches" >&2; exit 1'
+    # fix-<n> is an issue branch: it adds the "in progress" label via
+    # `gh issue edit` and takes the marker path, but must never hit the
+    # `gh pr checkout` path (that's for gh-<n> PR branches). Allow `issue
+    # edit`; fail loud on any `pr checkout` so the marker write can't
+    # silently coexist with a stray checkout.
+    stub_command gh 'case "$*" in
+        "pr checkout"*) echo "gh pr checkout must not be called for issue branches" >&2; exit 1 ;;
+        *) exit 0 ;;
+    esac'
     run "$ADD_WORKTREE" fix-952
     [ "$status" -eq 0 ]
 

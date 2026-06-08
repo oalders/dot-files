@@ -65,6 +65,7 @@ cd "$worktree_dir" || exit 1
 if [[ "$type" == "pr" ]]; then
     gh pr checkout "$number"
 elif [[ "$type" == "issue" ]]; then
+    gh issue edit "$number" --add-label "in progress"
     # Queue the first `nn` launch in this worktree to auto-run
     # `/kitchen-sink:fix-gh-issue` (it infers issue #$number from the
     # fix-<n> branch name). bin/nn reads this marker, hands the line to
