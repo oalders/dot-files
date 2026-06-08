@@ -85,3 +85,92 @@ setup() {
     [ "$status" -eq 0 ]
     [ ! -f "$BATS_TEST_TMPDIR/clodhopper-argv" ]
 }
+
+@test "bin/nn hands claude the queued prompt and consumes the marker" {
+    mkdir -p .tmp
+    printf '%s\n' '/kitchen-sink:fix-gh-issue' >.tmp/fix-gh-issue.pending
+    run "$NN"
+    [ "$status" -eq 0 ]
+    # The queued slash command reaches claude as its initial prompt.
+    grep -Fxq '/kitchen-sink:fix-gh-issue' "$BATS_TEST_TMPDIR/nono-argv"
+    # The marker is one-shot: consumed on the first launch.
+    [ ! -f .tmp/fix-gh-issue.pending ]
+}
+
+@test "bin/nn does not re-run the queued prompt after the marker is consumed" {
+    mkdir -p .tmp
+    printf '%s\n' '/kitchen-sink:fix-gh-issue' >.tmp/fix-gh-issue.pending
+    run "$NN"
+    [ "$status" -eq 0 ]
+    # Second launch in the same worktree: the marker is gone, so the prompt
+    # must not fire again. Reset the recorded argv before the second run so
+    # the assertion sees only the second invocation's args (the stub uses `>`,
+    # so this is belt-and-suspenders against a future append-style stub).
+    : >"$BATS_TEST_TMPDIR/nono-argv"
+    run "$NN"
+    [ "$status" -eq 0 ]
+    ! grep -Fxq '/kitchen-sink:fix-gh-issue' "$BATS_TEST_TMPDIR/nono-argv"
+}
+
+@test "bin/nn injects nothing for an empty marker but still consumes it" {
+    # Baseline: the claude argv with no marker at all.
+    run "$NN"
+    [ "$status" -eq 0 ]
+    cp "$BATS_TEST_TMPDIR/nono-argv" "$BATS_TEST_TMPDIR/nono-argv.baseline"
+
+    # An empty marker holds no prompt: the `[[ -n $pending_prompt ]]` guard
+    # must suppress injection so the claude invocation is byte-for-byte the
+    # baseline (no stray empty positional appended) — yet the one-shot
+    # marker is still consumed. Comparing full argv (not just grepping for
+    # the slash command) is what catches an empty-string arg leaking through.
+    mkdir -p .tmp
+    : >.tmp/fix-gh-issue.pending
+    run "$NN"
+    [ "$status" -eq 0 ]
+    diff "$BATS_TEST_TMPDIR/nono-argv" "$BATS_TEST_TMPDIR/nono-argv.baseline"
+    [ ! -f .tmp/fix-gh-issue.pending ]
+}
+
+@test "bin/nn injects the queued prompt for a bare -- separator" {
+    mkdir -p .tmp
+    printf '%s\n' '/kitchen-sink:fix-gh-issue' >.tmp/fix-gh-issue.pending
+    # `--` starts with `-`, so the heuristic treats `nn --` as flag-only and
+    # still injects the queued prompt. Locks in the documented boundary.
+    run "$NN" --
+    [ "$status" -eq 0 ]
+    grep -Fxq '/kitchen-sink:fix-gh-issue' "$BATS_TEST_TMPDIR/nono-argv"
+    [ ! -f .tmp/fix-gh-issue.pending ]
+}
+
+@test "bin/nn suppresses the queued prompt for the documented --model opus misread" {
+    mkdir -p .tmp
+    printf '%s\n' '/kitchen-sink:fix-gh-issue' >.tmp/fix-gh-issue.pending
+    # `nn --model opus` is the one shape the heuristic misreads: the separate-
+    # word flag value `opus` looks like a user prompt, so injection is
+    # suppressed even though no real prompt was given. This test locks in that
+    # known limitation — if the heuristic is ever tightened to recognize flag
+    # values, update the comment in bin/nn and flip this assertion deliberately.
+    run "$NN" --model opus
+    [ "$status" -eq 0 ]
+    ! grep -Fxq '/kitchen-sink:fix-gh-issue' "$BATS_TEST_TMPDIR/nono-argv"
+    # The one-shot marker is still consumed regardless of the misread.
+    [ ! -f .tmp/fix-gh-issue.pending ]
+}
+
+@test "bin/nn passes no auto-prompt without the marker" {
+    run "$NN"
+    [ "$status" -eq 0 ]
+    ! grep -Fxq '/kitchen-sink:fix-gh-issue' "$BATS_TEST_TMPDIR/nono-argv"
+}
+
+@test "bin/nn skips the queued prompt when the user supplies their own" {
+    mkdir -p .tmp
+    printf '%s\n' '/kitchen-sink:fix-gh-issue' >.tmp/fix-gh-issue.pending
+    run "$NN" "do something else"
+    [ "$status" -eq 0 ]
+    # The user's prompt reaches claude; the queued one is suppressed.
+    grep -Fxq 'do something else' "$BATS_TEST_TMPDIR/nono-argv"
+    ! grep -Fxq '/kitchen-sink:fix-gh-issue' "$BATS_TEST_TMPDIR/nono-argv"
+    # The one-shot marker is still consumed on the first launch.
+    [ ! -f .tmp/fix-gh-issue.pending ]
+}
