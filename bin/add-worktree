@@ -61,11 +61,9 @@ fi
 
 cd "$worktree_dir" || exit 1
 
-# Handle GitHub PRs and issues
+# Handle GitHub PRs
 if [[ "$type" == "pr" ]]; then
     gh pr checkout "$number"
-elif [[ "$type" == "issue" ]]; then
-    gh issue edit "$number" --add-label "in progress"
 fi
 
 # `submodule.alternateLocation=superproject` is supposed to share objects with
