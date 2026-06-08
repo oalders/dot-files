@@ -72,6 +72,11 @@ setup() {
 
 @test "add-worktree queues fix-gh-issue for fix-<n> branches" {
     setup_git_repo
+    # fix-<n> is an issue branch: it must take the marker path, never the
+    # `gh pr checkout` path (that's for gh-<n> PR branches). Fail loud if gh
+    # is invoked, so the marker write can't silently coexist with a stray
+    # checkout.
+    stub_command gh 'echo "gh must not be called for issue branches" >&2; exit 1'
     run "$ADD_WORKTREE" fix-952
     [ "$status" -eq 0 ]
 

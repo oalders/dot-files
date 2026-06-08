@@ -103,7 +103,9 @@ setup() {
     run "$NN"
     [ "$status" -eq 0 ]
     # Second launch in the same worktree: the marker is gone, so the prompt
-    # must not fire again.
+    # must not fire again. Reset the recorded argv before the second run so
+    # the assertion sees only the second invocation's args (the stub uses `>`,
+    # so this is belt-and-suspenders against a future append-style stub).
     : >"$BATS_TEST_TMPDIR/nono-argv"
     run "$NN"
     [ "$status" -eq 0 ]
@@ -126,6 +128,32 @@ setup() {
     run "$NN"
     [ "$status" -eq 0 ]
     diff "$BATS_TEST_TMPDIR/nono-argv" "$BATS_TEST_TMPDIR/nono-argv.baseline"
+    [ ! -f .tmp/fix-gh-issue.pending ]
+}
+
+@test "bin/nn injects the queued prompt for a bare -- separator" {
+    mkdir -p .tmp
+    printf '%s\n' '/kitchen-sink:fix-gh-issue' >.tmp/fix-gh-issue.pending
+    # `--` starts with `-`, so the heuristic treats `nn --` as flag-only and
+    # still injects the queued prompt. Locks in the documented boundary.
+    run "$NN" --
+    [ "$status" -eq 0 ]
+    grep -Fxq '/kitchen-sink:fix-gh-issue' "$BATS_TEST_TMPDIR/nono-argv"
+    [ ! -f .tmp/fix-gh-issue.pending ]
+}
+
+@test "bin/nn suppresses the queued prompt for the documented --model opus misread" {
+    mkdir -p .tmp
+    printf '%s\n' '/kitchen-sink:fix-gh-issue' >.tmp/fix-gh-issue.pending
+    # `nn --model opus` is the one shape the heuristic misreads: the separate-
+    # word flag value `opus` looks like a user prompt, so injection is
+    # suppressed even though no real prompt was given. This test locks in that
+    # known limitation — if the heuristic is ever tightened to recognize flag
+    # values, update the comment in bin/nn and flip this assertion deliberately.
+    run "$NN" --model opus
+    [ "$status" -eq 0 ]
+    ! grep -Fxq '/kitchen-sink:fix-gh-issue' "$BATS_TEST_TMPDIR/nono-argv"
+    # The one-shot marker is still consumed regardless of the misread.
     [ ! -f .tmp/fix-gh-issue.pending ]
 }
 

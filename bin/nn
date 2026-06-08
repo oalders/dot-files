@@ -198,14 +198,20 @@ fi
 auto_prompt=()
 fix_marker="$PWD/.tmp/fix-gh-issue.pending"
 if [[ -f $fix_marker ]]; then
+    # Only the first line of the marker is read; the marker is always a
+    # single hardcoded slash command today, so multi-line content is not
+    # expected. `|| true` keeps `set -e` from aborting on an empty marker
+    # (read returns non-zero at EOF before a newline).
     read -r pending_prompt <"$fix_marker" || true
     rm -f "$fix_marker"
     # Treat the first non-flag positional as a user-supplied prompt and
     # suppress the queued one. The heuristic is intentionally simple: any
     # arg starting with `-` is assumed to be a flag, so flag-only first
     # launches (e.g. `nn --resume`) still get the queued prompt injected,
-    # which is the desired behavior in a fresh fix-<n> worktree. The one
-    # input shape it misreads is a flag with a separate-word value
+    # which is the desired behavior in a fresh fix-<n> worktree. `--` also
+    # starts with `-`, so a bare `nn --` is treated as flag-only and still
+    # injects (and `nn -- prompt` correctly detects `prompt` as the user's).
+    # The one input shape it misreads is a flag with a separate-word value
     # (`nn --model opus`), where the value would look like a prompt — not a
     # shape used on a first launch today.
     user_prompt=0
