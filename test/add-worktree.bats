@@ -14,8 +14,8 @@ setup() {
     # tries to start one if tmux is around. Force neither path.
     export MY_INSIDE_TMUX=false
     stub_command pgrep 'exit 1'
-    # Tests use generic branch names so the fix-/gh- branches that call
-    # `gh issue edit` / `gh pr checkout` aren't exercised; stub anyway.
+    # Tests use generic branch names so the gh- branches that call
+    # `gh pr checkout` aren't exercised; stub anyway.
     stub_command gh 'exit 0'
     export GIT_CEILING_DIRECTORIES
     GIT_CEILING_DIRECTORIES="$(dirname "$BATS_TEST_TMPDIR")"

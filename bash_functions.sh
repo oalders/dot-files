@@ -189,16 +189,14 @@ get_github_display_name() {
     # Remove special characters that tmux doesn't like
     title=${title//[.:]/}
 
-    # blocked → 🚫 prefix; in progress → suffix. Other labels are noise in
-    # the tmux window title (and "priority: medium"-style names contain
-    # colons that tmux parses as session:window separators).
-    local prefix="" suffix=""
+    # blocked → 🚫 prefix. Other labels are noise in the tmux window title
+    # (and "priority: medium"-style names contain colons that tmux parses as
+    # session:window separators).
+    local prefix=""
     while IFS= read -r label; do
         [[ -z $label ]] && continue
         if [[ $label == "blocked" ]]; then
             prefix=" 🚫 "
-        elif [[ $label == "in progress" ]]; then
-            suffix=" [$label]"
         fi
     done <<<"$labels"
 
@@ -209,8 +207,8 @@ get_github_display_name() {
         title="${title% *}"
     fi
 
-    # Return formatted name with prefix and suffix
-    echo "${prefix}${title}${suffix}"
+    # Return formatted name with prefix
+    echo "${prefix}${title}"
 }
 
 tmux_session_name() {
