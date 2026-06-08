@@ -110,6 +110,17 @@ setup() {
     ! grep -Fxq '/kitchen-sink:fix-gh-issue' "$BATS_TEST_TMPDIR/nono-argv"
 }
 
+@test "bin/nn injects nothing for an empty marker but still consumes it" {
+    mkdir -p .tmp
+    : >.tmp/fix-gh-issue.pending
+    run "$NN"
+    [ "$status" -eq 0 ]
+    # An empty marker holds no prompt, so nothing is injected, but the
+    # one-shot marker is consumed all the same.
+    ! grep -Fxq '/kitchen-sink:fix-gh-issue' "$BATS_TEST_TMPDIR/nono-argv"
+    [ ! -f .tmp/fix-gh-issue.pending ]
+}
+
 @test "bin/nn passes no auto-prompt without the marker" {
     run "$NN"
     [ "$status" -eq 0 ]

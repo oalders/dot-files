@@ -200,6 +200,14 @@ fix_marker="$PWD/.tmp/fix-gh-issue.pending"
 if [[ -f $fix_marker ]]; then
     read -r pending_prompt <"$fix_marker" || true
     rm -f "$fix_marker"
+    # Treat the first non-flag positional as a user-supplied prompt and
+    # suppress the queued one. The heuristic is intentionally simple: any
+    # arg starting with `-` is assumed to be a flag, so flag-only first
+    # launches (e.g. `nn --resume`) still get the queued prompt injected,
+    # which is the desired behavior in a fresh fix-<n> worktree. The one
+    # input shape it misreads is a flag with a separate-word value
+    # (`nn --model opus`), where the value would look like a prompt — not a
+    # shape used on a first launch today.
     user_prompt=0
     for arg in "$@"; do
         [[ $arg == -* ]] || {
