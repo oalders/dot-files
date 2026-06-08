@@ -85,3 +85,45 @@ setup() {
     [ "$status" -eq 0 ]
     [ ! -f "$BATS_TEST_TMPDIR/clodhopper-argv" ]
 }
+
+@test "bin/nn hands claude the queued prompt and consumes the marker" {
+    mkdir -p .tmp
+    printf '%s\n' '/kitchen-sink:fix-gh-issue' >.tmp/fix-gh-issue.pending
+    run "$NN"
+    [ "$status" -eq 0 ]
+    # The queued slash command reaches claude as its initial prompt.
+    grep -Fxq '/kitchen-sink:fix-gh-issue' "$BATS_TEST_TMPDIR/nono-argv"
+    # The marker is one-shot: consumed on the first launch.
+    [ ! -f .tmp/fix-gh-issue.pending ]
+}
+
+@test "bin/nn does not re-run the queued prompt after the marker is consumed" {
+    mkdir -p .tmp
+    printf '%s\n' '/kitchen-sink:fix-gh-issue' >.tmp/fix-gh-issue.pending
+    run "$NN"
+    [ "$status" -eq 0 ]
+    # Second launch in the same worktree: the marker is gone, so the prompt
+    # must not fire again.
+    : >"$BATS_TEST_TMPDIR/nono-argv"
+    run "$NN"
+    [ "$status" -eq 0 ]
+    ! grep -Fxq '/kitchen-sink:fix-gh-issue' "$BATS_TEST_TMPDIR/nono-argv"
+}
+
+@test "bin/nn passes no auto-prompt without the marker" {
+    run "$NN"
+    [ "$status" -eq 0 ]
+    ! grep -Fxq '/kitchen-sink:fix-gh-issue' "$BATS_TEST_TMPDIR/nono-argv"
+}
+
+@test "bin/nn skips the queued prompt when the user supplies their own" {
+    mkdir -p .tmp
+    printf '%s\n' '/kitchen-sink:fix-gh-issue' >.tmp/fix-gh-issue.pending
+    run "$NN" "do something else"
+    [ "$status" -eq 0 ]
+    # The user's prompt reaches claude; the queued one is suppressed.
+    grep -Fxq 'do something else' "$BATS_TEST_TMPDIR/nono-argv"
+    ! grep -Fxq '/kitchen-sink:fix-gh-issue' "$BATS_TEST_TMPDIR/nono-argv"
+    # The one-shot marker is still consumed on the first launch.
+    [ ! -f .tmp/fix-gh-issue.pending ]
+}

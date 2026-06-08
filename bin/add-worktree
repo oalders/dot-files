@@ -61,9 +61,18 @@ fi
 
 cd "$worktree_dir" || exit 1
 
-# Handle GitHub PRs
+# Handle GitHub PRs and issues
 if [[ "$type" == "pr" ]]; then
     gh pr checkout "$number"
+elif [[ "$type" == "issue" ]]; then
+    # Queue the first `nn` launch in this worktree to auto-run
+    # `/kitchen-sink:fix-gh-issue` (it infers issue #$number from the
+    # fix-<n> branch name). bin/nn reads this marker, hands the line to
+    # claude as its initial prompt, then deletes it — so the command fires
+    # exactly once and never re-triggers across tmux/nono sessions. Lives
+    # under .tmp/ (gitignored, worktree-local scratch).
+    mkdir -p .tmp
+    printf '%s\n' '/kitchen-sink:fix-gh-issue' >.tmp/fix-gh-issue.pending
 fi
 
 # `submodule.alternateLocation=superproject` is supposed to share objects with

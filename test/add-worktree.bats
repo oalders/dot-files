@@ -69,3 +69,30 @@ setup() {
     [ -d "$worktree" ]
     [ ! -f "$worktree/.gitmodules" ]
 }
+
+@test "add-worktree queues fix-gh-issue for fix-<n> branches" {
+    setup_git_repo
+    run "$ADD_WORKTREE" fix-952
+    [ "$status" -eq 0 ]
+
+    local date_stamp repo_name worktree
+    date_stamp="$(date +%Y-%m-%d)"
+    repo_name="$(basename "$REPO_DIR")"
+    worktree="$HOME/.worktree/$repo_name/$date_stamp/fix-952"
+
+    [ -f "$worktree/.tmp/fix-gh-issue.pending" ]
+    grep -Fxq '/kitchen-sink:fix-gh-issue' "$worktree/.tmp/fix-gh-issue.pending"
+}
+
+@test "add-worktree queues nothing for non-fix branches" {
+    setup_git_repo
+    run "$ADD_WORKTREE" feature-branch
+    [ "$status" -eq 0 ]
+
+    local date_stamp repo_name worktree
+    date_stamp="$(date +%Y-%m-%d)"
+    repo_name="$(basename "$REPO_DIR")"
+    worktree="$HOME/.worktree/$repo_name/$date_stamp/feature-branch"
+
+    [ ! -f "$worktree/.tmp/fix-gh-issue.pending" ]
+}

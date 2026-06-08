@@ -187,6 +187,32 @@ if ((clodhopper_enabled)); then
     clodhopper init --local
 fi
 
+# First-launch auto-prompt for fix-<n> worktrees. add-worktree drops a
+# one-shot marker (.tmp/fix-gh-issue.pending) holding the slash command to
+# run on the first nn launch in the worktree; we hand it to claude as the
+# initial prompt and delete the marker so it fires exactly once, surviving
+# across tmux/nono sessions. A Claude SessionStart hook can only inject
+# context, not submit a prompt, so this has to happen here at the wrapper
+# level. Skipped when the user supplies their own prompt (a non-flag
+# positional arg), though the one-shot marker is still consumed.
+auto_prompt=()
+fix_marker="$PWD/.tmp/fix-gh-issue.pending"
+if [[ -f $fix_marker ]]; then
+    read -r pending_prompt <"$fix_marker" || true
+    rm -f "$fix_marker"
+    user_prompt=0
+    for arg in "$@"; do
+        [[ $arg == -* ]] || {
+            user_prompt=1
+            break
+        }
+    done
+    if ((!user_prompt)) && [[ -n $pending_prompt ]]; then
+        auto_prompt=("$pending_prompt")
+        echo "🗯️nn: auto-running initial prompt: $pending_prompt" >&2
+    fi
+fi
+
 set -x
 # nono's allow_domain entries are injected into NO_PROXY inside the sandbox,
 # which makes HTTP clients bypass the nono proxy — and Landlock then blocks
@@ -203,4 +229,4 @@ exec nono run --profile "$profile" --allow-cwd --workdir . "${extra_allow[@]}" -
     SERENA_HOME="$PWD/.serena-home" \
     DISABLE_AUTOUPDATER=1 \
     claude --settings "$session_settings" \
-    --dangerously-skip-permissions "$@"
+    --dangerously-skip-permissions "$@" "${auto_prompt[@]+"${auto_prompt[@]}"}"
