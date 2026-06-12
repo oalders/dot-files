@@ -7,17 +7,35 @@ set -eu -o pipefail
 # --playwright force-enables the playwright MCP regardless of e2e/ markers.
 # --clodhopper wires clodhopper's hooks into .claude/settings.local.json
 # (gitignored) for this session, so shared project repos stay clean.
+# --profile <name|path> overrides profile discovery entirely: an existing
+# file is resolved to an absolute path, anything else is passed through as
+# a profile name for nono's ~/.config/nono/profiles lookup.
 chrome_enabled=0
 playwright_forced=0
 clodhopper_enabled=0
+profile_override=""
 forwarded_args=()
-for arg in "$@"; do
-    case "$arg" in
+while [[ $# -gt 0 ]]; do
+    case "$1" in
         --chrome) chrome_enabled=1 ;;
         --playwright) playwright_forced=1 ;;
         --clodhopper) clodhopper_enabled=1 ;;
-        *) forwarded_args+=("$arg") ;;
+        --profile)
+            [[ $# -ge 2 && -n "$2" ]] || {
+                echo "nn: --profile requires a value" >&2
+                exit 2
+            }
+            profile_override="$2"
+            shift
+            ;;
+        --profile=)
+            echo "nn: --profile requires a value" >&2
+            exit 2
+            ;;
+        --profile=*) profile_override="${1#--profile=}" ;;
+        *) forwarded_args+=("$1") ;;
     esac
+    shift
 done
 set -- "${forwarded_args[@]+"${forwarded_args[@]}"}"
 
@@ -36,8 +54,22 @@ fi
 profile=""
 profile_label=""
 project_root=$(git rev-parse --show-toplevel 2>/dev/null || echo "$PWD")
+
+# --profile short-circuits discovery: resolve an existing file to an
+# absolute path (so it works regardless of cwd), otherwise pass the value
+# through as a profile name. With the override set, the walk-up below and
+# the stack auto-detect (guarded by [[ -z "$profile" ]]) are both skipped.
+if [[ -n "$profile_override" ]]; then
+    if [[ -f "$profile_override" ]]; then
+        profile="$(realpath "$profile_override")"
+    else
+        profile="$profile_override"
+    fi
+    profile_label="$profile (--profile override)"
+fi
+
 dir="$PWD"
-while :; do
+while [[ -z "$profile" ]]; do
     if [[ -f "$dir/.nono/profile.json" ]]; then
         profile="$dir/.nono/profile.json"
         profile_label="$profile"
@@ -236,7 +268,15 @@ set -x
 # would be overwritten by nono before claude launches).
 #
 # DISABLE_AUTOUPDATER=1 stops claude from auto-updating, pinning the version.
-exec nono run --profile "$profile" --allow-cwd --workdir . "${extra_allow[@]}" -- \
+#
+# --read-file /usr/bin/env: the sandboxed command below starts with `env`,
+# so the env binary must be readable (read implies exec) under whatever
+# profile is active. Profiles extending the claude-code base already grant
+# it; --profile overrides that stand alone don't, and would die before
+# claude launches. Granting it here keeps the wrapper's own dependency out
+# of every override profile. Redundant grants are harmless.
+exec nono run --profile "$profile" --allow-cwd --workdir . \
+    --read-file /usr/bin/env "${extra_allow[@]}" -- \
     env NO_PROXY=localhost,127.0.0.1 no_proxy=localhost,127.0.0.1 TMPDIR="$PWD/.tmp" \
     XDG_CACHE_HOME="$PWD/.tmp/cache" \
     NPM_CONFIG_CACHE="$PWD/.tmp/cache/npm" \
