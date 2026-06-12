@@ -163,6 +163,60 @@ setup() {
     ! grep -Fxq '/kitchen-sink:fix-gh-issue' "$BATS_TEST_TMPDIR/nono-argv"
 }
 
+@test "bin/nn --profile passes a non-file value through as a profile name" {
+    run "$NN" --profile myprofile
+    [ "$status" -eq 0 ]
+    # The name lands as the value of nono's own --profile flag (the stub
+    # dumps one arg per line, so the value is the line right after the
+    # first --profile; -m1 keeps a forwarded duplicate from shadowing it).
+    [ "$(grep -Fx -A1 -m1 -- '--profile' "$BATS_TEST_TMPDIR/nono-argv" | tail -n1)" = "myprofile" ]
+    # And it reaches nono exactly once; a second occurrence would mean the
+    # value leaked into the forwarded claude args.
+    [ "$(grep -Fxc -- 'myprofile' "$BATS_TEST_TMPDIR/nono-argv")" -eq 1 ]
+}
+
+@test "bin/nn --profile resolves an existing file to an absolute path" {
+    echo '{"extends": ["oalders"]}' > custom-profile.json
+    run "$NN" --profile custom-profile.json
+    [ "$status" -eq 0 ]
+    grep -Fxq -- "$(realpath custom-profile.json)" "$BATS_TEST_TMPDIR/nono-argv"
+}
+
+@test "bin/nn supports the --profile=value form" {
+    run "$NN" --profile=myprofile
+    [ "$status" -eq 0 ]
+    grep -Fxq -- "myprofile" "$BATS_TEST_TMPDIR/nono-argv"
+    # The combined form is consumed, not forwarded to claude.
+    ! grep -Fxq -- "--profile=myprofile" "$BATS_TEST_TMPDIR/nono-argv"
+}
+
+@test "bin/nn --profile without a value fails with exit 2" {
+    run "$NN" --profile
+    [ "$status" -eq 2 ]
+    [[ "$output" == *"--profile requires a value"* ]]
+    # nono must not be launched on a usage error.
+    [ ! -f "$BATS_TEST_TMPDIR/nono-argv" ]
+}
+
+@test "bin/nn --profile overrides a discovered .nono/profile.json" {
+    mkdir -p .nono
+    echo '{"extends": ["oalders"]}' > .nono/profile.json
+    run "$NN" --profile myprofile
+    [ "$status" -eq 0 ]
+    grep -Fxq -- "myprofile" "$BATS_TEST_TMPDIR/nono-argv"
+    ! grep -Fxq -- "$BATS_TEST_TMPDIR/work/.nono/profile.json" "$BATS_TEST_TMPDIR/nono-argv"
+}
+
+@test "bin/nn --profile overrides stack auto-detection" {
+    # package.json would normally trigger the oalders-node auto-detect and
+    # write a .nono/profile.json wrapper; the override must skip both.
+    echo '{}' > package.json
+    run "$NN" --profile myprofile
+    [ "$status" -eq 0 ]
+    grep -Fxq -- "myprofile" "$BATS_TEST_TMPDIR/nono-argv"
+    [ ! -f .nono/profile.json ]
+}
+
 @test "bin/nn skips the queued prompt when the user supplies their own" {
     mkdir -p .tmp
     printf '%s\n' '/kitchen-sink:fix-gh-issue' >.tmp/fix-gh-issue.pending
