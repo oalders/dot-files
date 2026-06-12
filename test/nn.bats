@@ -248,6 +248,17 @@ setup() {
     [ ! -f .nono/profile.json ]
 }
 
+@test "bin/nn grants /usr/bin/env to nono so override profiles can exec env" {
+    # The sandboxed command starts with `env`; a --profile override that
+    # doesn't extend the claude-code base would otherwise be unable to exec
+    # it. The grant is unconditional, so assert it on a plain launch (the
+    # stub dumps one arg per line, so the path is the line right after the
+    # --read-file flag).
+    run "$NN"
+    [ "$status" -eq 0 ]
+    [ "$(grep -Fx -A1 -m1 -- '--read-file' "$BATS_TEST_TMPDIR/nono-argv" | tail -n1)" = "/usr/bin/env" ]
+}
+
 @test "bin/nn skips the queued prompt when the user supplies their own" {
     mkdir -p .tmp
     printf '%s\n' '/kitchen-sink:fix-gh-issue' >.tmp/fix-gh-issue.pending

@@ -268,7 +268,15 @@ set -x
 # would be overwritten by nono before claude launches).
 #
 # DISABLE_AUTOUPDATER=1 stops claude from auto-updating, pinning the version.
-exec nono run --profile "$profile" --allow-cwd --workdir . "${extra_allow[@]}" -- \
+#
+# --read-file /usr/bin/env: the sandboxed command below starts with `env`,
+# so the env binary must be readable (read implies exec) under whatever
+# profile is active. Profiles extending the claude-code base already grant
+# it; --profile overrides that stand alone don't, and would die before
+# claude launches. Granting it here keeps the wrapper's own dependency out
+# of every override profile. Redundant grants are harmless.
+exec nono run --profile "$profile" --allow-cwd --workdir . \
+    --read-file /usr/bin/env "${extra_allow[@]}" -- \
     env NO_PROXY=localhost,127.0.0.1 no_proxy=localhost,127.0.0.1 TMPDIR="$PWD/.tmp" \
     XDG_CACHE_HOME="$PWD/.tmp/cache" \
     NPM_CONFIG_CACHE="$PWD/.tmp/cache/npm" \
