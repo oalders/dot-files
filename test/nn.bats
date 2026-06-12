@@ -198,6 +198,26 @@ setup() {
     [ ! -f "$BATS_TEST_TMPDIR/nono-argv" ]
 }
 
+@test "bin/nn --profile= with an empty value fails with exit 2" {
+    # `--profile=` matches the `--profile=*` glob with an empty value, which
+    # the [[ -n $profile_override ]] guard would silently treat as no
+    # override; it must error like the separate-word form instead.
+    run "$NN" --profile=
+    [ "$status" -eq 2 ]
+    [[ "$output" == *"--profile requires a value"* ]]
+    # nono must not be launched on a usage error.
+    [ ! -f "$BATS_TEST_TMPDIR/nono-argv" ]
+}
+
+@test "bin/nn --profile is parsed out independently of forwarded args" {
+    run "$NN" --profile myprofile --resume
+    [ "$status" -eq 0 ]
+    # The profile reaches nono as the value of its own --profile flag.
+    [ "$(grep -Fx -A1 -m1 -- '--profile' "$BATS_TEST_TMPDIR/nono-argv" | tail -n1)" = "myprofile" ]
+    # The unrelated arg still reaches claude.
+    grep -Fxq -- "--resume" "$BATS_TEST_TMPDIR/nono-argv"
+}
+
 @test "bin/nn --profile overrides a discovered .nono/profile.json" {
     mkdir -p .nono
     echo '{"extends": ["oalders"]}' > .nono/profile.json

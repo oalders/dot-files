@@ -28,6 +28,10 @@ while [[ $# -gt 0 ]]; do
             profile_override="$2"
             shift
             ;;
+        --profile=)
+            echo "nn: --profile requires a value" >&2
+            exit 2
+            ;;
         --profile=*) profile_override="${1#--profile=}" ;;
         *) forwarded_args+=("$1") ;;
     esac
