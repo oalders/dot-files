@@ -21,7 +21,7 @@ while [[ $# -gt 0 ]]; do
         --playwright) playwright_forced=1 ;;
         --clodhopper) clodhopper_enabled=1 ;;
         --profile)
-            [[ $# -ge 2 ]] || {
+            [[ $# -ge 2 && -n "$2" ]] || {
                 echo "nn: --profile requires a value" >&2
                 exit 2
             }

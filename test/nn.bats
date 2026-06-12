@@ -209,6 +209,17 @@ setup() {
     [ ! -f "$BATS_TEST_TMPDIR/nono-argv" ]
 }
 
+@test "bin/nn --profile '' with an empty value fails with exit 2" {
+    # An explicitly empty separate-word value passes the argument-count
+    # check, but the [[ -n $profile_override ]] guard would silently treat
+    # it as no override; it must error like the missing-value form instead.
+    run "$NN" --profile ""
+    [ "$status" -eq 2 ]
+    [[ "$output" == *"--profile requires a value"* ]]
+    # nono must not be launched on a usage error.
+    [ ! -f "$BATS_TEST_TMPDIR/nono-argv" ]
+}
+
 @test "bin/nn --profile is parsed out independently of forwarded args" {
     run "$NN" --profile myprofile --resume
     [ "$status" -eq 0 ]
