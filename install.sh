@@ -42,6 +42,7 @@ run_mac_installers() {
 run_general_installers() {
     local installers=(
         ./installer/linux.sh
+        ./installer/nix.sh
         ./installer/terraform.sh
         ./configure/lid-poweroff.sh
         ./configure/power-profile.sh
