@@ -15,12 +15,14 @@
   "network": {
     "allow_domain": [
       "api.openverse.org",
+      "commons.wikimedia.org",
       "flickr.com",
       "fosstodon.org",
       "*.fosstodon.org",
       "media.licdn.com",
       "openverse.org",
       "*.staticflickr.com",
+      "upload.wikimedia.org",
       "www.flickr.com",
       "www.olafalders.com"
     ]
