@@ -59,20 +59,24 @@ model along the one axis that matters for nono: restrictions vs. grants.
 | File | Change | Holds |
 |------|--------|-------|
 | `oalders-core.json` | **new** | `extends: [claude-code, oalders-uv, oalders-serena, oalders-playwright, oalders-chrome]`, `security` block, cross-cutting `filesystem` block. **No `network`.** The net-free shared base. |
-| `oalders-net.json` | **new** | The curated `allow_domain` list + `open_port` from today's `oalders`, **plus** `pypi.org`/`files.pythonhosted.org` moved out of `oalders-uv`. |
+| `oalders-net.json` | **new** | `network_profile: null` + the curated `allow_domain` list + `open_port` from today's `oalders`, **plus** `pypi.org`/`files.pythonhosted.org` moved out of `oalders-uv`. The `network_profile: null` must ride along: it is the documented defensive opt-out (see `nono/CLAUDE.md`, "Why `network_profile` is set to `null`") and must not be dropped in the move. |
 | `oalders-uv.json` | **changed** | Drop its `network` block → fs-only (`~/.local/share/uv`). |
 | `oalders.json` | **changed** | Becomes `{"extends": ["oalders-core", "oalders-net"]}`. |
 | `oalders-perl.json` | **changed** | Drop its `network` block → fs-only. |
 | `oalders-perl-net.json` | **new** | The CPAN/MagPie `allow_domain` list moved out of `oalders-perl`. |
 | `oalders-perl-test.json` | **new (opt-in)** | `extends: [oalders-core, oalders-perl]`. No `network` block ⇒ open outbound + unrestricted localhost ports, with full MCP runtimes, perl fs grants, and the same fs lockdown. |
 
+Each new profile carries a `meta.name`/`meta.description` block, matching the
+convention of the existing siblings (`oalders.json` itself has none today; the
+new files follow the sibling convention, not `oalders`'s).
+
 ### Non-profile changes
 
 | File | Change |
 |------|--------|
-| `bin/nn` | Perl detection appends **both** `oalders-perl` and `oalders-perl-net` to `mixins` (was just `oalders-perl`). |
-| `installer/symlinks.sh` | Symlink the four new profiles into `~/.config/nono/profiles/`. |
-| `nono/CLAUDE.md` | Document the core/net split, the core principle, and the opt-in permissive profile. |
+| `bin/nn` | Perl detection appends **both** `oalders-perl` and `oalders-perl-net` to `mixins` (was just `oalders-perl`). **Regression risk:** appending only `oalders-perl` (the fs half) would silently strip all CPAN network access from every auto-detected Perl session. Both entries must land together; this is the single highest-risk edit. |
+| `installer/symlinks.sh` | Symlink exactly the four new profiles into `~/.config/nono/profiles/`: `oalders-core.json`, `oalders-net.json`, `oalders-perl-net.json`, `oalders-perl-test.json`. (`oalders.json`/`oalders-perl.json`/`oalders-uv.json` already have symlinks and only change content.) |
+| `nono/CLAUDE.md` | Document the core/net split, the core principle, and the opt-in permissive profile. Also fix now-stale rows in the existing tables: the `oalders-uv` row (no longer owns network) and the `oalders-perl` row (network moves to `oalders-perl-net`). |
 
 ## Behavior preservation (the critical invariant)
 
@@ -88,8 +92,12 @@ default path.
   oalders-perl-net`. `oalders-perl` (fs) + `oalders-perl-net` (CPAN domains)
   together equal today's `oalders-perl`. Zero change.
 - `oalders-uv` loses its domains but they reappear via `oalders-net` (always
-  extended by `oalders`). Zero change for any consumer that reaches uv through
-  `oalders`.
+  extended by `oalders`). `oalders-uv` is reached *only* through `oalders`
+  (nothing else extends it), so every uv consumer still gets pypi via
+  `oalders-net`. Zero change.
+- `network_profile: null` moves from `oalders`'s inline `network` block into
+  `oalders-net`, which `oalders` always extends — so it still resolves on
+  `oalders`. Without it the move would silently drop the defensive opt-out.
 
 ## The permissive profile
 
@@ -113,10 +121,14 @@ default path.
 
 - **MCP servers (serena/uv):** `oalders-perl-test` includes `oalders-core`, which
   carries the uv runtime fs grant and the serena/playwright/chrome grants, so
-  MCP servers launch the same as in a normal session. uv's pypi domains are
-  *not* in this profile's chain; `uvx` resolving an already-installed serena does
-  not need pypi at runtime, so this is acceptable. If a future need arises to
-  install via uv inside a permissive session, add the domains then.
+  MCP servers launch the same as in a normal session. `nn`'s per-launch serena
+  setup (`SERENA_HOME=$PWD/.serena-home` + seed `serena_config.yml`) runs for
+  *every* invocation including `nn --profile oalders-perl-test`, so serena is
+  configured identically. The fact that uv's pypi domains are not in this chain
+  is **not** a problem here: `oalders-perl-test` has *open* outbound (no
+  allowlist), so `uvx` can reach pypi like any host if it needs to revalidate or
+  fetch. (pypi being in `oalders-net` only matters for the locked `oalders` path,
+  where allowlist mode is in effect.)
 - **Validation:** each new/changed profile must pass
   `nono policy validate ~/.config/nono/profiles/<file>.json`.
 
