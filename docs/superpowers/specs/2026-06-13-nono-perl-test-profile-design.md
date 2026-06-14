@@ -75,8 +75,9 @@ new files follow the sibling convention, not `oalders`'s).
 | File | Change |
 |------|--------|
 | `bin/nn` | Perl detection appends **both** `oalders-perl` and `oalders-perl-net` to `mixins` (was just `oalders-perl`). **Regression risk:** appending only `oalders-perl` (the fs half) would silently strip all CPAN network access from every auto-detected Perl session. Both entries must land together; this is the single highest-risk edit. |
+| `test/nn.bats` | Add a regression case asserting the auto-detected Perl wrapper's `extends` contains **both** `oalders-perl` and `oalders-perl-net`. This is the single highest-risk edit (C3) and currently has zero coverage; the existing bats suite stubs `nono` and asserts argv plumbing, so this fits the harness. |
 | `installer/symlinks.sh` | Symlink exactly the four new profiles into `~/.config/nono/profiles/`: `oalders-core.json`, `oalders-net.json`, `oalders-perl-net.json`, `oalders-perl-test.json`. (`oalders.json`/`oalders-perl.json`/`oalders-uv.json` already have symlinks and only change content.) |
-| `nono/CLAUDE.md` | Document the core/net split, the core principle, and the opt-in permissive profile. Also fix now-stale rows in the existing tables: the `oalders-uv` row (no longer owns network) and the `oalders-perl` row (network moves to `oalders-perl-net`). |
+| `nono/CLAUDE.md` | Document the core/net split, the core principle, and the opt-in permissive profile. Also fix now-stale rows in the existing tables: the `oalders-uv` row (no longer owns network) and the `oalders-perl` row (network moves to `oalders-perl-net`). Further stale spots to update: the "Files" list (mention the new always-on `oalders-core`/`oalders-net`); the "Always-on, mixed in via `oalders.json`'s own extends" heading (always-on siblings are now pulled by `oalders-core`, not `oalders.json` directly); and the "Cross-cutting bits that stay in `oalders.json`" section plus the "Extending the profile" guidance (cross-cutting blocks move to `oalders-core` — point both at it). |
 
 ## Behavior preservation (the critical invariant)
 
@@ -131,6 +132,15 @@ default path.
   where allowlist mode is in effect.)
 - **Validation:** each new/changed profile must pass
   `nono policy validate ~/.config/nono/profiles/<file>.json`.
+- **Symlink-before-verify ordering trap:** `bin/test-nono-claude-md.sh` resolves
+  the repo-local `nono/oalders.json` (source of truth) via `nono why`, but the
+  *named* `extends` inside it (`oalders-core`, `oalders-net`) still resolve
+  through `~/.config/nono/profiles/`. After the reorg the `~/.claude/CLAUDE.md`
+  read grant moves from `oalders.json`'s inline `filesystem` block into
+  `oalders-core`, so this regression test (and any local-file `nono why`/`nono
+  run` against `nono/oalders.json`) **fails until the four new profiles are
+  symlinked**. Run `installer/symlinks.sh` *before* re-running the test or any
+  smoke test on the branch.
 
 ## Testing / verification
 
