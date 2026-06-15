@@ -97,10 +97,14 @@ ln -sf $prefix/claude-pulse/config.json ~/.config/claude-pulse/config.json
 ln -sf $prefix/mcphub/servers.json ~/.config/mcphub/servers.json
 ln -sf $prefix/nix/nix.conf ~/.config/nix/nix.conf
 ln -sf $prefix/nono/oalders-chrome.json ~/.config/nono/profiles/oalders-chrome.json
+ln -sf $prefix/nono/oalders-core.json ~/.config/nono/profiles/oalders-core.json
 ln -sf $prefix/nono/oalders-go.json ~/.config/nono/profiles/oalders-go.json
 ln -sf $prefix/nono/oalders-hugo.json ~/.config/nono/profiles/oalders-hugo.json
+ln -sf $prefix/nono/oalders-net.json ~/.config/nono/profiles/oalders-net.json
 ln -sf $prefix/nono/oalders-node.json ~/.config/nono/profiles/oalders-node.json
 ln -sf $prefix/nono/oalders-perl.json ~/.config/nono/profiles/oalders-perl.json
+ln -sf $prefix/nono/oalders-perl-net.json ~/.config/nono/profiles/oalders-perl-net.json
+ln -sf $prefix/nono/oalders-perl-test.json ~/.config/nono/profiles/oalders-perl-test.json
 ln -sf $prefix/nono/oalders-playwright.json ~/.config/nono/profiles/oalders-playwright.json
 ln -sf $prefix/nono/oalders-serena.json ~/.config/nono/profiles/oalders-serena.json
 ln -sf $prefix/nono/oalders-snap.json ~/.config/nono/profiles/oalders-snap.json
