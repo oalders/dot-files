@@ -270,3 +270,15 @@ setup() {
     # The one-shot marker is still consumed on the first launch.
     [ ! -f .tmp/fix-gh-issue.pending ]
 }
+
+@test "bin/nn auto-detect appends both oalders-perl and oalders-perl-net" {
+    # A cpanfile marks a Perl repo; detection must compose BOTH the fs mixin
+    # (oalders-perl) and the network mixin (oalders-perl-net). Appending only
+    # the fs half would silently strip CPAN network from auto-detected sessions.
+    echo "requires 'Moo';" > cpanfile
+    run "$NN"
+    [ "$status" -eq 0 ]
+    [ -f .nono/profile.json ]
+    grep -Fq '"oalders-perl"' .nono/profile.json
+    grep -Fq '"oalders-perl-net"' .nono/profile.json
+}
