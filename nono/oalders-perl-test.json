@@ -1,0 +1,10 @@
+{
+  "meta": {
+    "name": "oalders-perl-test",
+    "description": "Opt-in permissive Perl test profile: open outbound network and unrestricted localhost ports for CPAN test suites (Test::TCP, live-network tests), with the same filesystem lockdown as oalders. Invoke via: nn --profile oalders-perl-test."
+  },
+  "extends": [
+    "oalders-core",
+    "oalders-perl"
+  ]
+}
