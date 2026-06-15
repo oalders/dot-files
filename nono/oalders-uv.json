@@ -1,17 +1,11 @@
 {
   "meta": {
     "name": "oalders-uv",
-    "description": "uv runtime: location used by uv-installed tools (uvx, uv tool install), plus PyPI network access for installs"
+    "description": "uv runtime filesystem: location used by uv-installed tools (uvx, uv tool install). Net-free; PyPI domains live in oalders-net."
   },
   "filesystem": {
     "read": [
       "~/.local/share/uv"
-    ]
-  },
-  "network": {
-    "allow_domain": [
-      "pypi.org",
-      "files.pythonhosted.org"
     ]
   }
 }
