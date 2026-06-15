@@ -4,7 +4,9 @@ Wraps Claude Code in the [nono](https://nono.sh/) sandbox. Invoke via `nn` (from
 
 ## Files
 
-- `oalders.json` — nono profile, symlinked to `~/.config/nono/profiles/oalders.json`
+- `oalders.json` — nono profile composition root (`extends: [oalders-core, oalders-net]`), symlinked to `~/.config/nono/profiles/oalders.json`
+- `oalders-core.json` — net-free shared base (always-on MCP/runtime siblings, security policy, cross-cutting filesystem grants), symlinked to `~/.config/nono/profiles/oalders-core.json`
+- `oalders-net.json` — all outbound network rules for the default chain (curated `allow_domain`, `open_port`, `network_profile: null`), symlinked to `~/.config/nono/profiles/oalders-net.json`
 - `claude-settings.json` — `{"sandbox": {"enabled": false}}` passed to claude via `--settings`, symlinked to `~/.config/nono/claude-settings.json` (so claude's built-in sandbox stays off while nono does the real work)
 
 ## Per-project profiles
@@ -19,13 +21,22 @@ Project-local profiles can `"extends": "oalders"` to layer additional grants on 
 
 `extends` accepting a list comes from nono PR #399; sibling profiles must therefore live as named profiles in `~/.config/nono/profiles/` so the lookup resolves.
 
-### Always-on (mixed in via `oalders.json`'s own `extends`)
+### Net-free base vs. network siblings
 
-These are global infrastructure — MCP servers Claude relies on, and their runtimes — so they go in `oalders.json`'s `extends` list rather than per-repo detection.
+`oalders` is now `{"extends": ["oalders-core", "oalders-net"]}`:
+
+- **`oalders-core`** holds the always-on siblings, the `security` block, and the cross-cutting `filesystem` grants — and **no `network`**.
+- **`oalders-net`** holds *all* outbound rules: the curated `allow_domain` list, `open_port`, the defensive `network_profile: null`, and uv's PyPI domains.
+
+The rule that forces this split: nono's `extends` is append-only, and **any** `allow_domain` anywhere in the chain flips nono into proxy allowlist mode (default-deny outbound). There is no way to remove an inherited domain. So every grant sibling (filesystem/runtime) is kept net-free, and all domains/ports live in dedicated `*-net` siblings. A profile that needs open network — like `oalders-perl-test` — composes only net-free grants and adds no `*-net`, leaving outbound and localhost ports unrestricted.
+
+### Always-on (mixed in via `oalders-core`'s `extends`)
+
+These are global infrastructure — MCP servers Claude relies on, and their runtimes — so they go in `oalders-core`'s `extends` list (which `oalders` always pulls in) rather than per-repo detection.
 
 | Profile             | Owns                                                                                   |
 | ------------------- | -------------------------------------------------------------------------------------- |
-| `oalders-uv`        | `~/.local/share/uv` (uv runtime — used by `uvx` and `uv tool install`)                 |
+| `oalders-uv`        | `~/.local/share/uv` (uv runtime — used by `uvx` and `uv tool install`). Net-free; PyPI domains live in `oalders-net`. |
 | `oalders-serena`    | `~/.serena` (serena MCP config/logs/memories)                                          |
 | `oalders-playwright`| `~/.cache/ms-playwright` (Chromium bundle), `/dev/shm` (browser IPC)                   |
 | `oalders-chrome`    | `/opt/google/chrome` (browser binary), `~/.cache/superpowers` (browser session dirs)   |
@@ -36,7 +47,7 @@ These are global infrastructure — MCP servers Claude relies on, and their runt
 
 | Profile         | Markers at repo root                  | Owns                                                                               |
 | --------------- | ------------------------------------- | ---------------------------------------------------------------------------------- |
-| `oalders-perl`  | `cpanfile`, `Makefile.PL`, `dist.ini` | plenv (`~/.plenv`), local::lib (`~/perl5`), Dist::Zilla (`~/.dzil`, `~/dot-files/dzil`), prove (`~/.proverc`), CPAN/MagPie network, XS system C headers (`/usr/include`, `/usr/local/include`) |
+| `oalders-perl`  | `cpanfile`, `Makefile.PL`, `dist.ini` | plenv (`~/.plenv`), local::lib (`~/perl5`), Dist::Zilla (`~/.dzil`, `~/dot-files/dzil`), prove (`~/.proverc`), XS system C headers (`/usr/include`, `/usr/local/include`). Net-free; CPAN/MetaCPAN/MagPie network is in the paired `oalders-perl-net` (appended alongside it by `nn`). |
 | `oalders-node`  | `package.json`                        | `*.npmjs.org`, `registry.npmjs.org` (npm registry network access for installs)     |
 | `oalders-go`    | `go.mod`                              | Go toolchain (`go_runtime` group), build/module/lint caches (`~/.cache/go-build`, `~/.cache/golangci-lint`, `~/go/pkg/mod`), module proxy + checksum DB (`proxy.golang.org`, `sum.golang.org`), and cgo system headers (`/usr/include`, `/usr/local/include`, `/opt/homebrew/include`, pkg-config dirs, `/Library/Developer/CommandLineTools`) |
 | `oalders-hugo`  | `hugo.toml` / `hugo.yaml` / `hugo.json`, or `config.toml` + `themes/` | Hugo cache (`~/.cache/hugo_cache`). When Hugo matches, `nn` also appends `oalders-snap` to the mixin list because Hugo on Linux is typically snap-installed. |
@@ -55,6 +66,7 @@ These siblings are symlinked into `~/.config/nono/profiles/` but aren't mixed in
 | Profile             | Owns                                                                                  |
 | ------------------- | ------------------------------------------------------------------------------------- |
 | `oalders-terraform` | `~/.terraform.d`, `~/.terraformrc` (read-only); `registry.terraform.io` (network)     |
+| `oalders-perl-test` | Open outbound network + unrestricted localhost ports (no `allow_domain`/`open_port` in its chain), with `oalders-core` + `oalders-perl` grants and the full filesystem lockdown. For CPAN test suites needing live network or `Test::TCP`-style ephemeral ports. |
 
 Opt-in via per-repo `.nono/profile.json`:
 
@@ -62,11 +74,17 @@ Opt-in via per-repo `.nono/profile.json`:
 {"extends": ["oalders", "oalders-terraform"]}
 ```
 
+`oalders-perl-test` is invoked directly rather than via a per-repo wrapper, because it intentionally drops the network/port restrictions a wrapper extending `oalders` would re-impose:
+
+```
+nn --profile oalders-perl-test
+```
+
 ### Adding a new sibling
 
 1. Write `nono/oalders-<topic>.json` standalone (no `extends`).
 2. Add a symlink line in `installer/symlinks.sh` for `~/.config/nono/profiles/oalders-<topic>.json`.
-3. If it should be always-on, append `"oalders-<topic>"` to `oalders.json`'s `extends`. If it's per-project, add a detection block in `bin/nn` that appends `"oalders-<topic>"` to `mixins`.
+3. If it should be always-on, append `"oalders-<topic>"` to `oalders-core.json`'s `extends` (net-free grants); a sibling that adds outbound domains/ports instead folds into `oalders-net.json` (or is added to `oalders.json`'s `extends` alongside `oalders-net`). If it's per-project, add a detection block in `bin/nn` that appends `"oalders-<topic>"` to `mixins`.
 
 ### Wrapper lifecycle
 
@@ -100,14 +118,14 @@ The `claude-code` network bundle (`network.network_profile`) sets up nono's reve
 
 Surfaced 2026-04-30 after claude auto-updated to a version that respects `ANTHROPIC_BASE_URL`. Earlier claude went to `api.anthropic.com` directly and tunneled through `HTTPS_PROXY`, dodging the intercept.
 
-Workaround: set `"network_profile": null` in `oalders.json` and replace the curated bundle with an explicit `allow_domain` list (Anthropic, GitHub, npm, Go module proxy). The explicit `null` is the documented opt-out pattern — see nono's `docs/cli/clients/claude-code.mdx` (`claude-code-netopen` example). Today the parent `claude-code` profile doesn't set `network_profile`, so omitting the field would also work, but `null` is defensive against a future nono release adding it back.
+Workaround: set `"network_profile": null` in `oalders-net.json` (where all outbound rules now live) and replace the curated bundle with an explicit `allow_domain` list (Anthropic, GitHub, npm, Go module proxy). The explicit `null` is the documented opt-out pattern — see nono's `docs/cli/clients/claude-code.mdx` (`claude-code-netopen` example). Today the parent `claude-code` profile doesn't set `network_profile`, so omitting the field would also work, but `null` is defensive against a future nono release adding it back.
 
 Upstream to watch:
 - https://github.com/always-further/nono/issues/793 — exec-sourced credentials (covers `apiKeyHelper` shape)
 - https://github.com/always-further/nono/issues/770 — refreshable credential backend
 - https://github.com/always-further/nono/issues/724 — 3rd-party provider profiles
 
-Re-test on each nono release: temporarily flip `"network_profile": null` to `"claude-code"` in `oalders.json` and run from `$TMPDIR`:
+Re-test on each nono release: temporarily flip `"network_profile": null` to `"claude-code"` in `oalders-net.json` and run from `$TMPDIR`:
 ```
 cd "${TMPDIR:-/tmp}" && nono run --profile oalders --allow-cwd -- curl -s -o /dev/null -w "%{http_code}\n" \
   -X POST "$ANTHROPIC_BASE_URL/v1/messages" -d '{}'
@@ -125,7 +143,7 @@ When claude or an MCP server can't reach something:
 1. Confirm the block: `nono why --path <path> --op read --profile oalders` (or `--host <hostname>` for network).
 2. Add the minimal grant to the right file:
    - **Stack-specific** (only useful in Perl/Node/Go/etc. projects) → the matching `oalders-<stack>.json` sibling. If the stack doesn't have a sibling yet, see "Language sibling profiles" above for how to add one.
-   - **Cross-cutting** (needed across all projects) → `oalders.json`.
+   - **Cross-cutting** (needed across all projects) → `oalders-core.json` (the net-free base). New network domains/ports → `oalders-net.json`.
 
    Grant kinds:
    - `filesystem.read` — read-only directories
@@ -137,9 +155,9 @@ When claude or an MCP server can't reach something:
 
 **Avoid broad allows on `~`, `~/.config`, `~/.local`, `~/.cache`** — they'll bring back the deny-overlap problem. Prefer specific subpaths.
 
-### Cross-cutting bits that stay in `oalders.json`
+### Cross-cutting bits that live in `oalders-core.json`
 
-These don't belong to any single tool or stack, so they live in the base:
+These don't belong to any single tool or stack, so they live in `oalders-core` (the net-free base that `oalders` always extends):
 
 - `read` on `~/.local/bin` (uvx wrapper, serena-mcp-server, generic user-installed scripts — used across siblings) and `~/.npm-packages` (npm-installed binaries: playwright-mcp consumer + standalone npx use).
 - `read` on `~/dot-files/bin` (npx wrapper that intercepts `@playwright/mcp@latest` so it sits ahead of `~/dot-files/node_modules/.bin/npx` in PATH).
