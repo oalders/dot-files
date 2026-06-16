@@ -68,7 +68,7 @@ These siblings are symlinked into `~/.config/nono/profiles/` but aren't mixed in
 | ------------------- | ------------------------------------------------------------------------------------- |
 | `oalders-terraform` | `~/.terraform.d`, `~/.terraformrc` (read-only); `registry.terraform.io` (network)     |
 | `oalders-perl-test` | Open outbound network + unrestricted localhost ports (no `allow_domain`/`open_port` in its chain), with `oalders-core` + `oalders-perl` grants and the full filesystem lockdown. For CPAN test suites needing live network or `Test::TCP`-style ephemeral ports. |
-| `oalders-open`      | Open outbound network (no `allow_domain` in its chain → `network_allowed`), with only `oalders-core` grants and the full filesystem lockdown. General-purpose permissive profile for non-Perl sessions that genuinely need unrestricted outbound. |
+| `oalders-open`      | Open outbound network (no `allow_domain` in its chain, so `nono why` reports `network_allowed`), with only `oalders-core` grants and the full filesystem lockdown. General-purpose permissive profile for non-Perl sessions that genuinely need unrestricted outbound. |
 
 Opt-in via per-repo `.nono/profile.json`:
 
