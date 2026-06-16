@@ -1,0 +1,18 @@
+{
+  "meta": {
+    "name": "oalders-perl-net",
+    "description": "CPAN/MetaCPAN/MagPie network access for Perl sessions, split out of oalders-perl so the filesystem grants can be reused net-free."
+  },
+  "network": {
+    "allow_domain": [
+      "*.cpan.org",
+      "*.cpantesters.org",
+      "*.metacpan.org",
+      "*.perl-magpie.org",
+      "cpan.org",
+      "cpanmetadb.plackperl.org",
+      "cpantesters.org",
+      "metacpan.org"
+    ]
+  }
+}

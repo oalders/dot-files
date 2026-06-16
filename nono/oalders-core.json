@@ -1,0 +1,53 @@
+{
+  "meta": {
+    "name": "oalders-core",
+    "description": "Net-free shared base: always-on MCP/runtime siblings, security policy, and cross-cutting filesystem grants. Holds no network rules so permissive profiles can compose it without inheriting an allowlist."
+  },
+  "extends": [
+    "claude-code",
+    "oalders-uv",
+    "oalders-serena",
+    "oalders-playwright",
+    "oalders-chrome"
+  ],
+  "security": {
+    "signal_mode": "allow_same_sandbox",
+    "process_info_mode": "allow_same_sandbox",
+    "ipc_mode": "full"
+  },
+  "filesystem": {
+    "read": [
+      "/usr/libexec/gcc",
+      "/usr/local/",
+      "~/.config/gh",
+      "~/.local/bin",
+      "~/.local/share/nvim/mason",
+      "~/.npm-packages",
+      "~/dot-files/bin",
+      "~/dot-files/gitignore_global",
+      "~/dot-files/node_modules",
+      "~/dot-files/nono",
+      "~/local/bin"
+    ],
+    "allow": [
+      "/tmp/claude-1000"
+    ],
+    "read_file": [
+      "/etc/bash.bashrc",
+      "/etc/gitconfig",
+      "~/.bashrc",
+      "~/.docker/config.json",
+      "~/.gitconfig",
+      "~/dot-files/bashrc",
+      "~/dot-files/claude/CLAUDE.md",
+      "~/dot-files/claude/statusline-command.sh"
+    ],
+    "allow_file": [
+      "~/.claude/.credentials.json"
+    ],
+    "bypass_protection": [
+      "~/.bashrc",
+      "~/dot-files/bashrc"
+    ]
+  }
+}

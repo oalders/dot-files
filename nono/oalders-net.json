@@ -1,0 +1,23 @@
+{
+  "meta": {
+    "name": "oalders-net",
+    "description": "All outbound network rules for the default oalders chain: curated allow_domain list, open_port, and the defensive network_profile:null opt-out. Includes uv's PyPI domains so the uv sibling can stay net-free."
+  },
+  "network": {
+    "network_profile": null,
+    "allow_domain": [
+      "*.anthropic.com",
+      "*.claude.ai",
+      "*.github.com",
+      "*.githubusercontent.com",
+      "api.anthropic.com",
+      "claude.ai",
+      "datatracker.ietf.org",
+      "files.pythonhosted.org",
+      "github.com",
+      "pypi.org",
+      "www.rfc-editor.org"
+    ],
+    "open_port": [80, 5000, 5001, 8080]
+  }
+}

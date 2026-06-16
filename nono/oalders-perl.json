@@ -1,7 +1,7 @@
 {
   "meta": {
     "name": "oalders-perl",
-    "description": "Perl development mixin: plenv, local::lib (~/perl5), Dist::Zilla, prove, MetaCPAN, perl-cpm, common rc files, system C headers for XS"
+    "description": "Perl development mixin (filesystem only): plenv, local::lib (~/perl5), Dist::Zilla, prove, perlimports, common rc files, system C headers for XS. Net-free; CPAN domains live in oalders-perl-net."
   },
   "filesystem": {
     "allow": [
@@ -26,18 +26,6 @@
       "~/dot-files/dataprinter",
       "~/dot-files/perlcriticrc",
       "~/dot-files/perlimports/perlimports.toml"
-    ]
-  },
-  "network": {
-    "allow_domain": [
-      "*.cpan.org",
-      "*.cpantesters.org",
-      "*.metacpan.org",
-      "*.perl-magpie.org",
-      "cpan.org",
-      "cpanmetadb.plackperl.org",
-      "cpantesters.org",
-      "metacpan.org"
     ]
   }
 }

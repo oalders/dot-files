@@ -91,7 +91,7 @@ done
 if [[ -z "$profile" ]]; then
     mixins=()
     if [[ -f "$project_root/cpanfile" || -f "$project_root/Makefile.PL" || -f "$project_root/dist.ini" ]]; then
-        mixins+=("oalders-perl")
+        mixins+=("oalders-perl" "oalders-perl-net")
     fi
     if [[ -f "$project_root/package.json" ]]; then
         mixins+=("oalders-node")
