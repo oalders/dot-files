@@ -102,6 +102,7 @@ ln -sf $prefix/nono/oalders-go.json ~/.config/nono/profiles/oalders-go.json
 ln -sf $prefix/nono/oalders-hugo.json ~/.config/nono/profiles/oalders-hugo.json
 ln -sf $prefix/nono/oalders-net.json ~/.config/nono/profiles/oalders-net.json
 ln -sf $prefix/nono/oalders-node.json ~/.config/nono/profiles/oalders-node.json
+ln -sf $prefix/nono/oalders-open.json ~/.config/nono/profiles/oalders-open.json
 ln -sf $prefix/nono/oalders-perl.json ~/.config/nono/profiles/oalders-perl.json
 ln -sf $prefix/nono/oalders-perl-net.json ~/.config/nono/profiles/oalders-perl-net.json
 ln -sf $prefix/nono/oalders-perl-test.json ~/.config/nono/profiles/oalders-perl-test.json
