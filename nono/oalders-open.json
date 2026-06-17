@@ -1,0 +1,9 @@
+{
+  "meta": {
+    "name": "oalders-open",
+    "description": "Permissive: full outbound network with the same filesystem lockdown as oalders. Composes oalders-core (the net-free shared base) without oalders-net, so no allow_domain filter is applied and all outbound is allowed. Invoke via: nn --profile oalders-open."
+  },
+  "extends": [
+    "oalders-core"
+  ]
+}

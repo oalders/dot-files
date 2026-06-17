@@ -7,6 +7,7 @@ Wraps Claude Code in the [nono](https://nono.sh/) sandbox. Invoke via `nn` (from
 - `oalders.json` — nono profile composition root (`extends: [oalders-core, oalders-net]`), symlinked to `~/.config/nono/profiles/oalders.json`
 - `oalders-core.json` — net-free shared base (always-on MCP/runtime siblings, security policy, cross-cutting filesystem grants), symlinked to `~/.config/nono/profiles/oalders-core.json`
 - `oalders-net.json` — all outbound network rules for the default chain (curated `allow_domain`, `open_port`, `network_profile: null`), symlinked to `~/.config/nono/profiles/oalders-net.json`
+- `oalders-open.json` — permissive opt-in profile (`extends: [oalders-core]`, no `oalders-net`): full outbound network with the same filesystem lockdown as `oalders`, symlinked to `~/.config/nono/profiles/oalders-open.json`
 - `claude-settings.json` — `{"sandbox": {"enabled": false}}` passed to claude via `--settings`, symlinked to `~/.config/nono/claude-settings.json` (so claude's built-in sandbox stays off while nono does the real work)
 
 ## Per-project profiles
@@ -66,7 +67,8 @@ These siblings are symlinked into `~/.config/nono/profiles/` but aren't mixed in
 | Profile             | Owns                                                                                  |
 | ------------------- | ------------------------------------------------------------------------------------- |
 | `oalders-terraform` | `~/.terraform.d`, `~/.terraformrc` (read-only); `registry.terraform.io` (network)     |
-| `oalders-perl-test` | Open outbound network + unrestricted localhost ports (no `allow_domain`/`open_port` in its chain), with `oalders-core` + `oalders-perl` grants and the full filesystem lockdown. For CPAN test suites needing live network or `Test::TCP`-style ephemeral ports. |
+| `oalders-perl-test` | Open outbound network + unrestricted localhost ports (no `allow_domain`/`open_port` in its chain, so `nono why` likewise reports `network_allowed`), with `oalders-core` + `oalders-perl` grants and the full filesystem lockdown. For CPAN test suites needing live network or `Test::TCP`-style ephemeral ports. |
+| `oalders-open`      | Open outbound network (no `allow_domain` in its chain, so `nono why` reports `network_allowed`), with only `oalders-core` grants and the full filesystem lockdown. General-purpose permissive profile for non-Perl sessions that genuinely need unrestricted outbound. |
 
 Opt-in via per-repo `.nono/profile.json`:
 
@@ -74,10 +76,11 @@ Opt-in via per-repo `.nono/profile.json`:
 {"extends": ["oalders", "oalders-terraform"]}
 ```
 
-`oalders-perl-test` is invoked directly rather than via a per-repo wrapper, because it intentionally drops the network/port restrictions a wrapper extending `oalders` would re-impose:
+`oalders-perl-test` and `oalders-open` are invoked directly rather than via a per-repo wrapper, because they intentionally drop the network/port restrictions a wrapper extending `oalders` would re-impose:
 
 ```
 nn --profile oalders-perl-test
+nn --profile oalders-open
 ```
 
 ### Adding a new sibling
