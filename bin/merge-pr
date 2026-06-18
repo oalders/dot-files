@@ -4,7 +4,7 @@ set -eu -o pipefail
 
 usage() {
     cat <<'EOF'
-Usage: merge-pr [-f|--force] [gh pr merge args...]
+Usage: merge-pr [-f|--force] [--close] [gh pr merge/close args...]
 
 Merges the current branch's PR via `gh pr merge`, then removes the
 worktree, deletes the local branch, and kills the tmux session for the
@@ -14,6 +14,15 @@ Options:
   -f, --force   Discard uncommitted changes in the worktree when
                 removing it.
                 May appear anywhere in the argument list.
+  --close       Close the PR via `gh pr close` instead of merging it,
+                then run the same teardown (remove worktree, delete the
+                local branch, kill the tmux session). Because the branch
+                is being abandoned, this skips the unpushed-commits
+                pre-flight (cleanup discards local commits anyway) and
+                deletes the remote branch explicitly — a merge gets that
+                for free from GitHub's delete_branch_on_merge, but that
+                setting only fires on merge, not close. Extra args pass
+                through to `gh pr close`.
 
 Refuses:
   --auto, --auto-merge   gh pr merge would exit 0 while the PR stays
@@ -24,14 +33,19 @@ Refuses:
 EOF
 }
 
-# Parse our own --force/-f from anywhere in the argument list.
-# Refuse --auto / --auto-merge.
+# Parse our own --force/-f and --close from anywhere in the argument list.
+# Refuse --auto / --auto-merge. --close and -f/--force are consumed here and
+# must NOT be forwarded to gh; everything else passes through in gh_args.
 force=""
+close_mode=""
 gh_args=()
 for arg in "$@"; do
     case "$arg" in
         -f | --force)
             force="--force"
+            ;;
+        --close)
+            close_mode="1"
             ;;
         --auto | --auto-merge)
             echo "merge-pr: refusing $arg — cleanup would run before the merge completes" >&2
@@ -60,48 +74,55 @@ if [[ "$branch" == "HEAD" ]]; then
     exit 1
 fi
 
-# Pre-flight: branch must have an upstream.
-#
-# `@{u}` fails both when the branch is genuinely unpushed AND when it is
-# already on origin but its local tracking config is wrong (e.g.
-# branch.<name>.remote points at a clone URL instead of "origin"). In the
-# latter case "push first" misdiagnoses the problem — the branch is pushed;
-# only the tracking config needs repair. Distinguish the two by asking
-# origin directly.
-if ! git rev-parse --abbrev-ref --symbolic-full-name '@{u}' >/dev/null 2>&1; then
-    # Query the full ref path, not a bare name: `ls-remote origin foo`
-    # tail-matches path components and would also match `refs/heads/x/foo`,
-    # false-flagging a genuinely unpushed branch. The output is a single
-    # line, so `grep -q` consuming it before ls-remote blocks keeps the
-    # pipe safe under pipefail — don't widen this query.
-    if git ls-remote origin "refs/heads/$branch" 2>/dev/null | grep -q .; then
-        echo "merge-pr: branch '$branch' is on origin, but local tracking config" >&2
-        echo "          is wrong, so '@{u}' does not resolve. The branch is" >&2
-        echo "          already pushed — this is a config issue, not a missing push." >&2
-        printf "merge-pr: repair with 'git branch --set-upstream-to=origin/%s' and continue? [y/N] " "$branch" >&2
-        # Default to bailing: empty input (just Enter), EOF, or a
-        # non-interactive stdin all leave tracking untouched.
-        read -r reply || reply=""
-        case "$reply" in
-            [Yy]*)
-                git branch --set-upstream-to="origin/$branch" >&2
-                ;;
-            *)
-                echo "merge-pr: aborted — fix tracking config and re-run." >&2
-                exit 1
-                ;;
-        esac
-    else
-        echo "merge-pr: branch '$branch' has no upstream — push first" >&2
+# Close mode abandons the branch, so the "is it pushed / are there unpushed
+# commits?" pre-flight below is moot — cleanup discards local commits anyway,
+# and the branch need not be on origin at all. Skip the whole block (upstream
+# tracking AND unpushed-commit count) when closing; run it for merges, where
+# `gh pr merge` genuinely needs the branch pushed.
+if [[ -z "$close_mode" ]]; then
+    # Pre-flight: branch must have an upstream.
+    #
+    # `@{u}` fails both when the branch is genuinely unpushed AND when it is
+    # already on origin but its local tracking config is wrong (e.g.
+    # branch.<name>.remote points at a clone URL instead of "origin"). In the
+    # latter case "push first" misdiagnoses the problem — the branch is pushed;
+    # only the tracking config needs repair. Distinguish the two by asking
+    # origin directly.
+    if ! git rev-parse --abbrev-ref --symbolic-full-name '@{u}' >/dev/null 2>&1; then
+        # Query the full ref path, not a bare name: `ls-remote origin foo`
+        # tail-matches path components and would also match `refs/heads/x/foo`,
+        # false-flagging a genuinely unpushed branch. The output is a single
+        # line, so `grep -q` consuming it before ls-remote blocks keeps the
+        # pipe safe under pipefail — don't widen this query.
+        if git ls-remote origin "refs/heads/$branch" 2>/dev/null | grep -q .; then
+            echo "merge-pr: branch '$branch' is on origin, but local tracking config" >&2
+            echo "          is wrong, so '@{u}' does not resolve. The branch is" >&2
+            echo "          already pushed — this is a config issue, not a missing push." >&2
+            printf "merge-pr: repair with 'git branch --set-upstream-to=origin/%s' and continue? [y/N] " "$branch" >&2
+            # Default to bailing: empty input (just Enter), EOF, or a
+            # non-interactive stdin all leave tracking untouched.
+            read -r reply || reply=""
+            case "$reply" in
+                [Yy]*)
+                    git branch --set-upstream-to="origin/$branch" >&2
+                    ;;
+                *)
+                    echo "merge-pr: aborted — fix tracking config and re-run." >&2
+                    exit 1
+                    ;;
+            esac
+        else
+            echo "merge-pr: branch '$branch' has no upstream — push first" >&2
+            exit 1
+        fi
+    fi
+
+    # Pre-flight: no unpushed commits.
+    unpushed=$(git rev-list --count '@{u}..HEAD')
+    if [[ "$unpushed" -ne 0 ]]; then
+        echo "merge-pr: branch '$branch' has $unpushed unpushed commit(s) — push first" >&2
         exit 1
     fi
-fi
-
-# Pre-flight: no unpushed commits.
-unpushed=$(git rev-list --count '@{u}..HEAD')
-if [[ "$unpushed" -ne 0 ]]; then
-    echo "merge-pr: branch '$branch' has $unpushed unpushed commit(s) — push first" >&2
-    exit 1
 fi
 
 # Pre-flight: refuse a dirty worktree *before* merging. This runs up front
@@ -155,19 +176,54 @@ elif command -v tmux >/dev/null 2>&1 && tmux list-panes -a >/dev/null 2>&1; then
     )
 fi
 
-# Dispatch on PR state.
+# Dispatch on PR state, mode-aware. An OPEN PR is acted on (merge or close);
+# a state that already matches our goal (MERGED for merge, CLOSED for close)
+# falls through to cleanup; the mismatched terminal state and anything else
+# is refused.
 case "$pr_state" in
     OPEN)
-        gh pr merge "${gh_args[@]}"
+        if [[ -n "$close_mode" ]]; then
+            gh pr close "${gh_args[@]}"
+        else
+            gh pr merge "${gh_args[@]}"
+        fi
         ;;
     MERGED)
+        if [[ -n "$close_mode" ]]; then
+            echo "merge-pr: refusing to close a MERGED PR" >&2
+            exit 1
+        fi
         echo "merge-pr: PR already MERGED — proceeding to cleanup"
+        ;;
+    CLOSED)
+        # Only meaningful in close mode; in merge mode this falls through to
+        # the `*` refusal below (preserving the existing message).
+        if [[ -n "$close_mode" ]]; then
+            echo "merge-pr: PR already CLOSED — proceeding to cleanup"
+        else
+            echo "merge-pr: refusing to act on PR in state '$pr_state'" >&2
+            exit 1
+        fi
         ;;
     *)
         echo "merge-pr: refusing to act on PR in state '$pr_state'" >&2
         exit 1
         ;;
 esac
+
+# Close mode only: delete the remote branch explicitly. A merge gets this for
+# free from GitHub's delete_branch_on_merge (see bin/gh-delete-branch-on-merge),
+# but that setting fires only on merge, not close — so an abandoned PR would
+# otherwise leave its branch stranded on origin. Tolerate failure: the branch
+# may already be gone, and that must not abort local teardown. Run here, while
+# cwd is still the worktree and before the tmux kill, to keep the "kill tmux
+# LAST" invariant. Covers both the OPEN-close and already-CLOSED paths.
+if [[ -n "$close_mode" ]]; then
+    if ! git push origin --delete "$branch"; then
+        echo "merge-pr: warning: could not delete remote branch 'origin/$branch'" >&2
+        echo "          (it may already be gone); continuing with local cleanup." >&2
+    fi
+fi
 
 # Cleanup. Order matters:
 #   1. cd out of the worktree before removing it.

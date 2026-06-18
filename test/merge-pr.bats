@@ -305,3 +305,120 @@ esac
     [ "$status" -eq 0 ]
     [ ! -d "$WORKTREE_DIR" ]
 }
+
+# #950: --close tears down a PR without merging. The gh stub distinguishes
+# `pr view` (state lookup) from `pr close`/`pr merge`, recording a marker
+# file for whichever action runs. An OPEN PR must invoke `gh pr close`, never
+# `gh pr merge`, then run the full teardown including remote-branch deletion.
+@test "close: --close on an OPEN PR closes, cleans up, and deletes the remote branch" {
+    _ready_repo
+    setup_feature_worktree
+    unset TMUX
+    stub_command tmux 'exit 0'
+    stub_command gh '
+case "$2" in
+    view) printf "OPEN\tmain\n" ;;
+    close) : >"$BATS_TEST_TMPDIR/close-was-called" ;;
+    merge) : >"$BATS_TEST_TMPDIR/merge-was-called" ;;
+esac
+'
+
+    run "$MERGE_PR" --close
+    [ "$status" -eq 0 ]
+    [ -e "$BATS_TEST_TMPDIR/close-was-called" ]
+    [ ! -e "$BATS_TEST_TMPDIR/merge-was-called" ]
+    [ ! -d "$WORKTREE_DIR" ]
+    run git -C "$REPO_DIR" branch --list feature
+    [ -z "$output" ]
+    # cwd was the now-removed worktree; ls-remote needs a valid cwd.
+    cd "$REPO_DIR"
+    run git ls-remote "$UPSTREAM_DIR" refs/heads/feature
+    [ -z "$output" ]
+}
+
+# An already-CLOSED PR skips the close call but still runs full teardown.
+@test "close: --close on a CLOSED PR skips close and still tears down" {
+    _ready_repo
+    setup_feature_worktree
+    unset TMUX
+    stub_command tmux 'exit 0'
+    stub_command gh '
+case "$2" in
+    view) printf "CLOSED\tmain\n" ;;
+    close) : >"$BATS_TEST_TMPDIR/close-was-called" ;;
+esac
+'
+
+    run "$MERGE_PR" --close
+    [ "$status" -eq 0 ]
+    [ ! -e "$BATS_TEST_TMPDIR/close-was-called" ]
+    [ ! -d "$WORKTREE_DIR" ]
+    run git -C "$REPO_DIR" branch --list feature
+    [ -z "$output" ]
+    # cwd was the now-removed worktree; ls-remote needs a valid cwd.
+    cd "$REPO_DIR"
+    run git ls-remote "$UPSTREAM_DIR" refs/heads/feature
+    [ -z "$output" ]
+}
+
+# Close mode abandons the branch, so an unpushed commit must NOT bail the
+# pre-flight (contrast the merge-mode "unpushed commits" test above).
+@test "close: --close skips the unpushed-commit pre-flight" {
+    _ready_repo
+    setup_feature_worktree
+    unset TMUX
+    stub_command tmux 'exit 0'
+    git -c commit.gpgsign=false commit -q --allow-empty -m "extra unpushed"
+    stub_command gh '
+case "$2" in
+    view) printf "OPEN\tmain\n" ;;
+    close) : >"$BATS_TEST_TMPDIR/close-was-called" ;;
+esac
+'
+
+    run "$MERGE_PR" --close
+    [ "$status" -eq 0 ]
+    [ -e "$BATS_TEST_TMPDIR/close-was-called" ]
+    [ ! -d "$WORKTREE_DIR" ]
+}
+
+# Closing a MERGED PR is nonsensical; refuse it.
+@test "close: --close on a MERGED PR refuses" {
+    _ready_repo
+    git checkout -q -b feature
+    git push -q -u origin feature
+    stub_command gh 'printf "MERGED\tmain\n"'
+
+    run "$MERGE_PR" --close
+    [ "$status" -eq 1 ]
+    [[ "$output" == *"refusing to close a MERGED PR"* ]]
+}
+
+# Remote-branch deletion is tolerant: an already-gone branch still exits 0
+# and completes local cleanup. Delete origin/feature before running.
+@test "close: --close tolerates an already-deleted remote branch" {
+    _ready_repo
+    setup_feature_worktree
+    unset TMUX
+    stub_command tmux 'exit 0'
+    git push -q origin --delete feature
+    stub_command gh '
+case "$2" in
+    view) printf "OPEN\tmain\n" ;;
+    close) : >"$BATS_TEST_TMPDIR/close-was-called" ;;
+esac
+'
+
+    run "$MERGE_PR" --close
+    [ "$status" -eq 0 ]
+    [ -e "$BATS_TEST_TMPDIR/close-was-called" ]
+    [ ! -d "$WORKTREE_DIR" ]
+    run git -C "$REPO_DIR" branch --list feature
+    [ -z "$output" ]
+}
+
+@test "close: usage mentions --close" {
+    run "$MERGE_PR" -h
+    [ "$status" -eq 0 ]
+    [[ "$output" == *"--close"* ]]
+}
