@@ -183,6 +183,9 @@ fi
 case "$pr_state" in
     OPEN)
         if [[ -n "$close_mode" ]]; then
+            # Like `gh pr merge`, this resolves the PR from the current
+            # branch's git context (implicit-branch detection); any extra
+            # positional/flag args pass through.
             gh pr close "${gh_args[@]}"
         else
             gh pr merge "${gh_args[@]}"
@@ -214,14 +217,21 @@ esac
 # Close mode only: delete the remote branch explicitly. A merge gets this for
 # free from GitHub's delete_branch_on_merge (see bin/gh-delete-branch-on-merge),
 # but that setting fires only on merge, not close — so an abandoned PR would
-# otherwise leave its branch stranded on origin. Tolerate failure: the branch
-# may already be gone, and that must not abort local teardown. Run here, while
-# cwd is still the worktree and before the tmux kill, to keep the "kill tmux
-# LAST" invariant. Covers both the OPEN-close and already-CLOSED paths.
+# otherwise leave its branch stranded on origin. Run here, while cwd is still
+# the worktree and before the tmux kill, to keep the "kill tmux LAST"
+# invariant. Covers both the OPEN-close and already-CLOSED paths.
 if [[ -n "$close_mode" ]]; then
-    if ! git push origin --delete "$branch"; then
-        echo "merge-pr: warning: could not delete remote branch 'origin/$branch'" >&2
-        echo "          (it may already be gone); continuing with local cleanup." >&2
+    # Only delete the remote branch if origin actually has it. Close mode
+    # tolerates a never-pushed or already-deleted branch (see the skipped
+    # upstream pre-flight above), so a missing remote ref is normal here,
+    # not an error worth warning about. ls-remote takes the full ref path
+    # to avoid the tail-match pitfall noted earlier in this script. Used as
+    # an `if` condition, `--exit-code`'s non-zero "ref absent" status is
+    # consumed by the `if` and never aborts the script under `set -e`.
+    if git ls-remote --exit-code origin "refs/heads/$branch" >/dev/null 2>&1; then
+        if ! git push origin --delete "$branch"; then
+            echo "merge-pr: warning: could not delete remote branch 'origin/$branch'; continuing with local cleanup." >&2
+        fi
     fi
 fi
 

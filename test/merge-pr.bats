@@ -417,6 +417,39 @@ esac
     [ -z "$output" ]
 }
 
+# A branch that was NEVER pushed to origin must close and clean up silently:
+# close mode skips the upstream pre-flight, and the remote-branch deletion is
+# guarded by ls-remote, so the missing remote ref is normal — no warning.
+@test "close: --close on a never-pushed branch is silent about the remote branch" {
+    _ready_repo
+    # Build the worktree by hand (unlike setup_feature_worktree, which pushes):
+    # branch "feature" exists locally only, never on origin.
+    WORKTREE_DIR="$BATS_TEST_TMPDIR/feature-wt"
+    git worktree add -q "$WORKTREE_DIR" -b feature
+    cd "$WORKTREE_DIR"
+    git config user.email "test@example.com"
+    git config user.name "Test"
+    unset TMUX
+    stub_command tmux 'exit 0'
+    stub_command gh '
+case "$2" in
+    view) printf "OPEN\tmain\n" ;;
+    close) : >"$BATS_TEST_TMPDIR/close-was-called" ;;
+esac
+'
+
+    run "$MERGE_PR" --close
+    [ "$status" -eq 0 ]
+    [ -e "$BATS_TEST_TMPDIR/close-was-called" ]
+    [ ! -d "$WORKTREE_DIR" ]
+    # The never-pushed path must not warn about a missing remote branch.
+    # Check $output here, before the branch-list `run` clobbers it.
+    [[ "$output" != *"could not delete remote branch"* ]]
+    [[ "$output" != *"warning"* ]]
+    run git -C "$REPO_DIR" branch --list feature
+    [ -z "$output" ]
+}
+
 @test "close: usage mentions --close" {
     run "$MERGE_PR" -h
     [ "$status" -eq 0 ]
