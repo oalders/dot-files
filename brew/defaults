@@ -1,5 +1,5 @@
 tap "buo/cask-upgrade"
-cask "tailscale"
+cask "tailscale-app"
 brew "asciinema"
 brew "ansible-lint"
 brew "aspell"

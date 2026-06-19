@@ -29,6 +29,14 @@ brew upgrade
 # I so rarely set up a brand new macOS environment.
 brew cleanup
 brew doctor || true
+
+# Homebrew 6+ ignores third-party taps unless they're explicitly trusted.
+# Trust the taps we deliberately use so brew bundle can load them.
+if brew help trust >/dev/null 2>&1; then
+    brew trust --tap buo/cask-upgrade
+    brew trust --tap felixkratz/formulae
+fi
+
 brew bundle install --file=brew/defaults
 brew bundle install --file=brew/local-only
 # brew bundle install --file=brew/mas
