@@ -90,6 +90,12 @@ if is os name eq darwin; then
     add_path "/Applications/WezTerm.app/Contents/MacOS"
     add_path "/Applications/Docker.app/Contents/Resources/bin"
 
+    # The Tailscale GUI cask (tailscale-app) bundles the CLI but doesn't put
+    # it on PATH. Expose it as the conventional lowercase `tailscale` command.
+    if [ -x "/Applications/Tailscale.app/Contents/MacOS/Tailscale" ]; then
+        alias tailscale="/Applications/Tailscale.app/Contents/MacOS/Tailscale"
+    fi
+
     # no build for older Macs
     if is there eza; then
         alias ls=eza
