@@ -80,7 +80,7 @@ if [[ -n "$profile_override" ]]; then
     # message would. The check reads ~/.local/share/claude/... (neither cwd
     # nor $TMPDIR), so nono why's cwd/tmp false-verdict caveat doesn't apply.
     if claude_bin="$(command -v claude)"; then
-        claude_bin="$(readlink -f "$claude_bin")"
+        claude_bin="$(realpath "$claude_bin")"
         if nono why --path "$claude_bin" --op read --profile "$profile" 2>/dev/null | grep -q '^DENIED'; then
             echo "nn: profile '$profile' can't execute the claude binary (missing the claude-code base)." >&2
             echo "nn: it looks like a mixin meant to be composed via extends, not invoked directly." >&2
