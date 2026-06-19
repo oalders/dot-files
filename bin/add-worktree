@@ -65,7 +65,20 @@ cd "$worktree_dir" || exit 1
 if [[ "$type" == "pr" ]]; then
     gh pr checkout "$number"
 elif [[ "$type" == "issue" ]]; then
-    gh issue edit "$number" --add-label "in progress"
+    # The "in progress" label may not exist in the repo yet. Try to create
+    # it first, then label the issue. Neither step should abort worktree
+    # setup: if we lack permission (or the label already exists, or the
+    # issue can't be found), warn and carry on.
+    # 2ECC40 is a traffic-light green.
+    if ! label_out=$(gh label create "in progress" --color 2ECC40 2>&1); then
+        case $label_out in
+            *already\ exists*) ;; # label is already there — nothing to do
+            *) echo "Warning: could not create 'in progress' label: $label_out" >&2 ;;
+        esac
+    fi
+    if ! gh issue edit "$number" --add-label "in progress"; then
+        echo "Warning: could not add 'in progress' label to issue #$number" >&2
+    fi
     # Queue the first `nn` launch in this worktree to auto-run
     # `/kitchen-sink:fix-gh-issue` (it infers issue #$number from the
     # fix-<n> branch name). bin/nn reads this marker, hands the line to
