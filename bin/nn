@@ -66,6 +66,28 @@ if [[ -n "$profile_override" ]]; then
         profile="$profile_override"
     fi
     profile_label="$profile (--profile override)"
+
+    # A bare mixin override (oalders-perl, oalders-net, oalders-uv, ...) is a
+    # net-free filesystem sibling meant to be composed via `extends`, not
+    # invoked directly. It doesn't extend the claude-code base, so the sandbox
+    # never grants read+execute on the claude binary and the launch dies with
+    # a cryptic "/usr/bin/env: 'claude': Permission denied" (exit 126). Ask
+    # nono whether the resolved profile can actually read claude and refuse
+    # early with a useful message if it explicitly can't. Only an explicit
+    # DENIED verdict blocks: an unknown profile name (nono why exits non-zero,
+    # printing neither verdict) or any other nono-why error falls through to
+    # `nono run`, which reports those more accurately than a mixin-specific
+    # message would. The check reads ~/.local/share/claude/... (neither cwd
+    # nor $TMPDIR), so nono why's cwd/tmp false-verdict caveat doesn't apply.
+    if claude_bin="$(command -v claude)"; then
+        claude_bin="$(readlink -f "$claude_bin")"
+        if nono why --path "$claude_bin" --op read --profile "$profile" 2>/dev/null | grep -q '^DENIED'; then
+            echo "nn: profile '$profile' can't execute the claude binary (missing the claude-code base)." >&2
+            echo "nn: it looks like a mixin meant to be composed via extends, not invoked directly." >&2
+            echo "nn: run plain 'nn' to auto-compose, or use --profile oalders-perl-test for open-net Perl tests." >&2
+            exit 1
+        fi
+    fi
 fi
 
 dir="$PWD"

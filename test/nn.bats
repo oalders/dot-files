@@ -259,6 +259,44 @@ setup() {
     [ "$(grep -Fx -A1 -m1 -- '--read-file' "$BATS_TEST_TMPDIR/nono-argv" | tail -n1)" = "/usr/bin/env" ]
 }
 
+@test "bin/nn --profile refuses a mixin that can't execute the claude binary" {
+    # claude must resolve for the guard to run; stub it so the test doesn't
+    # depend on a real install. nono why reports the resolved profile can't
+    # read claude (the mixin footgun, #965), so the guard must refuse before
+    # ever reaching `nono run`.
+    stub_command claude 'true'
+    stub_command nono 'if [ "$1" = why ]; then echo DENIED; exit 0; fi; printf "%s\n" "$@" > "$BATS_TEST_TMPDIR/nono-argv"'
+    run "$NN" --profile oalders-perl
+    [ "$status" -eq 1 ]
+    [[ "$output" == *"can't execute the claude binary"* ]]
+    # Refused before launching: nono run was never reached, so no argv dump.
+    [ ! -f "$BATS_TEST_TMPDIR/nono-argv" ]
+}
+
+@test "bin/nn --profile proceeds when the profile can execute the claude binary" {
+    # An ALLOWED verdict means the override extends the claude-code base; the
+    # guard must let it through to nono run with the override profile intact.
+    stub_command claude 'true'
+    stub_command nono 'if [ "$1" = why ]; then echo ALLOWED; exit 0; fi; printf "%s\n" "$@" > "$BATS_TEST_TMPDIR/nono-argv"'
+    run "$NN" --profile oalders
+    [ "$status" -eq 0 ]
+    [ "$(grep -Fx -A1 -m1 -- '--profile' "$BATS_TEST_TMPDIR/nono-argv" | tail -n1)" = "oalders" ]
+}
+
+@test "bin/nn --profile falls through to nono for an unknown profile name" {
+    # nono why exits non-zero for an unknown profile, printing neither verdict.
+    # The guard must NOT mistake that for a mixin: it falls through to nono
+    # run, which surfaces its own profile-not-found error rather than the
+    # misleading mixin warning. This is the deliberate divergence from #965's
+    # `! ALLOWED` proposal — refuse only on an explicit DENIED.
+    stub_command claude 'true'
+    stub_command nono 'if [ "$1" = why ]; then exit 1; fi; printf "%s\n" "$@" > "$BATS_TEST_TMPDIR/nono-argv"'
+    run "$NN" --profile no-such-profile
+    [ "$status" -eq 0 ]
+    [[ "$output" != *"can't execute the claude binary"* ]]
+    grep -Fxq -- "no-such-profile" "$BATS_TEST_TMPDIR/nono-argv"
+}
+
 @test "bin/nn skips the queued prompt when the user supplies their own" {
     mkdir -p .tmp
     printf '%s\n' '/kitchen-sink:fix-gh-issue' >.tmp/fix-gh-issue.pending
