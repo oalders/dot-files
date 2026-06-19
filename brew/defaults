@@ -1,4 +1,5 @@
 tap "buo/cask-upgrade"
+cask "google-chrome"
 cask "tailscale-app"
 brew "asciinema"
 brew "ansible-lint"
