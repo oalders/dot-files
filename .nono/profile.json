@@ -5,10 +5,8 @@
       "~/dot-files/bashrc",
       "~/dot-files/bash_profile",
       "~/dot-files/profile"
-    ]
-  },
-  "policy": {
-    "override_deny": [
+    ],
+    "bypass_protection": [
       "~/dot-files/bashrc",
       "~/dot-files/bash_profile",
       "~/dot-files/profile"
