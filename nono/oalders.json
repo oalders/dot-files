@@ -1,6 +1,7 @@
 {
   "extends": [
     "oalders-core",
-    "oalders-net"
+    "oalders-net",
+    "oalders-playwright-net"
   ]
 }

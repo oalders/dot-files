@@ -4,9 +4,10 @@ Wraps Claude Code in the [nono](https://nono.sh/) sandbox. Invoke via `nn` (from
 
 ## Files
 
-- `oalders.json` — nono profile composition root (`extends: [oalders-core, oalders-net]`), symlinked to `~/.config/nono/profiles/oalders.json`
+- `oalders.json` — nono profile composition root (`extends: [oalders-core, oalders-net, oalders-playwright-net]`), symlinked to `~/.config/nono/profiles/oalders.json`
 - `oalders-core.json` — net-free shared base (always-on MCP/runtime siblings, security policy, cross-cutting filesystem grants), symlinked to `~/.config/nono/profiles/oalders-core.json`
 - `oalders-net.json` — all outbound network rules for the default chain (curated `allow_domain`, `open_port`, `network_profile: null`), symlinked to `~/.config/nono/profiles/oalders-net.json`
+- `oalders-playwright-net.json` — Playwright browser-download CDN hosts for the default chain (paired with the net-free `oalders-playwright`), symlinked to `~/.config/nono/profiles/oalders-playwright-net.json`
 - `oalders-open.json` — permissive opt-in profile (`extends: [oalders-core]`, no `oalders-net`): full outbound network with the same filesystem lockdown as `oalders`, symlinked to `~/.config/nono/profiles/oalders-open.json`
 - `claude-settings.json` — `{"sandbox": {"enabled": false}}` passed to claude via `--settings`, symlinked to `~/.config/nono/claude-settings.json` (so claude's built-in sandbox stays off while nono does the real work)
 
@@ -24,10 +25,11 @@ Project-local profiles can `"extends": "oalders"` to layer additional grants on 
 
 ### Net-free base vs. network siblings
 
-`oalders` is now `{"extends": ["oalders-core", "oalders-net"]}`:
+`oalders` is now `{"extends": ["oalders-core", "oalders-net", "oalders-playwright-net"]}`:
 
 - **`oalders-core`** holds the always-on siblings, the `security` block, and the cross-cutting `filesystem` grants — and **no `network`**.
-- **`oalders-net`** holds *all* outbound rules: the curated `allow_domain` list, `open_port`, the defensive `network_profile: null`, and uv's PyPI domains.
+- **`oalders-net`** holds *all* cross-cutting outbound rules: the curated `allow_domain` list, `open_port`, the defensive `network_profile: null`, and uv's PyPI domains.
+- **`oalders-playwright-net`** holds the Playwright browser-download CDN hosts. It pairs with the always-on net-free `oalders-playwright` (Chromium-bundle filesystem grant) the same way `oalders-perl-net` pairs with `oalders-perl` — kept separate so the filesystem grant stays net-free, but composed into the default `oalders` chain (not `oalders-core`) so the permissive profiles don't inherit its allowlist.
 
 The rule that forces this split: nono's `extends` is append-only, and **any** `allow_domain` anywhere in the chain flips nono into proxy allowlist mode (default-deny outbound). There is no way to remove an inherited domain. So every grant sibling (filesystem/runtime) is kept net-free, and all domains/ports live in dedicated `*-net` siblings. A profile that needs open network — like `oalders-perl-test` — composes only net-free grants and adds no `*-net`, leaving outbound and localhost ports unrestricted.
 
@@ -39,7 +41,7 @@ These are global infrastructure — MCP servers Claude relies on, and their runt
 | ------------------- | -------------------------------------------------------------------------------------- |
 | `oalders-uv`        | `~/.local/share/uv` (uv runtime — used by `uvx` and `uv tool install`). Net-free; PyPI domains live in `oalders-net`. |
 | `oalders-serena`    | `~/.serena` (serena MCP config/logs/memories)                                          |
-| `oalders-playwright`| `~/.cache/ms-playwright` (Chromium bundle), `/dev/shm` (browser IPC)                   |
+| `oalders-playwright`| `~/.cache/ms-playwright` (Chromium bundle), `/dev/shm` (browser IPC). Net-free; the browser-download CDN hosts live in the paired `oalders-playwright-net` (composed into `oalders.json`'s `extends`, not `oalders-core`'s, so only the default chain gets them). |
 | `oalders-chrome`    | `/opt/google/chrome` (browser binary), `~/.cache/superpowers` (browser session dirs)   |
 
 ### Project-detected (mixed in by `nn`)
