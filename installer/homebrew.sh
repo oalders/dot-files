@@ -33,6 +33,20 @@ brew bundle install --file=brew/defaults
 brew bundle install --file=brew/local-only
 # brew bundle install --file=brew/mas
 
+# macOS ships bash 3.2, which is too old for this setup (e.g. oh-my-posh's
+# generated init uses bash 4.2+ syntax like `[[ -v MC_SID ]]`). The brewfile
+# above installs a modern bash, so register it and make it the login shell.
+brew_bash="$(brew --prefix)/bin/bash"
+if [ -x "$brew_bash" ]; then
+    if ! grep -qxF "$brew_bash" /etc/shells; then
+        echo "$brew_bash" | sudo tee -a /etc/shells >/dev/null
+    fi
+    current_shell=$(dscl . -read "/Users/$USER" UserShell | awk '{print $2}')
+    if [ "$current_shell" != "$brew_bash" ]; then
+        chsh -s "$brew_bash"
+    fi
+fi
+
 #if is os version gte 14; then
     #brew install borders
 #fi
