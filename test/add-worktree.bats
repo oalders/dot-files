@@ -109,6 +109,55 @@ setup() {
     grep -Fxq '/kitchen-sink:fix-gh-issue' "$worktree/.tmp/fix-gh-issue.pending"
 }
 
+@test "add-worktree tries to create the in progress label for fix-<n> branches" {
+    setup_git_repo
+    export GH_LOG="$BATS_TEST_TMPDIR/gh.log"
+    stub_command gh 'printf "%s\n" "$*" >>"$GH_LOG"
+exit 0'
+    run "$ADD_WORKTREE" fix-952
+    [ "$status" -eq 0 ]
+    # Created with a traffic-light green color.
+    grep -q "label create in progress --color 2ECC40" "$GH_LOG"
+}
+
+@test "add-worktree continues when gh issue edit fails to add the label" {
+    setup_git_repo
+    # Simulate the label add failing (e.g. label missing, or no perms). The
+    # script must warn and carry on, not abort worktree setup.
+    stub_command gh 'case "$*" in
+        "issue edit"*) echo "could not add label: not found" >&2; exit 1 ;;
+        *) exit 0 ;;
+    esac'
+    run "$ADD_WORKTREE" fix-952
+    [ "$status" -eq 0 ]
+
+    local date_stamp repo_name worktree
+    date_stamp="$(date +%Y-%m-%d)"
+    repo_name="$(basename "$REPO_DIR")"
+    worktree="$HOME/.worktree/$repo_name/$date_stamp/fix-952"
+
+    [ -f "$worktree/.tmp/fix-gh-issue.pending" ]
+}
+
+@test "add-worktree continues when it lacks permission to create the label" {
+    setup_git_repo
+    # Simulate `gh label create` being denied (403). The script must warn
+    # and carry on to label the issue and finish setup.
+    stub_command gh 'case "$*" in
+        "label create"*) echo "HTTP 403: Resource not accessible by integration" >&2; exit 1 ;;
+        *) exit 0 ;;
+    esac'
+    run "$ADD_WORKTREE" fix-952
+    [ "$status" -eq 0 ]
+
+    local date_stamp repo_name worktree
+    date_stamp="$(date +%Y-%m-%d)"
+    repo_name="$(basename "$REPO_DIR")"
+    worktree="$HOME/.worktree/$repo_name/$date_stamp/fix-952"
+
+    [ -f "$worktree/.tmp/fix-gh-issue.pending" ]
+}
+
 @test "add-worktree queues nothing for non-fix branches" {
     setup_git_repo
     run "$ADD_WORKTREE" feature-branch
