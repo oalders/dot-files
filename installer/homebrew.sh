@@ -33,9 +33,9 @@ brew bundle install --file=brew/defaults
 brew bundle install --file=brew/local-only
 # brew bundle install --file=brew/mas
 
-if is os version gte 14; then
-    brew install borders
-fi
+#if is os version gte 14; then
+    #brew install borders
+#fi
 
 # if we keep cask "karabiner-elements" in the brewfile we get a dialog asking
 # us to choose a keyboard layout every time this file is executed.

@@ -23,7 +23,7 @@ if is os name eq darwin; then
     # but that fails fairly regularly
     debounce 1 d \
         bash -c \
-        'brew uninstall --cask wezterm@nightly && brew install --cask wezterm@nightly'
+        'brew uninstall --cask wezterm@nightly 2>/dev/null || true; brew install --cask wezterm@nightly'
 elif is os name eq linux; then
     if ! is user sudoer; then
         echo "😭 $USER is not a sudoer"
