@@ -450,6 +450,132 @@ esac
     [ -z "$output" ]
 }
 
+# #966: when merge-pr is run from the MAIN working tree (not a linked
+# worktree), it must still merge and clean up the branch, but skip the
+# worktree-removal step instead of emitting a `fatal:` + failure message.
+# Build the scenario by checking out "feature" directly in the main repo
+# (no `git worktree add`), so worktree_path == main_repo inside the script.
+@test "main tree: merges, deletes branch, switches to base, skips worktree removal" {
+    _ready_repo
+    # _ready_repo leaves cwd in REPO_DIR; make that explicit so the test runs
+    # from the main working tree (not a linked worktree) regardless of helper
+    # changes.
+    cd "$REPO_DIR"
+    git checkout -q -b feature
+    git push -q -u origin feature
+    unset TMUX
+    stub_command tmux 'exit 0'
+    stub_command gh '
+case "$2" in
+    view) printf "OPEN\tmain\n" ;;
+    merge) : >"$BATS_TEST_TMPDIR/merge-was-called" ;;
+esac
+'
+
+    run "$MERGE_PR"
+    [ "$status" -eq 0 ]
+    [ -e "$BATS_TEST_TMPDIR/merge-was-called" ]
+    # No worktree-removal attempt: no fatal, no failure message.
+    [[ "$output" != *"fatal"* ]]
+    [[ "$output" != *"failed to remove worktree"* ]]
+    [[ "$output" == *"main working tree"* ]]
+    # The main checkout still exists, the branch is gone, and HEAD is on base.
+    [ -d "$REPO_DIR" ]
+    run git -C "$REPO_DIR" branch --list feature
+    [ -z "$output" ]
+    run git -C "$REPO_DIR" rev-parse --abbrev-ref HEAD
+    [[ "$output" == "main" ]]
+}
+
+# Main-tree + --close: closes the PR, deletes the remote branch, and cleans up
+# locally without attempting (and failing) to remove the main working tree.
+@test "main tree: --close cleans up and deletes the remote branch, no worktree removal" {
+    _ready_repo
+    cd "$REPO_DIR"
+    git checkout -q -b feature
+    git push -q -u origin feature
+    unset TMUX
+    stub_command tmux 'exit 0'
+    stub_command gh '
+case "$2" in
+    view) printf "OPEN\tmain\n" ;;
+    close) : >"$BATS_TEST_TMPDIR/close-was-called" ;;
+    merge) : >"$BATS_TEST_TMPDIR/merge-was-called" ;;
+esac
+'
+
+    run "$MERGE_PR" --close
+    [ "$status" -eq 0 ]
+    [ -e "$BATS_TEST_TMPDIR/close-was-called" ]
+    [ ! -e "$BATS_TEST_TMPDIR/merge-was-called" ]
+    [[ "$output" != *"fatal"* ]]
+    [ -d "$REPO_DIR" ]
+    run git -C "$REPO_DIR" branch --list feature
+    [ -z "$output" ]
+    # cwd is still REPO_DIR (the main tree is never removed), so ls-remote
+    # against the upstream resolves fine without a cd.
+    run git ls-remote "$UPSTREAM_DIR" refs/heads/feature
+    [ -z "$output" ]
+}
+
+# The exact #966 scenario: `gh pr merge -d` already switched to base and
+# deleted the local branch before merge-pr's cleanup runs. The main-tree
+# path must tolerate the already-gone branch and still exit 0 cleanly.
+@test "main tree: tolerates a branch already switched-off and deleted by gh -d" {
+    _ready_repo
+    cd "$REPO_DIR"
+    git checkout -q -b feature
+    git push -q -u origin feature
+    unset TMUX
+    stub_command tmux 'exit 0'
+    # Mimic `gh pr merge -d`: on merge, switch to main and delete the branch,
+    # exactly as gh's --delete-branch would, before merge-pr cleans up.
+    stub_command gh '
+case "$2" in
+    view) printf "OPEN\tmain\n" ;;
+    merge) git switch -q main && git branch -D feature ;;
+esac
+'
+
+    run "$MERGE_PR"
+    [ "$status" -eq 0 ]
+    [[ "$output" != *"fatal"* ]]
+    [[ "$output" != *"failed to remove worktree"* ]]
+    [ -d "$REPO_DIR" ]
+    run git -C "$REPO_DIR" branch --list feature
+    [ -z "$output" ]
+}
+
+# Main tree, switch failure: if the PR base has no local branch and no
+# origin/<base> for git to DWIM from, the post-merge `git switch` fails. The
+# script must report it clearly and exit non-zero rather than aborting with a
+# bare git error — and must leave the (already-merged) branch in place.
+@test "main tree: reports cleanly when it cannot switch off the branch to the base" {
+    _ready_repo
+    cd "$REPO_DIR"
+    git checkout -q -b feature
+    git push -q -u origin feature
+    unset TMUX
+    stub_command tmux 'exit 0'
+    # Base "ghost" exists neither locally nor on origin, so `git switch ghost`
+    # cannot succeed.
+    stub_command gh '
+case "$2" in
+    view) printf "OPEN\tghost\n" ;;
+    merge) : >"$BATS_TEST_TMPDIR/merge-was-called" ;;
+esac
+'
+
+    run "$MERGE_PR"
+    [ "$status" -eq 1 ]
+    [ -e "$BATS_TEST_TMPDIR/merge-was-called" ]
+    [[ "$output" == *"could not switch off 'feature' to base 'ghost'"* ]]
+    # The branch survives (left for manual cleanup); main tree intact.
+    [ -d "$REPO_DIR" ]
+    run git -C "$REPO_DIR" branch --list feature
+    [[ "$output" == *"feature"* ]]
+}
+
 @test "close: usage mentions --close" {
     run "$MERGE_PR" -h
     [ "$status" -eq 0 ]

@@ -143,8 +143,11 @@ fi
 worktree_path=$(git rev-parse --show-toplevel)
 git_common_dir=$(git rev-parse --git-common-dir)
 # In a linked worktree, --git-common-dir returns the main repo's .git;
-# its parent is the main repo working directory.
-main_repo=$(cd "$git_common_dir" && cd .. && pwd)
+# its parent is the main repo working directory. Resolve with `pwd -P`
+# (physical path) so it matches `--show-toplevel`, which is already
+# symlink-resolved — otherwise a cwd reached through a symlink would make
+# the two diverge and break the main-working-tree comparison below.
+main_repo=$(cd "$git_common_dir" && cd .. && pwd -P)
 
 # PR lookup: state + baseRefName in a single call.
 if ! pr_info=$(gh pr view --json state,baseRefName -q '[.state, .baseRefName] | @tsv' 2>/dev/null); then
@@ -233,6 +236,40 @@ if [[ -n "$close_mode" ]]; then
             echo "merge-pr: warning: could not delete remote branch 'origin/$branch'; continuing with local cleanup." >&2
         fi
     fi
+fi
+
+# Main-working-tree case. When merge-pr is run from the main checkout rather
+# than a linked worktree, worktree_path and main_repo resolve to the same
+# directory (--git-common-dir is the bare ".git", whose parent is the cwd).
+# git will never remove the main working tree, so the worktree-removal block
+# below would only emit a `fatal:` and a misleading "remove it manually" hint.
+# The process kill and tmux session kill also target a throwaway worktree —
+# here they'd act on the main checkout we're standing in (the proc kill would
+# even take out this very script). So skip that whole teardown: just switch
+# off the merged/closed branch and delete it, then report success.
+if [[ "$worktree_path" == "$main_repo" ]]; then
+    # git refuses to delete the branch currently checked out here, so switch
+    # to the PR's base first. If `gh pr merge -d` already switched away and
+    # deleted the branch, both steps are simply skipped (HEAD is no longer on
+    # "$branch", and the branch ref is gone).
+    #
+    # The switch can legitimately fail — e.g. the base has no local branch and
+    # no origin/<base> for git to DWIM from (shallow clone, base never
+    # fetched). Catch that instead of letting `set -e` abort with a bare git
+    # error: the PR is already merged/closed, so report clearly and leave the
+    # branch in place for the user to remove manually.
+    if [[ "$(git rev-parse --abbrev-ref HEAD)" == "$branch" ]]; then
+        if ! git switch "$pr_base"; then
+            echo "merge-pr: PR handled, but could not switch off '$branch' to base '$pr_base'." >&2
+            echo "          The local branch was left in place — switch away and delete it manually." >&2
+            exit 1
+        fi
+    fi
+    if git show-ref --verify --quiet "refs/heads/$branch"; then
+        git branch -D "$branch"
+    fi
+    echo "merge-pr: ran from the main working tree — no worktree to remove; cleanup done."
+    exit 0
 fi
 
 # Cleanup. Order matters:
