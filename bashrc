@@ -79,7 +79,11 @@ if is os name eq darwin; then
     add_path "/usr/local/sbin"
     add_path "/usr/local/bin"
 
-    # More modern homebrew uses
+    # More modern homebrew uses. macOS path_helper seeds /opt/homebrew/bin
+    # via /etc/paths.d/homebrew, but lands it after /bin, so a bare add_path
+    # would no-op and leave the system bash 3.2 shadowing Homebrew's. Strip
+    # the stale entry first so we can force it to the front.
+    remove_path "/opt/homebrew/bin"
     add_path "/opt/homebrew/bin"
     add_path "/opt/homebrew/sbin"
 

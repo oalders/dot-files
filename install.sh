@@ -32,6 +32,7 @@ run_mac_installers() {
         # https://github.com/kcrawford/dockutil/issues/127
         # ./installer/dockutil.sh
         #./configure/dock.sh
+        ./configure/macos.sh
         ./installer/spoon-installer.sh
     )
 
@@ -56,7 +57,6 @@ run_general_installers() {
         ./installer/npm.sh
         ./installer/cpan.sh
         ./installer/cargo.sh
-        ./installer/cz.sh
         ./installer/imgcat.sh
         ./configure/bat.sh
         ./installer/oh-my-posh.sh

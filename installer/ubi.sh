@@ -84,7 +84,6 @@ maybe_install bensadeh/tailspin --exe tspin
 maybe_install charmbracelet/gum
 maybe_install cloudflare/cloudflared
 maybe_install crate-ci/typos
-maybe_install gohugoio/hugo --matching extended --tag v0.161.1
 maybe_install golangci/golangci-lint
 maybe_install houseabsolute/omegasort
 maybe_install houseabsolute/precious
@@ -99,6 +98,13 @@ maybe_install oalders/is
 maybe_install sigstore/cosign
 maybe_install stripe/stripe-cli --exe stripe
 maybe_install tummychow/git-absorb
+
+# hugo only ships .pkg archives for macOS, which ubi can't extract, so on darwin
+# it is installed via Homebrew (see brew/defaults). Linux gets the extended
+# tar.gz via ubi.
+if ! is os name eq darwin; then
+    maybe_install gohugoio/hugo --matching extended --tag v0.161.1
+fi
 
 if is cli output stdout hostname eq wolfblitzer; then
     delta_version=0.16.5

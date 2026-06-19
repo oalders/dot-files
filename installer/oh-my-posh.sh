@@ -31,5 +31,5 @@ fi
 
 font='JetBrainsMono'
 if ! is cli output stdout fc-list --arg=': family' like "$font Nerd Font"; then
-    oh-my-posh font install $font
+    oh-my-posh font install --headless $font
 fi
