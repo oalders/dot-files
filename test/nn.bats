@@ -347,6 +347,9 @@ setup() {
     # for every sandbox would needlessly widen idle and non-browser sessions.
     run "$NN"
     [ "$status" -eq 0 ]
+    # Guard against a vacuous pass: if the stub never wrote the argv dump the
+    # negative greps would "succeed" on a missing file and mask a regression.
+    [ -f "$BATS_TEST_TMPDIR/nono-argv" ]
     ! grep -Fxq -- "--open-port" "$BATS_TEST_TMPDIR/nono-argv"
     ! grep -Fxq -- "CHROME_WS_PORT=9222" "$BATS_TEST_TMPDIR/nono-argv"
 }
@@ -356,5 +359,6 @@ setup() {
     # through to claude (which would reject the unknown flag).
     run "$NN" --chrome
     [ "$status" -eq 0 ]
+    [ -f "$BATS_TEST_TMPDIR/nono-argv" ]
     ! grep -Fxq -- "--chrome" "$BATS_TEST_TMPDIR/nono-argv"
 }
