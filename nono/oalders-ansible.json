@@ -1,0 +1,11 @@
+{
+  "meta": {
+    "name": "oalders-ansible",
+    "description": "Ansible CLI mixin: read the pipx-installed ansible venv so its binaries (ansible-vault / ansible-playbook) can run. Filesystem only; no network egress."
+  },
+  "filesystem": {
+    "read": [
+      "~/.local/share/pipx/venvs/ansible"
+    ]
+  }
+}
