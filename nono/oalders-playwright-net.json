@@ -1,13 +1,14 @@
 {
   "meta": {
     "name": "oalders-playwright-net",
-    "description": "Playwright browser-download CDN hosts (cdn.playwright.dev entry point plus the prss.microsoft.com / azureedge.net blob hosts), split out of oalders-playwright so the Chromium-bundle filesystem grant can stay net-free."
+    "description": "Playwright browser-download hosts: the cdn.playwright.dev entry point, its prss.microsoft.com / azureedge.net blob hosts, and storage.googleapis.com (cdn.playwright.dev 307-redirects the `chromium` = Chrome for Testing build to the chrome-for-testing-public GCS bucket). Split out of oalders-playwright so the Chromium-bundle filesystem grant can stay net-free."
   },
   "network": {
     "allow_domain": [
       "cdn.playwright.dev",
       "playwright.azureedge.net",
-      "playwright.download.prss.microsoft.com"
+      "playwright.download.prss.microsoft.com",
+      "storage.googleapis.com"
     ]
   }
 }

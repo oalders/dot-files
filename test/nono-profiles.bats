@@ -46,7 +46,10 @@ SYMLINKS="$SCRIPT_DIR/installer/symlinks.sh"
 
 @test "oalders-playwright-net.json allows the Playwright download CDN hosts" {
     local host
-    for host in cdn.playwright.dev playwright.download.prss.microsoft.com playwright.azureedge.net; do
+    # storage.googleapis.com is the Chrome for Testing redirect target that the
+    # `chromium` build resolves to (cdn.playwright.dev 307s to it); without it,
+    # `playwright install chromium` 403s at the redirected GCS host (#969).
+    for host in cdn.playwright.dev playwright.download.prss.microsoft.com playwright.azureedge.net storage.googleapis.com; do
         grep -Fq "\"$host\"" "$NONO_DIR/oalders-playwright-net.json" || {
             printf 'missing allow_domain entry: %s\n' "$host"
             false
