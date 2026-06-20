@@ -320,3 +320,41 @@ setup() {
     grep -Fq '"oalders-perl"' .nono/profile.json
     grep -Fq '"oalders-perl-net"' .nono/profile.json
 }
+
+@test "bin/nn --chrome opens the pinned DevTools port and sets CHROME_WS_PORT" {
+    # The superpowers-chrome MCP serves DevTools over a localhost TCP port the
+    # default chain doesn't open. nn opens one fixed port (--open-port) and
+    # pins the MCP to it (CHROME_WS_PORT) so the bind lands on the opened port
+    # instead of a random one in the MCP's 9222-12111 range (#970).
+    run "$NN" --chrome
+    [ "$status" -eq 0 ]
+    grep -Fxq -- "--open-port" "$BATS_TEST_TMPDIR/nono-argv"
+    grep -Fxq -- "9222" "$BATS_TEST_TMPDIR/nono-argv"
+    grep -Fxq -- "CHROME_WS_PORT=9222" "$BATS_TEST_TMPDIR/nono-argv"
+}
+
+@test "bin/nn --chrome pre-creates the crashpad Crash Reports dir" {
+    # The oalders-chrome grant can't create the dir (its parent stays denied),
+    # so nn seeds it outside the sandbox; without it full Chrome SIGTRAPs on
+    # startup in the crashpad handler (#970).
+    run "$NN" --chrome
+    [ "$status" -eq 0 ]
+    [ -d "$HOME/.config/google-chrome/Crash Reports" ]
+}
+
+@test "bin/nn without --chrome opens no DevTools port" {
+    # The port and env pin stay scoped to --chrome sessions; opening the port
+    # for every sandbox would needlessly widen idle and non-browser sessions.
+    run "$NN"
+    [ "$status" -eq 0 ]
+    ! grep -Fxq -- "--open-port" "$BATS_TEST_TMPDIR/nono-argv"
+    ! grep -Fxq -- "CHROME_WS_PORT=9222" "$BATS_TEST_TMPDIR/nono-argv"
+}
+
+@test "bin/nn --chrome is consumed, not forwarded to claude" {
+    # --chrome is an nn-specific flag: it must be parsed out of \$@, not passed
+    # through to claude (which would reject the unknown flag).
+    run "$NN" --chrome
+    [ "$status" -eq 0 ]
+    ! grep -Fxq -- "--chrome" "$BATS_TEST_TMPDIR/nono-argv"
+}

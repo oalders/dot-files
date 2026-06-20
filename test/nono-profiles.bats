@@ -56,3 +56,48 @@ SYMLINKS="$SCRIPT_DIR/installer/symlinks.sh"
         }
     done
 }
+
+# Full Chrome writes its crash database to ~/.config/google-chrome/Crash
+# Reports (a fixed path, not under --user-data-dir), which the claude-code
+# base denies via deny_browser_data_linux. Without a writable crash dir the
+# crashpad handler aborts ("--database is required") and the browser SIGTRAPs
+# on startup under the sandbox (#970). The fix grants that subdir AND
+# bypass-protects it — nono rejects a bypass_protection path that lacks a
+# matching grant, so the two must travel together.
+@test "oalders-chrome.json grants the crashpad Crash Reports dir" {
+    run grep -Fq '"~/.config/google-chrome/Crash Reports"' "$NONO_DIR/oalders-chrome.json"
+    [ "$status" -eq 0 ]
+}
+
+@test "oalders-chrome.json bypass-protects the Crash Reports dir it grants" {
+    # nono: bypass_protection only removes the deny; it must be paired with an
+    # allow/read/write grant for the same path or the sandbox refuses to start.
+    run jq -e '
+        (.filesystem.bypass_protection // []) as $b
+        | (.filesystem.allow // []) as $a
+        | ($b | index("~/.config/google-chrome/Crash Reports")) != null
+          and ($a | index("~/.config/google-chrome/Crash Reports")) != null
+    ' "$NONO_DIR/oalders-chrome.json"
+    [ "$status" -eq 0 ]
+}
+
+# The grant must stay scoped to the Crash Reports subdir. Granting the parent
+# ~/.config/google-chrome (or bypassing it) would expose the sibling Default/
+# dir, where cookies, saved passwords, and sessions live — exactly what
+# deny_browser_data_linux protects.
+@test "oalders-chrome.json does not grant the whole google-chrome data dir" {
+    run jq -e '
+        [.filesystem.allow[]?, .filesystem.read[]?, .filesystem.bypass_protection[]?]
+        | any(. == "~/.config/google-chrome" or . == "~/.config/google-chrome/")
+    ' "$NONO_DIR/oalders-chrome.json"
+    # jq -e exits non-zero when the result is false/null: that is the pass.
+    [ "$status" -ne 0 ]
+}
+
+# oalders-chrome is composed into oalders-core, which the permissive
+# open-network profiles also extend — so it must stay net-free (no network
+# rules), the same invariant the playwright sibling holds (#969).
+@test "oalders-chrome.json carries no network rules (stays net-free)" {
+    run grep -Fq '"network"' "$NONO_DIR/oalders-chrome.json"
+    [ "$status" -ne 0 ]
+}
