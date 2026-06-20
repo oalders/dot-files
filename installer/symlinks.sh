@@ -107,6 +107,7 @@ ln -sf $prefix/nono/oalders-perl.json ~/.config/nono/profiles/oalders-perl.json
 ln -sf $prefix/nono/oalders-perl-net.json ~/.config/nono/profiles/oalders-perl-net.json
 ln -sf $prefix/nono/oalders-perl-test.json ~/.config/nono/profiles/oalders-perl-test.json
 ln -sf $prefix/nono/oalders-playwright.json ~/.config/nono/profiles/oalders-playwright.json
+ln -sf $prefix/nono/oalders-playwright-net.json ~/.config/nono/profiles/oalders-playwright-net.json
 ln -sf $prefix/nono/oalders-serena.json ~/.config/nono/profiles/oalders-serena.json
 ln -sf $prefix/nono/oalders-snap.json ~/.config/nono/profiles/oalders-snap.json
 ln -sf $prefix/nono/oalders-terraform.json ~/.config/nono/profiles/oalders-terraform.json
