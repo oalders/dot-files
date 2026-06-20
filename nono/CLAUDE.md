@@ -68,6 +68,7 @@ These siblings are symlinked into `~/.config/nono/profiles/` but aren't mixed in
 
 | Profile             | Owns                                                                                  |
 | ------------------- | ------------------------------------------------------------------------------------- |
+| `oalders-ansible`   | `~/.local/share/pipx/venvs/ansible` (read+exec; the pipx venv whose binaries `~/.local/bin/ansible*` symlink into). Filesystem only, no network — SSH egress to deploy targets stays out of scope. Opt-in because ansible is deploy-host tooling rarely used inside dev repos. |
 | `oalders-terraform` | `~/.terraform.d`, `~/.terraformrc` (read-only); `registry.terraform.io` (network)     |
 | `oalders-perl-test` | Open outbound network + unrestricted localhost ports (no `allow_domain`/`open_port` in its chain, so `nono why` likewise reports `network_allowed`), with `oalders-core` + `oalders-perl` grants and the full filesystem lockdown. For CPAN test suites needing live network or `Test::TCP`-style ephemeral ports. |
 | `oalders-open`      | Open outbound network (no `allow_domain` in its chain, so `nono why` reports `network_allowed`), with only `oalders-core` grants and the full filesystem lockdown. General-purpose permissive profile for non-Perl sessions that genuinely need unrestricted outbound. |

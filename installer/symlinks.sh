@@ -96,6 +96,7 @@ ln -sf $prefix/oh-my-posh/themes/local.omp.json ~/.config/oh-my-posh/themes/loca
 ln -sf $prefix/claude-pulse/config.json ~/.config/claude-pulse/config.json
 ln -sf $prefix/mcphub/servers.json ~/.config/mcphub/servers.json
 ln -sf $prefix/nix/nix.conf ~/.config/nix/nix.conf
+ln -sf $prefix/nono/oalders-ansible.json ~/.config/nono/profiles/oalders-ansible.json
 ln -sf $prefix/nono/oalders-chrome.json ~/.config/nono/profiles/oalders-chrome.json
 ln -sf $prefix/nono/oalders-core.json ~/.config/nono/profiles/oalders-core.json
 ln -sf $prefix/nono/oalders-go.json ~/.config/nono/profiles/oalders-go.json
