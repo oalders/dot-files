@@ -42,7 +42,7 @@ These are global infrastructure — MCP servers Claude relies on, and their runt
 | `oalders-uv`        | `~/.local/share/uv` (uv runtime — used by `uvx` and `uv tool install`). Net-free; PyPI domains live in `oalders-net`. |
 | `oalders-serena`    | `~/.serena` (serena MCP config/logs/memories)                                          |
 | `oalders-playwright`| `~/.cache/ms-playwright` (Chromium bundle), `/dev/shm` (browser IPC). Net-free; the browser-download CDN hosts live in the paired `oalders-playwright-net` (composed into `oalders.json`'s `extends`, not `oalders-core`'s, so only the default chain gets them). |
-| `oalders-chrome`    | `/opt/google/chrome` (browser binary), `~/.cache/superpowers` (browser session dirs)   |
+| `oalders-chrome`    | `/opt/google/chrome` (browser binary), `~/.cache/superpowers` (browser session dirs), `~/.config/google-chrome/Crash Reports` (crashpad database — grant + `bypass_protection`; see "superpowers-chrome (full Chrome) under the sandbox") |
 
 ### Project-detected (mixed in by `nn`)
 
@@ -136,6 +136,27 @@ cd "${TMPDIR:-/tmp}" && nono run --profile oalders --allow-cwd -- curl -s -o /de
   -X POST "$ANTHROPIC_BASE_URL/v1/messages" -d '{}'
 ```
 Non-407 means the route became OAuth-aware and you can re-adopt the curated bundle. While `network_profile` is null, the `NO_PROXY` reset in `bin/nn` is vestigial (no proxy is started) but harmless — it re-becomes load-bearing the moment the curated bundle is restored.
+
+## superpowers-chrome (full Chrome) under the sandbox
+
+The `superpowers-chrome` MCP (opt-in via `nn --chrome`) drives the **full** Google Chrome build, not Playwright's headless shell. Two things break it under the sandbox; `bin/nn` and `oalders-chrome.json` fix both, gated on `--chrome` (#970).
+
+### 1. Crashpad crash database
+
+Full Chrome writes its crash database to **`~/.config/google-chrome/Crash Reports`** — a fixed path derived from the default config dir, *independent of `--user-data-dir`* (so pointing the session dir at `~/.cache/superpowers` doesn't move it). The base `claude-code` profile denies that tree via the `deny_browser_data_linux` group. When Chrome can't write there it launches its crashpad handler without a `--database` argument; the handler aborts with `chrome_crashpad_handler: --database is required` (plus `recvmsg: Connection reset by peer`), and the browser **SIGTRAPs on startup** (exit 133). The Playwright headless shell is immune because it ships no separate crashpad handler.
+
+The fix is narrow:
+
+- `oalders-chrome.json` grants **only** the `Crash Reports` subdir (`filesystem.allow`) and lifts the deny on it (`filesystem.bypass_protection`). nono rejects a `bypass_protection` path that has no matching grant, so the two must name the **same** path — you can't bypass the parent `~/.config/google-chrome` and allow only the child. Keeping the grant on the subdir leaves the sibling `Default/` (cookies, saved passwords, sessions) denied, which is the whole point of `deny_browser_data_linux`.
+- A grant can't *create* the dir (its parent stays denied), so `bin/nn` pre-creates `~/.config/google-chrome/Crash Reports` outside the sandbox before launch (same pattern as `.tmp`/`.serena-home`). Without the dir, Chrome can't establish the database and the crash returns.
+
+The crashpad-disabling flags the issue floated (`--disable-crashpad`, `--no-crashpad`, `--disable-crash-reporter`, `--disable-features=Crashpad`) do **not** prevent the handler from spawning on this Chrome build — confirmed by experiment — so disabling crashpad is not a viable alternative to the grant.
+
+### 2. DevTools TCP port
+
+The MCP serves the Chrome DevTools endpoint over a localhost TCP port (its default range is 9222–12111), but the default chain only opens `[80, 5000, 5001, 8080]` (`oalders-net`'s `open_port`). The `bind()` fails with `Cannot start http server for devtools` and the MCP can't drive the browser. (Playwright sidesteps this entirely by talking to the browser over a stdio pipe, not a TCP port — which is also why the headless shell "just works".)
+
+`bin/nn` pins the MCP to one fixed port via `CHROME_WS_PORT=9222` and opens exactly that port with `nono run --open-port 9222` (localhost connect + listen). Done via the CLI flag rather than a dedicated `*-net` sibling because nono's `extends` resolves by **name only** (not path), so a net sibling can't compose onto the path-based profiles `nn` builds (`.nono/profile.json` wrappers, `--profile` overrides); the flag is conditional by construction and works for every profile shape. Scoped to `--chrome` so idle and non-browser sandboxes keep the port closed.
 
 ## Kernel requirement
 

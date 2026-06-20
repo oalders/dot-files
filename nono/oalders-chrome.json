@@ -1,14 +1,18 @@
 {
   "meta": {
     "name": "oalders-chrome",
-    "description": "superpowers-chrome MCP: Chrome browser binary and session cache"
+    "description": "superpowers-chrome MCP: Chrome browser binary, session cache, and crashpad database (so full Chrome doesn't SIGTRAP on startup under the sandbox)"
   },
   "filesystem": {
     "read": [
       "/opt/google/chrome"
     ],
     "allow": [
-      "~/.cache/superpowers"
+      "~/.cache/superpowers",
+      "~/.config/google-chrome/Crash Reports"
+    ],
+    "bypass_protection": [
+      "~/.config/google-chrome/Crash Reports"
     ]
   }
 }

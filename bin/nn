@@ -228,6 +228,37 @@ fi
 echo "🗯️nn: using profile $profile_label" >&2
 echo "🗯️nn: using settings $settings_label" >&2
 
+# superpowers-chrome MCP: make its full-Chrome DevTools endpoint usable under
+# the sandbox. Two sandbox-specific fixes, both gated on --chrome (#970):
+#
+#   1. Crashpad: full Chrome writes its crash database to
+#      ~/.config/google-chrome/Crash Reports (a fixed path, independent of
+#      --user-data-dir), which the claude-code base denies via
+#      deny_browser_data_linux. When it can't write there the crashpad handler
+#      aborts ("--database is required") and the browser SIGTRAPs on startup.
+#      oalders-chrome.json grants + bypass-protects exactly that subdir (the
+#      sensitive cookies/sessions under Default/ stay denied), but a grant
+#      can't create the dir (its parent stays denied), so pre-create it here,
+#      outside the sandbox, the same way .tmp/.serena-home are seeded above.
+#
+#   2. DevTools port: the MCP serves DevTools over a localhost TCP port
+#      (default range 9222-12111), but the default chain only opens
+#      80/5000/5001/8080, so the bind() fails ("Cannot start http server for
+#      devtools") and the MCP can't drive the browser. Pin the MCP to one
+#      fixed port via CHROME_WS_PORT and open just that port with --open-port
+#      (localhost connect + listen). Scoped to --chrome so other sandboxes
+#      keep the port closed.
+#
+# See nono/CLAUDE.md ("superpowers-chrome (full Chrome) under the sandbox").
+chrome_run_args=()
+chrome_env=()
+if ((chrome_enabled)); then
+    mkdir -p "$HOME/.config/google-chrome/Crash Reports"
+    chrome_devtools_port=9222
+    chrome_run_args=(--open-port "$chrome_devtools_port")
+    chrome_env=("CHROME_WS_PORT=$chrome_devtools_port")
+fi
+
 # Opt-in clodhopper wiring. clodhopper init --local writes the hooks into
 # .claude/settings.local.json (gitignored). --settings adds a settings source;
 # it doesn't replace the project hierarchy, so claude still loads
@@ -298,11 +329,12 @@ set -x
 # claude launches. Granting it here keeps the wrapper's own dependency out
 # of every override profile. Redundant grants are harmless.
 exec nono run --profile "$profile" --allow-cwd --workdir . \
-    --read-file /usr/bin/env "${extra_allow[@]}" -- \
+    --read-file /usr/bin/env "${chrome_run_args[@]+"${chrome_run_args[@]}"}" "${extra_allow[@]}" -- \
     env NO_PROXY=localhost,127.0.0.1 no_proxy=localhost,127.0.0.1 TMPDIR="$PWD/.tmp" \
     XDG_CACHE_HOME="$PWD/.tmp/cache" \
     NPM_CONFIG_CACHE="$PWD/.tmp/cache/npm" \
     SERENA_HOME="$PWD/.serena-home" \
     DISABLE_AUTOUPDATER=1 \
+    "${chrome_env[@]+"${chrome_env[@]}"}" \
     claude --settings "$session_settings" \
     --dangerously-skip-permissions "$@" "${auto_prompt[@]+"${auto_prompt[@]}"}"
