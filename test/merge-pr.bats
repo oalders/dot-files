@@ -205,6 +205,31 @@ _ready_repo() {
     [ -z "$output" ]
 }
 
+# A MERGED PR whose remote branch was auto-deleted (delete_branch_on_merge)
+# has no resolvable upstream. Plain merge-pr must still tear it down — not bail
+# "push first" — because `gh pr merge` never runs for a MERGED PR.
+@test "cleanup: MERGED PR with no upstream tears down without 'push first'" {
+    _ready_repo
+    setup_feature_worktree
+    # Simulate the auto-deleted remote branch: drop origin's ref (this also
+    # removes the local origin/feature tracking ref, so `@{u}` no longer
+    # resolves) and clear the tracking config for good measure.
+    git -C "$REPO_DIR" push -q origin --delete feature
+    git -C "$WORKTREE_DIR" branch --unset-upstream
+    unset TMUX
+    stub_command tmux 'exit 0'
+    stub_command gh 'printf "MERGED\tmain\n"'
+
+    run "$MERGE_PR"
+    [ "$status" -eq 0 ]
+    [[ "$output" == *"PR already MERGED"* ]]
+    [[ "$output" != *"push first"* ]]
+    [[ "$output" != *"has no upstream"* ]]
+    [ ! -d "$WORKTREE_DIR" ]
+    run git -C "$REPO_DIR" branch --list feature
+    [ -z "$output" ]
+}
+
 @test "pre-flight: refuses a dirty worktree without --force" {
     _ready_repo
     setup_feature_worktree

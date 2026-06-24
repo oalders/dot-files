@@ -10,6 +10,9 @@ Merges the current branch's PR via `gh pr merge`, then removes the
 worktree, deletes the local branch, and kills the tmux session for the
 worktree. Run from inside the worktree's tmux session.
 
+If the PR is already MERGED, the merge is skipped and teardown runs even
+when the branch is no longer on origin — no push required.
+
 Options:
   -f, --force   Discard uncommitted changes in the worktree when
                 removing it.
@@ -74,12 +77,21 @@ if [[ "$branch" == "HEAD" ]]; then
     exit 1
 fi
 
-# Close mode abandons the branch, so the "is it pushed / are there unpushed
-# commits?" pre-flight below is moot — cleanup discards local commits anyway,
-# and the branch need not be on origin at all. Skip the whole block (upstream
-# tracking AND unpushed-commit count) when closing; run it for merges, where
-# `gh pr merge` genuinely needs the branch pushed.
+# Deferred push pre-flight failure (no upstream / unpushed commits). The push
+# pre-flight exists only to satisfy `gh pr merge`, which runs only for an OPEN
+# PR; an already-MERGED PR is torn down without pushing, so the failure is moot
+# there. Record the reason and resolve it once the PR state is known (below).
+# Initialized unconditionally so it stays defined under `set -u`, including in
+# close mode where the pre-flight block is skipped.
+preflight_block_reason=""
+
 if [[ -z "$close_mode" ]]; then
+    # upstream_ok defaults to 1: on a normally tracked branch the `@{u}` block
+    # below is skipped entirely, yet the unpushed-commit check still has to run.
+    # Only the genuinely-no-upstream path clears it — there `@{u}` is unresolved
+    # and `git rev-list '@{u}..HEAD'` would abort the script under `set -e`.
+    upstream_ok=1
+
     # Pre-flight: branch must have an upstream.
     #
     # `@{u}` fails both when the branch is genuinely unpushed AND when it is
@@ -95,6 +107,9 @@ if [[ -z "$close_mode" ]]; then
         # line, so `grep -q` consuming it before ls-remote blocks keeps the
         # pipe safe under pipefail — don't widen this query.
         if git ls-remote origin "refs/heads/$branch" 2>/dev/null | grep -q .; then
+            # Branch IS on origin; only tracking config is wrong. This is not a
+            # missing push, and cannot arise for a MERGED PR (its remote branch
+            # is gone), so handle it immediately rather than deferring.
             echo "merge-pr: branch '$branch' is on origin, but local tracking config" >&2
             echo "          is wrong, so '@{u}' does not resolve. The branch is" >&2
             echo "          already pushed — this is a config issue, not a missing push." >&2
@@ -112,16 +127,21 @@ if [[ -z "$close_mode" ]]; then
                     ;;
             esac
         else
-            echo "merge-pr: branch '$branch' has no upstream — push first" >&2
-            exit 1
+            # Genuinely unpushed. Defer instead of bailing — a MERGED PR needs
+            # no push. `@{u}` is unresolved, so skip the unpushed-commit check.
+            preflight_block_reason="branch '$branch' has no upstream — push first"
+            upstream_ok=0
         fi
     fi
 
-    # Pre-flight: no unpushed commits.
-    unpushed=$(git rev-list --count '@{u}..HEAD')
-    if [[ "$unpushed" -ne 0 ]]; then
-        echo "merge-pr: branch '$branch' has $unpushed unpushed commit(s) — push first" >&2
-        exit 1
+    # Pre-flight: no unpushed commits. Runs only when `@{u}` resolves; a
+    # successful tracking-repair above leaves upstream_ok=1, so it still runs
+    # after a repair.
+    if [[ "$upstream_ok" -eq 1 ]]; then
+        unpushed=$(git rev-list --count '@{u}..HEAD')
+        if [[ "$unpushed" -ne 0 ]]; then
+            preflight_block_reason="branch '$branch' has $unpushed unpushed commit(s) — push first"
+        fi
     fi
 fi
 
@@ -151,11 +171,26 @@ main_repo=$(cd "$git_common_dir" && cd .. && pwd -P)
 
 # PR lookup: state + baseRefName in a single call.
 if ! pr_info=$(gh pr view --json state,baseRefName -q '[.state, .baseRefName] | @tsv' 2>/dev/null); then
+    # A deferred push pre-flight failure means we can't even identify the PR;
+    # surface that actionable reason instead of the generic "no PR found".
+    if [[ -n "$preflight_block_reason" ]]; then
+        echo "merge-pr: $preflight_block_reason" >&2
+        exit 1
+    fi
     echo "merge-pr: no PR found for branch '$branch'" >&2
     exit 1
 fi
 pr_state=$(echo "$pr_info" | cut -f1)
 pr_base=$(echo "$pr_info" | cut -f2)
+
+# Resolve a deferred push pre-flight failure. It matters only when we'll run
+# `gh pr merge` (an OPEN PR). A MERGED PR is torn down without pushing — the
+# whole point of deferring. CLOSED/other states fall through to the dispatch
+# refusal below.
+if [[ -n "$preflight_block_reason" && "$pr_state" == "OPEN" ]]; then
+    echo "merge-pr: $preflight_block_reason" >&2
+    exit 1
+fi
 
 # Pre-flight (deferred from Task 3): current branch must not be the PR's base.
 if [[ "$branch" == "$pr_base" ]]; then
