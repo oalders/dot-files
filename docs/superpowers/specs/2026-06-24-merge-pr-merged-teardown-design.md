@@ -92,9 +92,10 @@ state is known.
 4. **Usage text.** Add a line noting that an already-MERGED PR is cleaned up
    even when its branch is no longer on origin (no push required).
 
-`preflight_block_reason` is only assigned inside the merge-mode block
-(`[[ -z "$close_mode" ]]`); reference it as `${preflight_block_reason:-}` so
-close mode (where it is unset) is unaffected.
+`preflight_block_reason` is initialized to `""` unconditionally, before the
+merge-mode block (`[[ -z "$close_mode" ]]`). It is therefore always defined —
+including in close mode, where the pre-flight block is skipped — so every read
+of it is safe under `set -u` without needing `${preflight_block_reason:-}`.
 
 ## Behavior deltas
 
