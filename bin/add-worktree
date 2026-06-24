@@ -26,8 +26,6 @@ elif [[ $branch_name =~ ^gh-([0-9]+)$ ]]; then
     type="pr"
 fi
 
-set -x
-
 git_dir=$(git rev-parse --git-common-dir)
 
 if [[ -z $git_dir ]]; then
