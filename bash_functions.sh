@@ -238,8 +238,6 @@ tmux_session_name() {
             # configuration
             ["dot-files"]=""
             ["local-dot-files"]=""
-            ["my-mind-is-racing"]="👟"
-
             # markdown -- nvim devicons doesn't have an icon for hugo
             ["freelancer-theme"]="󰍔"
             ["www-olafalders-dot-com"]="󰍔"
@@ -264,7 +262,6 @@ tmux_session_name() {
         keys=(
             "dot-files"
             "local-dot-files"
-            "my-mind-is-racing"
             "www-olafalders-dot-com"
             "dist.ini"
             "cpanfile"

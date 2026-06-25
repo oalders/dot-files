@@ -4,12 +4,12 @@
 
 **Goal:** A universal Docker image and `bin/dev` launcher that runs Claude Code in isolated containers from any project directory.
 
-**Architecture:** Port `my-mind-is-racing`'s `Dockerfile.agent` + `agent-container.sh` into dotfiles as `Dockerfile.dev` + `bin/dev`. Replace the mmir-specific CI base image with `ubuntu:latest` and install Node.js/Playwright explicitly. Remove all mmir-specific env vars and container naming.
+**Architecture:** Port an internal project's `Dockerfile.agent` + `agent-container.sh` into dotfiles as `Dockerfile.dev` + `bin/dev`. Replace the project-specific CI base image with `ubuntu:latest` and install Node.js/Playwright explicitly. Remove all project-specific env vars and container naming.
 
 **Tech Stack:** Docker (BuildKit), Bash, Ubuntu base image, Node.js 24.x, Playwright, Go tools
 
 **Spec:** `docs/superpowers/specs/2026-03-11-dev-container-design.md`
-**Prior art:** `~/Documents/github/oalders/my-mind-is-racing/Dockerfile.agent` and `infra/scripts/agent-container.sh`
+**Prior art:** an internal project's `Dockerfile.agent` and `agent-container.sh`
 
 ---
 
@@ -20,8 +20,8 @@
 
 **Step 1: Write the Dockerfile**
 
-Port `my-mind-is-racing/Dockerfile.agent` with these changes:
-- Base: `FROM ubuntu:latest` instead of the mmir CI image
+Port the internal project's `Dockerfile.agent` with these changes:
+- Base: `FROM ubuntu:latest` instead of the project's CI image
 - Add Node.js 24.x installation (nodesource pattern from `installer/npm.sh`)
 - Add Playwright + Chromium installation (since it no longer comes from CI base)
 - Add Go installation (no longer from CI base)
@@ -29,7 +29,7 @@ Port `my-mind-is-racing/Dockerfile.agent` with these changes:
 - Keep: Go tools (gopls, goimports, golangci-lint), serena uvx cache, Claude plugins
 - Keep: Playwright browser relocation + symlinks, locale setup
 - Remove: `trurl` backports install (Debian-specific, not needed on Ubuntu)
-- Remove: `mmir-cache` mount
+- Remove: the project-specific cache mount
 
 ```dockerfile
 # Universal dev container for running Claude Code in isolation.
@@ -174,12 +174,12 @@ git commit -m "feat: add Dockerfile.dev for universal dev container"
 **Step 1: Write the launcher script**
 
 Port `agent-container.sh` with these changes:
-- Container naming: `<repo>-<branch>` instead of `mmir-agent-<branch>`
-- Image name: `dev-env:latest` instead of `mmir-agent:latest`
+- Container naming: `<repo>-<branch>` instead of a fixed per-project agent name
+- Image name: `dev-env:latest` instead of the project-specific image name
 - Build context: always `~/dot-files` (not repo-relative)
-- Remove: MMIR-specific env vars (OPENCAGE, GEONAMES, LIBPOSTAL, devenv sourcing)
+- Remove: project-specific env vars (OPENCAGE, GEONAMES, LIBPOSTAL, devenv sourcing)
 - Remove: GHCR login (no private base image)
-- Remove: mmir cache volume mount
+- Remove: the project's cache volume mount
 - GitHub token: prefer `gh auth token`, fall back to `GITHUB_TOKEN` env var
 - Add `--add-host host.docker.internal:host-gateway` for service access
 
