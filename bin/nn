@@ -176,13 +176,6 @@ if [[ ! -e $seed ]]; then
 fi
 cp "$seed" .serena-home/serena_config.yml
 
-# Dedicated, writable Playwright browser bundle shared across all worktrees
-# (see the PLAYWRIGHT_BROWSERS_PATH note in the env block below). The
-# always-on oalders-playwright profile grants this path r+w, but a grant
-# can't create the dir — its ~/.cache parent stays denied — so seed it here
-# outside the sandbox, the same way .tmp/.serena-home are seeded above.
-mkdir -p "$HOME/.cache/nono-playwright/ms-playwright"
-
 # Decide which browser MCPs to enable for this session:
 #   - superpowers-chrome: only when --chrome was passed (general-purpose web,
 #     opt-in per-session so idle sandboxes don't spawn Chromium MCPs).
@@ -329,19 +322,21 @@ set -x
 #
 # DISABLE_AUTOUPDATER=1 stops claude from auto-updating, pinning the version.
 #
-# PLAYWRIGHT_BROWSERS_PATH pins Playwright's browser bundle to a dedicated
-# shared host cache. Playwright otherwise derives its path from XDG_CACHE_HOME,
-# which is per-worktree ("$PWD/.tmp/cache") — so every worktree's first e2e run
-# would re-download a full headless Chromium (~265 MB). Anchoring it under a
-# shared "$HOME" dir lets all worktrees (and the in-sandbox Playwright MCP)
-# share one bundle (build dirs are version-suffixed, so versions coexist).
-# This is a dedicated dir, NOT the system bundle ~/.cache/ms-playwright: the
-# oalders-playwright profile keeps that one read-only so an in-sandbox session
-# can never tamper with a binary that a later host/un-sandboxed `playwright`
-# run would execute outside Landlock (#975). The dedicated bundle is r+w (so
-# the first in-sandbox install seeds it) but its binaries only ever run inside
-# the sandbox, confining the blast radius. Pre-created above since the grant
-# can't create the dir (its ~/.cache parent stays denied).
+# PLAYWRIGHT_BROWSERS_PATH pins Playwright's browser bundle to the shared,
+# read-only host bundle at ~/.cache/ms-playwright. Playwright otherwise derives
+# its path from XDG_CACHE_HOME, which is per-worktree ("$PWD/.tmp/cache") — so
+# every worktree's first e2e run would re-download a full headless Chromium
+# (~265 MB). Anchoring it at the one host bundle lets all worktrees (and the
+# in-sandbox Playwright MCP) share it (build dirs are version-suffixed, so
+# versions coexist). The oalders-playwright profile grants this path READ-ONLY:
+# the sandbox executes browser binaries but can never write them, so there is
+# nothing an in-sandbox session can tamper with — not for a later host/un-
+# sandboxed `playwright` run (the original #975 concern) and not for another
+# sandboxed session sharing the same bundle. The bundle is seeded and kept
+# current on the host by installer/playwright-mcp.sh (`playwright install`);
+# keep the host Playwright in step with the versions projects pin. An in-sandbox
+# `playwright install` for a not-yet-seeded build will fail loudly against the
+# read-only path — that's the cue to refresh the bundle on the host.
 #
 # --read-file /usr/bin/env: the sandboxed command below starts with `env`,
 # so the env binary must be readable (read implies exec) under whatever
@@ -353,7 +348,7 @@ exec nono run --profile "$profile" --allow-cwd --workdir . \
     --read-file /usr/bin/env "${chrome_run_args[@]+"${chrome_run_args[@]}"}" "${extra_allow[@]}" -- \
     env NO_PROXY=localhost,127.0.0.1 no_proxy=localhost,127.0.0.1 TMPDIR="$PWD/.tmp" \
     XDG_CACHE_HOME="$PWD/.tmp/cache" \
-    PLAYWRIGHT_BROWSERS_PATH="$HOME/.cache/nono-playwright/ms-playwright" \
+    PLAYWRIGHT_BROWSERS_PATH="$HOME/.cache/ms-playwright" \
     NPM_CONFIG_CACHE="$PWD/.tmp/cache/npm" \
     SERENA_HOME="$PWD/.serena-home" \
     DISABLE_AUTOUPDATER=1 \

@@ -1,14 +1,13 @@
 {
   "meta": {
     "name": "oalders-playwright",
-    "description": "Playwright: read-only host Chromium bundle, writable sandbox-shared e2e bundle, and browser IPC shared-memory"
+    "description": "Playwright: read-only shared host Chromium bundle and browser IPC shared-memory"
   },
   "filesystem": {
     "read": [
       "~/.cache/ms-playwright"
     ],
     "allow": [
-      "~/.cache/nono-playwright/ms-playwright",
       "/dev/shm"
     ]
   }
