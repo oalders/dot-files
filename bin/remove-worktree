@@ -50,5 +50,14 @@ else
     echo "remove-worktree: warning: kill-worktree-procs not found; skipping process cleanup" >&2
 fi
 
-git worktree remove "$@" "$worktree_path"
+# git refuses to remove a worktree containing an initialized submodule unless
+# --force is given (issue #977). Escalate to --force when .gitmodules is
+# present, matching bin/merge-pr. This is already an aggressive teardown tool —
+# it kills process trees and force-deletes the branch below — so discarding a
+# submodule checkout here is in keeping.
+if [ -f "$worktree_path/.gitmodules" ]; then
+    git worktree remove --force "$@" "$worktree_path"
+else
+    git worktree remove "$@" "$worktree_path"
+fi
 git branch -D "$@" "$branch_name"
