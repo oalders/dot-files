@@ -10,9 +10,9 @@ any language, without adding files to each project.
 
 ## Prior Art
 
-`~/Documents/github/oalders/my-mind-is-racing/Dockerfile.agent` and
-`infra/scripts/agent-container.sh` solve this problem for one project. This
-design generalizes that solution into dotfiles so it works everywhere.
+An internal project's `Dockerfile.agent` and `agent-container.sh` solve this
+problem for one project. This design generalizes that solution into dotfiles so
+it works everywhere.
 
 ## Image: `Dockerfile.dev`
 
@@ -21,14 +21,14 @@ change.
 
 ### Base
 
-`FROM ubuntu:latest` (replaces the mmir-specific CI base image).
+`FROM ubuntu:latest` (replaces the project-specific CI base image).
 
 ### Contents
 
 - apt deps: ca-certificates, git, man, sudo, wget, vim, ripgrep, perl,
   python3, locales, openssh-client, sqlite3, less, gh CLI
 - dotfiles baked in via `dev-vm-install.sh` (run as non-root `agent` user)
-- Node.js + TypeScript (explicitly installed, since these came from the mmir CI
+- Node.js + TypeScript (explicitly installed, since these came from the project's CI
   base image rather than dotfiles)
 - Go tools: gopls, goimports, staticcheck, golangci-lint
 - Playwright + Chromium (moved to `/opt/ms-playwright`, symlinked to standard
@@ -162,7 +162,7 @@ To resume: `dev claude --resume <session-id>`
 ## What is NOT in scope
 
 - Per-project customization (projects can still have their own `Dockerfile.agent`
-  if needed, as mmir does)
+  if needed, as the internal project does)
 - Publishing the image to a registry (local build only)
 - Language version management via mise/asdf (languages are pinned in the image)
 - TypeScript LSP beyond what the typescript-lsp plugin provides
