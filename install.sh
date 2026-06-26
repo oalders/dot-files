@@ -65,6 +65,12 @@ run_general_installers() {
     run_installers "${installers[@]}"
     debounce 30 days ./configure/eza.sh
     debounce 7 d ./installer/maintenance.sh
+
+    # Seed the shared Playwright Chromium bundle only on the dev box that runs
+    # browser-driven tests under nono. See nono/CLAUDE.md.
+    if is cli output stdout "hostname" eq "olaf-dev"; then
+        run_installer ./installer/playwright-mcp.sh
+    fi
 }
 
 if is os name eq darwin; then
