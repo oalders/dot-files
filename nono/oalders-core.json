@@ -22,6 +22,7 @@
       "~/dot-files/gitignore_global",
       "~/dot-files/node_modules",
       "~/dot-files/nono",
+      "~/.gitconfig",
       "~/local/bin",
       "~/.local/share/nvim/mason",
       "~/.local/bin",
