@@ -17,17 +17,18 @@
   },
   "filesystem": {
     "read": [
-      "/usr/libexec/gcc",
-      "/usr/local/",
       "~/.config/gh",
-      "~/.local/bin",
-      "~/.local/share/nvim/mason",
-      "~/.npm-packages",
       "~/dot-files/bin",
       "~/dot-files/gitignore_global",
       "~/dot-files/node_modules",
       "~/dot-files/nono",
-      "~/local/bin"
+      "~/local/bin",
+      "~/.local/share/nvim/mason",
+      "~/.local/bin",
+      "~/.npm-packages",
+      "~/.plenv",
+      "/usr/libexec/gcc",
+      "/usr/local/"
     ],
     "allow": [
       "/tmp/claude-1000"
