@@ -601,6 +601,62 @@ esac
     [[ "$output" == *"feature"* ]]
 }
 
+# --close with no PR at all (gh pr view fails) must still tear down the
+# worktree, local branch, and tmux session — the branch is being abandoned,
+# and a missing PR just means there's nothing to close. Contrast the
+# merge-mode "no PR found" test above, which exits 1.
+@test "close: --close with no PR still tears down the worktree" {
+    _ready_repo
+    setup_feature_worktree
+    unset TMUX
+    stub_command tmux 'exit 0'
+    stub_command gh '
+case "$2" in
+    view) exit 1 ;;
+    close) : >"$BATS_TEST_TMPDIR/close-was-called" ;;
+esac
+'
+
+    run "$MERGE_PR" --close
+    [ "$status" -eq 0 ]
+    [[ "$output" == *"no PR found"* ]]
+    [[ "$output" == *"proceeding to cleanup"* ]]
+    # No PR means nothing to close: `gh pr close` must not run.
+    [ ! -e "$BATS_TEST_TMPDIR/close-was-called" ]
+    [ ! -d "$WORKTREE_DIR" ]
+    run git -C "$REPO_DIR" branch --list feature
+    [ -z "$output" ]
+}
+
+# --close with no PR from the MAIN working tree: there's no linked worktree or
+# tmux session to tear down, and deleting the checked-out branch would need a
+# base we don't have. Report cleanly and leave the branch — never attempt (and
+# fail) to remove the main working tree.
+@test "main tree: --close with no PR reports nothing to tear down and leaves the branch" {
+    _ready_repo
+    cd "$REPO_DIR"
+    git checkout -q -b feature
+    git push -q -u origin feature
+    unset TMUX
+    stub_command tmux 'exit 0'
+    stub_command gh '
+case "$2" in
+    view) exit 1 ;;
+    close) : >"$BATS_TEST_TMPDIR/close-was-called" ;;
+esac
+'
+
+    run "$MERGE_PR" --close
+    [ "$status" -eq 0 ]
+    [ ! -e "$BATS_TEST_TMPDIR/close-was-called" ]
+    [[ "$output" != *"fatal"* ]]
+    [[ "$output" != *"failed to remove worktree"* ]]
+    [[ "$output" == *"nothing to tear down"* ]]
+    [ -d "$REPO_DIR" ]
+    run git -C "$REPO_DIR" branch --list feature
+    [[ "$output" == *"feature"* ]]
+}
+
 @test "close: usage mentions --close" {
     run "$MERGE_PR" -h
     [ "$status" -eq 0 ]

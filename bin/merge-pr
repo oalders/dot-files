@@ -25,7 +25,10 @@ Options:
                 deletes the remote branch explicitly — a merge gets that
                 for free from GitHub's delete_branch_on_merge, but that
                 setting only fires on merge, not close. Extra args pass
-                through to `gh pr close`.
+                through to `gh pr close`. If no PR exists for the branch,
+                there's nothing to close, so teardown still runs (from a
+                linked worktree; from the main working tree there's nothing
+                to tear down and the branch is left for manual deletion).
 
 Refuses:
   --auto, --auto-merge   gh pr merge would exit 0 while the PR stays
@@ -169,19 +172,35 @@ git_common_dir=$(git rev-parse --git-common-dir)
 # the two diverge and break the main-working-tree comparison below.
 main_repo=$(cd "$git_common_dir" && cd .. && pwd -P)
 
-# PR lookup: state + baseRefName in a single call.
+# PR lookup: state + baseRefName in a single call. `no_pr` records the
+# close-mode case where there's no PR at all; teardown still runs, but the
+# PR-state dispatch below is skipped.
+no_pr=""
 if ! pr_info=$(gh pr view --json state,baseRefName -q '[.state, .baseRefName] | @tsv' 2>/dev/null); then
-    # A deferred push pre-flight failure means we can't even identify the PR;
-    # surface that actionable reason instead of the generic "no PR found".
-    if [[ -n "$preflight_block_reason" ]]; then
-        echo "merge-pr: $preflight_block_reason" >&2
+    if [[ -n "$close_mode" ]]; then
+        # --close abandons the branch. With no PR to close (never opened, or
+        # already deleted) there's simply nothing to close, so fall through to
+        # the same teardown. baseRefName is unknown; only the main-working-tree
+        # path needs it, and it short-circuits there.
+        echo "merge-pr: no PR found for branch '$branch' — proceeding to cleanup"
+        no_pr=1
+        pr_state=""
+        pr_base=""
+    else
+        # A deferred push pre-flight failure means we can't even identify the
+        # PR; surface that actionable reason instead of the generic "no PR
+        # found".
+        if [[ -n "$preflight_block_reason" ]]; then
+            echo "merge-pr: $preflight_block_reason" >&2
+            exit 1
+        fi
+        echo "merge-pr: no PR found for branch '$branch'" >&2
         exit 1
     fi
-    echo "merge-pr: no PR found for branch '$branch'" >&2
-    exit 1
+else
+    pr_state=$(echo "$pr_info" | cut -f1)
+    pr_base=$(echo "$pr_info" | cut -f2)
 fi
-pr_state=$(echo "$pr_info" | cut -f1)
-pr_base=$(echo "$pr_info" | cut -f2)
 
 # Resolve a deferred push pre-flight failure. It matters only when we'll run
 # `gh pr merge` (an OPEN PR). A MERGED PR is torn down without pushing — the
@@ -217,40 +236,43 @@ fi
 # Dispatch on PR state, mode-aware. An OPEN PR is acted on (merge or close);
 # a state that already matches our goal (MERGED for merge, CLOSED for close)
 # falls through to cleanup; the mismatched terminal state and anything else
-# is refused.
-case "$pr_state" in
-    OPEN)
-        if [[ -n "$close_mode" ]]; then
-            # Like `gh pr merge`, this resolves the PR from the current
-            # branch's git context (implicit-branch detection); any extra
-            # positional/flag args pass through.
-            gh pr close "${gh_args[@]}"
-        else
-            gh pr merge "${gh_args[@]}"
-        fi
-        ;;
-    MERGED)
-        if [[ -n "$close_mode" ]]; then
-            echo "merge-pr: refusing to close a MERGED PR" >&2
-            exit 1
-        fi
-        echo "merge-pr: PR already MERGED — proceeding to cleanup"
-        ;;
-    CLOSED)
-        # Only meaningful in close mode; in merge mode this falls through to
-        # the `*` refusal below (preserving the existing message).
-        if [[ -n "$close_mode" ]]; then
-            echo "merge-pr: PR already CLOSED — proceeding to cleanup"
-        else
+# is refused. Skipped entirely when there's no PR (close mode, `no_pr`) —
+# there's nothing to act on, only teardown remains.
+if [[ -z "$no_pr" ]]; then
+    case "$pr_state" in
+        OPEN)
+            if [[ -n "$close_mode" ]]; then
+                # Like `gh pr merge`, this resolves the PR from the current
+                # branch's git context (implicit-branch detection); any extra
+                # positional/flag args pass through.
+                gh pr close "${gh_args[@]}"
+            else
+                gh pr merge "${gh_args[@]}"
+            fi
+            ;;
+        MERGED)
+            if [[ -n "$close_mode" ]]; then
+                echo "merge-pr: refusing to close a MERGED PR" >&2
+                exit 1
+            fi
+            echo "merge-pr: PR already MERGED — proceeding to cleanup"
+            ;;
+        CLOSED)
+            # Only meaningful in close mode; in merge mode this falls through
+            # to the `*` refusal below (preserving the existing message).
+            if [[ -n "$close_mode" ]]; then
+                echo "merge-pr: PR already CLOSED — proceeding to cleanup"
+            else
+                echo "merge-pr: refusing to act on PR in state '$pr_state'" >&2
+                exit 1
+            fi
+            ;;
+        *)
             echo "merge-pr: refusing to act on PR in state '$pr_state'" >&2
             exit 1
-        fi
-        ;;
-    *)
-        echo "merge-pr: refusing to act on PR in state '$pr_state'" >&2
-        exit 1
-        ;;
-esac
+            ;;
+    esac
+fi
 
 # Close mode only: delete the remote branch explicitly. A merge gets this for
 # free from GitHub's delete_branch_on_merge (see bin/gh-delete-branch-on-merge),
@@ -283,6 +305,16 @@ fi
 # even take out this very script). So skip that whole teardown: just switch
 # off the merged/closed branch and delete it, then report success.
 if [[ "$worktree_path" == "$main_repo" ]]; then
+    # No PR and run from the main working tree: there's no linked worktree or
+    # its tmux session to tear down, and deleting the branch checked out here
+    # would need a base to switch to that we don't have (no PR → no
+    # baseRefName). Nothing safe to do — report and leave the branch.
+    if [[ -n "$no_pr" ]]; then
+        echo "merge-pr: no PR and running from the main working tree — nothing to tear down."
+        echo "          Delete the local branch '$branch' manually if you want it gone."
+        exit 0
+    fi
+
     # git refuses to delete the branch currently checked out here, so switch
     # to the PR's base first. If `gh pr merge -d` already switched away and
     # deleted the branch, both steps are simply skipped (HEAD is no longer on
