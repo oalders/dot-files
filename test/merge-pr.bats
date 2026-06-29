@@ -361,6 +361,27 @@ esac
     [ -z "$output" ]
 }
 
+# #982: `gh pr close` has no implicit current-branch detection (its positional
+# PR arg is required), so a bare `merge-pr --close` must pass the branch name
+# explicitly. Without it, `gh pr close` errors and teardown never runs. The
+# stub records its positional arg ($3, after `pr close`) so we can assert it.
+@test "close: --close passes the branch name to gh pr close" {
+    _ready_repo
+    setup_feature_worktree
+    unset TMUX
+    stub_command tmux 'exit 0'
+    stub_command gh '
+case "$2" in
+    view) printf "OPEN\tmain\n" ;;
+    close) printf "%s" "$3" >"$BATS_TEST_TMPDIR/close-arg" ;;
+esac
+'
+
+    run "$MERGE_PR" --close
+    [ "$status" -eq 0 ]
+    [ "$(cat "$BATS_TEST_TMPDIR/close-arg")" = "feature" ]
+}
+
 # An already-CLOSED PR skips the close call but still runs full teardown.
 @test "close: --close on a CLOSED PR skips close and still tears down" {
     _ready_repo

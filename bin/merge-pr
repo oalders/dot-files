@@ -242,10 +242,11 @@ if [[ -z "$no_pr" ]]; then
     case "$pr_state" in
         OPEN)
             if [[ -n "$close_mode" ]]; then
-                # Like `gh pr merge`, this resolves the PR from the current
-                # branch's git context (implicit-branch detection); any extra
-                # positional/flag args pass through.
-                gh pr close "${gh_args[@]}"
+                # Unlike `gh pr merge`, `gh pr close` has no implicit
+                # current-branch detection — its positional PR arg is
+                # required — so pass "$branch" explicitly. Any extra
+                # positional/flag args still pass through after it.
+                gh pr close "$branch" "${gh_args[@]}"
             else
                 gh pr merge "${gh_args[@]}"
             fi
