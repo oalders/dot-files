@@ -352,6 +352,7 @@ exec nono run --profile "$profile" --allow-cwd --workdir . \
     NPM_CONFIG_CACHE="$PWD/.tmp/cache/npm" \
     SERENA_HOME="$PWD/.serena-home" \
     DISABLE_AUTOUPDATER=1 \
+    COLORTERM=truecolor \
     "${chrome_env[@]+"${chrome_env[@]}"}" \
     claude --settings "$session_settings" \
     --dangerously-skip-permissions "$@" "${auto_prompt[@]+"${auto_prompt[@]}"}"
