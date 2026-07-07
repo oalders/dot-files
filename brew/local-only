@@ -1,5 +1,6 @@
 # don't install these on CI
 tap "FelixKratz/formulae"
+tap "nikitabobko/tap"
 
 brew "dockutil"
 brew "git-lfs"
@@ -9,9 +10,11 @@ brew "nvm"
 brew "python"
 brew "sqlite"
 brew "yt-dlp"
+cask "aerospace"
 cask "alfred"
 cask "dash"
 cask "db-browser-for-sqlite"
+cask "element"
 # cask "google-chrome"
 cask "hammerspoon"
 # cask "spotify"

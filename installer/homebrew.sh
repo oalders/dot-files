@@ -35,6 +35,7 @@ brew doctor || true
 if brew help trust >/dev/null 2>&1; then
     brew trust --tap buo/cask-upgrade
     brew trust --tap felixkratz/formulae
+    brew trust --tap nikitabobko/tap
 fi
 
 brew bundle install --file=brew/defaults
