@@ -55,6 +55,40 @@ profile=""
 profile_label=""
 project_root=$(git rev-parse --show-toplevel 2>/dev/null || echo "$PWD")
 
+# Hugo detection, computed once and reused. Markers: modern config names
+# (hugo.toml/yaml/json), the modular config/_default/ layout, OR legacy
+# config.toml paired with themes/. The bare hugo.* names and config/_default/
+# are Hugo-specific and need no themes/ guard; only config.toml does (it
+# guards against false positives on any other TOML-using project). Detected
+# here (not just in the mixin auto-gen block below) so it also fires when a
+# pre-generated .nono/profile.json or a --profile override skips that block —
+# the tailscale serve grant should follow the project, not the profile shape.
+hugo_enabled=0
+if [[ -f "$project_root/hugo.toml" || -f "$project_root/hugo.yaml" || -f "$project_root/hugo.json" ||
+    -d "$project_root/config/_default" ||
+    (-f "$project_root/config.toml" && -d "$project_root/themes") ]]; then
+    hugo_enabled=1
+fi
+
+# Hugo dev server over Tailscale. `hugo server` binds a single interface; to
+# preview a build from another tailnet device (phone, laptop) it must bind the
+# host's tailscale IPv4 rather than loopback. nono's network mediation is
+# port-based, so serving on that IP just needs the serve port opened for
+# listen; reaching it from *inside* the sandbox (curl, the Playwright MCP) also
+# needs the IP in NO_PROXY so the client connects directly instead of routing
+# through the credential proxy (which would block it). Prefer `tailscale ip -4`
+# (cross-platform, official); fall back to the Linux tailscale0 interface when
+# the CLI is unavailable or transiently empty. Gated on Hugo being detected so
+# non-Hugo sandboxes never probe for the IP. `|| true` keeps `set -e`/pipefail
+# from aborting when tailscale isn't installed or connected.
+tailscale_ip=""
+if ((hugo_enabled)); then
+    tailscale_ip=$(tailscale ip -4 2>/dev/null | head -1 || true)
+    if [[ -z $tailscale_ip ]]; then
+        tailscale_ip=$(ip -4 -o addr show tailscale0 2>/dev/null | awk '{print $4}' | cut -d/ -f1 | head -1 || true)
+    fi
+fi
+
 # --profile short-circuits discovery: resolve an existing file to an
 # absolute path (so it works regardless of cwd), otherwise pass the value
 # through as a profile name. With the override set, the walk-up below and
@@ -121,17 +155,10 @@ if [[ -z "$profile" ]]; then
     if [[ -f "$project_root/go.mod" ]]; then
         mixins+=("oalders-go")
     fi
-    # Hugo: modern config names (hugo.toml/yaml/json), the modular
-    # config/_default/ layout, OR legacy config.toml paired with themes/.
-    # The bare hugo.* names and config/_default/ are Hugo-specific, so they
-    # need no themes/ guard; only config.toml does (it guards against false
-    # positives on any other TOML-using project). Pulls in oalders-snap
-    # because Hugo on Linux is typically installed via snap, which needs
-    # /snap, /var/lib/snapd, and /etc/fstab readable to clear snapd's
-    # startup checks.
-    if [[ -f "$project_root/hugo.toml" || -f "$project_root/hugo.yaml" || -f "$project_root/hugo.json" ||
-        -d "$project_root/config/_default" ||
-        (-f "$project_root/config.toml" && -d "$project_root/themes") ]]; then
+    # Hugo (detected once above): pulls in oalders-snap because Hugo on Linux
+    # is typically installed via snap, which needs /snap, /var/lib/snapd, and
+    # /etc/fstab readable to clear snapd's startup checks.
+    if ((hugo_enabled)); then
         mixins+=("oalders-snap" "oalders-hugo")
     fi
     if (( ${#mixins[@]} > 0 )); then
@@ -280,6 +307,34 @@ if ((playwright_enabled)); then
     done
 fi
 
+# Hugo dev server ports. When Hugo is detected AND the host has a tailscale
+# IPv4 (see the detection near the top), open Hugo's default serve port and a
+# few above it so `hugo server --bind $TAILSCALE_IP` can bind+listen (the
+# default chain's open_port [80, 5000, 5001, 8080] doesn't cover 1313). The
+# small 1313-1316 block leaves room for a second instance or a custom --port
+# near the default. --open-port grants connect + listen, so an in-sandbox tool
+# (curl, the Playwright MCP) can also load the served site to inspect it.
+# $TAILSCALE_IP is exported below and the IP is appended to NO_PROXY so that
+# in-sandbox connection goes direct instead of through the credential proxy.
+# Gated on a tailscale IP existing so non-tailnet Hugo sandboxes keep the ports
+# closed.
+# NO_PROXY normally covers only loopback (see the exec below); the Hugo block
+# appends the tailscale IP so in-sandbox clients reach the served site directly
+# rather than via the proxy, which has no allow_domain entry for it.
+hugo_run_args=()
+hugo_env=()
+no_proxy_value="localhost,127.0.0.1"
+if ((hugo_enabled)) && [[ -n $tailscale_ip ]]; then
+    hugo_base_port=1313
+    for ((p = hugo_base_port; p <= hugo_base_port + 3; p++)); do
+        hugo_run_args+=(--open-port "$p")
+    done
+    hugo_env=("TAILSCALE_IP=$tailscale_ip")
+    no_proxy_value="$no_proxy_value,$tailscale_ip"
+    echo "🗯️nn: Hugo + tailscale $tailscale_ip — ports 1313-1316 open, \$TAILSCALE_IP set" >&2
+    echo "🗯️nn: serve with: hugo server --bind \$TAILSCALE_IP --baseURL http://\$TAILSCALE_IP:1313/" >&2
+fi
+
 # Opt-in clodhopper wiring. clodhopper init --local writes the hooks into
 # .claude/settings.local.json (gitignored). --settings adds a settings source;
 # it doesn't replace the project hierarchy, so claude still loads
@@ -367,8 +422,9 @@ set -x
 # of every override profile. Redundant grants are harmless.
 exec nono run --profile "$profile" --allow-cwd --workdir . \
     --read-file /usr/bin/env "${chrome_run_args[@]+"${chrome_run_args[@]}"}" \
-    "${playwright_run_args[@]+"${playwright_run_args[@]}"}" "${extra_allow[@]}" -- \
-    env NO_PROXY=localhost,127.0.0.1 no_proxy=localhost,127.0.0.1 TMPDIR="$PWD/.tmp" \
+    "${playwright_run_args[@]+"${playwright_run_args[@]}"}" \
+    "${hugo_run_args[@]+"${hugo_run_args[@]}"}" "${extra_allow[@]}" -- \
+    env NO_PROXY="$no_proxy_value" no_proxy="$no_proxy_value" TMPDIR="$PWD/.tmp" \
     XDG_CACHE_HOME="$PWD/.tmp/cache" \
     PLAYWRIGHT_BROWSERS_PATH="$HOME/.cache/ms-playwright" \
     NPM_CONFIG_CACHE="$PWD/.tmp/cache/npm" \
@@ -376,5 +432,6 @@ exec nono run --profile "$profile" --allow-cwd --workdir . \
     DISABLE_AUTOUPDATER=1 \
     COLORTERM=truecolor \
     "${chrome_env[@]+"${chrome_env[@]}"}" \
+    "${hugo_env[@]+"${hugo_env[@]}"}" \
     claude --settings "$session_settings" \
     --dangerously-skip-permissions "$@" "${auto_prompt[@]+"${auto_prompt[@]}"}"
