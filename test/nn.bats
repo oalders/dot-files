@@ -362,3 +362,59 @@ setup() {
     [ -f "$BATS_TEST_TMPDIR/nono-argv" ]
     ! grep -Fxq -- "--chrome" "$BATS_TEST_TMPDIR/nono-argv"
 }
+
+@test "bin/nn --playwright produces a launch that can actually use Playwright" {
+    # "Usable" has two halves that must BOTH hold, so this asserts them together:
+    #   1. the Playwright MCP is enabled in the session settings handed to claude
+    #      (without it there is no Playwright to drive), and
+    #   2. every localhost port a Playwright *test* run binds is opened. The MCP
+    #      talks to the browser over a stdio pipe, but the tests bind TCP the
+    #      default chain doesn't cover — the HTML report / trace viewer
+    #      (preferredPort 9323, increments when busy) and a preview/webServer —
+    #      so an unopened bind is Landlock-denied. nn opens the 9323-9342 block.
+    run "$NN" --playwright
+    [ "$status" -eq 0 ]
+    [ "$(jq -r '.enabledPlugins["playwright@claude-plugins-official"]' .tmp/claude-settings.json)" = "true" ]
+    # Exactly the 20-port block, no wider (over-opening needlessly widens the
+    # sandbox) and no narrower (a missing port is a bind that still fails).
+    [ "$(grep -Fxc -- "--open-port" "$BATS_TEST_TMPDIR/nono-argv")" -eq 20 ]
+    # Spot-check both ends and the interior of the documented range.
+    grep -Fxq -- "9323" "$BATS_TEST_TMPDIR/nono-argv"
+    grep -Fxq -- "9333" "$BATS_TEST_TMPDIR/nono-argv"
+    grep -Fxq -- "9342" "$BATS_TEST_TMPDIR/nono-argv"
+    # And nothing just outside it.
+    ! grep -Fxq -- "9322" "$BATS_TEST_TMPDIR/nono-argv"
+    ! grep -Fxq -- "9343" "$BATS_TEST_TMPDIR/nono-argv"
+}
+
+@test "bin/nn auto-enables Playwright from a playwright.config.js marker" {
+    # Detection keys on an e2e marker at the repo top, so a project that has
+    # committed a Playwright config gets the MCP and its ports without --playwright.
+    echo 'export default {};' > playwright.config.js
+    run "$NN"
+    [ "$status" -eq 0 ]
+    [ "$(jq -r '.enabledPlugins["playwright@claude-plugins-official"]' .tmp/claude-settings.json)" = "true" ]
+    [ "$(grep -Fxc -- "--open-port" "$BATS_TEST_TMPDIR/nono-argv")" -eq 20 ]
+    grep -Fxq -- "9323" "$BATS_TEST_TMPDIR/nono-argv"
+}
+
+@test "bin/nn without Playwright opens no Playwright ports and leaves the MCP off" {
+    # The port block and MCP stay scoped to Playwright sessions; enabling them
+    # for every sandbox would needlessly widen idle and non-e2e sessions. (The
+    # clean test cwd has no e2e markers, so nothing auto-enables here.)
+    run "$NN"
+    [ "$status" -eq 0 ]
+    # Guard against a vacuous pass on a missing argv dump.
+    [ -f "$BATS_TEST_TMPDIR/nono-argv" ]
+    [ "$(jq -r '.enabledPlugins["playwright@claude-plugins-official"]' .tmp/claude-settings.json)" = "false" ]
+    [ "$(grep -Fxc -- "--open-port" "$BATS_TEST_TMPDIR/nono-argv")" -eq 0 ]
+}
+
+@test "bin/nn --playwright is consumed, not forwarded to claude" {
+    # --playwright is an nn-specific flag: it must be parsed out of \$@, not
+    # passed through to claude (which would reject the unknown flag).
+    run "$NN" --playwright
+    [ "$status" -eq 0 ]
+    [ -f "$BATS_TEST_TMPDIR/nono-argv" ]
+    ! grep -Fxq -- "--playwright" "$BATS_TEST_TMPDIR/nono-argv"
+}

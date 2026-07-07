@@ -259,6 +259,27 @@ if ((chrome_enabled)); then
     chrome_env=("CHROME_WS_PORT=$chrome_devtools_port")
 fi
 
+# Playwright localhost ports: the MCP drives the browser over a stdio pipe (no
+# TCP), but running actual Playwright *tests* in the sandbox binds ports the
+# default chain (open_port [80, 5000, 5001, 8080]) doesn't cover, so bind() is
+# Landlock-denied ("permission denied 127.0.0.1:<port>"). Two consumers:
+#   1. Playwright's HTML report / trace viewer, whose preferredPort is 9323 and
+#      increments upward when busy.
+#   2. A local preview / config.webServer that an e2e run serves the build from
+#      for the browser to load.
+# Open a 20-port block starting at Playwright's own 9323 default so the reporter
+# works natively and 9324-9342 are free for a preview/webServer to bind (serve
+# within this range). --open-port grants localhost connect + listen and is
+# repeatable, one port each. Scoped to playwright_enabled so idle/non-e2e
+# sandboxes keep these ports closed.
+playwright_run_args=()
+if ((playwright_enabled)); then
+    playwright_base_port=9323
+    for ((p = playwright_base_port; p < playwright_base_port + 20; p++)); do
+        playwright_run_args+=(--open-port "$p")
+    done
+fi
+
 # Opt-in clodhopper wiring. clodhopper init --local writes the hooks into
 # .claude/settings.local.json (gitignored). --settings adds a settings source;
 # it doesn't replace the project hierarchy, so claude still loads
@@ -345,7 +366,8 @@ set -x
 # claude launches. Granting it here keeps the wrapper's own dependency out
 # of every override profile. Redundant grants are harmless.
 exec nono run --profile "$profile" --allow-cwd --workdir . \
-    --read-file /usr/bin/env "${chrome_run_args[@]+"${chrome_run_args[@]}"}" "${extra_allow[@]}" -- \
+    --read-file /usr/bin/env "${chrome_run_args[@]+"${chrome_run_args[@]}"}" \
+    "${playwright_run_args[@]+"${playwright_run_args[@]}"}" "${extra_allow[@]}" -- \
     env NO_PROXY=localhost,127.0.0.1 no_proxy=localhost,127.0.0.1 TMPDIR="$PWD/.tmp" \
     XDG_CACHE_HOME="$PWD/.tmp/cache" \
     PLAYWRIGHT_BROWSERS_PATH="$HOME/.cache/ms-playwright" \

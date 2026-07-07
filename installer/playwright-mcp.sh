@@ -44,17 +44,48 @@ fi
 
 npx_bin="$HOME/dot-files/bin/npx"
 
+# Short scratch base for the browser's temp profile; see the wrapper comment.
+# Resolved at install time (like pw_mcp_bin) so the wrapper carries a literal.
+# Matches the oalders-core filesystem.allow grant of /tmp/claude-<uid>, which is
+# what makes this path writable inside the nono sandbox.
+browser_tmp="/tmp/claude-$(id -u)/pw-mcp"
+
 cat >"$npx_bin" <<EOF
 #!/bin/bash
 # Strip the @playwright/mcp spec and exec the installed binary directly.
 # playwright-mcp takes zero positional args and errors if the spec is passed.
+#
+# --browser chromium: @playwright/mcp defaults to the "chrome" channel, i.e.
+# system Google Chrome at /opt/google/chrome/chrome. Under the nono sandbox that
+# binary SIGTRAPs on startup because its crashpad handler can't write
+# ~/.config/google-chrome/Crash Reports and fatally aborts ("--database is
+# required"; the same crash --chrome in bin/nn grants around for the
+# superpowers-chrome MCP — see nono/CLAUDE.md). Playwright's own bundled Chrome
+# for Testing only logs a *non-fatal* permission error for its crash-reports dir
+# and keeps running, so point the MCP at the bundled build instead. It lives in
+# the shared ~/.cache/ms-playwright bundle this installer seeds.
+#
+# --headless: the sandbox has no display, so a headed launch can't come up.
+#
+# TMPDIR: Chromium's process-singleton opens a Unix domain socket at
+# <user-data-dir>/SingletonSocket, and Playwright puts that user-data-dir under
+# \$TMPDIR. bin/nn sets TMPDIR=\$PWD/.tmp to keep scratch inside --allow-cwd; in
+# a deep (dated) worktree that prefix plus the socket name overruns the ~108-char
+# sun_path limit and Chromium FATALs ("Socket path too long"). Redirect just the
+# browser's TMPDIR to the short, already-granted /tmp/claude-<uid> scratch base
+# so the socket fits — the session-wide TMPDIR is left untouched. mkdir guards
+# against a run where that base isn't writable (e.g. outside the sandbox): on
+# failure we skip the override and fall back to the inherited TMPDIR.
+#
+# User-supplied args come last, so an explicit --browser/--headed still wins.
 if [[ "\$*" == *"@playwright/mcp"* ]]; then
     args=()
     for arg in "\$@"; do
         [[ \$arg == @playwright/* ]] && continue
         args+=("\$arg")
     done
-    exec "$pw_mcp_bin" "\${args[@]}"
+    mkdir -p "$browser_tmp" 2>/dev/null && export TMPDIR="$browser_tmp"
+    exec "$pw_mcp_bin" --browser chromium --headless "\${args[@]}"
 fi
 exec /usr/bin/npx "\$@"
 EOF
