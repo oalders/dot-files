@@ -16,9 +16,23 @@ fi
 
 npm install -g @playwright/mcp@latest
 
+# @playwright/mcp pins its own playwright version (e.g. an alpha), which wants a
+# specific chromium build revision. Driving that install through a bare
+# `npx playwright install` resolves to whatever playwright npx happens to cache
+# (often an older release) and downloads the wrong browser build, so the MCP
+# launches against a chromium it doesn't match. Install through the playwright
+# CLI bundled *inside* @playwright/mcp instead, so the browser revision always
+# matches what the MCP drives.
+mcp_dir="$(npm root -g)/@playwright/mcp"
+pw_cli="$mcp_dir/node_modules/playwright/cli.js"
+if [[ ! -f $pw_cli ]]; then
+    echo "bundled playwright CLI not found at $pw_cli after install" >&2
+    exit 1
+fi
+
 # Downloads to ~/.cache/ms-playwright/chromium-*. Idempotent — skips when the
-# current playwright version already has the browser cached.
-npx playwright install chromium
+# bundled playwright version already has the browser cached.
+node "$pw_cli" install chromium
 
 # Resolve the playwright-mcp binary path at install time so the wrapper
 # doesn't depend on ~/.npm-packages/bin being in PATH.
