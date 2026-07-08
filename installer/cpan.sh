@@ -20,7 +20,7 @@ fi
 if ! is there cpm; then
     tmpscript=$(mktemp)
     trap 'rm -f "$tmpscript"' EXIT
-    curl -fsSL --compressed -o "$tmpscript" https://raw.githubusercontent.com/skaji/cpm/v0.999.0/cpm
+    curl -fsSL --compressed --retry 5 --retry-delay 2 --retry-all-errors -o "$tmpscript" https://raw.githubusercontent.com/skaji/cpm/v0.999.0/cpm
     perl "$tmpscript" install --global App::cpm
 fi
 
