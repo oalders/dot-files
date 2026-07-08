@@ -53,7 +53,7 @@ These are global infrastructure — MCP servers Claude relies on, and their runt
 | `oalders-perl`  | `cpanfile`, `Makefile.PL`, `dist.ini` | plenv (`~/.plenv`), local::lib (`~/perl5`), Dist::Zilla (`~/.dzil`, `~/dot-files/dzil`), prove (`~/.proverc`), XS system C headers (`/usr/include`, `/usr/local/include`). Net-free; CPAN/MetaCPAN/MagPie network is in the paired `oalders-perl-net` (appended alongside it by `nn`). |
 | `oalders-node`  | `package.json`                        | `*.npmjs.org`, `registry.npmjs.org` (npm registry network access for installs)     |
 | `oalders-go`    | `go.mod`                              | Go toolchain (`go_runtime` group), build/module/lint caches (`~/.cache/go-build`, `~/.cache/golangci-lint`, `~/go/pkg/mod`), module proxy + checksum DB (`proxy.golang.org`, `sum.golang.org`), and cgo system headers (`/usr/include`, `/usr/local/include`, `/opt/homebrew/include`, pkg-config dirs, `/Library/Developer/CommandLineTools`) |
-| `oalders-hugo`  | `hugo.toml` / `hugo.yaml` / `hugo.json`, or `config.toml` + `themes/` | Hugo cache (`~/.cache/hugo_cache`). When Hugo matches, `nn` also appends `oalders-snap` to the mixin list because Hugo on Linux is typically snap-installed. |
+| `oalders-hugo`  | `hugo.toml` / `hugo.yaml` / `hugo.json`, or `config.toml` + `themes/` | Hugo cache (`~/.cache/hugo_cache`). When Hugo matches, `nn` also appends `oalders-snap` to the mixin list because Hugo on Linux is typically snap-installed, and — if the host is on a tailnet — opens Hugo's serve ports over the tailscale IP (see §2c). |
 | `oalders-snap`  | (no markers of its own — `nn` appends it alongside any snap-backed sibling like `oalders-hugo`) | Reads for snap-confined binaries: `/snap`, `/var/lib/snapd`, `/etc/fstab` (snapd's startup checks parse the mount table). |
 
 Example wrapper for a Node + Perl repo (`package.json` + `cpanfile` at top):
@@ -168,6 +168,18 @@ The MCP serves the Chrome DevTools endpoint over a localhost TCP port (its defau
 The Playwright MCP drives the browser over a pipe, so it needs no port — but running actual Playwright **tests** in the sandbox does. Two consumers bind localhost TCP the default chain doesn't cover, so `bind()` is Landlock-denied (`permission denied 127.0.0.1:<port>`): Playwright's HTML report / trace viewer (preferredPort `9323`, increments when busy) and any local preview / `config.webServer` that serves the build for the browser to load.
 
 `bin/nn` opens a 20-port block `9323–9342` with repeated `nono run --open-port` (same CLI-flag rationale as the DevTools port above). `9323` is Playwright's own default so the reporter works untouched; `9324–9342` are free for a preview/`webServer` — **serve within this range** (e.g. `python -m http.server 9324 --bind 127.0.0.1`), since a bind outside it is still denied. Scoped to `playwright_enabled` (e2e markers present, or `--playwright`) so idle/non-e2e sandboxes keep the ports closed.
+
+### 2c. Hugo serve ports over Tailscale (1313–1316)
+
+`hugo server` binds a single interface. To preview a build from another tailnet device (phone, laptop), it must bind the host's **tailscale IPv4** rather than loopback: `hugo server --bind $TAILSCALE_IP --baseURL http://$TAILSCALE_IP:1313/`. nono's network mediation is port-based, so serving on that IP just needs the serve port opened; the default chain's `open_port [80, 5000, 5001, 8080]` doesn't cover Hugo's default `1313`.
+
+When Hugo is detected (same markers as the `oalders-hugo` mixin: `hugo.toml`/`yaml`/`json`, `config/_default/`, or `config.toml` + `themes/`) **and** the host has a tailscale IPv4, `bin/nn`:
+
+- opens the `1313–1316` block with repeated `nono run --open-port` (same CLI-flag rationale as the ports above) — the small range leaves room for a second instance or a custom `--port` near the default;
+- exports `TAILSCALE_IP` so the `--bind`/`--baseURL` command above is copy-pasteable and scripts can reference it;
+- appends the tailscale IP to `NO_PROXY`, so an **in-sandbox** client (curl, the Playwright MCP) reaches the served site directly instead of routing through the credential proxy — which has no `allow_domain` entry for it and would block the connection.
+
+The IPv4 comes from `tailscale ip -4` (cross-platform), falling back to the Linux `tailscale0` interface via `ip addr`. Gated on a tailscale IP actually existing, so non-tailnet Hugo sandboxes keep the ports closed and `NO_PROXY` at loopback. Detection lives near the top of `bin/nn` (not only in the mixin auto-gen block) so the grant still fires when a pre-generated `.nono/profile.json` or a `--profile` override skips that block — the serve grant follows the project, not the profile shape.
 
 ## Kernel requirement
 

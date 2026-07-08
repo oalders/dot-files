@@ -19,6 +19,11 @@ setup() {
     echo '{}' > "$HOME/.config/nono/serena_config.yml"
     # Stub nono to dump its argv to a file we can grep.
     stub_command nono 'printf "%s\n" "$@" > "$BATS_TEST_TMPDIR/nono-argv"'
+    # Default to "no tailscale IP" so Hugo detection doesn't probe the real
+    # host (which would leak the runner's tailscale IP into argv and make
+    # tests non-hermetic). The Hugo-over-tailscale test overrides tailscale.
+    stub_command tailscale 'exit 0'
+    stub_command ip 'exit 0'
     # Clean cwd outside any git work tree.
     mkdir -p "$BATS_TEST_TMPDIR/work"
     cd "$BATS_TEST_TMPDIR/work"
@@ -417,4 +422,50 @@ setup() {
     [ "$status" -eq 0 ]
     [ -f "$BATS_TEST_TMPDIR/nono-argv" ]
     ! grep -Fxq -- "--playwright" "$BATS_TEST_TMPDIR/nono-argv"
+}
+
+@test "bin/nn opens Hugo serve ports and wires the tailscale IP when one exists" {
+    # A Hugo project on a tailnet host should be servable to other devices via
+    # `hugo server --bind $TAILSCALE_IP`. That needs three things, asserted
+    # together here: the serve ports opened for bind+listen, the IP exported as
+    # $TAILSCALE_IP, and the IP added to NO_PROXY so in-sandbox inspection
+    # (curl / the Playwright MCP) reaches the served site directly instead of
+    # through the credential proxy.
+    echo '{"baseURL": "https://example.com/"}' > hugo.json
+    stub_command tailscale 'if [ "$1" = "ip" ]; then echo "100.72.160.52"; fi'
+    run "$NN"
+    [ "$status" -eq 0 ]
+    # Exactly the 1313-1316 block, no wider and no narrower.
+    [ "$(grep -Fxc -- "--open-port" "$BATS_TEST_TMPDIR/nono-argv")" -eq 4 ]
+    grep -Fxq -- "1313" "$BATS_TEST_TMPDIR/nono-argv"
+    grep -Fxq -- "1316" "$BATS_TEST_TMPDIR/nono-argv"
+    ! grep -Fxq -- "1312" "$BATS_TEST_TMPDIR/nono-argv"
+    ! grep -Fxq -- "1317" "$BATS_TEST_TMPDIR/nono-argv"
+    grep -Fxq -- "TAILSCALE_IP=100.72.160.52" "$BATS_TEST_TMPDIR/nono-argv"
+    grep -Fxq -- "NO_PROXY=localhost,127.0.0.1,100.72.160.52" "$BATS_TEST_TMPDIR/nono-argv"
+    grep -Fxq -- "no_proxy=localhost,127.0.0.1,100.72.160.52" "$BATS_TEST_TMPDIR/nono-argv"
+}
+
+@test "bin/nn opens no Hugo ports when the host has no tailscale IP" {
+    # The serve grant is scoped to hosts that actually have a tailscale IPv4
+    # (the default setup() stubs make tailscale/ip return nothing). Without
+    # one there is nothing to serve to, so the ports stay closed, NO_PROXY
+    # keeps only loopback, and $TAILSCALE_IP is never set.
+    echo '{"baseURL": "https://example.com/"}' > hugo.json
+    run "$NN"
+    [ "$status" -eq 0 ]
+    [ "$(grep -Fxc -- "--open-port" "$BATS_TEST_TMPDIR/nono-argv")" -eq 0 ]
+    ! grep -Fq -- "TAILSCALE_IP=" "$BATS_TEST_TMPDIR/nono-argv"
+    grep -Fxq -- "NO_PROXY=localhost,127.0.0.1" "$BATS_TEST_TMPDIR/nono-argv"
+}
+
+@test "bin/nn does not probe for a tailscale IP outside Hugo projects" {
+    # The tailscale grant is Hugo-scoped: a non-Hugo sandbox opens no serve
+    # ports and leaves NO_PROXY at loopback even if the host is on a tailnet.
+    stub_command tailscale 'if [ "$1" = "ip" ]; then echo "100.72.160.52"; fi'
+    run "$NN"
+    [ "$status" -eq 0 ]
+    [ "$(grep -Fxc -- "--open-port" "$BATS_TEST_TMPDIR/nono-argv")" -eq 0 ]
+    ! grep -Fq -- "TAILSCALE_IP=" "$BATS_TEST_TMPDIR/nono-argv"
+    grep -Fxq -- "NO_PROXY=localhost,127.0.0.1" "$BATS_TEST_TMPDIR/nono-argv"
 }
