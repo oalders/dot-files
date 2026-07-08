@@ -2,45 +2,57 @@
 
 set -eu -o pipefail
 
-# Installs @playwright/mcp globally plus the chromium it drives, and sets up
-# an npx wrapper at ~/dot-files/bin/npx that intercepts @playwright/mcp
-# calls so the plugin's `npx @playwright/mcp@latest` invocation doesn't hit
-# the npm registry on every MCP launch. ~/dot-files/bin is ahead of
-# ~/dot-files/node_modules/.bin in PATH, so the wrapper wins over the
-# npm-installed npx without having to reorder PATH.
+# Installs the version-pinned @playwright/mcp (see dot-files/package.json) plus
+# the chromium it drives, and sets up an npx wrapper at ~/dot-files/bin/npx that
+# intercepts @playwright/mcp calls so the plugin's `npx @playwright/mcp@latest`
+# invocation runs the local pinned build instead of hitting the npm registry on
+# every MCP launch. ~/dot-files/bin is ahead of ~/dot-files/node_modules/.bin in
+# PATH, so the wrapper wins over the npm-installed npx without reordering PATH.
 
 if ! command -v npm >/dev/null; then
     echo "npm not in PATH — install node first" >&2
     exit 1
 fi
 
-npm install -g @playwright/mcp@latest
+dotfiles="$HOME/dot-files"
 
-# @playwright/mcp pins its own playwright version (e.g. an alpha), which wants a
+# @playwright/mcp is version-pinned in dot-files/package.json (exact, so it
+# can't drift on @latest between runs; dependabot proposes upgrades as PRs).
+# installer/npm.sh's `npm install` brings it into the local node_modules — but
+# ensure it's present so this script also works when run standalone. npm install
+# is idempotent.
+if [[ ! -d $dotfiles/node_modules/@playwright/mcp ]]; then
+    (cd "$dotfiles" && npm install)
+fi
+
+pw_mcp_bin="$dotfiles/node_modules/.bin/playwright-mcp"
+if [[ ! -x $pw_mcp_bin ]]; then
+    echo "playwright-mcp not found at $pw_mcp_bin after install" >&2
+    exit 1
+fi
+
+# @playwright/mcp pins its own playwright version (an alpha), which wants a
 # specific chromium build revision. Driving that install through a bare
 # `npx playwright install` resolves to whatever playwright npx happens to cache
 # (often an older release) and downloads the wrong browser build, so the MCP
-# launches against a chromium it doesn't match. Install through the playwright
-# CLI bundled *inside* @playwright/mcp instead, so the browser revision always
-# matches what the MCP drives.
-mcp_dir="$(npm root -g)/@playwright/mcp"
-pw_cli="$mcp_dir/node_modules/playwright/cli.js"
+# launches against a chromium it doesn't match. Resolve the playwright CLI the
+# way the MCP itself resolves the `playwright` module and install through that,
+# so the browser revision always matches what the MCP drives. cli.js isn't an
+# exported subpath, so resolve the package dir and join it.
+pw_cli="$(cd "$dotfiles" && node -e '
+    const path = require("path");
+    const mcpDir = path.dirname(require.resolve("@playwright/mcp/package.json"));
+    const pwPkg = require.resolve("playwright/package.json", { paths: [mcpDir] });
+    process.stdout.write(path.join(path.dirname(pwPkg), "cli.js"));
+')"
 if [[ ! -f $pw_cli ]]; then
-    echo "bundled playwright CLI not found at $pw_cli after install" >&2
+    echo "bundled playwright CLI not found at $pw_cli" >&2
     exit 1
 fi
 
 # Downloads to ~/.cache/ms-playwright/chromium-*. Idempotent — skips when the
 # bundled playwright version already has the browser cached.
 node "$pw_cli" install chromium
-
-# Resolve the playwright-mcp binary path at install time so the wrapper
-# doesn't depend on ~/.npm-packages/bin being in PATH.
-pw_mcp_bin="$(npm prefix -g)/bin/playwright-mcp"
-if [[ ! -x $pw_mcp_bin ]]; then
-    echo "playwright-mcp not found at $pw_mcp_bin after install" >&2
-    exit 1
-fi
 
 npx_bin="$HOME/dot-files/bin/npx"
 
