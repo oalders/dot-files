@@ -157,6 +157,17 @@ The crashpad-disabling flags the issue floated (`--disable-crashpad`, `--no-cras
 
 **And once it launches, a deep worktree trips a second failure: `Socket path too long`.** Chromium's process-singleton opens a Unix domain socket at `<user-data-dir>/SingletonSocket`, and Playwright creates that user-data-dir under `$TMPDIR`. `bin/nn` sets `TMPDIR=$PWD/.tmp` (to keep scratch inside `--allow-cwd`), so in a dated worktree like `~/.worktree/<repo>/<date>/<name>` the prefix plus `org.chromium.Chromium.XXXXXX/SingletonSocket` overruns the ~108-char `sun_path` limit and Chromium FATALs (`process_singleton_posix.cc: Socket path too long`) before any page loads. The same `bin/npx` wrapper redirects **just the browser's** `TMPDIR` to the short, already-granted `/tmp/claude-<uid>` scratch base (`oalders-core` `filesystem.allow`) so the socket fits; the session-wide `TMPDIR` and every other tool's scratch stay in `$PWD/.tmp`. The redirect is guarded by `mkdir -p`, so a context where that base isn't writable just falls back to the inherited `TMPDIR`.
 
+### Ports `bin/nn` opens (overview)
+
+Every localhost port `bin/nn` grants, and its trigger. All non-default grants use repeated `nono run --open-port` (localhost connect + listen), scoped so idle sandboxes keep them closed; the per-feature sections below carry the rationale.
+
+| Port(s) | Opened when | For | Section |
+| --- | --- | --- | --- |
+| `80`, `5000`, `5001`, `8080` | always (default chain) | `oalders-net`'s baseline `open_port` | `oalders-net.json` |
+| `9222` | `--chrome` | Chrome DevTools endpoint the superpowers-chrome MCP drives | §2 |
+| `9323`–`9342` | `playwright_enabled` (e2e markers or `--playwright`) | Playwright HTML report / trace viewer (`9323`) + preview / `webServer` (`9324`–`9342`) | §2b |
+| `1313`–`1316` | Hugo detected **and** host has a tailscale IPv4 | `hugo server` reachable over the tailnet | §2c |
+
 ### 2. DevTools TCP port
 
 The MCP serves the Chrome DevTools endpoint over a localhost TCP port (its default range is 9222–12111), but the default chain only opens `[80, 5000, 5001, 8080]` (`oalders-net`'s `open_port`). The `bind()` fails with `Cannot start http server for devtools` and the MCP can't drive the browser. (The **Playwright MCP** sidesteps *this* by talking to the browser over a stdio pipe, not a TCP port — which is also why the headless shell "just works" — but see the Playwright note below: running actual Playwright *tests* still needs ports.)
