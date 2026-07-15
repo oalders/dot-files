@@ -398,6 +398,10 @@ set -x
 #
 # DISABLE_AUTOUPDATER=1 stops claude from auto-updating, pinning the version.
 #
+# FORCE_AUTOUPDATE_PLUGINS=1 keeps plugins updating even though the claude
+# binary itself is pinned: DISABLE_AUTOUPDATER would otherwise freeze plugins
+# alongside the CLI, so we opt them back in explicitly.
+#
 # PLAYWRIGHT_BROWSERS_PATH pins Playwright's browser bundle to the shared,
 # read-only host bundle at ~/.cache/ms-playwright. Playwright otherwise derives
 # its path from XDG_CACHE_HOME, which is per-worktree ("$PWD/.tmp/cache") — so
@@ -430,6 +434,7 @@ exec nono run --profile "$profile" --allow-cwd --workdir . \
     NPM_CONFIG_CACHE="$PWD/.tmp/cache/npm" \
     SERENA_HOME="$PWD/.serena-home" \
     DISABLE_AUTOUPDATER=1 \
+    FORCE_AUTOUPDATE_PLUGINS=1 \
     COLORTERM=truecolor \
     "${chrome_env[@]+"${chrome_env[@]}"}" \
     "${hugo_env[@]+"${hugo_env[@]}"}" \
