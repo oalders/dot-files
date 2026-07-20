@@ -55,12 +55,10 @@ fi
 
 set -x
 
-# Remove the snap first so its tailscaled does not fight the apt one over the
-# /var/run socket and systemd service.
-if snap list tailscale &>/dev/null; then
-    sudo snap remove tailscale
-fi
-
+# Install the apt package *before* removing the snap. Removing the snap first
+# tears down its tailscaled and drops the tailnet session, leaving the host with
+# no tailscale at all until the apt install finishes -- reorder so a working
+# tailscaled is always present.
 sudo apt-get install -y -q --no-install-recommends \
     apt-transport-https \
     ca-certificates \
@@ -78,8 +76,14 @@ curl -fsSL "https://pkgs.tailscale.com/stable/ubuntu/${CODENAME}.tailscale-keyri
 sudo apt-get update -q
 sudo apt-get install -y -q tailscale
 
-# The package enables and starts the daemon on install, but do it explicitly so
-# re-runs converge on a running, boot-enabled daemon.
+# Now remove the snap so its tailscaled does not fight the apt one over the
+# /var/run socket and systemd service.
+if snap list tailscale &>/dev/null; then
+    sudo snap remove tailscale
+fi
+
+# The package enables and starts the daemon on install, but do it explicitly
+# (after the snap is gone) so re-runs converge on a running, boot-enabled daemon.
 sudo systemctl enable tailscaled
 sudo systemctl start tailscaled
 
