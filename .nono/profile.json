@@ -1,5 +1,5 @@
 {
-  "extends": "oalders",
+  "extends": ["oalders", "oalders-node"],
   "filesystem": {
     "allow_file": [
       "~/dot-files/bashrc",
