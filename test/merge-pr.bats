@@ -11,6 +11,9 @@ setup() {
     # one. See test "pre-flight: refuses when not in a git work tree".
     export GIT_CEILING_DIRECTORIES
     GIT_CEILING_DIRECTORIES="$(dirname "$BATS_TEST_TMPDIR")"
+    # Stub docker so the docker-teardown step is hermetic: every query returns
+    # empty, so it finds no worktree-owned containers regardless of host state.
+    stub_command docker 'exit 0'
 }
 
 @test "merge-pr -h prints usage and exits 0" {

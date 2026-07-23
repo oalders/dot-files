@@ -8,6 +8,9 @@ setup() {
     # No tmux: stub pgrep so the tmux-session-kill block is skipped (an empty
     # `$(pgrep tmux)` short-circuits it). Mirrors add-worktree.bats.
     stub_command pgrep 'exit 1'
+    # Stub docker so the docker-teardown step is hermetic: every query returns
+    # empty, so it finds no worktree-owned containers regardless of host state.
+    stub_command docker 'exit 0'
     export GIT_CEILING_DIRECTORIES
     GIT_CEILING_DIRECTORIES="$(dirname "$BATS_TEST_TMPDIR")"
 }
