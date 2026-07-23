@@ -1,11 +1,12 @@
 {
   "meta": {
     "name": "oalders-ansible",
-    "description": "Ansible CLI mixin: read the pipx-installed ansible venv so its binaries (ansible-vault / ansible-playbook) can run. Filesystem only; no network egress."
+    "description": "Ansible CLI mixin: read the pipx-installed ansible venv (so its ansible-vault / ansible-playbook binaries run) plus user-installed Galaxy collections under ~/.ansible/collections. Filesystem only; no network egress."
   },
   "filesystem": {
     "read": [
-      "~/.local/share/pipx/venvs/ansible"
+      "~/.local/share/pipx/venvs/ansible",
+      "~/.ansible/collections"
     ]
   }
 }

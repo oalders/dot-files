@@ -335,6 +335,31 @@ if ((hugo_enabled)) && [[ -n $tailscale_ip ]]; then
     echo "🗯️nn: serve with: hugo server --bind \$TAILSCALE_IP --baseURL http://\$TAILSCALE_IP:1313/" >&2
 fi
 
+# Ansible controller temp. Ansible stages module payloads (and, for local
+# connections, all task scratch) under local_tmp, which defaults to
+# ~/.ansible/tmp — a persistent-home path the net-free oalders-ansible mixin
+# deliberately does not grant for write (it stays read-only, filesystem-only),
+# so an unredirected run fails when ansible tries to write it. Point local_tmp
+# at the worktree-local .tmp instead: it's covered by --allow-cwd (no home
+# write grant needed), and being per-worktree it is NOT shared with other
+# concurrent sandbox sessions the way the /tmp/claude-<uid> base is — module
+# payloads can hold vault-decrypted secrets, so keeping them off the shared
+# scratch base is the point. local_tmp holds regular files, not sockets, so the
+# ~108-char sun_path limit that forces the browser's socket dir onto a short
+# base (see nono/CLAUDE.md) does not apply here; and SSH ControlPersist sockets
+# — a separate setting (control_path_dir, ~/.ansible/cp) — are out of scope for
+# this net-free mixin, which does no remote egress. No mkdir here: ansible
+# creates its own subdir under the --allow-cwd-writable .tmp. Gated on the
+# resolved profile actually listing oalders-ansible in its `extends` (checked
+# structurally, so a stray substring elsewhere in the file can't trip it; a
+# deeper nested chain still isn't detected) so non-ansible sessions stay clean.
+ansible_env=()
+if [[ -f $profile ]] && jq -e '[.extends] | flatten | any(. == "oalders-ansible")' "$profile" >/dev/null 2>&1; then
+    ansible_local_tmp="$PWD/.tmp/ansible"
+    ansible_env=("ANSIBLE_LOCAL_TEMP=$ansible_local_tmp")
+    echo "🗯️nn: ansible mixin — ANSIBLE_LOCAL_TEMP=$ansible_local_tmp" >&2
+fi
+
 # Opt-in clodhopper wiring. clodhopper init --local writes the hooks into
 # .claude/settings.local.json (gitignored). --settings adds a settings source;
 # it doesn't replace the project hierarchy, so claude still loads
@@ -438,5 +463,6 @@ exec nono run --profile "$profile" --allow-cwd --workdir . \
     COLORTERM=truecolor \
     "${chrome_env[@]+"${chrome_env[@]}"}" \
     "${hugo_env[@]+"${hugo_env[@]}"}" \
+    "${ansible_env[@]+"${ansible_env[@]}"}" \
     claude --settings "$session_settings" \
     --dangerously-skip-permissions "$@" "${auto_prompt[@]+"${auto_prompt[@]}"}"
