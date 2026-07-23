@@ -101,3 +101,33 @@ SYMLINKS="$SCRIPT_DIR/installer/symlinks.sh"
     run grep -Fq '"network"' "$NONO_DIR/oalders-chrome.json"
     [ "$status" -ne 0 ]
 }
+
+# Regression guard for #991. The full `ansible` pipx package installs its venv
+# at venvs/ansible — that's where the ~/.local/bin/ansible* entrypoints resolve.
+# The issue proposed renaming the grant to venvs/ansible-core (the name pipx
+# uses for `pipx install ansible-core`), which would point the read at a path
+# that does not exist for this setup and leave every ansible binary unreadable
+# (errno 13) under the sandbox. Pin the correct venv name and reject the rename.
+@test "oalders-ansible.json reads the ansible venv, not ansible-core" {
+    run jq -e '.filesystem.read | any(. == "~/.local/share/pipx/venvs/ansible")' "$NONO_DIR/oalders-ansible.json"
+    [ "$status" -eq 0 ]
+    run jq -e '.filesystem.read | any(. == "~/.local/share/pipx/venvs/ansible-core")' "$NONO_DIR/oalders-ansible.json"
+    # jq -e exits non-zero when the result is false/null: that is the pass.
+    [ "$status" -ne 0 ]
+}
+
+# A real playbook run using user-installed Galaxy collections needs
+# ~/.ansible/collections readable — they install outside the venv (#991).
+@test "oalders-ansible.json grants the Galaxy collections read path" {
+    run jq -e '.filesystem.read | any(. == "~/.ansible/collections")' "$NONO_DIR/oalders-ansible.json"
+    [ "$status" -eq 0 ]
+}
+
+# oalders-ansible is filesystem-only by design: SSH egress to deploy targets is
+# out of scope, and the controller temp is redirected to a granted scratch base
+# by bin/nn rather than granted here. It must carry no network rules so nothing
+# composing it inherits an allowlist (the same invariant the other siblings hold).
+@test "oalders-ansible.json carries no network rules (stays net-free)" {
+    run grep -Fq '"network"' "$NONO_DIR/oalders-ansible.json"
+    [ "$status" -ne 0 ]
+}

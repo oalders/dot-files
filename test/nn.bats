@@ -469,3 +469,41 @@ setup() {
     ! grep -Fq -- "TAILSCALE_IP=" "$BATS_TEST_TMPDIR/nono-argv"
     grep -Fxq -- "NO_PROXY=localhost,127.0.0.1" "$BATS_TEST_TMPDIR/nono-argv"
 }
+
+@test "bin/nn points ansible's local_tmp at the worktree-local .tmp" {
+    # Ansible's controller local_tmp defaults to ~/.ansible/tmp, which the
+    # net-free oalders-ansible mixin doesn't grant for write. When the resolved
+    # profile lists the mixin in its extends, nn redirects local_tmp to the
+    # worktree-local .tmp (covered by --allow-cwd) so no home write grant is
+    # needed and secret-bearing module payloads stay off the shared
+    # /tmp/claude-<uid> scratch base (#991).
+    mkdir -p .nono
+    echo '{"extends": ["oalders", "oalders-ansible"]}' >.nono/profile.json
+    run "$NN"
+    [ "$status" -eq 0 ]
+    grep -Fxq -- "ANSIBLE_LOCAL_TEMP=$BATS_TEST_TMPDIR/work/.tmp/ansible" "$BATS_TEST_TMPDIR/nono-argv"
+}
+
+@test "bin/nn sets no ansible local_tmp for a non-ansible profile" {
+    # The redirect is scoped to profiles that actually compose oalders-ansible;
+    # a plain session must not carry the ansible-specific env var. (The clean
+    # test cwd resolves to the bare oalders profile, which doesn't pull it in.)
+    run "$NN"
+    [ "$status" -eq 0 ]
+    # Guard against a vacuous pass on a missing argv dump.
+    [ -f "$BATS_TEST_TMPDIR/nono-argv" ]
+    ! grep -Fq -- "ANSIBLE_LOCAL_TEMP=" "$BATS_TEST_TMPDIR/nono-argv"
+}
+
+@test "bin/nn does not trip the ansible redirect on a substring-only match" {
+    # The gate inspects the extends array structurally (jq), not as a raw
+    # substring, so a profile that merely contains the string "oalders-ansible"
+    # as part of a differently-named entry must NOT trigger the redirect. Guards
+    # the grep->jq tightening from the #991 review.
+    mkdir -p .nono
+    echo '{"extends": ["oalders", "oalders-ansible-experimental"]}' >.nono/profile.json
+    run "$NN"
+    [ "$status" -eq 0 ]
+    [ -f "$BATS_TEST_TMPDIR/nono-argv" ]
+    ! grep -Fq -- "ANSIBLE_LOCAL_TEMP=" "$BATS_TEST_TMPDIR/nono-argv"
+}
