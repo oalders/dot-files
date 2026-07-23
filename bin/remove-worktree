@@ -40,6 +40,14 @@ if [[ -z $worktree_path ]]; then
     worktree_path="$branch_name"
 fi
 
+# Remove docker containers this worktree's session started (bin/dev and
+# docker-compose). They're children of the docker daemon, not the process
+# tree kill-worktree-procs walks, so they'd otherwise survive teardown.
+teardown_docker="$(dirname "${BASH_SOURCE[0]}")/docker-teardown"
+if [ -x "$teardown_docker" ]; then
+    "$teardown_docker" "$worktree_path" "$branch_name" || true
+fi
+
 # Kill any agent process trees (nono/claude/serena) still running inside
 # the worktree before we remove it. tmux kill-session above only SIGHUPs
 # the pane shell; sandboxed claude trees often survive that.

@@ -1,0 +1,147 @@
+#!/usr/bin/env bash
+#
+# docker-teardown - remove docker containers a worktree session started.
+#
+# Given a worktree path (and optionally its branch), removes the docker
+# containers that provably belong to that worktree: the `bin/dev` container
+# for the worktree+branch, and any `docker compose` containers whose project
+# working directory is at or under the worktree. Session volumes are kept.
+#
+# Why this exists: containers are children of the docker daemon, not of the
+# tmux pane or the nono/claude/serena process tree. So neither
+# `kill-worktree-procs` (which walks /proc cwd + nono/claude ancestry) nor
+# `tmux kill-session` touches them. Left behind, they keep running with the
+# worktree deleted. The worktree-removal scripts (merge-pr, remove-worktree)
+# call this helper just before `kill-worktree-procs`.
+#
+# Safety — this NEVER does a bare `docker ps` sweep. A container is a target
+# only when its ownership of THIS worktree is provable:
+#   * compose: the `com.docker.compose.project.working_dir` label is $wt or
+#     a path under it;
+#   * bin/dev: the container name is exactly `<basename $wt>-<branch>`, which
+#     is how bin/dev derives it (repo basename + branch, '/' -> '-').
+# Ad-hoc `docker run` containers carry no such handle and are left alone
+# (with a note), matching the "minimize false positives" bias of the other
+# teardown helpers.
+
+set -u
+
+usage() {
+    cat <<'EOF'
+Usage: docker-teardown [-n|--dry-run] WORKTREE_PATH [BRANCH]
+
+Removes docker containers that belong to WORKTREE_PATH: the bin/dev
+container for WORKTREE_PATH+BRANCH and any docker-compose containers whose
+project working_dir is at or under WORKTREE_PATH. Session volumes are kept.
+
+  -n, --dry-run   Report what would be removed; remove nothing.
+  -h, --help      Show this help.
+
+A missing docker CLI or an unreachable daemon is not an error: the helper
+warns and exits 0 so worktree teardown is never blocked on docker.
+EOF
+}
+
+dry=0
+while [ $# -gt 0 ]; do
+    case "$1" in
+    -n | --dry-run)
+        dry=1
+        shift
+        ;;
+    -h | --help)
+        usage
+        exit 0
+        ;;
+    -*)
+        echo "docker-teardown: unknown option: $1" >&2
+        exit 2
+        ;;
+    *) break ;;
+    esac
+done
+
+wt="${1:-}"
+if [ -z "$wt" ]; then
+    usage >&2
+    exit 2
+fi
+branch="${2:-}"
+
+wt="${wt%/}"
+# Resolve symlinks so the label comparison matches what compose recorded.
+# Callers run us before `git worktree remove`, so the dir normally still
+# exists; if it doesn't, fall back to the path as given.
+if [ -d "$wt" ]; then
+    wt="$(cd "$wt" && pwd -P)"
+fi
+
+# No docker, or a daemon we can't reach: warn and succeed. Teardown of the
+# worktree itself must not hinge on docker being available.
+if ! command -v docker >/dev/null 2>&1; then
+    echo "docker-teardown: docker not found; skipping container cleanup" >&2
+    exit 0
+fi
+if ! docker ps -q >/dev/null 2>&1; then
+    echo "docker-teardown: docker daemon unreachable; skipping container cleanup" >&2
+    exit 0
+fi
+
+targets=""
+
+# Source 1 — compose containers owned by this worktree. Enumerate every
+# container carrying a project working_dir label, then keep only those whose
+# value is $wt or a path beneath it. `-a` so stopped-but-lingering containers
+# are caught too. The tab-delimited format keeps ID and label value paired.
+wd_label="com.docker.compose.project.working_dir"
+while IFS=$'\t' read -r id wd; do
+    [ -n "$id" ] || continue
+    case "$wd" in
+    "$wt" | "$wt"/*)
+        targets="$targets $id"
+        ;;
+    esac
+done < <(docker ps -a --filter "label=$wd_label" \
+    --format "{{.ID}}"$'\t'"{{.Label \"$wd_label\"}}" 2>/dev/null)
+
+# Source 2 — the bin/dev container for this worktree+branch. bin/dev names it
+# `<repo>-<branch>` where repo is the worktree dir basename and branch has
+# '/' rewritten to '-'. Only attempt this when a branch was supplied.
+if [ -n "$branch" ]; then
+    dev_name="$(basename "$wt")-$(printf '%s' "$branch" | tr '/' '-')"
+    # Anchor the name filter so `dot-files-feature` doesn't also match
+    # `dot-files-feature-2`.
+    dev_id="$(docker ps -aq --filter "name=^${dev_name}$" 2>/dev/null)"
+    [ -n "$dev_id" ] && targets="$targets $dev_id"
+fi
+
+# Dedup to one ID per line. A dev container has no compose label, so overlap
+# is unexpected, but guarding is cheap. The `^[0-9a-f]+$` filter keeps only
+# real container IDs (docker's are lowercase hex), so a stray token from a
+# mis-parsed row can never reach `docker rm -f`.
+targets="$(printf '%s' "$targets" | tr ' ' '\n' | grep -E '^[0-9a-f]+$' | sort -u)"
+
+if [ -z "$targets" ]; then
+    echo "docker-teardown: no worktree-owned containers under $wt"
+    exit 0
+fi
+
+count="$(printf '%s\n' "$targets" | wc -l | tr -d ' ')"
+
+if [ "$dry" = 1 ]; then
+    echo "docker-teardown: DRY RUN - would remove $count container(s) owned by $wt:"
+    while IFS= read -r id; do
+        docker ps -a --filter "id=$id" \
+            --format '  {{.ID}}  {{.Names}}  {{.Status}}' 2>/dev/null
+    done <<<"$targets"
+    exit 0
+fi
+
+echo "docker-teardown: removing $count container(s) owned by $wt"
+# `rm -f` stops (SIGKILL) then removes; volumes are intentionally left in
+# place (bin/dev's session volume persists Claude history across runs).
+# $targets is one non-empty ID per line here, so xargs always runs once.
+if ! printf '%s\n' "$targets" | xargs docker rm -f >/dev/null 2>&1; then
+    echo "docker-teardown: warning: one or more containers could not be removed" >&2
+fi
+echo "docker-teardown: done"

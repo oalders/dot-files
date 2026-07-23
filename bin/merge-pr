@@ -349,6 +349,14 @@ fi
 #      session, this terminates the script. Nothing may follow.
 cd "$main_repo"
 
+# Remove docker containers this worktree's session started (bin/dev and
+# docker-compose). They're children of the docker daemon, not the process
+# tree kill-worktree-procs walks, so they'd otherwise survive teardown.
+teardown_docker="$(dirname "${BASH_SOURCE[0]}")/docker-teardown"
+if [ -x "$teardown_docker" ]; then
+    "$teardown_docker" "$worktree_path" "$branch" || true
+fi
+
 # Kill any agent process trees (nono/claude/serena) still running inside
 # the worktree before we remove it. Otherwise they live on with cwd
 # "(deleted)", accumulate over days, exhaust RAM and spike load average.
