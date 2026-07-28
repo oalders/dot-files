@@ -452,7 +452,7 @@ set -x
 exec nono run --profile "$profile" --allow-cwd --workdir . \
     --read-file /usr/bin/env "${chrome_run_args[@]+"${chrome_run_args[@]}"}" \
     "${playwright_run_args[@]+"${playwright_run_args[@]}"}" \
-    "${hugo_run_args[@]+"${hugo_run_args[@]}"}" "${extra_allow[@]}" -- \
+    "${hugo_run_args[@]+"${hugo_run_args[@]}"}" "${extra_allow[@]+"${extra_allow[@]}"}" -- \
     env NO_PROXY="$no_proxy_value" no_proxy="$no_proxy_value" TMPDIR="$PWD/.tmp" \
     XDG_CACHE_HOME="$PWD/.tmp/cache" \
     PLAYWRIGHT_BROWSERS_PATH="$HOME/.cache/ms-playwright" \
