@@ -76,3 +76,9 @@ set_env_key CLAUDE_CODE_MAX_CONCURRENT_SUBAGENTS 5
 # which keeps Fable out of the picker. Experimental: unverified whether this key
 # is honored; harmless if ignored since it only narrows an allowlist.
 set_key availableModels '["opus","sonnet","haiku"]'
+
+# Default new sessions to medium reasoning effort to trim thinking-token spend.
+# /effort overwrites this in ~/.claude/settings.json; --effort and
+# CLAUDE_CODE_EFFORT_LEVEL override for a single session. Accepts
+# low/medium/high/xhigh (no "max").
+set_key effortLevel '"medium"'
