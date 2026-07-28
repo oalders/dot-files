@@ -21,11 +21,11 @@ if is there plenv; then
     eval "$(plenv init -)"
 fi
 
+if [[ -d ~/.rbenv ]]; then
+    add_path "$HOME/.rbenv/bin"
+fi
 if is there rbenv; then
-    if [[ -d ~/.rbenv ]]; then
-        add_path "$HOME/.rbenv/bin"
-        eval "$(rbenv init -)"
-    fi
+    eval "$(rbenv init -)"
 fi
 
 gcloud_completion="/usr/local/Caskroom/google-cloud-sdk/latest/google-cloud-sdk/completion.bash.inc"
