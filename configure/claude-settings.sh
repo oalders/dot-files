@@ -71,3 +71,8 @@ set_env_key CLAUDE_CODE_DISABLE_1M_CONTEXT 1
 # older versions. DISABLE_AUTOUPDATER above means installer/claude.sh decides
 # when we actually land on a version that reads this.
 set_env_key CLAUDE_CODE_MAX_CONCURRENT_SUBAGENTS 5
+
+# Allowlist the models offered by /model, --model, ANTHROPIC_MODEL and resume,
+# which keeps Fable out of the picker. Experimental: unverified whether this key
+# is honored; harmless if ignored since it only narrows an allowlist.
+set_key availableModels '["opus","sonnet","haiku"]'
