@@ -8,7 +8,12 @@ source ~/dot-files/bash_functions.sh
 set -x
 
 target_version=24
-if is os name eq linux && is there apt && (! is there node || is cli version --major node lt $target_version) && is user sudoer; then
+
+# Minimum full version, not just the major. Recent npm releases refuse to run
+# on older 24.x builds (npm 12 wants ^24.15.0), so a major-only check would
+# leave a stale node in place and every npm command would warn.
+min_version=24.15.0
+if is os name eq linux && is there apt && (! is there node || is cli version node lt $min_version) && is user sudoer; then
     tmpscript=$(mktemp)
     trap 'rm -f "$tmpscript"' EXIT
     curl -sL -o "$tmpscript" https://deb.nodesource.com/setup_$target_version.x
