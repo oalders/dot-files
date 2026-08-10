@@ -131,3 +131,101 @@ SYMLINKS="$SCRIPT_DIR/installer/symlinks.sh"
     run grep -Fq '"network"' "$NONO_DIR/oalders-ansible.json"
     [ "$status" -ne 0 ]
 }
+
+# The actual #1002 bug, and the only load-bearing grant in the mixin: `docker
+# compose` and `docker buildx` are CLI *plugins* — standalone binaries under
+# /usr/libexec/docker/cli-plugins that the docker binary execs by path, not
+# subcommands of it. Without a read grant on that dir those two commands fail
+# with "docker: unknown command" even though `docker` itself runs fine.
+@test "oalders-docker.json grants the docker CLI plugins dir" {
+    run jq -e '.filesystem.read | any(. == "/usr/libexec/docker/cli-plugins")' "$NONO_DIR/oalders-docker.json"
+    [ "$status" -eq 0 ]
+}
+
+# The grant is narrowed to cli-plugins/ rather than the whole
+# /usr/libexec/docker tree, which also carries daemon-side helpers the CLI
+# never needs. Guard the narrowing so it can't silently widen back (#1002).
+@test "oalders-docker.json does not grant the whole /usr/libexec/docker dir" {
+    # Parse first. jq -e exits 2 on a missing or malformed file, which is
+    # indistinguishable from "predicate was false" (exit 1) — without this, the
+    # guard below would go green if the profile were deleted or corrupted.
+    run jq empty "$NONO_DIR/oalders-docker.json"
+    [ "$status" -eq 0 ]
+    # Reject any ancestor of cli-plugins/, across every filesystem grant key —
+    # widening to /usr/libexec or /usr would defeat a check pinned to the one
+    # exact string, and a widening added under *_file or bypass_protection
+    # would be invisible to a check that only reads allow/read.
+    # $e binds the element before the `| startswith` pipe, which would
+    # otherwise rebind `.` to $want and silently compare $want against itself.
+    run jq -e --arg want /usr/libexec/docker/cli-plugins '
+        [.filesystem.allow[]?, .filesystem.read[]?,
+         .filesystem.allow_file[]?, .filesystem.read_file[]?,
+         .filesystem.bypass_protection[]?]
+        | map(sub("/$"; ""))
+        | any(. as $e | $e != $want and ($want | startswith($e + "/")))
+    ' "$NONO_DIR/oalders-docker.json"
+    # jq -e exits non-zero when the result is false/null: that is the pass.
+    [ "$status" -ne 0 ]
+}
+
+# These two entries are DEFENSIVE and NOT load-bearing: they are not what lets
+# the CLI reach the daemon. Landlock mediates path open(), not connect(AF_UNIX),
+# so the daemon socket is reachable from every nono session regardless of
+# profile — verified: `nono why --path /run/docker.sock --op write --profile
+# oalders` reports DENIED / path_not_granted while `docker ps` in that same
+# session still talks to the host daemon. The grants are kept (and asserted
+# here) purely so the profile is correct-by-construction should nono ever
+# mediate socket connect, and so it stays portable to layouts where /var/run is
+# not a symlink to /run (on Linux it is, and nono reports the resolved path).
+# This test asserts presence only; it makes no containment claim (#1002).
+@test "oalders-docker.json keeps both docker socket paths as defensive grants" {
+    local sock
+    for sock in /var/run/docker.sock /run/docker.sock; do
+        jq -e --arg s "$sock" '.filesystem.allow_file | any(. == $s)' "$NONO_DIR/oalders-docker.json" >/dev/null || {
+            printf 'missing allow_file entry: %s\n' "$sock"
+            false
+        }
+    done
+}
+
+# Buildx writes its own state (builder instances, metadata) under
+# ~/.docker/buildx, so that path needs write, not just read (#1002).
+@test "oalders-docker.json grants ~/.docker/buildx for write" {
+    run jq -e '.filesystem.allow | any(. == "~/.docker/buildx")' "$NONO_DIR/oalders-docker.json"
+    [ "$status" -eq 0 ]
+}
+
+# ~/.docker is deliberately narrowed to contexts/, buildx/, and config.json
+# rather than a directory-wide read: the tree can also hold credential
+# helper output and other daemon/registry state (#1002).
+@test "oalders-docker.json does not grant the whole ~/.docker dir" {
+    # Parse first — see the /usr/libexec guard above for why.
+    run jq empty "$NONO_DIR/oalders-docker.json"
+    [ "$status" -eq 0 ]
+    # Directory grants only: config.json is deliberately granted as a single
+    # file (read_file), so *_file keys are excluded here. $HOME and ~ are both
+    # rejected, since either spelling would re-widen the grant.
+    run jq -e '
+        [.filesystem.allow[]?, .filesystem.read[]?,
+         .filesystem.bypass_protection[]?]
+        | map(sub("/$"; ""))
+        | any(. == "~/.docker" or . == "$HOME/.docker"
+              or . == "~" or . == "$HOME")
+    ' "$NONO_DIR/oalders-docker.json"
+    # jq -e exits non-zero when the result is false/null: that is the pass.
+    [ "$status" -ne 0 ]
+}
+
+# Image pulls are performed by the daemon, which runs OUTSIDE the sandbox, so
+# nothing docker does traverses the session proxy. The mixin must stay
+# net-free like every other oalders-* sibling (#1002).
+@test "oalders-docker.json carries no network rules (stays net-free)" {
+    # Parse first: grep -Fq also exits non-zero on a missing file, so without
+    # this the assertion below would pass vacuously if the profile vanished.
+    # (The sibling net-free tests above share that gap; fixed here only, since
+    # widening the change would put unrelated profiles in this diff.)
+    run jq empty "$NONO_DIR/oalders-docker.json"
+    [ "$status" -eq 0 ]
+    run grep -Fq '"network"' "$NONO_DIR/oalders-docker.json"
+    [ "$status" -ne 0 ]
+}

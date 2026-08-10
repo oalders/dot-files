@@ -155,6 +155,19 @@ if [[ -z "$profile" ]]; then
     if [[ -f "$project_root/go.mod" ]]; then
         mixins+=("oalders-go")
     fi
+    # Docker: grants the CLI plugins dir (/usr/libexec/docker/cli-plugins —
+    # where `docker compose` and `docker buildx` live as separate plugin
+    # binaries) plus a narrow slice of ~/.docker. That plugins read is the
+    # only load-bearing grant; the mixin's docker.sock entries are defensive
+    # only, since Landlock doesn't mediate connect(AF_UNIX) and the daemon is
+    # reachable from every session regardless of profile (see nono/CLAUDE.md,
+    # and #1003). Gated on a compose file rather than a bare Dockerfile to
+    # keep the grant off repos with no compose/buildx workflow to fix — noise
+    # reduction, NOT a security boundary: withholding the mixin withholds
+    # nothing but the two plugin subcommands (#1002).
+    if [[ -f "$project_root/docker-compose.yml" || -f "$project_root/docker-compose.yaml" || -f "$project_root/compose.yml" || -f "$project_root/compose.yaml" ]]; then
+        mixins+=("oalders-docker")
+    fi
     # Hugo (detected once above): pulls in oalders-snap because Hugo on Linux
     # is typically installed via snap, which needs /snap, /var/lib/snapd, and
     # /etc/fstab readable to clear snapd's startup checks.

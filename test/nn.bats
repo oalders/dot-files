@@ -507,3 +507,57 @@ setup() {
     [ -f "$BATS_TEST_TMPDIR/nono-argv" ]
     ! grep -Fq -- "ANSIBLE_LOCAL_TEMP=" "$BATS_TEST_TMPDIR/nono-argv"
 }
+
+# bin/nn checks four compose filenames; cover each so dropping one from the
+# marker list can't pass unnoticed. A compose file at the repo top means the
+# session will run `docker compose`, which needs the CLI plugins dir the
+# default chain doesn't grant (#1002).
+@test "bin/nn auto-detect appends oalders-docker for docker-compose.yml" {
+    printf 'services: {}\n' > docker-compose.yml
+    run "$NN"
+    [ "$status" -eq 0 ]
+    [ -f .nono/profile.json ]
+    grep -Fq '"oalders-docker"' .nono/profile.json
+}
+
+@test "bin/nn auto-detect appends oalders-docker for docker-compose.yaml" {
+    printf 'services: {}\n' > docker-compose.yaml
+    run "$NN"
+    [ "$status" -eq 0 ]
+    [ -f .nono/profile.json ]
+    grep -Fq '"oalders-docker"' .nono/profile.json
+}
+
+@test "bin/nn auto-detect appends oalders-docker for compose.yml" {
+    printf 'services: {}\n' > compose.yml
+    run "$NN"
+    [ "$status" -eq 0 ]
+    [ -f .nono/profile.json ]
+    grep -Fq '"oalders-docker"' .nono/profile.json
+}
+
+@test "bin/nn auto-detect appends oalders-docker for compose.yaml" {
+    printf 'services: {}\n' > compose.yaml
+    run "$NN"
+    [ "$status" -eq 0 ]
+    [ -f .nono/profile.json ]
+    grep -Fq '"oalders-docker"' .nono/profile.json
+}
+
+@test "bin/nn auto-detect skips oalders-docker for a bare Dockerfile" {
+    # A Dockerfile alone is not a marker: a repo that only builds an image has
+    # no compose/buildx workflow to fix, so the mixin would be noise. This is
+    # NOT a security boundary — withholding the mixin withholds nothing but the
+    # two plugin subcommands, since the daemon is reachable from every session
+    # regardless of profile (#1003). See nono/CLAUDE.md.
+    #
+    # Paired with a package.json so a wrapper IS written: asserting merely that
+    # no profile.json exists would also pass if detection were deleted outright.
+    printf 'FROM alpine\n' > Dockerfile
+    printf '{}\n' > package.json
+    run "$NN"
+    [ "$status" -eq 0 ]
+    [ -f .nono/profile.json ]
+    grep -Fq '"oalders-node"' .nono/profile.json
+    ! grep -Fq '"oalders-docker"' .nono/profile.json
+}
