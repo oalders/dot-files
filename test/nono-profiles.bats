@@ -131,3 +131,52 @@ SYMLINKS="$SCRIPT_DIR/installer/symlinks.sh"
     run grep -Fq '"network"' "$NONO_DIR/oalders-ansible.json"
     [ "$status" -ne 0 ]
 }
+
+# The actual #1002 bug: `docker compose` is a CLI *plugin* living under
+# /usr/libexec/docker/cli-plugins, not a subcommand of the docker binary.
+# Without a read grant on that dir the sandbox reports "unknown command" even
+# though `docker` itself runs fine (nono why: DENIED / path_not_granted).
+@test "oalders-docker.json grants the docker CLI plugins dir" {
+    run jq -e '.filesystem.read | any(. == "/usr/libexec/docker")' "$NONO_DIR/oalders-docker.json"
+    [ "$status" -eq 0 ]
+}
+
+# Both daemon socket paths are granted on purpose: on Linux /var/run is a
+# symlink to /run, so nono resolves the CLI's /var/run/docker.sock to
+# /run/docker.sock — but other layouts keep them distinct (#1002).
+@test "oalders-docker.json grants both docker socket paths" {
+    local sock
+    for sock in /var/run/docker.sock /run/docker.sock; do
+        jq -e --arg s "$sock" '.filesystem.allow_file | any(. == $s)' "$NONO_DIR/oalders-docker.json" >/dev/null || {
+            printf 'missing allow_file entry: %s\n' "$sock"
+            false
+        }
+    done
+}
+
+# Buildx writes its own state (builder instances, metadata) under
+# ~/.docker/buildx, so that path needs write, not just read (#1002).
+@test "oalders-docker.json grants ~/.docker/buildx for write" {
+    run jq -e '.filesystem.allow | any(. == "~/.docker/buildx")' "$NONO_DIR/oalders-docker.json"
+    [ "$status" -eq 0 ]
+}
+
+# ~/.docker is deliberately narrowed to contexts/, buildx/, and config.json
+# rather than a directory-wide read: the tree can also hold credential
+# helper output and other daemon/registry state (#1002).
+@test "oalders-docker.json does not grant the whole ~/.docker dir" {
+    run jq -e '
+        [.filesystem.allow[]?, .filesystem.read[]?]
+        | any(. == "~/.docker" or . == "~/.docker/")
+    ' "$NONO_DIR/oalders-docker.json"
+    # jq -e exits non-zero when the result is false/null: that is the pass.
+    [ "$status" -ne 0 ]
+}
+
+# Image pulls are performed by the daemon, which runs OUTSIDE the sandbox, so
+# nothing docker does traverses the session proxy. The mixin must stay
+# net-free like every other oalders-* sibling (#1002).
+@test "oalders-docker.json carries no network rules (stays net-free)" {
+    run grep -Fq '"network"' "$NONO_DIR/oalders-docker.json"
+    [ "$status" -ne 0 ]
+}

@@ -98,6 +98,7 @@ ln -sf $prefix/nix/nix.conf ~/.config/nix/nix.conf
 ln -sf $prefix/nono/oalders-ansible.json ~/.config/nono/profiles/oalders-ansible.json
 ln -sf $prefix/nono/oalders-chrome.json ~/.config/nono/profiles/oalders-chrome.json
 ln -sf $prefix/nono/oalders-core.json ~/.config/nono/profiles/oalders-core.json
+ln -sf $prefix/nono/oalders-docker.json ~/.config/nono/profiles/oalders-docker.json
 ln -sf $prefix/nono/oalders-go.json ~/.config/nono/profiles/oalders-go.json
 ln -sf $prefix/nono/oalders-hugo.json ~/.config/nono/profiles/oalders-hugo.json
 ln -sf $prefix/nono/oalders-net.json ~/.config/nono/profiles/oalders-net.json

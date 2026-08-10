@@ -507,3 +507,23 @@ setup() {
     [ -f "$BATS_TEST_TMPDIR/nono-argv" ]
     ! grep -Fq -- "ANSIBLE_LOCAL_TEMP=" "$BATS_TEST_TMPDIR/nono-argv"
 }
+
+@test "bin/nn auto-detect appends oalders-docker for a compose file" {
+    # A compose file at the repo top means the session will drive the daemon:
+    # compose out of the box needs the CLI plugins dir and the daemon socket,
+    # neither of which the default chain grants (#1002).
+    printf 'services: {}\n' > docker-compose.yml
+    run "$NN"
+    [ "$status" -eq 0 ]
+    [ -f .nono/profile.json ]
+    grep -Fq '"oalders-docker"' .nono/profile.json
+}
+
+@test "bin/nn auto-detect skips oalders-docker for a bare Dockerfile" {
+    # A Dockerfile alone is not a marker: a repo that only builds an image
+    # shouldn't be handed the daemon socket (#1002).
+    printf 'FROM alpine\n' > Dockerfile
+    run "$NN"
+    [ "$status" -eq 0 ]
+    [ ! -f .nono/profile.json ]
+}
