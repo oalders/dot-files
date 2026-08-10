@@ -220,6 +220,12 @@ SYMLINKS="$SCRIPT_DIR/installer/symlinks.sh"
 # nothing docker does traverses the session proxy. The mixin must stay
 # net-free like every other oalders-* sibling (#1002).
 @test "oalders-docker.json carries no network rules (stays net-free)" {
+    # Parse first: grep -Fq also exits non-zero on a missing file, so without
+    # this the assertion below would pass vacuously if the profile vanished.
+    # (The sibling net-free tests above share that gap; fixed here only, since
+    # widening the change would put unrelated profiles in this diff.)
+    run jq empty "$NONO_DIR/oalders-docker.json"
+    [ "$status" -eq 0 ]
     run grep -Fq '"network"' "$NONO_DIR/oalders-docker.json"
     [ "$status" -ne 0 ]
 }
