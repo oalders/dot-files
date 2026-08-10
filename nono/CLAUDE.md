@@ -100,7 +100,12 @@ them on that basis and no other.
 daemon runs as root *outside* the sandbox, so any session that can talk to it
 can do `docker run --privileged -v /:/host` and have host root — which, per the
 above, is every session. This is pre-existing; the mixin neither introduces nor
-widens it.
+widens it. Tracked with the full evidence and candidate mitigations (namespace
+shim around `nono run`, a Docker `AuthZ` plugin, rootless Docker) in #1003 —
+none of them fixable in a profile. A corollary worth carrying beyond Docker:
+`nono why` returns `DENIED` for an access the sandbox permits here, so its
+verdict is unreliable for sockets, FIFOs, and device nodes. Verify those
+empirically rather than trusting the check.
 
 **Which is why detection is automatic.** Keying on compose files rather than
 making the mixin opt-in costs no containment: the escape is already universal,
