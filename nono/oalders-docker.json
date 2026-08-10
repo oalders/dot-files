@@ -1,11 +1,11 @@
 {
   "meta": {
     "name": "oalders-docker",
-    "description": "Docker CLI mixin: the CLI plugins dir (/usr/libexec/docker — where `docker compose` and `docker buildx` actually live), both daemon socket paths (/var/run is a symlink to /run on Linux), plus a narrow slice of ~/.docker (contexts, buildx state, config.json). Net-free: image pulls run in the daemon outside the sandbox, so nothing traverses the session proxy."
+    "description": "Docker CLI mixin: the CLI plugins dir (/usr/libexec/docker/cli-plugins — where `docker compose` and `docker buildx` actually live) plus a narrow slice of ~/.docker (contexts, buildx state, config.json). The two daemon socket allow_file entries are defensive only: Landlock mediates path open(), not connect(AF_UNIX), so the daemon is reachable from any session regardless of profile. Net-free: image pulls run in the daemon outside the sandbox, so nothing traverses the session proxy."
   },
   "filesystem": {
     "read": [
-      "/usr/libexec/docker",
+      "/usr/libexec/docker/cli-plugins",
       "~/.docker/contexts"
     ],
     "allow": [
@@ -15,8 +15,8 @@
       "~/.docker/config.json"
     ],
     "allow_file": [
-      "/var/run/docker.sock",
-      "/run/docker.sock"
+      "/run/docker.sock",
+      "/var/run/docker.sock"
     ]
   }
 }

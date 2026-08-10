@@ -508,11 +508,36 @@ setup() {
     ! grep -Fq -- "ANSIBLE_LOCAL_TEMP=" "$BATS_TEST_TMPDIR/nono-argv"
 }
 
-@test "bin/nn auto-detect appends oalders-docker for a compose file" {
-    # A compose file at the repo top means the session will drive the daemon:
-    # compose out of the box needs the CLI plugins dir and the daemon socket,
-    # neither of which the default chain grants (#1002).
+# bin/nn checks four compose filenames; cover each so dropping one from the
+# marker list can't pass unnoticed. A compose file at the repo top means the
+# session will run `docker compose`, which needs the CLI plugins dir the
+# default chain doesn't grant (#1002).
+@test "bin/nn auto-detect appends oalders-docker for docker-compose.yml" {
     printf 'services: {}\n' > docker-compose.yml
+    run "$NN"
+    [ "$status" -eq 0 ]
+    [ -f .nono/profile.json ]
+    grep -Fq '"oalders-docker"' .nono/profile.json
+}
+
+@test "bin/nn auto-detect appends oalders-docker for docker-compose.yaml" {
+    printf 'services: {}\n' > docker-compose.yaml
+    run "$NN"
+    [ "$status" -eq 0 ]
+    [ -f .nono/profile.json ]
+    grep -Fq '"oalders-docker"' .nono/profile.json
+}
+
+@test "bin/nn auto-detect appends oalders-docker for compose.yml" {
+    printf 'services: {}\n' > compose.yml
+    run "$NN"
+    [ "$status" -eq 0 ]
+    [ -f .nono/profile.json ]
+    grep -Fq '"oalders-docker"' .nono/profile.json
+}
+
+@test "bin/nn auto-detect appends oalders-docker for compose.yaml" {
+    printf 'services: {}\n' > compose.yaml
     run "$NN"
     [ "$status" -eq 0 ]
     [ -f .nono/profile.json ]

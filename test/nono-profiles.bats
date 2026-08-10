@@ -132,19 +132,39 @@ SYMLINKS="$SCRIPT_DIR/installer/symlinks.sh"
     [ "$status" -ne 0 ]
 }
 
-# The actual #1002 bug: `docker compose` is a CLI *plugin* living under
-# /usr/libexec/docker/cli-plugins, not a subcommand of the docker binary.
-# Without a read grant on that dir the sandbox reports "unknown command" even
-# though `docker` itself runs fine (nono why: DENIED / path_not_granted).
+# The actual #1002 bug, and the only load-bearing grant in the mixin: `docker
+# compose` and `docker buildx` are CLI *plugins* — standalone binaries under
+# /usr/libexec/docker/cli-plugins that the docker binary execs by path, not
+# subcommands of it. Without a read grant on that dir those two commands fail
+# with "docker: unknown command" even though `docker` itself runs fine.
 @test "oalders-docker.json grants the docker CLI plugins dir" {
-    run jq -e '.filesystem.read | any(. == "/usr/libexec/docker")' "$NONO_DIR/oalders-docker.json"
+    run jq -e '.filesystem.read | any(. == "/usr/libexec/docker/cli-plugins")' "$NONO_DIR/oalders-docker.json"
     [ "$status" -eq 0 ]
 }
 
-# Both daemon socket paths are granted on purpose: on Linux /var/run is a
-# symlink to /run, so nono resolves the CLI's /var/run/docker.sock to
-# /run/docker.sock — but other layouts keep them distinct (#1002).
-@test "oalders-docker.json grants both docker socket paths" {
+# The grant is narrowed to cli-plugins/ rather than the whole
+# /usr/libexec/docker tree, which also carries daemon-side helpers the CLI
+# never needs. Guard the narrowing so it can't silently widen back (#1002).
+@test "oalders-docker.json does not grant the whole /usr/libexec/docker dir" {
+    run jq -e '
+        [.filesystem.allow[]?, .filesystem.read[]?]
+        | any(. == "/usr/libexec/docker" or . == "/usr/libexec/docker/")
+    ' "$NONO_DIR/oalders-docker.json"
+    # jq -e exits non-zero when the result is false/null: that is the pass.
+    [ "$status" -ne 0 ]
+}
+
+# These two entries are DEFENSIVE and NOT load-bearing: they are not what lets
+# the CLI reach the daemon. Landlock mediates path open(), not connect(AF_UNIX),
+# so the daemon socket is reachable from every nono session regardless of
+# profile — verified: `nono why --path /run/docker.sock --op write --profile
+# oalders` reports DENIED / path_not_granted while `docker ps` in that same
+# session still talks to the host daemon. The grants are kept (and asserted
+# here) purely so the profile is correct-by-construction should nono ever
+# mediate socket connect, and so it stays portable to layouts where /var/run is
+# not a symlink to /run (on Linux it is, and nono reports the resolved path).
+# This test asserts presence only; it makes no containment claim (#1002).
+@test "oalders-docker.json keeps both docker socket paths as defensive grants" {
     local sock
     for sock in /var/run/docker.sock /run/docker.sock; do
         jq -e --arg s "$sock" '.filesystem.allow_file | any(. == $s)' "$NONO_DIR/oalders-docker.json" >/dev/null || {

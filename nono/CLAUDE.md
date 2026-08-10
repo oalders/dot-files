@@ -53,7 +53,7 @@ These are global infrastructure — MCP servers Claude relies on, and their runt
 | `oalders-perl`  | `cpanfile`, `Makefile.PL`, `dist.ini` | plenv (`~/.plenv`), local::lib (`~/perl5`), Dist::Zilla (`~/.dzil`, `~/dot-files/dzil`), prove (`~/.proverc`), XS system C headers (`/usr/include`, `/usr/local/include`). Net-free; CPAN/MetaCPAN/MagPie network is in the paired `oalders-perl-net` (appended alongside it by `nn`). |
 | `oalders-node`  | `package.json`                        | `*.npmjs.org`, `registry.npmjs.org` (npm registry network access for installs)     |
 | `oalders-go`    | `go.mod`                              | Go toolchain (`go_runtime` group), build/module/lint caches (`~/.cache/go-build`, `~/.cache/golangci-lint`, `~/go/pkg/mod`), module proxy + checksum DB (`proxy.golang.org`, `sum.golang.org`), and cgo system headers (`/usr/include`, `/usr/local/include`, `/opt/homebrew/include`, pkg-config dirs, `/Library/Developer/CommandLineTools`) |
-| `oalders-docker` | `docker-compose.yml` / `docker-compose.yaml` / `compose.yml` / `compose.yaml` | `/usr/libexec/docker` (read) — the actual fix for #1002: `docker compose` and `docker buildx` are CLI *plugins* under `cli-plugins/`, not subcommands of the `docker` binary, so without this read the sandbox reports "unknown command" while plain `docker` works. Both `/var/run/docker.sock` and `/run/docker.sock` (`allow_file`), because `/var/run` is a symlink to `/run` on Linux and `nono why` reports the resolved path — granting both covers either layout. `~/.docker` is deliberately narrowed to `contexts/` (read), `buildx/` (write — buildx persists builder state), and `config.json` (read) rather than a directory-wide read; `config.json` is duplicated from `oalders-core` so the sibling stands alone. Net-free: image pulls are done by the daemon, which runs **outside** the sandbox, so nothing traverses the session proxy. A bare `Dockerfile` is deliberately **not** a marker — a repo that only builds an image shouldn't be handed the daemon socket. |
+| `oalders-docker` | `docker-compose.yml` / `docker-compose.yaml` / `compose.yml` / `compose.yaml` | `/usr/libexec/docker/cli-plugins` (read) — the actual fix for #1002 and the **only load-bearing grant** in the mixin: `docker compose` and `docker buildx` are CLI *plugins* (standalone binaries in that dir), not subcommands of the `docker` binary, so without this read they fail with `docker: unknown command` while plain `docker` works. `~/.docker` is deliberately narrowed to `contexts/` (read), `buildx/` (write — buildx persists builder state), and `config.json` (read) rather than a directory-wide read; `config.json` is duplicated from `oalders-core` so the sibling stands alone. Both `/var/run/docker.sock` and `/run/docker.sock` (`allow_file`) are **defensive only** — see below. Net-free: image pulls are done by the daemon, which runs **outside** the sandbox, so nothing traverses the session proxy. A bare `Dockerfile` is deliberately **not** a marker. |
 | `oalders-hugo`  | `hugo.toml` / `hugo.yaml` / `hugo.json`, or `config.toml` + `themes/` | Hugo cache (`~/.cache/hugo_cache`). When Hugo matches, `nn` also appends `oalders-snap` to the mixin list because Hugo on Linux is typically snap-installed, and — if the host is on a tailnet — opens Hugo's serve ports over the tailscale IP (see §2c). |
 | `oalders-snap`  | (no markers of its own — `nn` appends it alongside any snap-backed sibling like `oalders-hugo`) | Reads for snap-confined binaries: `/snap`, `/var/lib/snapd`, `/etc/fstab` (snapd's startup checks parse the mount table). |
 
@@ -62,6 +62,54 @@ Example wrapper for a Node + Perl repo (`package.json` + `cpanfile` at top):
 ```json
 {"extends": ["oalders", "oalders-perl", "oalders-node"]}
 ```
+
+#### `oalders-docker`: the socket grants contain nothing
+
+Read this before reasoning about what the Docker mixin does or doesn't gate.
+
+**The plugins dir is the whole fix.** `/usr/libexec/docker/cli-plugins` (read)
+is the only grant in `oalders-docker` that changes what a session can do.
+`compose` and `buildx` ship as separate executables in that directory and the
+`docker` binary `exec`s them by path, so a session without the read grant gets
+`docker: unknown command` for exactly those two — and nothing else about Docker
+is broken. It's narrowed to `cli-plugins/` rather than all of
+`/usr/libexec/docker`, which also holds daemon-side helpers the CLI never
+needs.
+
+**The daemon socket is reachable from every session, profile regardless.**
+Landlock's rights model covers path `open()`, not `connect(AF_UNIX)`, so a
+grant on `docker.sock` is not what lets the CLI reach the daemon — and
+withholding it does not withhold access. Verified empirically from a live
+session whose profile did **not** include this mixin:
+
+- `nono why --path /run/docker.sock --op write --profile oalders` →
+  `DENIED / path_not_granted`
+- …and yet `docker ps` succeeds in that same session, reaching the host daemon
+  (server 29.1.3) and listing host containers.
+- Only `docker compose version` and `docker buildx version` fail there, both
+  with `docker: unknown command` — the plugin-dir symptom, nothing socket-shaped.
+
+The two `allow_file` entries therefore stay as **defensive, non-load-bearing**
+grants: kept so the profile is correct-by-construction if nono ever mediates
+socket `connect()`, and so it stays portable to layouts where `/var/run` is not
+a symlink to `/run` (on Linux it is, and `nono why` reports the resolved path).
+They are not what makes Docker work today, and `test/nono-profiles.bats` guards
+them on that basis and no other.
+
+**Treat every session on this box as uncontained with respect to Docker.** The
+daemon runs as root *outside* the sandbox, so any session that can talk to it
+can do `docker run --privileged -v /:/host` and have host root — which, per the
+above, is every session. This is pre-existing; the mixin neither introduces nor
+widens it.
+
+**Which is why detection is automatic.** Keying on compose files rather than
+making the mixin opt-in costs no containment: the escape is already universal,
+so an opt-in gate would gate a privilege sessions already hold and buy nothing
+but friction. The mixin exists to make `docker compose` *work*, not to gate
+access to the daemon — do not read opt-in-vs-auto here as a security boundary
+in either direction. A bare `Dockerfile` is still deliberately not a marker: a
+repo that only builds an image has no compose/buildx workflow to fix, so the
+grant would be noise.
 
 ### Opt-in only (no auto-detection)
 
