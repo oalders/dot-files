@@ -68,7 +68,8 @@ Example wrapper for a Node + Perl repo (`package.json` + `cpanfile` at top):
 Read this before reasoning about what the Docker mixin does or doesn't gate.
 
 **The plugins dir is the whole fix.** `/usr/libexec/docker/cli-plugins` (read)
-is the only grant in `oalders-docker` that changes what a session can do.
+is the only grant in `oalders-docker` that fixes #1002 — but not the only one
+that changes what a session can do: see the buildx caveat below.
 `compose` and `buildx` ship as separate executables in that directory and the
 `docker` binary `exec`s them by path, so a session without the read grant gets
 `docker: unknown command` for exactly those two — and nothing else about Docker
@@ -107,12 +108,31 @@ none of them fixable in a profile. A corollary worth carrying beyond Docker:
 verdict is unreliable for sockets, FIFOs, and device nodes. Verify those
 empirically rather than trusting the check.
 
+**The one grant with a host-side blast radius is `~/.docker/buildx` (write).**
+It is load-bearing (`docker buildx create` can't persist a builder without it)
+and it is the mixin's only write that outlives the session. A session can
+persist a `remote`-driver builder pointing at an endpoint it chooses and mark
+it current; a later **un-sandboxed** `docker buildx build` on the host then
+ships that build context — source, `.env` files — to the endpoint. Note the
+asymmetry with `~/.docker/contexts`, kept read-only for exactly this reason.
+Accepted for now and tracked in #1004, which proposes redirecting it to
+`BUILDX_CONFIG="$PWD/.tmp/buildx"` the way `bin/nn` already redirects
+`SERENA_HOME` and `ANSIBLE_LOCAL_TEMP`. Low priority only because #1003 means
+host root is reachable anyway — this is not the weakest link, just the one
+that survives worktree deletion.
+
 **Which is why detection is automatic.** Keying on compose files rather than
 making the mixin opt-in costs no containment: the escape is already universal,
 so an opt-in gate would gate a privilege sessions already hold and buy nothing
 but friction. The mixin exists to make `docker compose` *work*, not to gate
 access to the daemon — do not read opt-in-vs-auto here as a security boundary
-in either direction. A bare `Dockerfile` is still deliberately not a marker: a
+in either direction. One honest caveat on the residual delta: auto-detect
+grants no *capability* a session lacked, but it does raise *likelihood* — a
+cloned repo's own `compose.yaml` becomes directly runnable via the exact
+command its README suggests, and a compose file can legitimately carry
+`privileged: true` or `volumes: ["/:/host"]`. That's an ergonomics trade, not
+a containment one, but it is the reason to keep treating a strange repo's
+compose file as untrusted content rather than a build script. A bare `Dockerfile` is still deliberately not a marker: a
 repo that only builds an image has no compose/buildx workflow to fix, so the
 grant would be noise.
 

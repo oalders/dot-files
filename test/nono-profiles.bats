@@ -146,9 +146,23 @@ SYMLINKS="$SCRIPT_DIR/installer/symlinks.sh"
 # /usr/libexec/docker tree, which also carries daemon-side helpers the CLI
 # never needs. Guard the narrowing so it can't silently widen back (#1002).
 @test "oalders-docker.json does not grant the whole /usr/libexec/docker dir" {
-    run jq -e '
-        [.filesystem.allow[]?, .filesystem.read[]?]
-        | any(. == "/usr/libexec/docker" or . == "/usr/libexec/docker/")
+    # Parse first. jq -e exits 2 on a missing or malformed file, which is
+    # indistinguishable from "predicate was false" (exit 1) — without this, the
+    # guard below would go green if the profile were deleted or corrupted.
+    run jq empty "$NONO_DIR/oalders-docker.json"
+    [ "$status" -eq 0 ]
+    # Reject any ancestor of cli-plugins/, across every filesystem grant key —
+    # widening to /usr/libexec or /usr would defeat a check pinned to the one
+    # exact string, and a widening added under *_file or bypass_protection
+    # would be invisible to a check that only reads allow/read.
+    # $e binds the element before the `| startswith` pipe, which would
+    # otherwise rebind `.` to $want and silently compare $want against itself.
+    run jq -e --arg want /usr/libexec/docker/cli-plugins '
+        [.filesystem.allow[]?, .filesystem.read[]?,
+         .filesystem.allow_file[]?, .filesystem.read_file[]?,
+         .filesystem.bypass_protection[]?]
+        | map(sub("/$"; ""))
+        | any(. as $e | $e != $want and ($want | startswith($e + "/")))
     ' "$NONO_DIR/oalders-docker.json"
     # jq -e exits non-zero when the result is false/null: that is the pass.
     [ "$status" -ne 0 ]
@@ -185,9 +199,18 @@ SYMLINKS="$SCRIPT_DIR/installer/symlinks.sh"
 # rather than a directory-wide read: the tree can also hold credential
 # helper output and other daemon/registry state (#1002).
 @test "oalders-docker.json does not grant the whole ~/.docker dir" {
+    # Parse first — see the /usr/libexec guard above for why.
+    run jq empty "$NONO_DIR/oalders-docker.json"
+    [ "$status" -eq 0 ]
+    # Directory grants only: config.json is deliberately granted as a single
+    # file (read_file), so *_file keys are excluded here. $HOME and ~ are both
+    # rejected, since either spelling would re-widen the grant.
     run jq -e '
-        [.filesystem.allow[]?, .filesystem.read[]?]
-        | any(. == "~/.docker" or . == "~/.docker/")
+        [.filesystem.allow[]?, .filesystem.read[]?,
+         .filesystem.bypass_protection[]?]
+        | map(sub("/$"; ""))
+        | any(. == "~/.docker" or . == "$HOME/.docker"
+              or . == "~" or . == "$HOME")
     ' "$NONO_DIR/oalders-docker.json"
     # jq -e exits non-zero when the result is false/null: that is the pass.
     [ "$status" -ne 0 ]

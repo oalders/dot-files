@@ -545,10 +545,19 @@ setup() {
 }
 
 @test "bin/nn auto-detect skips oalders-docker for a bare Dockerfile" {
-    # A Dockerfile alone is not a marker: a repo that only builds an image
-    # shouldn't be handed the daemon socket (#1002).
+    # A Dockerfile alone is not a marker: a repo that only builds an image has
+    # no compose/buildx workflow to fix, so the mixin would be noise. This is
+    # NOT a security boundary — withholding the mixin withholds nothing but the
+    # two plugin subcommands, since the daemon is reachable from every session
+    # regardless of profile (#1003). See nono/CLAUDE.md.
+    #
+    # Paired with a package.json so a wrapper IS written: asserting merely that
+    # no profile.json exists would also pass if detection were deleted outright.
     printf 'FROM alpine\n' > Dockerfile
+    printf '{}\n' > package.json
     run "$NN"
     [ "$status" -eq 0 ]
-    [ ! -f .nono/profile.json ]
+    [ -f .nono/profile.json ]
+    grep -Fq '"oalders-node"' .nono/profile.json
+    ! grep -Fq '"oalders-docker"' .nono/profile.json
 }
