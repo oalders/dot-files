@@ -11,6 +11,10 @@ load 'helpers.bash'
 #                         query; empty => no dev container.
 #   DOCKER_RM_LOG         file the stub appends `rm` arguments to, so a test
 #                         can assert exactly which ids were removed.
+#   DOCKER_IMAGE_LOCAL    "1" (default) => `docker image inspect` succeeds, so
+#                         the reclaim step finds a local image.
+#   DOCKER_RUN_LOG        file the stub appends `run` arguments to, so a test
+#                         can assert how the ownership-reclaim container ran.
 docker_stub_body='
 case "${1:-}" in
 ps)
@@ -52,6 +56,14 @@ rm)
     printf "%s\n" "$*" >>"${DOCKER_RM_LOG:?}"
     exit 0
     ;;
+image)
+    [ "${DOCKER_IMAGE_LOCAL:-1}" = "1" ] && exit 0 || exit 1
+    ;;
+run)
+    shift
+    printf "%s\n" "$*" >>"${DOCKER_RUN_LOG:?}"
+    exit 0
+    ;;
 esac
 exit 0
 '
@@ -65,7 +77,18 @@ setup() {
     RM_LOG="$BATS_TEST_TMPDIR/rm.log"
     : >"$RM_LOG"
     export DOCKER_RM_LOG="$RM_LOG"
+    RUN_LOG="$BATS_TEST_TMPDIR/run.log"
+    : >"$RUN_LOG"
+    export DOCKER_RUN_LOG="$RUN_LOG"
     stub_command docker "$docker_stub_body"
+}
+
+# A worktree-shaped directory whose contents are all ours. Sets WT to it,
+# replacing the never-created default so the ownership-reclaim step runs.
+make_real_worktree() {
+    WT="$BATS_TEST_TMPDIR/real-wt"
+    mkdir -p "$WT/live-mysql-data"
+    echo x >"$WT/live-mysql-data/ibdata"
 }
 
 @test "docker-teardown prints usage and exits 2 with no args" {
@@ -132,4 +155,63 @@ setup() {
     [[ "$output" == *"DRY RUN"* ]]
     [[ "$output" == *abc123* ]]
     [ ! -s "$RM_LOG" ]
+}
+
+# --- ownership reclaim ---------------------------------------------------
+#
+# The reclaim step exists because a compose service that bind-mounts a
+# worktree directory writes it as root, and `git worktree remove --force`
+# then dies with "Permission denied" *after* unregistering the worktree.
+# Creating a genuinely root-owned file in a test would need sudo, so these
+# tests stub `find` to report one instead — the stub PATH shadows it for
+# docker-teardown just as it does `docker`.
+
+@test "reclaim: no container is started when every path is already ours" {
+    make_real_worktree
+    run "$DT" "$WT" feature
+    [ "$status" -eq 0 ]
+    [[ "$output" != *"reclaiming"* ]]
+    [ ! -s "$RUN_LOG" ]
+}
+
+@test "reclaim: a root-owned path triggers a chown container over the worktree" {
+    make_real_worktree
+    stub_command find "printf '%s\n' \"\$2/live-mysql-data\""
+    run "$DT" "$WT" feature
+    [ "$status" -eq 0 ]
+    [[ "$output" == *"reclaiming"* ]]
+    started="$(cat "$RUN_LOG")"
+    # Mounts exactly the worktree, and chowns to the invoking user.
+    [[ "$started" == *"-v $WT:/wt"* ]]
+    [[ "$started" == *"chown -h $(id -u):$(id -g)"* ]]
+    # Never reaches the network, and never touches .git.
+    [[ "$started" == *"--network none"* ]]
+    [[ "$started" == *"-name .git -prune"* ]]
+}
+
+@test "reclaim: dry-run reports the root-owned paths but starts no container" {
+    make_real_worktree
+    stub_command find "printf '%s\n' \"\$2/live-mysql-data\""
+    run "$DT" --dry-run "$WT" feature
+    [ "$status" -eq 0 ]
+    [[ "$output" == *"would chown"* ]]
+    [[ "$output" == *"live-mysql-data"* ]]
+    [ ! -s "$RUN_LOG" ]
+}
+
+@test "reclaim: a failed chown container warns but still exits 0" {
+    make_real_worktree
+    stub_command find "printf '%s\n' \"\$2/live-mysql-data\""
+    # Re-stub docker so only `run` fails. No containers match in this test, so
+    # the trimmed `ps` handling is enough.
+    stub_command docker "case \"\${1:-}\" in
+ps) exit 0 ;;
+image) exit 0 ;;
+run) exit 1 ;;
+esac
+exit 0"
+    run "$DT" "$WT" feature
+    # Teardown must never block worktree removal on docker.
+    [ "$status" -eq 0 ]
+    [[ "$output" == *"could not reclaim"* ]]
 }
