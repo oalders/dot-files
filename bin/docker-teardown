@@ -1,11 +1,14 @@
 #!/usr/bin/env bash
 #
-# docker-teardown - remove docker containers a worktree session started.
+# docker-teardown - remove docker artifacts a worktree session left behind.
 #
 # Given a worktree path (and optionally its branch), removes the docker
 # containers that provably belong to that worktree: the `bin/dev` container
 # for the worktree+branch, and any `docker compose` containers whose project
 # working directory is at or under the worktree. Session volumes are kept.
+#
+# It then reclaims ownership of files those containers wrote into the worktree
+# as root (bind-mounted data dirs — see "ownership reclaim" below).
 #
 # Why this exists: containers are children of the docker daemon, not of the
 # tmux pane or the nono/claude/serena process tree. So neither
@@ -33,6 +36,9 @@ Usage: docker-teardown [-n|--dry-run] WORKTREE_PATH [BRANCH]
 Removes docker containers that belong to WORKTREE_PATH: the bin/dev
 container for WORKTREE_PATH+BRANCH and any docker-compose containers whose
 project working_dir is at or under WORKTREE_PATH. Session volumes are kept.
+
+Then chowns back any path under WORKTREE_PATH that a container wrote as
+root, so `git worktree remove` can delete the tree.
 
   -n, --dry-run   Report what would be removed; remove nothing.
   -h, --help      Show this help.
@@ -123,25 +129,90 @@ targets="$(printf '%s' "$targets" | tr ' ' '\n' | grep -E '^[0-9a-f]+$' | sort -
 
 if [ -z "$targets" ]; then
     echo "docker-teardown: no worktree-owned containers under $wt"
+else
+    count="$(printf '%s\n' "$targets" | wc -l | tr -d ' ')"
+
+    if [ "$dry" = 1 ]; then
+        echo "docker-teardown: DRY RUN - would remove $count container(s) owned by $wt:"
+        while IFS= read -r id; do
+            docker ps -a --filter "id=$id" \
+                --format '  {{.ID}}  {{.Names}}  {{.Status}}' 2>/dev/null
+        done <<<"$targets"
+    else
+        echo "docker-teardown: removing $count container(s) owned by $wt"
+        # `rm -f` stops (SIGKILL) then removes; volumes are intentionally left
+        # in place (bin/dev's session volume persists Claude history across
+        # runs). $targets is one non-empty ID per line here, so xargs always
+        # runs once.
+        if ! printf '%s\n' "$targets" | xargs docker rm -f >/dev/null 2>&1; then
+            echo "docker-teardown: warning: one or more containers could not be removed" >&2
+        fi
+    fi
+fi
+
+# --- ownership reclaim ---------------------------------------------------
+#
+# A compose service that bind-mounts a directory from the worktree (a database
+# data dir, a certbot state dir) runs as root inside the container and creates
+# those files as root on the host. `git worktree remove --force` then dies with
+# "Permission denied" partway through the delete — and by then it has already
+# removed .git and unregistered the worktree, so what's left is an orphaned
+# directory tree that `git worktree list` no longer knows about. That is the
+# only thing standing between a clean teardown and a manual `sudo rm -rf`.
+#
+# Fix it the same way it was caused: a throwaway container running as root,
+# with the worktree bind-mounted, chowning the offending paths back to us. No
+# sudo, no password prompt.
+#
+# Runs even when no containers were found: the container that wrote the files
+# may have been removed days ago, or by a previous run of this script.
+
+if [ ! -d "$wt" ]; then
+    echo "docker-teardown: done"
     exit 0
 fi
 
-count="$(printf '%s\n' "$targets" | wc -l | tr -d ' ')"
+uid="$(id -u)"
+gid="$(id -g)"
+
+# Cheap detection first, so the common case never starts a container. A
+# root-owned directory we cannot descend into is itself reported by this find,
+# so being unable to read its contents costs us nothing. .git is skipped: it is
+# ours by construction and never bind-mounted.
+if ! find "$wt" -name .git -prune -o ! -user "$uid" -print 2>/dev/null | grep -q .; then
+    echo "docker-teardown: done"
+    exit 0
+fi
+
+# Pick an image that is already local before falling back to pulling one — a
+# teardown should not stall on a registry round trip if anything tiny is at
+# hand.
+reclaim_image=""
+for img in alpine:latest busybox:latest alpine busybox; do
+    if docker image inspect "$img" >/dev/null 2>&1; then
+        reclaim_image="$img"
+        break
+    fi
+done
+[ -n "$reclaim_image" ] || reclaim_image="alpine:latest"
 
 if [ "$dry" = 1 ]; then
-    echo "docker-teardown: DRY RUN - would remove $count container(s) owned by $wt:"
-    while IFS= read -r id; do
-        docker ps -a --filter "id=$id" \
-            --format '  {{.ID}}  {{.Names}}  {{.Status}}' 2>/dev/null
-    done <<<"$targets"
+    echo "docker-teardown: DRY RUN - would chown root-owned paths under $wt to $uid:$gid:"
+    find "$wt" -name .git -prune -o ! -user "$uid" -print 2>/dev/null | head -20
+    echo "docker-teardown: done"
     exit 0
 fi
 
-echo "docker-teardown: removing $count container(s) owned by $wt"
-# `rm -f` stops (SIGKILL) then removes; volumes are intentionally left in
-# place (bin/dev's session volume persists Claude history across runs).
-# $targets is one non-empty ID per line here, so xargs always runs once.
-if ! printf '%s\n' "$targets" | xargs docker rm -f >/dev/null 2>&1; then
-    echo "docker-teardown: warning: one or more containers could not be removed" >&2
+echo "docker-teardown: reclaiming root-owned paths under $wt"
+# The find runs *inside* the container, as root, so it reaches paths the host
+# find cannot descend into. -h chowns symlinks themselves rather than their
+# targets, which keeps a link pointing outside the worktree from redirecting
+# the chown there. The mount is the worktree and nothing else, so the blast
+# radius is exactly the tree we are about to delete.
+if ! docker run --rm --network none -v "$wt:/wt" "$reclaim_image" \
+    sh -c "find /wt -name .git -prune -o ! -user $uid -print0 | xargs -0 -r chown -h $uid:$gid" \
+    >/dev/null 2>&1; then
+    echo "docker-teardown: warning: could not reclaim root-owned paths under $wt;" >&2
+    echo "                 'git worktree remove' may fail with Permission denied." >&2
 fi
 echo "docker-teardown: done"

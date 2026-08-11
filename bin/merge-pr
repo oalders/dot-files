@@ -122,6 +122,23 @@ if [[ -z "$close_mode" ]]; then
             read -r reply || reply=""
             case "$reply" in
                 [Yy]*)
+                    # --set-upstream-to needs refs/remotes/origin/<branch> to
+                    # exist locally, and it may not: origin has the branch (we
+                    # just asked it), but this clone may never have fetched it,
+                    # or the ref may be stale relative to what origin holds.
+                    # Both make the repair fail ("the requested upstream branch
+                    # does not exist") or leave the unpushed-commit check below
+                    # comparing against an out-of-date ref. Fetch the one ref
+                    # explicitly first — a full `git fetch` is unnecessary and
+                    # slow, and the explicit refspec avoids depending on the
+                    # remote's configured fetch refspec.
+                    # The leading "+" matches the standard remote-tracking
+                    # refspec: a stale local ref that isn't a fast-forward of
+                    # origin's still gets updated rather than failing.
+                    if ! git fetch origin "+refs/heads/$branch:refs/remotes/origin/$branch" >&2; then
+                        echo "merge-pr: could not fetch 'refs/heads/$branch' from origin — cannot repair tracking." >&2
+                        exit 1
+                    fi
                     git branch --set-upstream-to="origin/$branch" >&2
                     ;;
                 *)
