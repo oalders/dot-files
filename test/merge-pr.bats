@@ -102,6 +102,28 @@ setup() {
     [[ "$output" == "origin" ]]
 }
 
+# The branch is on origin but this clone has no refs/remotes/origin/<branch>
+# (pushed from elsewhere, or the tracking ref was pruned). --set-upstream-to
+# alone fails there with "the requested upstream branch does not exist", so
+# the repair has to fetch the ref first.
+@test "pre-flight: tracking repair works with no local remote-tracking ref" {
+    setup_git_repo
+    setup_upstream
+    git checkout -q -b feature
+    git push -q origin feature
+    git branch -q -D -r origin/feature
+    git config --unset branch.feature.remote || true
+    git config --unset branch.feature.merge || true
+    stub_command gh 'exit 1'
+    run "$MERGE_PR" <<<"y"
+    # Reaching PR lookup (which the gh stub fails) proves the repair worked.
+    [ "$status" -eq 1 ]
+    [[ "$output" == *"no PR found"* ]]
+    run git rev-parse --abbrev-ref --symbolic-full-name '@{u}'
+    [ "$status" -eq 0 ]
+    [[ "$output" == "origin/feature" ]]
+}
+
 # A genuinely unpushed branch whose name is a path suffix of an existing
 # remote branch (e.g. local "foo" vs remote "feature/foo") must still get
 # "push first", not the repair prompt. Guards against ls-remote tail-match.
