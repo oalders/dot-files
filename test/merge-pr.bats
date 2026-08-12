@@ -148,6 +148,44 @@ setup() {
     [[ "$output" == *"unpushed commit"* ]]
 }
 
+# #1007: a stale refs/remotes/origin/<branch> made already-pushed commits look
+# unpushed. Push a second commit (B) so origin and HEAD agree at B, then rewind
+# the tracking ref to the earlier SHA (A) — exactly the phantom count. The
+# pre-flight now refreshes the ref (offline, against the local bare origin)
+# before counting, so it must NOT report "unpushed commit(s)" and must proceed
+# past the pre-flight to the gh-stub PR-lookup failure.
+@test "pre-flight: stale tracking ref does not block an already-pushed branch" {
+    setup_git_repo
+    setup_upstream
+    local a
+    a=$(git rev-parse HEAD)
+    git -c commit.gpgsign=false commit -q --allow-empty -m "B"
+    git push -q origin HEAD
+    # Rewind the local tracking ref to A while origin/HEAD are both at B.
+    git update-ref "refs/remotes/origin/main" "$a"
+    stub_command gh 'exit 1'
+    run "$MERGE_PR"
+    [ "$status" -eq 1 ]
+    [[ "$output" != *"unpushed commit"* ]]
+    [[ "$output" == *"no PR found"* ]]
+}
+
+# #1007: the refresh fetch is non-fatal. Point origin at a nonexistent repo so
+# the fetch fails; under `set -e` a bare fetch would abort the script, but the
+# guarded form must warn and continue past the pre-flight (reaching the gh-stub
+# PR-lookup failure) rather than aborting.
+@test "pre-flight: refresh fetch failure warns but is non-fatal" {
+    setup_git_repo
+    setup_upstream
+    # Unreachable remote: @{u} still resolves locally, but the fetch fails.
+    git remote set-url origin "$BATS_TEST_TMPDIR/nonexistent.git"
+    stub_command gh 'exit 1'
+    run "$MERGE_PR"
+    [ "$status" -eq 1 ]
+    [[ "$output" == *"could not refresh 'origin/main'"* ]]
+    [[ "$output" == *"no PR found"* ]]
+}
+
 @test "pre-flight: refuses on detached HEAD" {
     setup_git_repo
     setup_upstream
