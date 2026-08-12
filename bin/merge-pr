@@ -95,6 +95,11 @@ if [[ -z "$close_mode" ]]; then
     # and `git rev-list '@{u}..HEAD'` would abort the script under `set -e`.
     upstream_ok=1
 
+    # Records whether the tracking ref has already been brought current this
+    # run. Initialized here so it stays defined under `set -u`; the count block
+    # below refreshes the ref only when this is still empty (no double fetch).
+    refreshed_ref=""
+
     # Pre-flight: branch must have an upstream.
     #
     # `@{u}` fails both when the branch is genuinely unpushed AND when it is
@@ -139,6 +144,9 @@ if [[ -z "$close_mode" ]]; then
                         echo "merge-pr: could not fetch 'refs/heads/$branch' from origin — cannot repair tracking." >&2
                         exit 1
                     fi
+                    # The ref is now current — the count block must not re-fetch
+                    # the same refspec.
+                    refreshed_ref=1
                     git branch --set-upstream-to="origin/$branch" >&2
                     ;;
                 *)
@@ -158,6 +166,21 @@ if [[ -z "$close_mode" ]]; then
     # successful tracking-repair above leaves upstream_ok=1, so it still runs
     # after a repair.
     if [[ "$upstream_ok" -eq 1 ]]; then
+        # `git rev-list '@{u}..HEAD'` trusts refs/remotes/origin/$branch, which
+        # can be stale — e.g. a push to a literal URL updates origin's branch
+        # but no local tracking ref — making already-pushed commits look
+        # unpushed and blocking the merge with a phantom count. Refresh the ref
+        # first (unless the repair path above already did), reusing that path's
+        # refspec. Under `set -eu -o pipefail` this MUST be the guarded
+        # `if ! ...` form: a bare fetch would abort before warning, and a
+        # fetch failure is non-fatal — keep working against the (possibly
+        # stale) ref so an unreachable remote (offline, slow) falls back to
+        # today's behaviour rather than aborting.
+        if [[ -z "$refreshed_ref" ]]; then
+            if ! git fetch origin "+refs/heads/$branch:refs/remotes/origin/$branch" >&2; then
+                echo "merge-pr: warning: could not refresh 'origin/$branch' — unpushed count may be stale" >&2
+            fi
+        fi
         unpushed=$(git rev-list --count '@{u}..HEAD')
         if [[ "$unpushed" -ne 0 ]]; then
             preflight_block_reason="branch '$branch' has $unpushed unpushed commit(s) — push first"
