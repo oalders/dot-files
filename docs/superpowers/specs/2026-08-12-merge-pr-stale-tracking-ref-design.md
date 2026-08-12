@@ -56,16 +56,23 @@ the refspec the repair path already trusts.
 2. In the repair path, on a successful `git fetch`, set `refreshed_ref=1`. That
    path already fetched the same refspec, so the ref is current and the count
    block must not fetch it a second time.
-3. In the count block, before `git rev-list`: if `refreshed_ref` is empty, run
+3. In the count block, before `git rev-list`: if `refreshed_ref` is empty,
+   refresh the ref. The script runs under `set -eu -o pipefail`, so the fetch
+   **must** use the guarded `if ! ...; then` form — a bare `git fetch` would
+   abort the script on failure before any warning runs, and a `|| warn` tail
+   trips `set -e` unless `warn` returns 0. Mirror the repair path (line 138) by
+   redirecting fetch chatter to stderr so it never pollutes stdout:
 
    ```sh
-   git fetch origin "+refs/heads/$branch:refs/remotes/origin/$branch"
+   if ! git fetch origin "+refs/heads/$branch:refs/remotes/origin/$branch" >&2; then
+       echo "merge-pr: warning: could not refresh 'origin/$branch' — unpushed count may be stale" >&2
+   fi
    ```
 
-   On failure, emit a warning to stderr and continue against the (possibly
-   stale) ref. A fetch failure is **not** fatal: it keeps the script usable when
-   the remote is unreachable (offline, slow remote), falling back to today's
-   behaviour. On success or skip, compute `@{u}..HEAD` exactly as today.
+   On failure, the warning is emitted and the script continues against the
+   (possibly stale) ref. A fetch failure is **not** fatal: it keeps the script
+   usable when the remote is unreachable (offline, slow remote), falling back to
+   today's behaviour. On success or skip, compute `@{u}..HEAD` exactly as today.
 
 ### Why this shape
 
@@ -84,23 +91,47 @@ the refspec the repair path already trusts.
   fetches exactly once, and a session that just repaired tracking does not fetch
   the same refspec twice.
 
+### Assumption
+
+The refresh targets `refs/remotes/origin/$branch`, but `git rev-list` reads
+whatever `@{u}` resolves to. This fix assumes `@{u}` resolves to
+`origin/$branch` — the normal case, and the exact scenario in the issue (the
+tracking *config* still points at origin; only the ref content is stale). If a
+branch tracked a non-origin remote, the refresh would update a ref `@{u}` does
+not read and the phantom count could persist. The whole script already
+hardcodes `origin` elsewhere (the repair path, the teardown `ls-remote`), so
+this fix stays consistent with that assumption rather than widening it.
+
 ## Tests
 
 Added to `test/merge-pr.bats`, following existing patterns (bare-upstream
 `setup_upstream`, `stub_command gh 'exit 1'` to prove the pre-flight was passed
 by reaching the PR-lookup failure).
 
-- **Stale tracking ref no longer blocks.** Push the branch, then make
-  `refs/remotes/origin/$branch` stale (reset it to an older SHA while `HEAD` and
-  the remote agree). Assert merge-pr does **not** report "unpushed commit(s)"
-  and proceeds past the pre-flight (reaching the gh-stub failure, as the
-  existing repair test does).
+- **Stale tracking ref no longer blocks.** Push a second commit (B) so origin
+  and `HEAD` agree at B, then make the tracking ref lag with
+  `git update-ref refs/remotes/origin/$branch <A>` (an earlier SHA). This
+  faithfully reproduces the phantom count — `@{u}..HEAD` sees B as "unpushed"
+  though it is on origin. Assert merge-pr does **not** report "unpushed
+  commit(s)" and proceeds past the pre-flight (reaching the gh-stub failure, as
+  the existing repair test does). The refresh stays offline — origin is a local
+  bare repo — so no network dependency is introduced.
 - **Genuinely unpushed still blocks.** A real local-ahead commit still yields
   "unpushed commit" after the refresh, guarding against the refresh masking real
-  cases. The existing "refuses when branch has unpushed commits" test covers
-  this; verify it still passes and extend only if a gap appears.
-- **Fetch-failure fallback is non-fatal.** With the remote unreachable, the
-  refresh warns but the script continues rather than aborting.
+  cases. The existing "refuses when branch has unpushed commits" test
+  (`test/merge-pr.bats:142`) covers this — its bare upstream lacks the new
+  commit, so the refresh cannot pull it forward and the count stays non-zero.
+  Verify it still passes; extend only if a gap appears.
+- **Fetch-failure fallback is non-fatal.** Simulate an unreachable remote after
+  `setup_upstream` with `git remote set-url origin "$BATS_TEST_TMPDIR/nonexistent.git"`
+  (leaves `@{u}` resolvable locally, but the fetch fails). Assert the refresh
+  warns yet the script continues past the pre-flight rather than aborting under
+  `set -e`. This is the test that actually guards the non-fatal requirement.
+
+The `refreshed_ref` guard (no double fetch on the repair path) is a performance
+property, not a correctness one, and is hard to assert without wrapping `git`.
+It is left **explicitly untested**; the guard is a single flag check verified by
+review.
 
 ## Out of scope
 
