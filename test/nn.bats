@@ -508,6 +508,43 @@ setup() {
     ! grep -Fq -- "ANSIBLE_LOCAL_TEMP=" "$BATS_TEST_TMPDIR/nono-argv"
 }
 
+@test "bin/nn points buildx state at the worktree-local .tmp" {
+    # Buildx defaults its state to ~/.docker/buildx; granting that home path for
+    # write was a channel out of the sandbox (a persisted remote-driver builder
+    # picked up by a later un-sandboxed host build). When the resolved profile
+    # lists oalders-docker in its extends, nn redirects the state to the
+    # worktree-local .tmp (covered by --allow-cwd, so no home write grant) and
+    # the profile no longer grants ~/.docker/buildx (#1004).
+    mkdir -p .nono
+    echo '{"extends": ["oalders", "oalders-docker"]}' >.nono/profile.json
+    run "$NN"
+    [ "$status" -eq 0 ]
+    grep -Fxq -- "BUILDX_CONFIG=$BATS_TEST_TMPDIR/work/.tmp/buildx" "$BATS_TEST_TMPDIR/nono-argv"
+}
+
+@test "bin/nn sets no BUILDX_CONFIG for a non-docker profile" {
+    # The redirect is scoped to profiles that actually compose oalders-docker; a
+    # plain session must not carry the docker-specific env var. (The clean test
+    # cwd resolves to the bare oalders profile, which doesn't pull it in.)
+    run "$NN"
+    [ "$status" -eq 0 ]
+    # Guard against a vacuous pass on a missing argv dump.
+    [ -f "$BATS_TEST_TMPDIR/nono-argv" ]
+    ! grep -Fq -- "BUILDX_CONFIG=" "$BATS_TEST_TMPDIR/nono-argv"
+}
+
+@test "bin/nn does not trip the buildx redirect on a substring-only match" {
+    # The gate inspects the extends array structurally (jq), not as a raw
+    # substring, so a profile that merely contains the string "oalders-docker"
+    # as part of a differently-named entry must NOT trigger the redirect.
+    mkdir -p .nono
+    echo '{"extends": ["oalders", "oalders-docker-experimental"]}' >.nono/profile.json
+    run "$NN"
+    [ "$status" -eq 0 ]
+    [ -f "$BATS_TEST_TMPDIR/nono-argv" ]
+    ! grep -Fq -- "BUILDX_CONFIG=" "$BATS_TEST_TMPDIR/nono-argv"
+}
+
 # bin/nn checks four compose filenames; cover each so dropping one from the
 # marker list can't pass unnoticed. A compose file at the repo top means the
 # session will run `docker compose`, which needs the CLI plugins dir the

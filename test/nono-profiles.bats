@@ -188,16 +188,30 @@ SYMLINKS="$SCRIPT_DIR/installer/symlinks.sh"
     done
 }
 
-# Buildx writes its own state (builder instances, metadata) under
-# ~/.docker/buildx, so that path needs write, not just read (#1002).
-@test "oalders-docker.json grants ~/.docker/buildx for write" {
-    run jq -e '.filesystem.allow | any(. == "~/.docker/buildx")' "$NONO_DIR/oalders-docker.json"
+# Buildx state is deliberately NOT granted at the home path anymore. Granting
+# ~/.docker/buildx for write was a channel out of the sandbox: a session could
+# persist a remote-driver builder aimed at an attacker endpoint and a later
+# un-sandboxed `docker buildx build` on the host would ship its build context
+# there, surviving worktree deletion. bin/nn redirects the state into the
+# worktree via BUILDX_CONFIG instead (#1004; see the nn.bats redirect test).
+@test "oalders-docker.json does not grant ~/.docker/buildx (redirected via BUILDX_CONFIG)" {
+    # Parse first so a vanished profile fails loudly rather than passing vacuously.
+    run jq empty "$NONO_DIR/oalders-docker.json"
     [ "$status" -eq 0 ]
+    # Reject the path under any write-granting key, in either ~ or $HOME spelling.
+    run jq -e '
+        [.filesystem.allow[]?, .filesystem.allow_file[]?,
+         .filesystem.bypass_protection[]?]
+        | any(. == "~/.docker/buildx" or . == "$HOME/.docker/buildx")
+    ' "$NONO_DIR/oalders-docker.json"
+    # jq -e exits non-zero when the result is false/null: that is the pass.
+    [ "$status" -ne 0 ]
 }
 
-# ~/.docker is deliberately narrowed to contexts/, buildx/, and config.json
-# rather than a directory-wide read: the tree can also hold credential
-# helper output and other daemon/registry state (#1002).
+# ~/.docker is deliberately narrowed to contexts/ and config.json rather than a
+# directory-wide read: the tree can also hold credential helper output and other
+# daemon/registry state (#1002). Buildx state used to sit here too but is now
+# redirected to the worktree (#1004).
 @test "oalders-docker.json does not grant the whole ~/.docker dir" {
     # Parse first — see the /usr/libexec guard above for why.
     run jq empty "$NONO_DIR/oalders-docker.json"
