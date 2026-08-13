@@ -373,6 +373,24 @@ if [[ -f $profile ]] && jq -e '[.extends] | flatten | any(. == "oalders-ansible"
     echo "🗯️nn: ansible mixin — ANSIBLE_LOCAL_TEMP=$ansible_local_tmp" >&2
 fi
 
+# Buildx keeps its state (builder instances, the current-builder pointer) under
+# ~/.docker/buildx by default. Granting that home path for write is a channel
+# out of the sandbox: a compromised session could persist a remote-driver
+# builder aimed at an attacker endpoint and mark it current, and a later
+# un-sandboxed `docker buildx build` on the host would ship its build context
+# there — a compromise that outlives the worktree (#1004). Redirect the state
+# into the worktree-local .tmp (covered by --allow-cwd, so no home write grant)
+# instead; the only trade-off is that builders no longer persist across
+# worktrees, matching the accepted trade-off for serena's memories. Gated on the
+# resolved profile structurally listing oalders-docker in its extends, same
+# shape as the ansible redirect above.
+docker_env=()
+if [[ -f $profile ]] && jq -e '[.extends] | flatten | any(. == "oalders-docker")' "$profile" >/dev/null 2>&1; then
+    buildx_config="$PWD/.tmp/buildx"
+    docker_env=("BUILDX_CONFIG=$buildx_config")
+    echo "🗯️nn: docker mixin — BUILDX_CONFIG=$buildx_config" >&2
+fi
+
 # Opt-in clodhopper wiring. clodhopper init --local writes the hooks into
 # .claude/settings.local.json (gitignored). --settings adds a settings source;
 # it doesn't replace the project hierarchy, so claude still loads
@@ -477,5 +495,6 @@ exec nono run --profile "$profile" --allow-cwd --workdir . \
     "${chrome_env[@]+"${chrome_env[@]}"}" \
     "${hugo_env[@]+"${hugo_env[@]}"}" \
     "${ansible_env[@]+"${ansible_env[@]}"}" \
+    "${docker_env[@]+"${docker_env[@]}"}" \
     claude --settings "$session_settings" \
     --dangerously-skip-permissions "$@" "${auto_prompt[@]+"${auto_prompt[@]}"}"

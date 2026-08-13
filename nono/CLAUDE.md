@@ -53,7 +53,7 @@ These are global infrastructure — MCP servers Claude relies on, and their runt
 | `oalders-perl`  | `cpanfile`, `Makefile.PL`, `dist.ini` | plenv (`~/.plenv`), local::lib (`~/perl5`), Dist::Zilla (`~/.dzil`, `~/dot-files/dzil`), prove (`~/.proverc`), XS system C headers (`/usr/include`, `/usr/local/include`). Net-free; CPAN/MetaCPAN/MagPie network is in the paired `oalders-perl-net` (appended alongside it by `nn`). |
 | `oalders-node`  | `package.json`                        | `*.npmjs.org`, `registry.npmjs.org` (npm registry network access for installs)     |
 | `oalders-go`    | `go.mod`                              | Go toolchain (`go_runtime` group), build/module/lint caches (`~/.cache/go-build`, `~/.cache/golangci-lint`, `~/go/pkg/mod`), module proxy + checksum DB (`proxy.golang.org`, `sum.golang.org`), and cgo system headers (`/usr/include`, `/usr/local/include`, `/opt/homebrew/include`, pkg-config dirs, `/Library/Developer/CommandLineTools`) |
-| `oalders-docker` | `docker-compose.yml` / `docker-compose.yaml` / `compose.yml` / `compose.yaml` | `/usr/libexec/docker/cli-plugins` (read) — the actual fix for #1002 and the **only load-bearing grant** in the mixin: `docker compose` and `docker buildx` are CLI *plugins* (standalone binaries in that dir), not subcommands of the `docker` binary, so without this read they fail with `docker: unknown command` while plain `docker` works. `~/.docker` is deliberately narrowed to `contexts/` (read), `buildx/` (write — buildx persists builder state), and `config.json` (read) rather than a directory-wide read; `config.json` is duplicated from `oalders-core` so the sibling stands alone. Both `/var/run/docker.sock` and `/run/docker.sock` (`allow_file`) are **defensive only** — see below. Net-free: image pulls are done by the daemon, which runs **outside** the sandbox, so nothing traverses the session proxy. A bare `Dockerfile` is deliberately **not** a marker. |
+| `oalders-docker` | `docker-compose.yml` / `docker-compose.yaml` / `compose.yml` / `compose.yaml` | `/usr/libexec/docker/cli-plugins` (read) — the actual fix for #1002 and the **only load-bearing grant** in the mixin: `docker compose` and `docker buildx` are CLI *plugins* (standalone binaries in that dir), not subcommands of the `docker` binary, so without this read they fail with `docker: unknown command` while plain `docker` works. `~/.docker` is deliberately narrowed to `contexts/` (read) and `config.json` (read) rather than a directory-wide read, and no `~/.docker` path is granted for write; `config.json` is duplicated from `oalders-core` so the sibling stands alone. Buildx state, which used to need `buildx/` (write), is redirected into the worktree via `BUILDX_CONFIG` in `bin/nn` (#1004) — see the blast-radius note below. Both `/var/run/docker.sock` and `/run/docker.sock` (`allow_file`) are **defensive only** — see below. Net-free: image pulls are done by the daemon, which runs **outside** the sandbox, so nothing traverses the session proxy. A bare `Dockerfile` is deliberately **not** a marker. |
 | `oalders-hugo`  | `hugo.toml` / `hugo.yaml` / `hugo.json`, or `config.toml` + `themes/` | Hugo cache (`~/.cache/hugo_cache`). When Hugo matches, `nn` also appends `oalders-snap` to the mixin list because Hugo on Linux is typically snap-installed, and — if the host is on a tailnet — opens Hugo's serve ports over the tailscale IP (see §2c). |
 | `oalders-snap`  | (no markers of its own — `nn` appends it alongside any snap-backed sibling like `oalders-hugo`) | Reads for snap-confined binaries: `/snap`, `/var/lib/snapd`, `/etc/fstab` (snapd's startup checks parse the mount table). |
 
@@ -108,18 +108,23 @@ none of them fixable in a profile. A corollary worth carrying beyond Docker:
 verdict is unreliable for sockets, FIFOs, and device nodes. Verify those
 empirically rather than trusting the check.
 
-**The one grant with a host-side blast radius is `~/.docker/buildx` (write).**
-It is load-bearing (`docker buildx create` can't persist a builder without it)
-and it is the mixin's only write that outlives the session. A session can
-persist a `remote`-driver builder pointing at an endpoint it chooses and mark
-it current; a later **un-sandboxed** `docker buildx build` on the host then
-ships that build context — source, `.env` files — to the endpoint. Note the
-asymmetry with `~/.docker/contexts`, kept read-only for exactly this reason.
-Accepted for now and tracked in #1004, which proposes redirecting it to
-`BUILDX_CONFIG="$PWD/.tmp/buildx"` the way `bin/nn` already redirects
-`SERENA_HOME` and `ANSIBLE_LOCAL_TEMP`. Low priority only because #1003 means
-host root is reachable anyway — this is not the weakest link, just the one
-that survives worktree deletion.
+**Buildx state is redirected out of `~/.docker`, not granted there (#1004).**
+Buildx keeps its builder instances and current-builder pointer under
+`~/.docker/buildx` by default, and granting that home path for write would be
+the mixin's only write to outlive the session — a host-side blast radius. A
+session could persist a `remote`-driver builder pointing at an endpoint it
+chooses and mark it current; a later **un-sandboxed** `docker buildx build` on
+the host would then ship that build context — source, `.env` files — to the
+endpoint, surviving deletion of the worktree that created it. Note the
+asymmetry it would create with `~/.docker/contexts`, kept read-only for exactly
+this reason. So `bin/nn` exports `BUILDX_CONFIG="$PWD/.tmp/buildx"` whenever the
+resolved profile lists `oalders-docker` in its `extends` — the same redirect it
+already does for `SERENA_HOME` and `ANSIBLE_LOCAL_TEMP` — and the profile grants
+no `~/.docker` write at all. The `.tmp` target is covered by `--allow-cwd`, so
+no new grant is needed; the only trade-off is that builders no longer persist
+across worktrees, matching the accepted trade-off for serena's memories. This
+was low priority (per #1003 host root is reachable anyway, so it was never the
+weakest link) but is cheap, correct hygiene now done.
 
 **Which is why detection is automatic.** Keying on compose files rather than
 making the mixin opt-in costs no containment: the escape is already universal,
