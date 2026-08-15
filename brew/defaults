@@ -1,6 +1,16 @@
 tap "buo/cask-upgrade"
 cask "google-chrome"
-cask "tailscale-app"
+
+# Tailscale is deliberately NOT a cask. It is installed once by
+# installer/tailscale.sh from the standalone macsys pkg and self-updates via
+# Sparkle after that, so the cask adds no upgrades -- only risk. The
+# tailscale-app cask's uninstall stanza is `pkgutil: com.tailscale.ipn.macsys`,
+# which deletes every file the pkg laid down. Because a cask upgrade is
+# uninstall-then-install, any greedy upgrade (`brew cu`, `brew upgrade
+# --greedy`) discards the node key, tailscaled re-authenticates from scratch,
+# and the tailnet mints a *new* machine -- the old hostname is still taken, so
+# the device comes back as `<host>-1`, `-2`, `-3`. Managing it in one place
+# keeps the machine's tailnet identity stable.
 brew "asciinema"
 brew "ansible-lint"
 brew "aspell"

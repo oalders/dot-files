@@ -11,14 +11,20 @@ source ~/dot-files/bash_functions.sh
 # needed for full CLI/exit-node/subnet-router behavior. The app auto-updates
 # itself once installed, so this script just bootstraps and then no-ops.
 #
+# This is the *only* manager for Tailscale on macOS. Do not also add the
+# tailscale-app cask to brew/defaults: a cask upgrade is uninstall-then-install,
+# and that cask's `pkgutil: com.tailscale.ipn.macsys` uninstall deletes the
+# pkg's files along with the node key, so the host re-registers as a brand-new
+# machine and the tailnet renames it `<host>-1`, `-2`, and so on.
+#
 # On Linux: installed from the official apt repo (pkgs.tailscale.com) rather than
 # the snap. The apt package runs unconfined and can read/write anywhere the
 # daemon's user can, which the snap's confinement prevents.
 # Instructions: https://tailscale.com/download/linux
 #
-# Not wired into install.sh on purpose -- run this script directly. On Linux,
-# switching from the snap drops any active tailnet session, so re-run
-# `sudo tailscale up` to authenticate afterwards.
+# macOS runs this from install.sh (run_mac_installers); on Linux it is not wired
+# in, so run it directly. On Linux, switching from the snap drops any active
+# tailnet session, so re-run `sudo tailscale up` to authenticate afterwards.
 
 if is os name eq darwin; then
     if [[ -d /Applications/Tailscale.app ]]; then

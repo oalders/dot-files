@@ -38,6 +38,19 @@ if brew help trust >/dev/null 2>&1; then
     brew trust --tap nikitabobko/tap
 fi
 
+# tailscale-app was dropped from brew/defaults (see the comment there), but
+# dropping it from the Brewfile does not deregister an already-installed cask,
+# and `brew cu` upgrades `auto_updates` casks that plain `brew upgrade` skips.
+# Its upgrade is uninstall-then-install, and the uninstall stanza's
+# `pkgutil: com.tailscale.ipn.macsys` takes the node key with it, so the host
+# re-registers as a new tailnet machine and gets renamed `<host>-1`, `-2`, ...
+# Pin it so `brew cu` leaves it alone; the app self-updates via Sparkle anyway.
+# Deliberately not `brew uninstall --cask tailscale-app` -- that runs the very
+# uninstall stanza we are avoiding.
+if brew list --cask tailscale-app &>/dev/null; then
+    brew cu pin tailscale-app || true
+fi
+
 brew bundle install --file=brew/defaults
 brew bundle install --file=brew/local-only
 # brew bundle install --file=brew/mas
