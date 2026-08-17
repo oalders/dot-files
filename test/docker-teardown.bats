@@ -15,6 +15,14 @@ load 'helpers.bash'
 #                         the reclaim step finds a local image.
 #   DOCKER_RUN_LOG        file the stub appends `run` arguments to, so a test
 #                         can assert how the ownership-reclaim container ran.
+#   DOCKER_NETWORK_ROWS   file of "<project><TAB><id><TAB><name>" lines; the
+#                         `network ls` query emits the id/name of rows whose
+#                         project matches the requested label filter.
+#   DOCKER_NETWORK_ATTACHED file of "<id><TAB><count>" lines giving the
+#                         attached-container count `network inspect` reports for
+#                         a network; a network absent from the file counts 0.
+#   DOCKER_NETRM_LOG      file the stub appends `network rm` arguments to, so a
+#                         test can assert which networks were removed.
 docker_stub_body='
 case "${1:-}" in
 ps)
@@ -64,6 +72,53 @@ run)
     printf "%s\n" "$*" >>"${DOCKER_RUN_LOG:?}"
     exit 0
     ;;
+network)
+    shift
+    case "${1:-}" in
+    ls)
+        shift
+        proj=""
+        while [ "$#" -gt 0 ]; do
+            case "$1" in
+            --filter)
+                shift
+                case "$1" in
+                label=com.docker.compose.project=*)
+                    proj="${1#label=com.docker.compose.project=}"
+                    ;;
+                esac
+                ;;
+            --format) shift ;;
+            esac
+            shift
+        done
+        if [ -f "${DOCKER_NETWORK_ROWS:-/nonexistent}" ]; then
+            while IFS="$(printf "\t")" read -r p id name; do
+                [ "$p" = "$proj" ] && printf "%s\t%s\n" "$id" "$name"
+            done <"$DOCKER_NETWORK_ROWS"
+        fi
+        exit 0
+        ;;
+    inspect)
+        shift
+        net="$1"
+        count=0
+        if [ -f "${DOCKER_NETWORK_ATTACHED:-/nonexistent}" ]; then
+            while IFS="$(printf "\t")" read -r n c; do
+                [ "$n" = "$net" ] && count="$c"
+            done <"$DOCKER_NETWORK_ATTACHED"
+        fi
+        echo "$count"
+        exit 0
+        ;;
+    rm)
+        shift
+        printf "%s\n" "$*" >>"${DOCKER_NETRM_LOG:?}"
+        exit 0
+        ;;
+    esac
+    exit 0
+    ;;
 esac
 exit 0
 '
@@ -80,6 +135,9 @@ setup() {
     RUN_LOG="$BATS_TEST_TMPDIR/run.log"
     : >"$RUN_LOG"
     export DOCKER_RUN_LOG="$RUN_LOG"
+    NETRM_LOG="$BATS_TEST_TMPDIR/netrm.log"
+    : >"$NETRM_LOG"
+    export DOCKER_NETRM_LOG="$NETRM_LOG"
     stub_command docker "$docker_stub_body"
 }
 
@@ -208,10 +266,122 @@ make_real_worktree() {
 ps) exit 0 ;;
 image) exit 0 ;;
 run) exit 1 ;;
+network) exit 0 ;;
 esac
 exit 0"
     run "$DT" "$WT" feature
     # Teardown must never block worktree removal on docker.
     [ "$status" -eq 0 ]
     [[ "$output" == *"could not reclaim"* ]]
+}
+
+# --- compose network sweep -----------------------------------------------
+#
+# The real leak: containers are gone but a `<basename>_default` network with
+# zero attachments survives. The sweep infers the compose project name from the
+# worktree basename ("wt" here) and removes the empty network. Guard: a network
+# with an attached container is left alone. It also honours project names
+# derived from matched containers, mirrors the container dry-run style, and is a
+# no-op when nothing matches.
+
+@test "network sweep removes a stale empty network for the worktree basename" {
+    nets="$BATS_TEST_TMPDIR/nets"
+    # basename of WT is "wt"; compose's default project would be "wt".
+    printf 'wt\taaa111\twt_default\n' >"$nets"
+    export DOCKER_NETWORK_ROWS="$nets"
+
+    run "$DT" "$WT"
+    [ "$status" -eq 0 ]
+    [[ "$output" == *"removing 1 network(s)"* ]]
+    [[ "$(cat "$NETRM_LOG")" == *aaa111* ]]
+}
+
+@test "network sweep leaves a network that still has attached containers" {
+    nets="$BATS_TEST_TMPDIR/nets"
+    printf 'wt\taaa111\twt_default\n' >"$nets"
+    export DOCKER_NETWORK_ROWS="$nets"
+    attached="$BATS_TEST_TMPDIR/attached"
+    printf 'aaa111\t2\n' >"$attached"
+    export DOCKER_NETWORK_ATTACHED="$attached"
+
+    run "$DT" "$WT"
+    [ "$status" -eq 0 ]
+    [ ! -s "$NETRM_LOG" ]
+}
+
+@test "network sweep removes a network derived from a matched container's project" {
+    rows="$BATS_TEST_TMPDIR/rows"
+    # A matched container carrying a compose project label whose value differs
+    # from the worktree basename.
+    printf 'aaa111\t%s\tmyproj\n' "$WT" >"$rows"
+    export DOCKER_COMPOSE_ROWS="$rows"
+    nets="$BATS_TEST_TMPDIR/nets"
+    printf 'myproj\tbbb222\tmyproj_default\n' >"$nets"
+    export DOCKER_NETWORK_ROWS="$nets"
+
+    run "$DT" "$WT"
+    [ "$status" -eq 0 ]
+    [[ "$(cat "$NETRM_LOG")" == *bbb222* ]]
+}
+
+@test "network sweep dry-run lists the network but removes nothing" {
+    nets="$BATS_TEST_TMPDIR/nets"
+    printf 'wt\taaa111\twt_default\n' >"$nets"
+    export DOCKER_NETWORK_ROWS="$nets"
+
+    run "$DT" --dry-run "$WT"
+    [ "$status" -eq 0 ]
+    [[ "$output" == *"DRY RUN - would remove 1 network(s)"* ]]
+    [[ "$output" == *"aaa111  wt_default"* ]]
+    [ ! -s "$NETRM_LOG" ]
+}
+
+@test "network sweep is a no-op when no networks match" {
+    run "$DT" "$WT"
+    [ "$status" -eq 0 ]
+    [ ! -s "$NETRM_LOG" ]
+}
+
+@test "network sweep removes multiple networks in a single run" {
+    rows="$BATS_TEST_TMPDIR/rows"
+    # A matched container contributes a second project, so two distinct
+    # projects each own one empty network.
+    printf 'aaa111\t%s\tmyproj\n' "$WT" >"$rows"
+    export DOCKER_COMPOSE_ROWS="$rows"
+    nets="$BATS_TEST_TMPDIR/nets"
+    printf 'wt\taaa111\twt_default\n' >"$nets"
+    printf 'myproj\tbbb222\tmyproj_default\n' >>"$nets"
+    export DOCKER_NETWORK_ROWS="$nets"
+
+    run "$DT" "$WT"
+    [ "$status" -eq 0 ]
+    [[ "$output" == *"removing 2 network(s)"* ]]
+    removed="$(cat "$NETRM_LOG")"
+    [[ "$removed" == *aaa111* ]]
+    [[ "$removed" == *bbb222* ]]
+}
+
+@test "network sweep: a failed network rm warns but still exits 0" {
+    nets="$BATS_TEST_TMPDIR/nets"
+    printf 'wt\taaa111\twt_default\n' >"$nets"
+    export DOCKER_NETWORK_ROWS="$nets"
+    # Re-stub docker so only `network rm` fails; the network ls/inspect queries
+    # still succeed so a target is found and removal is attempted.
+    stub_command docker "case \"\${1:-}\" in
+ps) exit 0 ;;
+image) exit 0 ;;
+run) exit 0 ;;
+network)
+    case \"\${2:-}\" in
+    ls) printf 'aaa111\twt_default\n'; exit 0 ;;
+    inspect) echo 0; exit 0 ;;
+    rm) exit 1 ;;
+    esac
+    exit 0
+    ;;
+esac
+exit 0"
+    run "$DT" "$WT"
+    [ "$status" -eq 0 ]
+    [[ "$output" == *"one or more networks could not be removed"* ]]
 }

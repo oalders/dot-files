@@ -5,7 +5,8 @@
 # Given a worktree path (and optionally its branch), removes the docker
 # containers that provably belong to that worktree: the `bin/dev` container
 # for the worktree+branch, and any `docker compose` containers whose project
-# working directory is at or under the worktree. Session volumes are kept.
+# working directory is at or under the worktree. Session volumes are kept. It
+# then sweeps the worktree's empty compose networks (see "network sweep").
 #
 # It then reclaims ownership of files those containers wrote into the worktree
 # as root (bind-mounted data dirs — see "ownership reclaim" below).
@@ -26,6 +27,34 @@
 # Ad-hoc `docker run` containers carry no such handle and are left alone
 # (with a note), matching the "minimize false positives" bias of the other
 # teardown helpers.
+#
+# Compose networks are swept too, but held to the same provable-ownership bar.
+# A network is removed only when BOTH hold: (a) its
+# `com.docker.compose.project` label matches a project this worktree owns —
+# either a project name derived from a container matched above, or the compose
+# default project (the worktree dir basename, normalized as compose stores it)
+# — AND (b) it has zero attached containers. The zero-attachment guard keeps a
+# network shared/in-use by another worktree safe, and makes re-runs a no-op.
+#
+# Same-basename collision (deliberate, bounded tradeoff): two worktrees sharing
+# a dir basename — the same repo checked out twice, or the same basename across
+# different repos — resolve to the SAME compose default project name, so a
+# teardown of one may sweep a network the sibling worktree also uses. The
+# zero-attachment guard bounds this: only an EMPTY network is ever removed, and
+# compose recreates `<project>_default` on the sibling's next `up`. Nothing
+# in use is touched.
+#
+# Networks are removed, whereas session volumes are KEPT, and that asymmetry is
+# deliberate: a compose network is cheap to recreate (the next `compose up`
+# rebuilds `<project>_default`), whereas a session volume holds state (bin/dev's
+# Claude history) that no `up` would bring back. Leaked empty networks are also
+# a real hazard — they accumulate until docker's default address pool is
+# subnetted out and `compose up` fails everywhere with "all predefined address
+# pools have been fully subnetted".
+#
+# NOTE: a bare `docker network prune` is NOT the fix. It would also delete empty
+# hand-created `external:` networks, which compose does NOT recreate. This
+# targeted, label-scoped sweep touches only this worktree's own networks.
 
 set -u
 
@@ -36,6 +65,10 @@ Usage: docker-teardown [-n|--dry-run] WORKTREE_PATH [BRANCH]
 Removes docker containers that belong to WORKTREE_PATH: the bin/dev
 container for WORKTREE_PATH+BRANCH and any docker-compose containers whose
 project working_dir is at or under WORKTREE_PATH. Session volumes are kept.
+
+Then removes this worktree's empty compose networks (those labelled with a
+project it owns and with zero attached containers); networks, unlike
+volumes, are cheap for compose to recreate on the next `up`.
 
 Then chowns back any path under WORKTREE_PATH that a container wrote as
 root, so `git worktree remove` can delete the tree.
@@ -100,15 +133,20 @@ targets=""
 # value is $wt or a path beneath it. `-a` so stopped-but-lingering containers
 # are caught too. The tab-delimited format keeps ID and label value paired.
 wd_label="com.docker.compose.project.working_dir"
-while IFS=$'\t' read -r id wd; do
+proj_label="com.docker.compose.project"
+# Compose project names collected from matched containers. These are provably
+# this worktree's and seed the network sweep further down.
+compose_projects=""
+while IFS=$'\t' read -r id wd proj; do
     [ -n "$id" ] || continue
     case "$wd" in
     "$wt" | "$wt"/*)
         targets="$targets $id"
+        [ -n "$proj" ] && compose_projects="$compose_projects $proj"
         ;;
     esac
 done < <(docker ps -a --filter "label=$wd_label" \
-    --format "{{.ID}}"$'\t'"{{.Label \"$wd_label\"}}" 2>/dev/null)
+    --format "{{.ID}}"$'\t'"{{.Label \"$wd_label\"}}"$'\t'"{{.Label \"$proj_label\"}}" 2>/dev/null)
 
 # Source 2 — the bin/dev container for this worktree+branch. bin/dev names it
 # `<repo>-<branch>` where repo is the worktree dir basename and branch has
@@ -146,6 +184,66 @@ else
         # runs once.
         if ! printf '%s\n' "$targets" | xargs docker rm -f >/dev/null 2>&1; then
             echo "docker-teardown: warning: one or more containers could not be removed" >&2
+        fi
+    fi
+fi
+
+# --- compose network sweep -----------------------------------------------
+#
+# Runs regardless of whether any containers matched above: the real leak is a
+# `<project>_default` network whose containers are long gone, so there is
+# nothing for Source 1/2 to find — only the network survives. Candidate project
+# names come from two sources: the labels of the containers matched above
+# (provably ours), and the compose default project name inferred from the
+# worktree dir basename (normalized the way compose stores it: lowercased, with
+# characters outside [a-z0-9_-] dropped). A network is removed only if it has
+# zero attached containers, so an in-use network is never touched and re-runs
+# are no-ops. Networks are kept in their own pipeline, never folded into
+# $targets (whose grep filters to hex container IDs).
+proj_fallback="$(basename "$wt" | tr '[:upper:]' '[:lower:]' | tr -cd 'a-z0-9_-')"
+
+# Dedup the candidate project names from both sources. $compose_projects is
+# left unquoted on purpose so it word-splits into separate names; disable glob
+# expansion around it so a name can never be expanded as a pathname pattern.
+set -f
+candidate_projects="$(printf '%s\n' $compose_projects "$proj_fallback" \
+    | grep -v '^$' | sort -u)"
+set +f
+
+# Collect removable networks as "<id><TAB><name>" lines: labelled with a
+# candidate project AND carrying zero attached containers.
+net_targets=""
+while IFS= read -r proj; do
+    [ -n "$proj" ] || continue
+    while IFS=$'\t' read -r net_id net_name; do
+        [ -n "$net_id" ] || continue
+        attached="$(docker network inspect "$net_id" \
+            --format '{{len .Containers}}' 2>/dev/null)"
+        [ "$attached" = 0 ] || continue
+        net_targets="$net_targets$net_id"$'\t'"$net_name"$'\n'
+    done < <(docker network ls \
+        --filter "label=com.docker.compose.project=$proj" \
+        --format '{{.ID}}'$'\t''{{.Name}}' 2>/dev/null)
+done <<<"$candidate_projects"
+
+net_targets="$(printf '%s' "$net_targets" | grep -v '^$' | sort -u)"
+
+if [ -n "$net_targets" ]; then
+    net_count="$(printf '%s\n' "$net_targets" | wc -l | tr -d ' ')"
+    if [ "$dry" = 1 ]; then
+        echo "docker-teardown: DRY RUN - would remove $net_count network(s) owned by $wt:"
+        while IFS=$'\t' read -r net_id net_name; do
+            echo "  $net_id  $net_name"
+        done <<<"$net_targets"
+    else
+        echo "docker-teardown: removing $net_count network(s) owned by $wt"
+        # There is no `-f` for network rm; the zero-attachment guard above
+        # already ensures nothing is attached. Warn (don't abort) on failure.
+        # The `^[0-9a-f]+$` allowlist mirrors the container path: only real
+        # docker IDs (lowercase hex) reach `docker network rm`.
+        net_ids="$(printf '%s\n' "$net_targets" | cut -f1 | grep -E '^[0-9a-f]+$')"
+        if ! printf '%s\n' "$net_ids" | xargs docker network rm >/dev/null 2>&1; then
+            echo "docker-teardown: warning: one or more networks could not be removed" >&2
         fi
     fi
 fi
