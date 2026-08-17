@@ -287,21 +287,21 @@ exit 0"
 @test "network sweep removes a stale empty network for the worktree basename" {
     nets="$BATS_TEST_TMPDIR/nets"
     # basename of WT is "wt"; compose's default project would be "wt".
-    printf 'wt\tnet-aaa\twt_default\n' >"$nets"
+    printf 'wt\taaa111\twt_default\n' >"$nets"
     export DOCKER_NETWORK_ROWS="$nets"
 
     run "$DT" "$WT"
     [ "$status" -eq 0 ]
     [[ "$output" == *"removing 1 network(s)"* ]]
-    [[ "$(cat "$NETRM_LOG")" == *net-aaa* ]]
+    [[ "$(cat "$NETRM_LOG")" == *aaa111* ]]
 }
 
 @test "network sweep leaves a network that still has attached containers" {
     nets="$BATS_TEST_TMPDIR/nets"
-    printf 'wt\tnet-aaa\twt_default\n' >"$nets"
+    printf 'wt\taaa111\twt_default\n' >"$nets"
     export DOCKER_NETWORK_ROWS="$nets"
     attached="$BATS_TEST_TMPDIR/attached"
-    printf 'net-aaa\t2\n' >"$attached"
+    printf 'aaa111\t2\n' >"$attached"
     export DOCKER_NETWORK_ATTACHED="$attached"
 
     run "$DT" "$WT"
@@ -316,23 +316,23 @@ exit 0"
     printf 'aaa111\t%s\tmyproj\n' "$WT" >"$rows"
     export DOCKER_COMPOSE_ROWS="$rows"
     nets="$BATS_TEST_TMPDIR/nets"
-    printf 'myproj\tnet-bbb\tmyproj_default\n' >"$nets"
+    printf 'myproj\tbbb222\tmyproj_default\n' >"$nets"
     export DOCKER_NETWORK_ROWS="$nets"
 
     run "$DT" "$WT"
     [ "$status" -eq 0 ]
-    [[ "$(cat "$NETRM_LOG")" == *net-bbb* ]]
+    [[ "$(cat "$NETRM_LOG")" == *bbb222* ]]
 }
 
 @test "network sweep dry-run lists the network but removes nothing" {
     nets="$BATS_TEST_TMPDIR/nets"
-    printf 'wt\tnet-aaa\twt_default\n' >"$nets"
+    printf 'wt\taaa111\twt_default\n' >"$nets"
     export DOCKER_NETWORK_ROWS="$nets"
 
     run "$DT" --dry-run "$WT"
     [ "$status" -eq 0 ]
     [[ "$output" == *"DRY RUN - would remove 1 network(s)"* ]]
-    [[ "$output" == *"net-aaa  wt_default"* ]]
+    [[ "$output" == *"aaa111  wt_default"* ]]
     [ ! -s "$NETRM_LOG" ]
 }
 
@@ -340,4 +340,48 @@ exit 0"
     run "$DT" "$WT"
     [ "$status" -eq 0 ]
     [ ! -s "$NETRM_LOG" ]
+}
+
+@test "network sweep removes multiple networks in a single run" {
+    rows="$BATS_TEST_TMPDIR/rows"
+    # A matched container contributes a second project, so two distinct
+    # projects each own one empty network.
+    printf 'aaa111\t%s\tmyproj\n' "$WT" >"$rows"
+    export DOCKER_COMPOSE_ROWS="$rows"
+    nets="$BATS_TEST_TMPDIR/nets"
+    printf 'wt\taaa111\twt_default\n' >"$nets"
+    printf 'myproj\tbbb222\tmyproj_default\n' >>"$nets"
+    export DOCKER_NETWORK_ROWS="$nets"
+
+    run "$DT" "$WT"
+    [ "$status" -eq 0 ]
+    [[ "$output" == *"removing 2 network(s)"* ]]
+    removed="$(cat "$NETRM_LOG")"
+    [[ "$removed" == *aaa111* ]]
+    [[ "$removed" == *bbb222* ]]
+}
+
+@test "network sweep: a failed network rm warns but still exits 0" {
+    nets="$BATS_TEST_TMPDIR/nets"
+    printf 'wt\taaa111\twt_default\n' >"$nets"
+    export DOCKER_NETWORK_ROWS="$nets"
+    # Re-stub docker so only `network rm` fails; the network ls/inspect queries
+    # still succeed so a target is found and removal is attempted.
+    stub_command docker "case \"\${1:-}\" in
+ps) exit 0 ;;
+image) exit 0 ;;
+run) exit 0 ;;
+network)
+    case \"\${2:-}\" in
+    ls) printf 'aaa111\twt_default\n'; exit 0 ;;
+    inspect) echo 0; exit 0 ;;
+    rm) exit 1 ;;
+    esac
+    exit 0
+    ;;
+esac
+exit 0"
+    run "$DT" "$WT"
+    [ "$status" -eq 0 ]
+    [[ "$output" == *"one or more networks could not be removed"* ]]
 }

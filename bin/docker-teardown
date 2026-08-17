@@ -36,7 +36,15 @@
 # — AND (b) it has zero attached containers. The zero-attachment guard keeps a
 # network shared/in-use by another worktree safe, and makes re-runs a no-op.
 #
-# Networks are removed where session volumes are KEPT, and that asymmetry is
+# Same-basename collision (deliberate, bounded tradeoff): two worktrees sharing
+# a dir basename — the same repo checked out twice, or the same basename across
+# different repos — resolve to the SAME compose default project name, so a
+# teardown of one may sweep a network the sibling worktree also uses. The
+# zero-attachment guard bounds this: only an EMPTY network is ever removed, and
+# compose recreates `<project>_default` on the sibling's next `up`. Nothing
+# in use is touched.
+#
+# Networks are removed, whereas session volumes are KEPT, and that asymmetry is
 # deliberate: a compose network is cheap to recreate (the next `compose up`
 # rebuilds `<project>_default`), whereas a session volume holds state (bin/dev's
 # Claude history) that no `up` would bring back. Leaked empty networks are also
@@ -194,9 +202,13 @@ fi
 # $targets (whose grep filters to hex container IDs).
 proj_fallback="$(basename "$wt" | tr '[:upper:]' '[:lower:]' | tr -cd 'a-z0-9_-')"
 
-# Dedup the candidate project names from both sources.
+# Dedup the candidate project names from both sources. $compose_projects is
+# left unquoted on purpose so it word-splits into separate names; disable glob
+# expansion around it so a name can never be expanded as a pathname pattern.
+set -f
 candidate_projects="$(printf '%s\n' $compose_projects "$proj_fallback" \
     | grep -v '^$' | sort -u)"
+set +f
 
 # Collect removable networks as "<id><TAB><name>" lines: labelled with a
 # candidate project AND carrying zero attached containers.
@@ -227,7 +239,9 @@ if [ -n "$net_targets" ]; then
         echo "docker-teardown: removing $net_count network(s) owned by $wt"
         # There is no `-f` for network rm; the zero-attachment guard above
         # already ensures nothing is attached. Warn (don't abort) on failure.
-        net_ids="$(printf '%s\n' "$net_targets" | cut -f1)"
+        # The `^[0-9a-f]+$` allowlist mirrors the container path: only real
+        # docker IDs (lowercase hex) reach `docker network rm`.
+        net_ids="$(printf '%s\n' "$net_targets" | cut -f1 | grep -E '^[0-9a-f]+$')"
         if ! printf '%s\n' "$net_ids" | xargs docker network rm >/dev/null 2>&1; then
             echo "docker-teardown: warning: one or more networks could not be removed" >&2
         fi
