@@ -37,27 +37,40 @@ if ! is there apt; then
 else
 
     debounce 12 h sudo apt-get update -q
-    sudo apt-get install -y -q --no-install-recommends --autoremove \
-        build-essential \
-        chafa \
-        cpanminus \
-        curl \
-        gnome-keyring \
-        jq \
-        libexpat1-dev \
-        libnet-ssleay-perl \
-        libsecret-tools \
-        locate \
-        luarocks \
-        pandoc \
-        pipx \
-        python3-pip \
-        python3-setuptools \
-        ripgrep \
-        shellcheck \
-        tig \
-        tree \
+
+    packages=(
+        build-essential
+        chafa
+        cpanminus
+        curl
+        jq
+        libexpat1-dev
+        libnet-ssleay-perl
+        libsecret-tools
+        locate
+        luarocks
+        pandoc
+        pipx
+        python3-pip
+        python3-setuptools
+        ripgrep
+        shellcheck
+        tig
+        tree
         trurl
+    )
+
+    # gnome-keyring pulls in a GTK4/GCR desktop stack (libgtk-4-1,
+    # libgcr-ui-3-1, pinentry-gnome3, ...) that's only useful for an
+    # interactive desktop session storing git credentials. CI never launches
+    # the keyring daemon, so skip it there to avoid downloading packages
+    # nothing exercises. IS_GITHUB comes from bash_functions.sh (sourced
+    # above), the repo's existing "are we in CI" signal.
+    if [[ $IS_GITHUB == false ]]; then
+        packages+=(gnome-keyring)
+    fi
+
+    sudo apt-get install -y -q --no-install-recommends --autoremove "${packages[@]}"
 fi
 
 if ! is there go; then
