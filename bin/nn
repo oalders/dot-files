@@ -62,8 +62,8 @@ project_root=$(git rev-parse --show-toplevel 2>/dev/null || echo "$PWD")
 # the gitignored settings.local.json — never the shared settings.json.
 # common_dir is set only inside the block above, so guard it for `set -u`.
 if [[ -n "${common_dir-}" ]]; then
-    main_root=$(realpath -m "$common_dir/..")
-    if [[ "$main_root" != "$(realpath -m "$project_root")" &&
+    main_root=$(realpath "$common_dir/..")
+    if [[ "$main_root" != "$(realpath "$project_root")" &&
         -f "$main_root/.claude/settings.local.json" ]]; then
         echo "Removing $main_root/.claude/settings.local.json (see anthropics/claude-code#77998)" >&2
         rm -f "$main_root/.claude/settings.local.json"
