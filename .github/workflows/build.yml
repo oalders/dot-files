@@ -34,6 +34,19 @@ jobs:
       - name: Set up symlink to ~/dot-files
         run: cd && ln -s $GITHUB_WORKSPACE .
 
+      - name: Tolerate a slow/flaky apt mirror
+        run: |
+          echo 'Acquire::Retries "3";' | sudo tee /etc/apt/apt.conf.d/99-retries
+          echo 'Acquire::http::Timeout "30";' | sudo tee -a /etc/apt/apt.conf.d/99-retries
+
+      - name: Cache apt archives
+        uses: actions/cache@v4
+        with:
+          path: /var/cache/apt/archives/*.deb
+          key: apt-${{ runner.os }}-${{ hashFiles('installer/**/*.sh', 'configure/**/*.sh') }}
+          restore-keys: |
+            apt-${{ runner.os }}-
+
       - name: Install tmux deps
         run: sudo apt install libevent-dev
 
