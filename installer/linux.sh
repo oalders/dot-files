@@ -64,8 +64,9 @@ else
     # libgcr-ui-3-1, pinentry-gnome3, ...) that's only useful for an
     # interactive desktop session storing git credentials. CI never launches
     # the keyring daemon, so skip it there to avoid downloading packages
-    # nothing exercises.
-    if ! is var GITHUB_ACTIONS eq true; then
+    # nothing exercises. IS_GITHUB comes from bash_functions.sh (sourced
+    # above), the repo's existing "are we in CI" signal.
+    if [[ $IS_GITHUB == false ]]; then
         packages+=(gnome-keyring)
     fi
 
