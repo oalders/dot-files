@@ -158,6 +158,52 @@ exit 0'
     [ -f "$worktree/.tmp/fix-gh-issue.pending" ]
 }
 
+@test "add-worktree removes the main checkout's .claude/settings.local.json" {
+    setup_git_repo
+    mkdir -p "$REPO_DIR/.claude"
+    echo '{}' >"$REPO_DIR/.claude/settings.local.json"
+    echo '{}' >"$REPO_DIR/.claude/settings.json"
+
+    run "$ADD_WORKTREE" feature-branch
+    [ "$status" -eq 0 ]
+
+    [ ! -e "$REPO_DIR/.claude/settings.local.json" ]
+    # Only the machine-local file goes; shared settings stay put.
+    [ -f "$REPO_DIR/.claude/settings.json" ]
+}
+
+@test "add-worktree removes settings.local.json even when setup later fails" {
+    # The removal must happen before anything that can abort under `set -e`.
+    # scripts/init.sh failing still leaves a created worktree behind, which
+    # is exactly the session that would hit the EACCES warning.
+    setup_git_repo
+    mkdir -p "$REPO_DIR/.claude" "$REPO_DIR/scripts"
+    echo '{}' >"$REPO_DIR/.claude/settings.local.json"
+    printf '%s\n' '#!/usr/bin/env bash' 'exit 1' >"$REPO_DIR/scripts/init.sh"
+    chmod +x "$REPO_DIR/scripts/init.sh"
+    git add scripts/init.sh
+    git -c commit.gpgsign=false commit -q -m "add failing init"
+
+    run "$ADD_WORKTREE" feature-branch
+    [ "$status" -ne 0 ]
+    [ ! -e "$REPO_DIR/.claude/settings.local.json" ]
+}
+
+@test "add-worktree succeeds when the main checkout has no .claude dir" {
+    setup_git_repo
+    [ ! -d "$REPO_DIR/.claude" ]
+
+    run "$ADD_WORKTREE" feature-branch
+    [ "$status" -eq 0 ]
+
+    local date_stamp repo_name worktree
+    date_stamp="$(date +%Y-%m-%d)"
+    repo_name="$(basename "$REPO_DIR")"
+    worktree="$HOME/.worktree/$repo_name/$date_stamp/feature-branch"
+
+    [ -d "$worktree" ]
+}
+
 @test "add-worktree queues nothing for non-fix branches" {
     setup_git_repo
     run "$ADD_WORKTREE" feature-branch

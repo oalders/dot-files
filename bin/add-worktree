@@ -43,6 +43,22 @@ cd "$git_dir/.." || exit 1
 
 repo_root="$(pwd)"
 repo_name="$(basename "$repo_root")"
+
+# Claude Code sessions started from a worktree walk over to the main checkout
+# and try to read its .claude/settings.local.json, which the sandbox can't
+# open — so every session opens with an EACCES warning. Upstream considers
+# that working as intended (anthropics/claude-code#77998). The file is
+# machine-local and gitignored, and the main checkout is only ever a source
+# for worktrees, so discarding its approved permissions costs nothing. Done
+# here, before anything that can fail under `set -e`, so a worktree never
+# gets created without the cleanup having run. This is point-in-time, not
+# durable: a later Claude session run in the main checkout recreates the
+# file, and existing worktrees warn again until the next add-worktree.
+if [[ -f "$repo_root/.claude/settings.local.json" ]]; then
+    echo "Removing $repo_root/.claude/settings.local.json (see anthropics/claude-code#77998)" >&2
+    rm -f "$repo_root/.claude/settings.local.json"
+fi
+
 date_stamp="$(date +%Y-%m-%d)"
 
 all_worktrees="$HOME/.worktree/$repo_name/$date_stamp"
