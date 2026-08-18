@@ -55,6 +55,21 @@ profile=""
 profile_label=""
 project_root=$(git rev-parse --show-toplevel 2>/dev/null || echo "$PWD")
 
+# When launched from a worktree, drop the MAIN checkout's machine-local
+# .claude/settings.local.json so the point-in-time cleanup add-worktree does
+# (PR #1014) stays durable across every launch. Only fire from a worktree (a
+# plain main checkout must keep its own approved permissions), and only remove
+# the gitignored settings.local.json — never the shared settings.json.
+# common_dir is set only inside the block above, so guard it for `set -u`.
+if [[ -n "${common_dir-}" ]]; then
+    main_root=$(realpath "$common_dir/..")
+    if [[ "$main_root" != "$(realpath "$project_root")" &&
+        -f "$main_root/.claude/settings.local.json" ]]; then
+        echo "Removing $main_root/.claude/settings.local.json (see anthropics/claude-code#77998)" >&2
+        rm -f "$main_root/.claude/settings.local.json"
+    fi
+fi
+
 # Hugo detection, computed once and reused. Markers: modern config names
 # (hugo.toml/yaml/json), the modular config/_default/ layout, OR legacy
 # config.toml paired with themes/. The bare hugo.* names and config/_default/

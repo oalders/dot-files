@@ -581,6 +581,63 @@ setup() {
     grep -Fq '"oalders-docker"' .nono/profile.json
 }
 
+@test "bin/nn removes the main checkout's .claude/settings.local.json from a worktree" {
+    # Launched from a worktree, nn drops the MAIN checkout's machine-local
+    # settings.local.json so add-worktree's point-in-time cleanup (PR #1014)
+    # stays durable across every launch. The shared settings.json must survive.
+    setup_git_repo
+    setup_upstream
+    mkdir -p "$REPO_DIR/.claude"
+    echo '{}' >"$REPO_DIR/.claude/settings.local.json"
+    echo '{}' >"$REPO_DIR/.claude/settings.json"
+    setup_feature_worktree
+
+    run "$NN"
+    [ "$status" -eq 0 ]
+    # Still launched: the removal is a side effect, not a short-circuit.
+    [ -f "$BATS_TEST_TMPDIR/nono-argv" ]
+    # The machine-local file goes; the shared one stays put.
+    [ ! -e "$REPO_DIR/.claude/settings.local.json" ]
+    [ -f "$REPO_DIR/.claude/settings.json" ]
+}
+
+@test "bin/nn announces the removal of the main checkout's settings.local.json" {
+    setup_git_repo
+    setup_upstream
+    mkdir -p "$REPO_DIR/.claude"
+    echo '{}' >"$REPO_DIR/.claude/settings.local.json"
+    setup_feature_worktree
+
+    run "$NN"
+    [ "$status" -eq 0 ]
+    [[ "$output" == *"Removing $REPO_DIR/.claude/settings.local.json"* ]]
+}
+
+@test "bin/nn does not remove settings.local.json from the plain main checkout" {
+    # A plain main checkout (not a worktree) must keep its own approved
+    # permissions: the removal is scoped to worktree launches only.
+    setup_git_repo
+    mkdir -p "$REPO_DIR/.claude"
+    echo '{}' >"$REPO_DIR/.claude/settings.local.json"
+    cd "$REPO_DIR"
+
+    run "$NN"
+    [ "$status" -eq 0 ]
+    [ -f "$REPO_DIR/.claude/settings.local.json" ]
+}
+
+@test "bin/nn succeeds from a worktree when the main checkout has no .claude dir" {
+    # The [[ -f ]] guard must tolerate a main checkout with no settings at all.
+    setup_git_repo
+    setup_upstream
+    [ ! -d "$REPO_DIR/.claude" ]
+    setup_feature_worktree
+
+    run "$NN"
+    [ "$status" -eq 0 ]
+    [ -f "$BATS_TEST_TMPDIR/nono-argv" ]
+}
+
 @test "bin/nn auto-detect skips oalders-docker for a bare Dockerfile" {
     # A Dockerfile alone is not a marker: a repo that only builds an image has
     # no compose/buildx workflow to fix, so the mixin would be noise. This is
