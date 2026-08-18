@@ -158,6 +158,35 @@ exit 0'
     [ -f "$worktree/.tmp/fix-gh-issue.pending" ]
 }
 
+@test "add-worktree removes the main checkout's .claude/settings.local.json" {
+    setup_git_repo
+    mkdir -p "$REPO_DIR/.claude"
+    echo '{}' >"$REPO_DIR/.claude/settings.local.json"
+    echo '{}' >"$REPO_DIR/.claude/settings.json"
+
+    run "$ADD_WORKTREE" feature-branch
+    [ "$status" -eq 0 ]
+
+    [ ! -e "$REPO_DIR/.claude/settings.local.json" ]
+    # Only the machine-local file goes; shared settings stay put.
+    [ -f "$REPO_DIR/.claude/settings.json" ]
+}
+
+@test "add-worktree succeeds when the main checkout has no .claude dir" {
+    setup_git_repo
+    [ ! -d "$REPO_DIR/.claude" ]
+
+    run "$ADD_WORKTREE" feature-branch
+    [ "$status" -eq 0 ]
+
+    local date_stamp repo_name worktree
+    date_stamp="$(date +%Y-%m-%d)"
+    repo_name="$(basename "$REPO_DIR")"
+    worktree="$HOME/.worktree/$repo_name/$date_stamp/feature-branch"
+
+    [ -d "$worktree" ]
+}
+
 @test "add-worktree queues nothing for non-fix branches" {
     setup_git_repo
     run "$ADD_WORKTREE" feature-branch

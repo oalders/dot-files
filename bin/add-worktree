@@ -112,6 +112,14 @@ if [[ -f scripts/init.sh ]]; then
     ./scripts/init.sh
 fi
 
+# Claude Code sessions started from a worktree walk over to the main checkout
+# and try to read its .claude/settings.local.json, which the sandbox can't
+# open — so every session opens with an EACCES warning. Upstream considers
+# that working as intended (anthropics/claude-code#77998). The file is
+# machine-local and gitignored, and the main checkout is only ever a source
+# for worktrees, so discarding its approved permissions costs nothing.
+rm -f "$repo_root/.claude/settings.local.json"
+
 if [[ -n $(pgrep tmux) ]]; then
     . ~/dot-files/bash_functions.sh
 
