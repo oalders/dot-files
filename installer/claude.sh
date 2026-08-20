@@ -5,7 +5,7 @@ set -euxo pipefail
 # Pin the Claude Code binary. DISABLE_AUTOUPDATER=1 (set in bin/nn) holds this
 # at runtime; passing the version here holds it at install time so re-runs of
 # this installer don't silently upgrade to latest.
-CLAUDE_VERSION=2.1.222
+CLAUDE_VERSION=2.1.237
 
 if ! is there claude; then
     tmpscript=$(mktemp)
