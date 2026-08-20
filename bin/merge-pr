@@ -118,42 +118,41 @@ if [[ -z "$close_mode" ]]; then
             # Branch IS on origin; only tracking config is wrong. This is not a
             # missing push, and cannot arise for a MERGED PR (its remote branch
             # is gone), so handle it immediately rather than deferring.
+            #
+            # Self-heal rather than prompting: the branch is already pushed,
+            # the repair is exactly what the user would have to type back, and
+            # it changes nothing about the code being merged — only which ref
+            # `@{u}` names. Report what was done instead of asking permission.
             echo "merge-pr: branch '$branch' is on origin, but local tracking config" >&2
             echo "          is wrong, so '@{u}' does not resolve. The branch is" >&2
-            echo "          already pushed — this is a config issue, not a missing push." >&2
-            printf "merge-pr: repair with 'git branch --set-upstream-to=origin/%s' and continue? [y/N] " "$branch" >&2
-            # Default to bailing: empty input (just Enter), EOF, or a
-            # non-interactive stdin all leave tracking untouched.
-            read -r reply || reply=""
-            case "$reply" in
-                [Yy]*)
-                    # --set-upstream-to needs refs/remotes/origin/<branch> to
-                    # exist locally, and it may not: origin has the branch (we
-                    # just asked it), but this clone may never have fetched it,
-                    # or the ref may be stale relative to what origin holds.
-                    # Both make the repair fail ("the requested upstream branch
-                    # does not exist") or leave the unpushed-commit check below
-                    # comparing against an out-of-date ref. Fetch the one ref
-                    # explicitly first — a full `git fetch` is unnecessary and
-                    # slow, and the explicit refspec avoids depending on the
-                    # remote's configured fetch refspec.
-                    # The leading "+" matches the standard remote-tracking
-                    # refspec: a stale local ref that isn't a fast-forward of
-                    # origin's still gets updated rather than failing.
-                    if ! git fetch origin "+refs/heads/$branch:refs/remotes/origin/$branch" >&2; then
-                        echo "merge-pr: could not fetch 'refs/heads/$branch' from origin — cannot repair tracking." >&2
-                        exit 1
-                    fi
-                    # The ref is now current — the count block must not re-fetch
-                    # the same refspec.
-                    refreshed_ref=1
-                    git branch --set-upstream-to="origin/$branch" >&2
-                    ;;
-                *)
-                    echo "merge-pr: aborted — fix tracking config and re-run." >&2
-                    exit 1
-                    ;;
-            esac
+            echo "          already pushed, so repairing tracking with" >&2
+            echo "          'git branch --set-upstream-to=origin/$branch' and continuing." >&2
+            # --set-upstream-to needs refs/remotes/origin/<branch> to exist
+            # locally, and it may not: origin has the branch (we just asked
+            # it), but this clone may never have fetched it, or the ref may be
+            # stale relative to what origin holds. Both make the repair fail
+            # ("the requested upstream branch does not exist") or leave the
+            # unpushed-commit check below comparing against an out-of-date ref.
+            # Fetch the one ref explicitly first — a full `git fetch` is
+            # unnecessary and slow, and the explicit refspec avoids depending
+            # on the remote's configured fetch refspec.
+            # The leading "+" matches the standard remote-tracking refspec: a
+            # stale local ref that isn't a fast-forward of origin's still gets
+            # updated rather than failing.
+            if ! git fetch origin "+refs/heads/$branch:refs/remotes/origin/$branch" >&2; then
+                echo "merge-pr: could not fetch 'refs/heads/$branch' from origin — cannot repair tracking." >&2
+                exit 1
+            fi
+            # The ref is now current — the count block must not re-fetch the
+            # same refspec.
+            refreshed_ref=1
+            # Guarded rather than bare: a failed repair must not fall through
+            # to the unpushed-commit check with '@{u}' still unresolved, where
+            # `git rev-list` would abort under `set -e` with a worse message.
+            if ! git branch --set-upstream-to="origin/$branch" >&2; then
+                echo "merge-pr: could not set upstream to 'origin/$branch' — fix tracking config and re-run." >&2
+                exit 1
+            fi
         else
             # Genuinely unpushed. Defer instead of bailing — a MERGED PR needs
             # no push. `@{u}` is unresolved, so skip the unpushed-commit check.
