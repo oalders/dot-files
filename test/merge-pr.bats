@@ -60,44 +60,24 @@ setup() {
     [[ "$output" == *"has no upstream"* ]]
 }
 
-# #935: when @{u} fails but the branch IS on origin (only the local
-# tracking config is wrong), don't misdiagnose it as "push first".
-@test "pre-flight: misconfigured tracking is not reported as 'push first'" {
+# #935: when @{u} fails but the branch IS on origin (only the local tracking
+# config is wrong), don't misdiagnose it as "push first" — and don't prompt.
+# The repair is self-healing: closed stdin stands in for a non-interactive run
+# (cron, a pipe), where the old prompt aborted. Reaching PR lookup (which the
+# gh stub fails) proves the pre-flight passed on the repaired tracking.
+@test "pre-flight: misconfigured tracking self-heals instead of saying 'push first'" {
     setup_git_repo
     setup_upstream
     break_tracking_config
+    stub_command gh 'exit 1'
     run "$MERGE_PR" </dev/null
     [ "$status" -eq 1 ]
     [[ "$output" != *"push first"* ]]
     [[ "$output" == *"is on origin"* ]]
     [[ "$output" == *"--set-upstream-to=origin/main"* ]]
-}
-
-# Declining the repair prompt (empty input / no) leaves tracking untouched.
-@test "pre-flight: declining the tracking-repair prompt aborts without changes" {
-    setup_git_repo
-    setup_upstream
-    break_tracking_config
-    run "$MERGE_PR" <<<"n"
-    [ "$status" -eq 1 ]
-    [[ "$output" == *"aborted"* ]]
-    run git config "branch.main.remote"
-    [[ "$output" == "$UPSTREAM_DIR" ]]
-}
-
-# Accepting the repair prompt rewrites tracking to origin and proceeds past
-# the upstream pre-flight (then fails later at PR lookup — far enough to
-# prove the repair worked).
-@test "pre-flight: accepting the tracking-repair prompt sets upstream to origin" {
-    setup_git_repo
-    setup_upstream
-    break_tracking_config
-    stub_command gh 'exit 1'
-    run "$MERGE_PR" <<<"y"
-    # Repair succeeded, so the upstream pre-flight passed and we reached
-    # PR lookup (which the gh stub fails).
-    [ "$status" -eq 1 ]
     [[ "$output" == *"no PR found"* ]]
+    [[ "$output" != *"[y/N]"* ]]
+    [[ "$output" != *"aborted"* ]]
     run git config "branch.main.remote"
     [[ "$output" == "origin" ]]
 }
@@ -115,7 +95,7 @@ setup() {
     git config --unset branch.feature.remote || true
     git config --unset branch.feature.merge || true
     stub_command gh 'exit 1'
-    run "$MERGE_PR" <<<"y"
+    run "$MERGE_PR" </dev/null
     # Reaching PR lookup (which the gh stub fails) proves the repair worked.
     [ "$status" -eq 1 ]
     [[ "$output" == *"no PR found"* ]]
