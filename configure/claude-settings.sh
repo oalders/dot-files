@@ -74,8 +74,15 @@ set_env_key CLAUDE_CODE_MAX_CONCURRENT_SUBAGENTS 5
 
 # Allowlist the models offered by /model, --model, ANTHROPIC_MODEL and resume,
 # which keeps Fable out of the picker. Experimental: unverified whether this key
-# is honored; harmless if ignored since it only narrows an allowlist.
-set_key availableModels '["opus","sonnet","haiku"]'
+# is honored; harmless if ignored since it only narrows an allowlist. The pinned
+# opus id below is listed explicitly so it matches the allowlist exactly rather
+# than relying on the "opus" family alias, which resolves to the newest Opus.
+set_key availableModels '["claude-opus-4-8","opus","sonnet","haiku"]'
+
+# Default new sessions to Opus 4.8 rather than whatever the "opus" alias points
+# at today (Opus 5). /model overwrites this in ~/.claude/settings.json for the
+# session; --model and ANTHROPIC_MODEL override for a single run.
+set_key model '"claude-opus-4-8"'
 
 # Default new sessions to medium reasoning effort to trim thinking-token spend.
 # /effort overwrites this in ~/.claude/settings.json; --effort and
