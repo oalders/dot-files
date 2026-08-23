@@ -259,11 +259,14 @@ SYMLINKS="$SCRIPT_DIR/installer/symlinks.sh"
     [ "$status" -eq 0 ]
 }
 
-# unix_socket_dir is non-recursive on the socket's own directory. The exact
+# unix_socket_dir grants connect() on the socket's own directory. The exact
 # socket filename varies by tmux server instance, so unix_socket on a fixed
-# path would not survive a server restart; the subtree variants are recursive
-# and would widen the grant past /tmp/tmux-$UID. Pin the narrow key so a
-# well-meaning "fix" doesn't silently broaden it (#1022).
+# path would not survive a server restart; the *_bind variants would add
+# bind(), and the *_subtree variants declare a recursive grant that widens
+# past /tmp/tmux-$UID. (Note that today's Linux Landlock fallback makes even
+# the dir variant recursive in practice -- see nono/CLAUDE.md -- but that is
+# an enforcement detail, not a reason to declare a wider grant.) Pin the
+# narrow key so a well-meaning "fix" doesn't silently broaden it (#1022).
 @test "oalders-core.json uses the narrow unix_socket_dir key, not a wider one" {
     run jq empty "$NONO_DIR/oalders-core.json"
     [ "$status" -eq 0 ]
