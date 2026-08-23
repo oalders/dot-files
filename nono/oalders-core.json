@@ -34,6 +34,9 @@
     "allow": [
       "/tmp/claude-1000"
     ],
+    "unix_socket_dir": [
+      "/tmp/tmux-1000"
+    ],
     "read_file": [
       "/etc/bash.bashrc",
       "/etc/gitconfig",

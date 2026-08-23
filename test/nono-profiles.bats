@@ -243,3 +243,62 @@ SYMLINKS="$SCRIPT_DIR/installer/symlinks.sh"
     run grep -Fq '"network"' "$NONO_DIR/oalders-docker.json"
     [ "$status" -ne 0 ]
 }
+
+# nono 0.74.0 added fail-closed inode-type validation to prepared Landlock
+# rules, so the broad /tmp grant no longer lets a sandboxed process connect()
+# to the tmux control socket. Without an explicit unix_socket* grant, tmux
+# session-name capture fails silently (empty label) rather than erroring
+# loudly, which is exactly the kind of regression a grep test catches (#1022).
+@test "oalders-core.json grants the tmux control socket directory" {
+    # Parse first: jq -e on a malformed profile would fail for the wrong
+    # reason, and the assertion must not pass vacuously on a missing file.
+    run jq empty "$NONO_DIR/oalders-core.json"
+    [ "$status" -eq 0 ]
+    run jq -e '.filesystem.unix_socket_dir | index("/tmp/tmux-1000")' \
+        "$NONO_DIR/oalders-core.json"
+    [ "$status" -eq 0 ]
+}
+
+# unix_socket_dir is non-recursive on the socket's own directory. The exact
+# socket filename varies by tmux server instance, so unix_socket on a fixed
+# path would not survive a server restart; the subtree variants are recursive
+# and would widen the grant past /tmp/tmux-$UID. Pin the narrow key so a
+# well-meaning "fix" doesn't silently broaden it (#1022).
+@test "oalders-core.json uses the narrow unix_socket_dir key, not a wider one" {
+    run jq empty "$NONO_DIR/oalders-core.json"
+    [ "$status" -eq 0 ]
+    run jq -e '
+        [.filesystem.unix_socket_subtree[]?,
+         .filesystem.unix_socket_subtree_bind[]?,
+         .filesystem.unix_socket_dir_bind[]?,
+         .filesystem.unix_socket_bind[]?]
+        | length > 0
+    ' "$NONO_DIR/oalders-core.json"
+    # jq -e exits non-zero when the result is false: that is the pass.
+    [ "$status" -ne 0 ]
+}
+
+# The tmux socket grant is documented as a deliberate security tradeoff rather
+# than an obvious win: holding the socket also allows `tmux send-keys` into
+# unsandboxed panes. If the grant ever moves or is re-scoped, the rationale in
+# nono/CLAUDE.md must move with it (#1022).
+@test "nono/CLAUDE.md documents the tmux socket grant" {
+    run grep -Fq '/tmp/tmux-1000' "$NONO_DIR/CLAUDE.md"
+    [ "$status" -eq 0 ]
+    run grep -Fq 'send-keys' "$NONO_DIR/CLAUDE.md"
+    [ "$status" -eq 0 ]
+}
+
+# The nono pin is intentional (fd30937c: version bumps should be deliberate),
+# but it went stale against an installed 0.74.0 while still naming the old
+# org. A fresh install.sh would then silently fetch the fail-open 0.73.0 that
+# this profile change depends on NOT being present (#1022).
+@test "installer/ubi.sh pins nono at the current org and version" {
+    local ubi="$SCRIPT_DIR/installer/ubi.sh"
+    run grep -Fq 'maybe_install nolabs-ai/nono --tag v0.74.0' "$ubi"
+    [ "$status" -eq 0 ]
+    # The repo redirects, so the old path keeps working and would not fail
+    # loudly; assert it is gone rather than trusting the line above alone.
+    run grep -Fq 'always-further/nono' "$ubi"
+    [ "$status" -ne 0 ]
+}
