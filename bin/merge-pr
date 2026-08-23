@@ -25,10 +25,13 @@ Options:
                 deletes the remote branch explicitly — a merge gets that
                 for free from GitHub's delete_branch_on_merge, but that
                 setting only fires on merge, not close. Extra args pass
-                through to `gh pr close`. If no PR exists for the branch,
-                there's nothing to close, so teardown still runs (from a
-                linked worktree; from the main working tree there's nothing
-                to tear down and the branch is left for manual deletion).
+                through to `gh pr close`. If the PR is already MERGED or
+                CLOSED, the close call — and any extra args, which have no
+                consumer then — is skipped, but teardown still runs.
+                If no PR exists for the branch, there's nothing to
+                close, so teardown still runs (from a linked worktree;
+                from the main working tree there's nothing to tear down
+                and the branch is left for manual deletion).
 
 Refuses:
   --auto, --auto-merge   gh pr merge would exit 0 while the PR stays
@@ -292,10 +295,18 @@ if [[ -z "$no_pr" ]]; then
             ;;
         MERGED)
             if [[ -n "$close_mode" ]]; then
-                echo "merge-pr: refusing to close a MERGED PR" >&2
-                exit 1
+                # `gh pr close` on a merged PR is nonsensical (GitHub would
+                # reject it), but closing is only one step of --close: the
+                # rest — remote branch, worktree, local branch, tmux session
+                # — is exactly the teardown the user asked for and is still
+                # wanted. So skip just the remote action and fall through,
+                # rather than making the user re-run bare `merge-pr`. Extra
+                # gh_args have no consumer on this path and are silently
+                # ignored, as they already are in merge mode below.
+                echo "merge-pr: PR already MERGED — closing is a no-op, proceeding to cleanup"
+            else
+                echo "merge-pr: PR already MERGED — proceeding to cleanup"
             fi
-            echo "merge-pr: PR already MERGED — proceeding to cleanup"
             ;;
         CLOSED)
             # Only meaningful in close mode; in merge mode this falls through
@@ -319,7 +330,11 @@ fi
 # but that setting fires only on merge, not close — so an abandoned PR would
 # otherwise leave its branch stranded on origin. Run here, while cwd is still
 # the worktree and before the tmux kill, to keep the "kill tmux LAST"
-# invariant. Covers both the OPEN-close and already-CLOSED paths.
+# invariant. Covers the OPEN-close, already-CLOSED and already-MERGED paths.
+# On the MERGED path delete_branch_on_merge has usually already removed the
+# branch, so the ls-remote guard below makes this a silent no-op; where that
+# setting is off, deleting the stale merged branch is the cleanup --close
+# promises anyway.
 if [[ -n "$close_mode" ]]; then
     # Only delete the remote branch if origin actually has it. Close mode
     # tolerates a never-pushed or already-deleted branch (see the skipped

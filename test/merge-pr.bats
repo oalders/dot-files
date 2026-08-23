@@ -471,16 +471,90 @@ esac
     [ ! -d "$WORKTREE_DIR" ]
 }
 
-# Closing a MERGED PR is nonsensical; refuse it.
-@test "close: --close on a MERGED PR refuses" {
+# `gh pr close` on a MERGED PR is nonsensical, but the teardown isn't: skip
+# the close call, say so, and run full cleanup (mirrors the CLOSED test above
+# and merge mode's already-MERGED path).
+@test "close: --close on a MERGED PR skips close and still tears down" {
     _ready_repo
-    git checkout -q -b feature
-    git push -q -u origin feature
-    stub_command gh 'printf "MERGED\tmain\n"'
+    setup_feature_worktree
+    unset TMUX
+    stub_command tmux 'exit 0'
+    stub_command gh '
+case "$2" in
+    view) printf "MERGED\tmain\n" ;;
+    close) : >"$BATS_TEST_TMPDIR/close-was-called" ;;
+esac
+'
 
     run "$MERGE_PR" --close
-    [ "$status" -eq 1 ]
-    [[ "$output" == *"refusing to close a MERGED PR"* ]]
+    [ "$status" -eq 0 ]
+    [[ "$output" == *"already MERGED — closing is a no-op"* ]]
+    [ ! -e "$BATS_TEST_TMPDIR/close-was-called" ]
+    [ ! -d "$WORKTREE_DIR" ]
+    run git -C "$REPO_DIR" branch --list feature
+    [ -z "$output" ]
+}
+
+# Extra pass-through args have no consumer on the MERGED path (there's no
+# `gh pr close` call to take them); they must be ignored, not refused.
+@test "close: --close on a MERGED PR ignores extra gh args" {
+    _ready_repo
+    setup_feature_worktree
+    unset TMUX
+    stub_command tmux 'exit 0'
+    stub_command gh '
+case "$2" in
+    view) printf "MERGED\tmain\n" ;;
+    close) : >"$BATS_TEST_TMPDIR/close-was-called" ;;
+esac
+'
+
+    run "$MERGE_PR" --close --comment "wontfix"
+    [ "$status" -eq 0 ]
+    [ ! -e "$BATS_TEST_TMPDIR/close-was-called" ]
+    [ ! -d "$WORKTREE_DIR" ]
+}
+
+# delete_branch_on_merge normally removes the remote branch before we get
+# here, making the close-mode delete a silent no-op. Simulate that repo by
+# deleting origin/feature first: teardown must still exit 0 without warning.
+@test "close: --close on a MERGED PR is silent when the remote branch is gone" {
+    _ready_repo
+    setup_feature_worktree
+    unset TMUX
+    stub_command tmux 'exit 0'
+    git push -q origin --delete feature
+    stub_command gh '
+case "$2" in
+    view) printf "MERGED\tmain\n" ;;
+esac
+'
+
+    run "$MERGE_PR" --close
+    [ "$status" -eq 0 ]
+    [[ "$output" != *"could not delete remote branch"* ]]
+    [[ "$output" != *"warning"* ]]
+    [ ! -d "$WORKTREE_DIR" ]
+}
+
+# With delete_branch_on_merge off the merged branch is still on origin; close
+# mode's explicit delete is the cleanup --close promises, so it must run.
+@test "close: --close on a MERGED PR deletes a lingering remote branch" {
+    _ready_repo
+    setup_feature_worktree
+    unset TMUX
+    stub_command tmux 'exit 0'
+    stub_command gh '
+case "$2" in
+    view) printf "MERGED\tmain\n" ;;
+esac
+'
+
+    run "$MERGE_PR" --close
+    [ "$status" -eq 0 ]
+    cd "$REPO_DIR"
+    run git ls-remote "$UPSTREAM_DIR" refs/heads/feature
+    [ -z "$output" ]
 }
 
 # Remote-branch deletion is tolerant: an already-gone branch still exits 0
