@@ -20,7 +20,14 @@ if ! is there uv; then
     tmpscript=$(mktemp)
     trap 'rm -f "$tmpscript"' EXIT
     curl -LsSf -o "$tmpscript" https://astral.sh/uv/install.sh
-    sh "$tmpscript"
+    # Don't let the installer append `. "$HOME/.local/bin/env"` to the shell rc
+    # files. Those are symlinks into this repo (created earlier by symlinks.sh),
+    # so on a fresh box the installer would write through the symlink and leave
+    # bashrc/bash_profile/profile dirty in the working tree. PATH for the rest
+    # of this script is handled below, and bashrc already adds ~/.local/bin via
+    # `add_path`, so the env shim is redundant anyway. UV_NO_MODIFY_PATH is the
+    # current knob; INSTALLER_NO_MODIFY_PATH is kept for older installer builds.
+    UV_NO_MODIFY_PATH=1 INSTALLER_NO_MODIFY_PATH=1 sh "$tmpscript"
 fi
 
 export PATH="$HOME/.local/bin:$PATH"

@@ -23,14 +23,33 @@ filename="go$version.$os-$arch.tar.gz"
 url="https://go.dev/dl/$filename"
 
 curl --location -O "$url"
-curl --location -O "https://go.dev/dl/$filename.sha256"
+
+# go.dev no longer serves per-file .sha256 sidecars: the old
+# https://go.dev/dl/<file>.sha256 URL now 302s to an HTML redirect page, so
+# `sha256sum --check` fails with "no properly formatted checksum lines found".
+# Pull the expected checksum from the download manifest JSON instead. Parsed
+# with grep (not jq) so this works during a fresh bootstrap before jq exists;
+# the "sha256" field sits a few lines below its "filename" in the pretty-printed
+# output. `|| true` keeps `set -e`/`pipefail` from aborting on an empty match so
+# the explicit check below can report a clear error.
+expected="$(
+    curl --location --silent "https://go.dev/dl/?mode=json&include=all" \
+        | grep -A6 "\"filename\": \"$filename\"" \
+        | grep '"sha256"' \
+        | grep -oE '[a-f0-9]{64}' \
+        | head -1 || true
+)"
+
+if [[ -z $expected ]]; then
+    echo "Could not determine expected sha256 for $filename from go.dev manifest" >&2
+    exit 1
+fi
 
 if command -v sha256sum &>/dev/null; then
-    echo "$(cat "$filename.sha256")  $filename" | sha256sum --check --strict
+    echo "$expected  $filename" | sha256sum --check --strict
 elif command -v shasum &>/dev/null; then
-    echo "$(cat "$filename.sha256")  $filename" | shasum -a 256 --check
+    echo "$expected  $filename" | shasum -a 256 --check
 fi
-rm -f "$filename.sha256"
 
 target=~/local/bin
 rm -rf "$target/go"

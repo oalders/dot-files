@@ -31,5 +31,7 @@ fi
 
 font='JetBrainsMono'
 if ! is cli output stdout fc-list --arg=': family' like "$font Nerd Font"; then
-    oh-my-posh font install --headless $font
+    # Newer oh-my-posh dropped the --headless flag; passing the font name as an
+    # argument is already non-interactive (no --headless needed).
+    oh-my-posh font install "$font"
 fi
