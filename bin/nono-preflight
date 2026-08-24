@@ -1,0 +1,92 @@
+#!/bin/bash
+
+set -eu -o pipefail
+
+# Preflight for nn/nono on kernels older than Linux 6.12.
+#
+# nono v0.74.0's supervised credential-proxy mode (which every network-enabled
+# profile enters) hard-requires Landlock ABI V6 (LANDLOCK_SCOPE_SIGNAL), first
+# shipped in Linux 6.12. On an older kernel (e.g. the Ubuntu 24.04 GA 6.8 line,
+# which reports Landlock V4) the sandbox aborts at init with a misleading error
+# that points at the network fd handoff:
+#
+#   Failed to receive required network seccomp notify fd number from child:
+#   ... recv_raw_fd_number failed: failed to fill whole buffer
+#
+# The real cause only surfaces from the supervised child:
+#
+#   SignalMode::AllowSameSandbox requires Landlock ABI V6+
+#   (LANDLOCK_SCOPE_SIGNAL), but this kernel does not support process scoping.
+#
+# This check surfaces that up front. It asks nono itself two questions rather
+# than parsing `uname`, so a backported kernel, a future nono that degrades
+# instead of hard-failing, or a post-upgrade kernel are all handled without
+# code changes here:
+#
+#   1. Is Landlock signal scoping supported? (kernel ABI >= V6)
+#   2. Does the resolved profile run the filtering proxy (supervised mode)?
+#      Direct-network and net-blocked profiles never enter supervised mode and
+#      survive on V4, so they must NOT be blocked.
+#
+# Only when signal scoping is unsupported AND the profile is proxy-supervised
+# do we block. See https://github.com/oalders/dot-files/issues/1024.
+#
+# Usage: nono-preflight <profile>
+#   Exit 0: safe to proceed. This is also the answer on any uncertainty (no
+#           profile, nono missing, an unexpected/empty query result) — fail
+#           open so the check never breaks a launch it can't positively
+#           diagnose.
+#   Exit 1: positive detection of the affected combination. The real cause and
+#           the fix are printed to stderr first.
+
+profile="${1:-}"
+
+# Without a profile we can't run the proxy probe, so there's nothing to check.
+[[ -n $profile ]] || exit 0
+
+# nono is the thing being guarded; if it isn't installed the launch fails for a
+# different, obvious reason and there's nothing to preflight.
+command -v nono >/dev/null 2>&1 || exit 0
+
+# (1) Landlock signal scoping. `nono why --scope signal` prints a "Supported:"
+# line (true/false). Only a literal "false" is a positive "kernel lacks V6"; an
+# empty or unexpected value means we can't tell, so fall through and fail open.
+# `|| true` keeps a nono error from tripping pipefail/set -e into a false block.
+signal_supported=$(
+    nono why --scope signal 2>/dev/null |
+        awk -F': *' '/^[[:space:]]*Supported:/ { print $2; exit }' || true
+)
+[[ $signal_supported == false ]] || exit 0
+
+# (2) Supervised proxy mode. Probe a host that can't be in any allowlist: a
+# proxy-supervised profile answers "DENIED / Reason: proxy_filtered" (the
+# filtering proxy is active), a direct-network profile answers
+# "network_allowed", and a net-blocked profile answers with a block reason.
+# Only proxy_filtered means this launch enters the mode that needs V6.
+probe=$(nono why --host nono-preflight-probe.invalid --profile "$profile" 2>/dev/null || true)
+grep -q 'proxy_filtered' <<<"$probe" || exit 0
+
+# Both conditions hold: this launch would crash at sandbox init. Explain the
+# real cause and the fix instead of letting the opaque error surface.
+nono_version=$(nono --version 2>/dev/null | awk '{ print $2 }' || true)
+kernel=$(uname -r)
+
+cat >&2 <<EOF
+🗯️nn: refusing to launch — this kernel is too old for nono ${nono_version:-v0.74.0+}.
+
+  Profile '$profile' uses nono's supervised credential proxy, which requires
+  Landlock ABI V6 (LANDLOCK_SCOPE_SIGNAL, kernel >= 6.12). This kernel
+  ($kernel) reports Landlock V4, so the sandbox would abort at init with a
+  misleading "recv_raw_fd_number failed" error.
+
+  Fix (recommended): upgrade to a kernel >= 6.12, then reboot:
+      ~/dot-files/bin/upgrade-to-hwe-kernel.sh
+      sudo reboot
+
+  Temporary workaround: pin nono to the last pre-V6 release in
+  installer/ubi.sh, then re-run the installer:
+      maybe_install nolabs-ai/nono --tag v0.73.0
+
+  See: https://github.com/oalders/dot-files/issues/1024
+EOF
+exit 1
