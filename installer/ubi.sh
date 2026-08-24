@@ -78,6 +78,12 @@ fi
 db ubi --project oalders/debounce --in "$in"
 
 # maybe_install air-verse/air
+# nono v0.74.0+ needs Landlock ABI V6 (LANDLOCK_SCOPE_SIGNAL, kernel >= 6.12)
+# for its supervised credential-proxy mode; on an older kernel every
+# network-enabled `nn` launch aborts at sandbox init. bin/nn preflights this and
+# prints the real cause (bin/nono-preflight). To run on a kernel < 6.12, either
+# upgrade (bin/upgrade-to-hwe-kernel.sh) or pin an older nono here (--tag
+# v0.73.0). See https://github.com/oalders/dot-files/issues/1024.
 maybe_install nolabs-ai/nono --tag v0.74.0
 maybe_install atanunq/viu
 maybe_install bensadeh/tailspin --exe tspin

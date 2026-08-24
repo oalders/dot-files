@@ -204,6 +204,19 @@ if [[ -z "$profile" ]]; then
     fi
 fi
 
+# Preflight the kernel/nono compatibility gap before doing any launch setup.
+# nono v0.74.0's supervised credential proxy needs Landlock ABI V6 (kernel >=
+# 6.12); on an older kernel a network-enabled profile crashes at sandbox init
+# with an opaque "recv_raw_fd_number failed" error. The helper asks nono
+# whether this exact launch is affected and, if so, prints the real cause + fix
+# and exits non-zero. It fails open (exit 0) on any uncertainty, and is a no-op
+# on kernels >= 6.12. Referenced via $HOME/dot-files like the other repo
+# resources below; guarded so a missing helper never blocks a launch. See #1024.
+nono_preflight="$HOME/dot-files/bin/nono-preflight"
+if [[ -x $nono_preflight ]]; then
+    "$nono_preflight" "$profile" || exit 1
+fi
+
 # Worktree-local scratch dir for $TMPDIR. Tools that honor TMPDIR (mktemp,
 # Python tempfile, Perl File::Temp, gh, gnupg, etc.) will write here instead
 # of /tmp, which keeps transient state inside --allow-cwd and out of the
