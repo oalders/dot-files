@@ -63,6 +63,12 @@ signal_supported=$(
 # filtering proxy is active), a direct-network profile answers
 # "network_allowed", and a net-blocked profile answers with a block reason.
 # Only proxy_filtered means this launch enters the mode that needs V6.
+#
+# The probe host uses the RFC 2606-reserved .invalid TLD, so it can never be in
+# a profile's allow_domain list — a proxy-supervised profile always reports
+# proxy_filtered for it. A profile with unrestricted outbound would instead
+# report network_allowed, which is correct: no filtering proxy means no
+# supervised mode, so there is nothing to block.
 probe=$(nono why --host nono-preflight-probe.invalid --profile "$profile" 2>/dev/null || true)
 grep -q 'proxy_filtered' <<<"$probe" || exit 0
 

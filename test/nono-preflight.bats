@@ -62,6 +62,20 @@ esac'
     [ -z "$output" ]
 }
 
+@test "nono-preflight fails open when the host probe errors on an old kernel" {
+    # Signal scoping is unsupported, but the second query (the proxy probe)
+    # itself errors. The `|| true` guard must absorb it and fall through to
+    # exit 0 rather than misread the empty output as proxy-supervised.
+    stub_command nono 'case "$*" in
+    "why --scope signal") echo "  Supported: false" ;;
+    "why --host "*) echo "boom" >&2; exit 1 ;;
+    *) exit 0 ;;
+esac'
+    run "$PREFLIGHT" oalders
+    [ "$status" -eq 0 ]
+    [ -z "$output" ]
+}
+
 @test "nono-preflight fails open when no profile is given" {
     stub_nono false proxy_filtered
     run "$PREFLIGHT"

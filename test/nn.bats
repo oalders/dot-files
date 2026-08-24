@@ -29,6 +29,24 @@ setup() {
     cd "$BATS_TEST_TMPDIR/work"
 }
 
+# Install a stub nono-preflight at the absolute path bin/nn invokes it from
+# ($HOME/dot-files/bin/nono-preflight, isolated under the sandbox HOME). It
+# records the profile arg it received to $BATS_TEST_TMPDIR/preflight-profile
+# and exits with the given code (non-zero => print a diagnostic, like the real
+# helper does when it blocks). Every other test leaves the helper absent, which
+# exercises bin/nn's [[ -x ]] no-op guard for free.
+stub_nono_preflight() {
+    local exit_code="$1"
+    mkdir -p "$HOME/dot-files/bin"
+    cat >"$HOME/dot-files/bin/nono-preflight" <<STUB
+#!/usr/bin/env bash
+printf '%s\n' "\$1" >"$BATS_TEST_TMPDIR/preflight-profile"
+[ $exit_code -eq 0 ] || echo "nono-preflight: kernel too old" >&2
+exit $exit_code
+STUB
+    chmod +x "$HOME/dot-files/bin/nono-preflight"
+}
+
 @test "bin/nn injects NPM_CONFIG_CACHE pointing at \$PWD/.tmp/cache/npm" {
     run "$NN"
     [ "$status" -eq 0 ]
@@ -654,4 +672,35 @@ setup() {
     [ -f .nono/profile.json ]
     grep -Fq '"oalders-node"' .nono/profile.json
     ! grep -Fq '"oalders-docker"' .nono/profile.json
+}
+
+# --- nono Landlock preflight wiring (#1024) --------------------------------
+
+@test "bin/nn aborts the launch when the nono preflight blocks" {
+    stub_nono_preflight 1
+    run "$NN"
+    [ "$status" -eq 1 ]
+    [[ "$output" == *"kernel too old"* ]]
+    # The helper is handed the resolved profile (bare cwd -> "oalders" fallback).
+    [ "$(cat "$BATS_TEST_TMPDIR/preflight-profile")" = "oalders" ]
+    # A block aborts before the sandbox launch: nono is never reached.
+    [ ! -f "$BATS_TEST_TMPDIR/nono-argv" ]
+}
+
+@test "bin/nn continues to launch when the nono preflight passes" {
+    stub_nono_preflight 0
+    run "$NN"
+    [ "$status" -eq 0 ]
+    [ "$(cat "$BATS_TEST_TMPDIR/preflight-profile")" = "oalders" ]
+    # A pass falls through to the normal, fully-sandboxed launch.
+    [ -f "$BATS_TEST_TMPDIR/nono-argv" ]
+}
+
+@test "bin/nn launches normally when the nono preflight helper is absent" {
+    # The [[ -x $nono_preflight ]] guard must no-op a missing helper so a fresh
+    # clone (before symlinks/install) still launches rather than aborting.
+    [ ! -e "$HOME/dot-files/bin/nono-preflight" ]
+    run "$NN"
+    [ "$status" -eq 0 ]
+    [ -f "$BATS_TEST_TMPDIR/nono-argv" ]
 }
