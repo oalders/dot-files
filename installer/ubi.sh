@@ -96,7 +96,6 @@ maybe_install mgdm/htmlq
 maybe_install oalders/clodhopper
 maybe_install oalders/is
 maybe_install sigstore/cosign
-maybe_install stripe/stripe-cli --exe stripe
 maybe_install tummychow/git-absorb
 
 # hugo only ships .pkg archives for macOS, which ubi can't extract, so on darwin
