@@ -204,8 +204,10 @@ fi
 uid="$(id -u)"
 gid="$(id -g)"
 
-# Cheap detection first, so the common case never starts a container. .git is
-# skipped: ours by construction, never bind-mounted.
+# Cheap detection first, so the common case never starts a container. An
+# unreadable root-owned dir is itself reported by this find, so suppressing its
+# permission errors can't hide a root-owned path. .git is skipped: ours by
+# construction, never bind-mounted.
 if ! find "$wt" -name .git -prune -o ! -user "$uid" -print 2>/dev/null | grep -q .; then
     echo "docker-teardown: done"
     exit 0

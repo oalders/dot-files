@@ -266,6 +266,8 @@ if [[ -z "$no_pr" ]]; then
                 # Closing a merged PR is a no-op, but the rest of --close's
                 # teardown is still wanted — skip just the remote action and
                 # fall through rather than making the user re-run bare merge-pr.
+                # Any extra gh_args have no consumer here and are silently
+                # ignored, as in merge mode.
                 echo "merge-pr: PR already MERGED — closing is a no-op, proceeding to cleanup"
             else
                 echo "merge-pr: PR already MERGED — proceeding to cleanup"
