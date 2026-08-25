@@ -56,6 +56,17 @@ setup() {
     [ -f "$worktree/mysub/sub-file" ]
 }
 
+@test "add-worktree refuses to run outside a git repository" {
+    # BATS_TEST_TMPDIR is not a git repo and GIT_CEILING_DIRECTORIES (set in
+    # setup) stops git from finding a parent one, so this exercises the
+    # "not in a repo" guard. It must print the friendly message and exit
+    # non-zero rather than aborting on git's raw error under `set -e`.
+    cd "$BATS_TEST_TMPDIR"
+    run "$ADD_WORKTREE" feature-branch
+    [ "$status" -ne 0 ]
+    [[ "$output" == *"must be run from inside a git repository"* ]]
+}
+
 @test "add-worktree creates a worktree for the submodule when run inside one" {
     # Regression test for #1029: run from inside a submodule, the worktree
     # must be created for the submodule you're standing in, not the parent

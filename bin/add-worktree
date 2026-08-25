@@ -33,16 +33,16 @@ if [[ -n "$(git rev-parse --show-superproject-working-tree 2>/dev/null)" ]]; the
     # parent repo (or its modules dir) instead of the submodule (#1029).
     repo_root="$(git rev-parse --show-toplevel)"
 else
-    git_dir=$(git rev-parse --git-common-dir)
-
-    if [[ -z $git_dir ]]; then
-        echo "This command must be run from inside a git repository"
-        exit
-    fi
-
     # git-common-dir (not show-toplevel) so running from a linked worktree
     # still bases the new worktree on the main checkout, not the worktree
-    # you happen to be standing in.
+    # you happen to be standing in. 2>/dev/null and the `if !` keep `set -e`
+    # from aborting on git's own "not a repository" error before we can
+    # print the friendly message.
+    if ! git_dir=$(git rev-parse --git-common-dir 2>/dev/null); then
+        echo "This command must be run from inside a git repository"
+        exit 1
+    fi
+
     repo_root="$(cd "$git_dir/.." && pwd)"
 fi
 
