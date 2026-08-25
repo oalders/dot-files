@@ -56,6 +56,51 @@ setup() {
     [ -f "$worktree/mysub/sub-file" ]
 }
 
+@test "add-worktree creates a worktree for the submodule when run inside one" {
+    # Regression test for #1029: run from inside a submodule, the worktree
+    # must be created for the submodule you're standing in, not the parent
+    # repo. Before the fix, --git-common-dir pointed into the superproject's
+    # .git/modules/<name>, so repo_root/repo_name resolved to the parent (or
+    # its modules dir) and the wrong repo got a worktree.
+    git config --global protocol.file.allow always
+    git config --global init.defaultBranch main
+    git config --global user.email t@example.com
+    git config --global user.name T
+
+    SUB_SRC="$BATS_TEST_TMPDIR/sub-src"
+    mkdir -p "$SUB_SRC"
+    (
+        cd "$SUB_SRC"
+        git init -q
+        echo sub >sub-file
+        git add sub-file
+        git -c commit.gpgsign=false commit -q -m init
+    )
+
+    setup_git_repo
+    git submodule add -q "$SUB_SRC" mysub
+    git -c commit.gpgsign=false commit -q -m "add submodule"
+
+    # Invoke from inside the submodule working tree.
+    cd "$REPO_DIR/mysub"
+    run "$ADD_WORKTREE" feature-branch
+    [ "$status" -eq 0 ]
+
+    local date_stamp worktree
+    date_stamp="$(date +%Y-%m-%d)"
+    # The worktree lands under the submodule's name (mysub), not the parent's.
+    worktree="$HOME/.worktree/mysub/$date_stamp/feature-branch"
+
+    [ -d "$worktree" ]
+    # It's a checkout of the submodule (has the submodule's file), on the new
+    # branch, and is its own repo -- not the superproject.
+    [ -f "$worktree/sub-file" ]
+    [ ! -f "$worktree/file" ]
+    [ "$(git -C "$worktree" rev-parse --abbrev-ref HEAD)" = "feature-branch" ]
+    # And the parent repo did NOT get a worktree.
+    [ ! -d "$HOME/.worktree/$(basename "$REPO_DIR")" ]
+}
+
 @test "add-worktree is a no-op for submodules in a repo without any" {
     setup_git_repo
     run "$ADD_WORKTREE" feature-branch

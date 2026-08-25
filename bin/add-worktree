@@ -26,11 +26,24 @@ elif [[ $branch_name =~ ^gh-([0-9]+)$ ]]; then
     type="pr"
 fi
 
-git_dir=$(git rev-parse --git-common-dir)
+if [[ -n "$(git rev-parse --show-superproject-working-tree 2>/dev/null)" ]]; then
+    # Inside a submodule, base the worktree on the submodule's own working
+    # tree. --git-common-dir points into the superproject's
+    # .git/modules/<name> here, so the old cd "$git_dir/.." resolved to the
+    # parent repo (or its modules dir) instead of the submodule (#1029).
+    repo_root="$(git rev-parse --show-toplevel)"
+else
+    git_dir=$(git rev-parse --git-common-dir)
 
-if [[ -z $git_dir ]]; then
-    echo "This command must be run from inside a git repository"
-    exit
+    if [[ -z $git_dir ]]; then
+        echo "This command must be run from inside a git repository"
+        exit
+    fi
+
+    # git-common-dir (not show-toplevel) so running from a linked worktree
+    # still bases the new worktree on the main checkout, not the worktree
+    # you happen to be standing in.
+    repo_root="$(cd "$git_dir/.." && pwd)"
 fi
 
 # shellcheck disable=SC2153
@@ -39,9 +52,8 @@ if [[ $MY_INSIDE_TMUX == true ]]; then
     exit
 fi
 
-cd "$git_dir/.." || exit 1
+cd "$repo_root" || exit 1
 
-repo_root="$(pwd)"
 repo_name="$(basename "$repo_root")"
 
 # Claude Code sessions started from a worktree walk over to the main checkout
