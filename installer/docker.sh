@@ -34,4 +34,12 @@ sudo apt-get update
 
 sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 
+# Let $USER run docker without sudo. The `docker` group is created by the
+# docker-ce package above. Group membership only takes effect in new login
+# sessions, so log out and back in (or run `newgrp docker`) afterwards.
+if ! id -nG "$USER" | tr ' ' '\n' | grep -qx docker; then
+    sudo usermod -aG docker "$USER"
+    echo "Added $USER to the docker group. Log out and back in for it to take effect."
+fi
+
 sudo docker run hello-world
