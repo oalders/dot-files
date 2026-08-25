@@ -19,19 +19,11 @@ Options:
                 May appear anywhere in the argument list.
   --close       Close the PR via `gh pr close` instead of merging it,
                 then run the same teardown (remove worktree, delete the
-                local branch, kill the tmux session). Because the branch
-                is being abandoned, this skips the unpushed-commits
-                pre-flight (cleanup discards local commits anyway) and
-                deletes the remote branch explicitly — a merge gets that
-                for free from GitHub's delete_branch_on_merge, but that
-                setting only fires on merge, not close. Extra args pass
-                through to `gh pr close`. If the PR is already MERGED or
-                CLOSED, the close call — and any extra args, which have no
-                consumer then — is skipped, but teardown still runs.
-                If no PR exists for the branch, there's nothing to
-                close, so teardown still runs (from a linked worktree;
-                from the main working tree there's nothing to tear down
-                and the branch is left for manual deletion).
+                local branch, kill the tmux session) and delete the remote
+                branch. Skips the unpushed-commits pre-flight since the
+                branch is abandoned. Extra args pass through to
+                `gh pr close`. Teardown still runs if the PR is already
+                MERGED/CLOSED or no PR exists.
 
 Refuses:
   --auto, --auto-merge   gh pr merge would exit 0 while the PR stays
@@ -83,24 +75,21 @@ if [[ "$branch" == "HEAD" ]]; then
     exit 1
 fi
 
-# Deferred push pre-flight failure (no upstream / unpushed commits). The push
-# pre-flight exists only to satisfy `gh pr merge`, which runs only for an OPEN
-# PR; an already-MERGED PR is torn down without pushing, so the failure is moot
-# there. Record the reason and resolve it once the PR state is known (below).
-# Initialized unconditionally so it stays defined under `set -u`, including in
-# close mode where the pre-flight block is skipped.
+# Deferred push pre-flight failure (no upstream / unpushed commits). The check
+# only matters for an OPEN PR (`gh pr merge`); a MERGED PR is torn down without
+# pushing, so record the reason here and resolve it once the PR state is known.
+# Defined unconditionally to stay set under `set -u` (close mode skips the block).
 preflight_block_reason=""
 
 if [[ -z "$close_mode" ]]; then
-    # upstream_ok defaults to 1: on a normally tracked branch the `@{u}` block
-    # below is skipped entirely, yet the unpushed-commit check still has to run.
-    # Only the genuinely-no-upstream path clears it — there `@{u}` is unresolved
-    # and `git rev-list '@{u}..HEAD'` would abort the script under `set -e`.
+    # Cleared only on the genuinely-no-upstream path, where `@{u}` is unresolved
+    # and `git rev-list '@{u}..HEAD'` would abort under `set -e`. Defaults to 1
+    # so the unpushed-commit check still runs on a normally tracked branch.
     upstream_ok=1
 
-    # Records whether the tracking ref has already been brought current this
-    # run. Initialized here so it stays defined under `set -u`; the count block
-    # below refreshes the ref only when this is still empty (no double fetch).
+    # Whether the tracking ref was already refreshed this run; the count block
+    # below refetches only when this is empty (no double fetch). Defined here to
+    # stay set under `set -u`.
     refreshed_ref=""
 
     # Pre-flight: branch must have an upstream.
@@ -112,46 +101,29 @@ if [[ -z "$close_mode" ]]; then
     # only the tracking config needs repair. Distinguish the two by asking
     # origin directly.
     if ! git rev-parse --abbrev-ref --symbolic-full-name '@{u}' >/dev/null 2>&1; then
-        # Query the full ref path, not a bare name: `ls-remote origin foo`
-        # tail-matches path components and would also match `refs/heads/x/foo`,
-        # false-flagging a genuinely unpushed branch. The output is a single
-        # line, so `grep -q` consuming it before ls-remote blocks keeps the
-        # pipe safe under pipefail — don't widen this query.
+        # Invariant: query the full ref path — a bare `ls-remote origin foo`
+        # tail-matches `refs/heads/x/foo` and would false-flag an unpushed branch.
         if git ls-remote origin "refs/heads/$branch" 2>/dev/null | grep -q .; then
-            # Branch IS on origin; only tracking config is wrong. This is not a
-            # missing push, and cannot arise for a MERGED PR (its remote branch
-            # is gone), so handle it immediately rather than deferring.
-            #
-            # Self-heal rather than prompting: the branch is already pushed,
-            # the repair is exactly what the user would have to type back, and
-            # it changes nothing about the code being merged — only which ref
-            # `@{u}` names. Report what was done instead of asking permission.
+            # Branch IS on origin; only tracking config is wrong (can't happen
+            # for a MERGED PR, whose remote branch is gone), so handle it now
+            # rather than deferring. Self-heal instead of prompting: the repair
+            # is exactly what the user would type back and changes only which
+            # ref `@{u}` names, not the code being merged.
             echo "merge-pr: branch '$branch' is on origin, but local tracking config" >&2
             echo "          is wrong, so '@{u}' does not resolve. The branch is" >&2
             echo "          already pushed, so repairing tracking with" >&2
             echo "          'git branch --set-upstream-to=origin/$branch' and continuing." >&2
-            # --set-upstream-to needs refs/remotes/origin/<branch> to exist
-            # locally, and it may not: origin has the branch (we just asked
-            # it), but this clone may never have fetched it, or the ref may be
-            # stale relative to what origin holds. Both make the repair fail
-            # ("the requested upstream branch does not exist") or leave the
-            # unpushed-commit check below comparing against an out-of-date ref.
-            # Fetch the one ref explicitly first — a full `git fetch` is
-            # unnecessary and slow, and the explicit refspec avoids depending
-            # on the remote's configured fetch refspec.
-            # The leading "+" matches the standard remote-tracking refspec: a
-            # stale local ref that isn't a fast-forward of origin's still gets
-            # updated rather than failing.
+            # --set-upstream-to needs a local refs/remotes/origin/<branch>,
+            # which this clone may never have fetched or may hold stale. Fetch
+            # the one ref explicitly first; the leading `+` force-updates a
+            # non-fast-forward stale ref, matching the count block below.
             if ! git fetch origin "+refs/heads/$branch:refs/remotes/origin/$branch" >&2; then
                 echo "merge-pr: could not fetch 'refs/heads/$branch' from origin — cannot repair tracking." >&2
                 exit 1
             fi
-            # The ref is now current — the count block must not re-fetch the
-            # same refspec.
-            refreshed_ref=1
-            # Guarded rather than bare: a failed repair must not fall through
-            # to the unpushed-commit check with '@{u}' still unresolved, where
-            # `git rev-list` would abort under `set -e` with a worse message.
+            refreshed_ref=1 # ref is current; count block must not re-fetch it
+            # Guarded: a failed repair must not fall through with '@{u}' still
+            # unresolved, where `git rev-list` would abort under `set -e`.
             if ! git branch --set-upstream-to="origin/$branch" >&2; then
                 echo "merge-pr: could not set upstream to 'origin/$branch' — fix tracking config and re-run." >&2
                 exit 1
@@ -164,20 +136,16 @@ if [[ -z "$close_mode" ]]; then
         fi
     fi
 
-    # Pre-flight: no unpushed commits. Runs only when `@{u}` resolves; a
-    # successful tracking-repair above leaves upstream_ok=1, so it still runs
-    # after a repair.
+    # Pre-flight: no unpushed commits. Runs only when `@{u}` resolves (a repair
+    # above leaves upstream_ok=1, so it still runs after one).
     if [[ "$upstream_ok" -eq 1 ]]; then
         # `git rev-list '@{u}..HEAD'` trusts refs/remotes/origin/$branch, which
-        # can be stale — e.g. a push to a literal URL updates origin's branch
-        # but no local tracking ref — making already-pushed commits look
-        # unpushed and blocking the merge with a phantom count. Refresh the ref
-        # first (unless the repair path above already did), reusing that path's
-        # refspec. Under `set -eu -o pipefail` this MUST be the guarded
-        # `if ! ...` form: a bare fetch would abort before warning, and a
-        # fetch failure is non-fatal — keep working against the (possibly
-        # stale) ref so an unreachable remote (offline, slow) falls back to
-        # today's behaviour rather than aborting.
+        # goes stale after a push to a literal URL and then reports a phantom
+        # unpushed count. Refresh it first (unless the repair path already did).
+        # Invariant: under `set -eu -o pipefail` the fetch MUST use the guarded
+        # `if !` form and stay non-fatal, so an unreachable remote falls back to
+        # the possibly-stale ref instead of aborting. Full rationale:
+        # docs/superpowers/specs/2026-08-12-merge-pr-stale-tracking-ref-design.md
         if [[ -z "$refreshed_ref" ]]; then
             if ! git fetch origin "+refs/heads/$branch:refs/remotes/origin/$branch" >&2; then
                 echo "merge-pr: warning: could not refresh 'origin/$branch' — unpushed count may be stale" >&2
@@ -253,7 +221,7 @@ if [[ -n "$preflight_block_reason" && "$pr_state" == "OPEN" ]]; then
     exit 1
 fi
 
-# Pre-flight (deferred from Task 3): current branch must not be the PR's base.
+# Pre-flight: current branch must not be the PR's base.
 if [[ "$branch" == "$pr_base" ]]; then
     echo "merge-pr: refusing to merge from base branch '$pr_base'" >&2
     exit 1
@@ -295,14 +263,11 @@ if [[ -z "$no_pr" ]]; then
             ;;
         MERGED)
             if [[ -n "$close_mode" ]]; then
-                # `gh pr close` on a merged PR is nonsensical (GitHub would
-                # reject it), but closing is only one step of --close: the
-                # rest — remote branch, worktree, local branch, tmux session
-                # — is exactly the teardown the user asked for and is still
-                # wanted. So skip just the remote action and fall through,
-                # rather than making the user re-run bare `merge-pr`. Extra
-                # gh_args have no consumer on this path and are silently
-                # ignored, as they already are in merge mode below.
+                # Closing a merged PR is a no-op, but the rest of --close's
+                # teardown is still wanted — skip just the remote action and
+                # fall through rather than making the user re-run bare merge-pr.
+                # Any extra gh_args have no consumer here and are silently
+                # ignored, as in merge mode.
                 echo "merge-pr: PR already MERGED — closing is a no-op, proceeding to cleanup"
             else
                 echo "merge-pr: PR already MERGED — proceeding to cleanup"
@@ -325,24 +290,15 @@ if [[ -z "$no_pr" ]]; then
     esac
 fi
 
-# Close mode only: delete the remote branch explicitly. A merge gets this for
-# free from GitHub's delete_branch_on_merge (see bin/gh-delete-branch-on-merge),
-# but that setting fires only on merge, not close — so an abandoned PR would
-# otherwise leave its branch stranded on origin. Run here, while cwd is still
-# the worktree and before the tmux kill, to keep the "kill tmux LAST"
-# invariant. Covers the OPEN-close, already-CLOSED and already-MERGED paths.
-# On the MERGED path delete_branch_on_merge has usually already removed the
-# branch, so the ls-remote guard below makes this a silent no-op; where that
-# setting is off, deleting the stale merged branch is the cleanup --close
-# promises anyway.
+# Close mode only: delete the remote branch explicitly. GitHub's
+# delete_branch_on_merge (see bin/gh-delete-branch-on-merge) fires only on
+# merge, not close, so an abandoned PR would otherwise strand its branch on
+# origin. Run before the tmux kill to keep the "kill tmux LAST" invariant.
 if [[ -n "$close_mode" ]]; then
-    # Only delete the remote branch if origin actually has it. Close mode
-    # tolerates a never-pushed or already-deleted branch (see the skipped
-    # upstream pre-flight above), so a missing remote ref is normal here,
-    # not an error worth warning about. ls-remote takes the full ref path
-    # to avoid the tail-match pitfall noted earlier in this script. Used as
-    # an `if` condition, `--exit-code`'s non-zero "ref absent" status is
-    # consumed by the `if` and never aborts the script under `set -e`.
+    # Only if origin has it — close mode tolerates a never-pushed or
+    # already-deleted branch, so a missing ref is normal, not a warning. Full
+    # ref path avoids the tail-match pitfall; `--exit-code`'s "ref absent"
+    # status is consumed by the `if` and never aborts under `set -e`.
     if git ls-remote --exit-code origin "refs/heads/$branch" >/dev/null 2>&1; then
         if ! git push origin --delete "$branch"; then
             echo "merge-pr: warning: could not delete remote branch 'origin/$branch'; continuing with local cleanup." >&2
@@ -350,15 +306,10 @@ if [[ -n "$close_mode" ]]; then
     fi
 fi
 
-# Main-working-tree case. When merge-pr is run from the main checkout rather
-# than a linked worktree, worktree_path and main_repo resolve to the same
-# directory (--git-common-dir is the bare ".git", whose parent is the cwd).
-# git will never remove the main working tree, so the worktree-removal block
-# below would only emit a `fatal:` and a misleading "remove it manually" hint.
-# The process kill and tmux session kill also target a throwaway worktree —
-# here they'd act on the main checkout we're standing in (the proc kill would
-# even take out this very script). So skip that whole teardown: just switch
-# off the merged/closed branch and delete it, then report success.
+# Main-working-tree case: worktree_path == main_repo when run from the main
+# checkout, not a linked worktree. git won't remove the main tree, and the proc
+# kill would target this very checkout (even this script), so skip teardown
+# entirely — just switch off the merged/closed branch, delete it, and report.
 if [[ "$worktree_path" == "$main_repo" ]]; then
     # No PR and run from the main working tree: there's no linked worktree or
     # its tmux session to tear down, and deleting the branch checked out here
@@ -375,11 +326,10 @@ if [[ "$worktree_path" == "$main_repo" ]]; then
     # deleted the branch, both steps are simply skipped (HEAD is no longer on
     # "$branch", and the branch ref is gone).
     #
-    # The switch can legitimately fail — e.g. the base has no local branch and
-    # no origin/<base> for git to DWIM from (shallow clone, base never
-    # fetched). Catch that instead of letting `set -e` abort with a bare git
-    # error: the PR is already merged/closed, so report clearly and leave the
-    # branch in place for the user to remove manually.
+    # The switch can legitimately fail (base has no local branch and no
+    # origin/<base> to DWIM from — shallow clone, base never fetched). Catch it
+    # rather than letting `set -e` abort: the PR is already merged/closed, so
+    # report and leave the branch for manual removal.
     if [[ "$(git rev-parse --abbrev-ref HEAD)" == "$branch" ]]; then
         if ! git switch "$pr_base"; then
             echo "merge-pr: PR handled, but could not switch off '$branch' to base '$pr_base'." >&2
@@ -403,9 +353,8 @@ fi
 #      session, this terminates the script. Nothing may follow.
 cd "$main_repo"
 
-# Remove docker containers this worktree's session started (bin/dev and
-# docker-compose). They're children of the docker daemon, not the process
-# tree kill-worktree-procs walks, so they'd otherwise survive teardown.
+# Remove docker containers this session started; they're children of the docker
+# daemon, not the process tree kill-worktree-procs walks (see docker-teardown).
 teardown_docker="$(dirname "${BASH_SOURCE[0]}")/docker-teardown"
 if [ -x "$teardown_docker" ]; then
     "$teardown_docker" "$worktree_path" "$branch" || true
@@ -421,15 +370,10 @@ else
     echo "merge-pr: warning: kill-worktree-procs not found; skipping process cleanup" >&2
 fi
 
-# `git worktree remove` refuses a worktree that contains submodules
-# unless --force is given — even when the worktree is perfectly clean.
-# A dirty tree was already refused up front (unless --force), so by here
-# the worktree is clean or the user opted in to discarding changes.
-#
-# Escalate to --force for a worktree with submodules (see above). A
-# single --force suffices; the .gitmodules check over-approximates (an
-# uninitialized submodule needs no --force) but forcing an
-# already-removable clean worktree is harmless.
+# `git worktree remove` refuses a worktree with submodules unless --force, even
+# when clean (a dirty tree was already refused up front unless --force). The
+# .gitmodules check over-approximates, but forcing a clean removable tree is
+# harmless.
 remove_force="$force"
 if [[ -f "$worktree_path/.gitmodules" ]]; then
     remove_force="--force"
