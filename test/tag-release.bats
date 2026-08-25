@@ -334,3 +334,64 @@ CLAUDE_MOCK
     [[ "$output" == *"Found 0 merged PR(s) since last tag"* ]]
     [[ "$output" != *"older PR"* ]]
 }
+
+@test "auto-increment picks the highest existing same-day suffix" {
+    cd "$REPO" || return
+    today=$(date +%Y-%m-%d)
+    git tag "${today}-01"
+    git tag "${today}-02"
+    out_file="$TMP/gh_output"
+    : >"$out_file"
+    GITHUB_OUTPUT="$out_file" run "$SCRIPT_PATH" --no-summary --dry-run --yes
+    [ "$status" -eq 0 ]
+    grep -q "^tag=${today}-03$" "$out_file"
+}
+
+@test "auto-increment is octal-safe past -08/-09" {
+    cd "$REPO" || return
+    # Regression: $((08 + 1)) throws "value too great for base" because bash
+    # reads a leading-zero literal as octal, and 08/09 are invalid octal.
+    today=$(date +%Y-%m-%d)
+    git tag "${today}-08"
+    out_file="$TMP/gh_output"
+    : >"$out_file"
+    GITHUB_OUTPUT="$out_file" run "$SCRIPT_PATH" --no-summary --dry-run --yes
+    [ "$status" -eq 0 ]
+    grep -q "^tag=${today}-09$" "$out_file"
+}
+
+@test "auto-increment rolls -09 to -10" {
+    cd "$REPO" || return
+    today=$(date +%Y-%m-%d)
+    git tag "${today}-09"
+    out_file="$TMP/gh_output"
+    : >"$out_file"
+    GITHUB_OUTPUT="$out_file" run "$SCRIPT_PATH" --no-summary --dry-run --yes
+    [ "$status" -eq 0 ]
+    grep -q "^tag=${today}-10$" "$out_file"
+}
+
+@test "separates dependabot PRs into a collapsed details block" {
+    cd "$REPO" || return
+    git tag 2020-01-01-01
+    GH_PR_LIST_JSON='[{"number":10,"title":"human change","body":"","author":{"login":"alice"},"mergedAt":"2099-12-31T23:59:59Z"},{"number":11,"title":"Bump left-pad from 1.0 to 1.1","body":"","author":{"login":"dependabot[bot]"},"mergedAt":"2099-12-31T23:59:59Z"}]' \
+        run "$SCRIPT_PATH" --no-summary --dry-run --yes 2099-12-31-80
+    [ "$status" -eq 0 ]
+    [[ "$output" == *"Human PRs: 1 | Dependabot PRs: 1"* ]]
+    [[ "$output" == *"<details>"* ]]
+    [[ "$output" == *"<summary>Dependency Updates</summary>"* ]]
+    [[ "$output" == *"Bump left-pad from 1.0 to 1.1 (#11)"* ]]
+    # Human PR renders outside the details block (title fallback under --no-summary).
+    [[ "$output" == *"human change (#10)"* ]]
+}
+
+@test "dependabot-only window emits 'No notable changes.'" {
+    cd "$REPO" || return
+    git tag 2020-01-01-01
+    GH_PR_LIST_JSON='[{"number":11,"title":"Bump left-pad","body":"","author":{"login":"dependabot[bot]"},"mergedAt":"2099-12-31T23:59:59Z"}]' \
+        run "$SCRIPT_PATH" --no-summary --dry-run --yes 2099-12-31-81
+    [ "$status" -eq 0 ]
+    [[ "$output" == *"Human PRs: 0 | Dependabot PRs: 1"* ]]
+    [[ "$output" == *"No notable changes."* ]]
+    [[ "$output" == *"<details>"* ]]
+}

@@ -75,8 +75,10 @@ set -- "${POSITIONAL[@]}"
 
 if [ -z "${1:-}" ]; then
     TODAY=$(date +%Y-%m-%d)
-    LAST_N=$(git tag --list "${TODAY}-*" | grep -oP '\d+$' | sort -n | tail -1 || true)
-    NEXT_N=$(printf '%02d' $((${LAST_N:-0} + 1)))
+    # grep -oE (not -oP): BSD/macOS grep lacks -P. 10# forces base-10 so a
+    # zero-padded suffix like 08/09 is not misread as invalid octal.
+    LAST_N=$(git tag --list "${TODAY}-*" | grep -oE '[0-9]+$' | sort -n | tail -1 || true)
+    NEXT_N=$(printf '%02d' $((10#${LAST_N:-0} + 1)))
     TAG="${TODAY}-${NEXT_N}"
 else
     TAG="$1"
@@ -114,7 +116,7 @@ if ! gh auth status &>/dev/null; then
     exit 1
 fi
 
-# Prerequisite: jq must be available (used in Claude fallback)
+# Prerequisite: jq must be available (used throughout for JSON filtering)
 if ! command -v jq &>/dev/null; then
     echo "Error: 'jq' not found. Install jq before running."
     exit 1
@@ -197,6 +199,10 @@ if [ "$HUMAN_COUNT" -gt 0 ]; then
         SUMMARY=$(echo "$HUMAN_PRS_JSON" | jq -r '.[] | "- \(.title) (#\(.number))"')
     else
         echo "Summarizing $HUMAN_COUNT human PR(s) via Claude..."
+        # PR titles/bodies are attacker-influenceable on a public repo and flow
+        # through Claude into the published notes. The generated notes are printed
+        # before the confirmation prompt below so the operator can catch an
+        # injected payload; --yes/-y skips that gate — avoid it on untrusted history.
         # Disable set -e temporarily so we can handle Claude failures gracefully
         set +e
         SUMMARY=$(echo "$HUMAN_PRS_JSON" | claude -p \
@@ -314,4 +320,9 @@ write_step_summary "Tag Release"
 
 echo ""
 echo "Done! Tag $TAG pushed and GitHub Release created."
-echo "View at: https://github.com/$(gh repo view --json nameWithOwner -q .nameWithOwner)/releases/tag/$TAG"
+# The release already succeeded; a failure resolving the URL must not flip the
+# exit code (a CI wrapper would wrongly retry and double-release).
+REPO_SLUG=$(gh repo view --json nameWithOwner -q .nameWithOwner 2>/dev/null || true)
+if [ -n "$REPO_SLUG" ]; then
+    echo "View at: https://github.com/$REPO_SLUG/releases/tag/$TAG"
+fi
