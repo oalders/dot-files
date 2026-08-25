@@ -121,8 +121,9 @@ elif is os name eq darwin || is os id eq ubuntu; then
     maybe_install dandavison/delta
 else
     maybe_install dandavison/delta --matching musl
-    maybe_install eza-community/eza
 fi
+
+maybe_install eza-community/eza
 
 if is os name eq darwin; then
     if ! is there bat || is cli version bat ne 0.24.0; then
