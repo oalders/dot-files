@@ -94,6 +94,15 @@ cross-platform compatibility.
 Scripts use `set -eu -o pipefail` for strict error handling and early exit on
 failures.
 
+### Prose in Non-Code Contributions
+
+Keep comments, commit messages, and CLAUDE.md prose minimal. Comment the
+non-obvious: *why* something is surprising and the one invariant a reader must
+not break. Prefer one load-bearing sentence over a paragraph of tradeoffs.
+Rationale belongs in one place — put alternatives-considered and design
+tradeoffs in a `docs/` explainer and let a comment point to it, rather than
+copying the reasoning inline.
+
 ## File Naming Conventions
 
 - Shell scripts use `.sh` extension

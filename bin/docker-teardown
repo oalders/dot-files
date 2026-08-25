@@ -1,60 +1,15 @@
 #!/usr/bin/env bash
 #
-# docker-teardown - remove docker artifacts a worktree session left behind.
+# docker-teardown - remove the docker artifacts a worktree session left behind
+# so `git worktree remove` can delete the tree. Removes only containers whose
+# ownership of this worktree is provable (a compose working_dir label under the
+# worktree, or the exact bin/dev container name), sweeps this worktree's empty
+# compose networks, then reclaims root-owned files a container wrote into the
+# tree. Session volumes are KEPT. Called by bin/merge-pr and bin/remove-worktree.
 #
-# Given a worktree path (and optionally its branch), removes the docker
-# containers that provably belong to that worktree: the `bin/dev` container
-# for the worktree+branch, and any `docker compose` containers whose project
-# working directory is at or under the worktree. Session volumes are kept. It
-# then sweeps the worktree's empty compose networks (see "network sweep").
-#
-# It then reclaims ownership of files those containers wrote into the worktree
-# as root (bind-mounted data dirs — see "ownership reclaim" below).
-#
-# Why this exists: containers are children of the docker daemon, not of the
-# tmux pane or the nono/claude/serena process tree. So neither
-# `kill-worktree-procs` (which walks /proc cwd + nono/claude ancestry) nor
-# `tmux kill-session` touches them. Left behind, they keep running with the
-# worktree deleted. The worktree-removal scripts (merge-pr, remove-worktree)
-# call this helper just before `kill-worktree-procs`.
-#
-# Safety — this NEVER does a bare `docker ps` sweep. A container is a target
-# only when its ownership of THIS worktree is provable:
-#   * compose: the `com.docker.compose.project.working_dir` label is $wt or
-#     a path under it;
-#   * bin/dev: the container name is exactly `<basename $wt>-<branch>`, which
-#     is how bin/dev derives it (repo basename + branch, '/' -> '-').
-# Ad-hoc `docker run` containers carry no such handle and are left alone
-# (with a note), matching the "minimize false positives" bias of the other
-# teardown helpers.
-#
-# Compose networks are swept too, but held to the same provable-ownership bar.
-# A network is removed only when BOTH hold: (a) its
-# `com.docker.compose.project` label matches a project this worktree owns —
-# either a project name derived from a container matched above, or the compose
-# default project (the worktree dir basename, normalized as compose stores it)
-# — AND (b) it has zero attached containers. The zero-attachment guard keeps a
-# network shared/in-use by another worktree safe, and makes re-runs a no-op.
-#
-# Same-basename collision (deliberate, bounded tradeoff): two worktrees sharing
-# a dir basename — the same repo checked out twice, or the same basename across
-# different repos — resolve to the SAME compose default project name, so a
-# teardown of one may sweep a network the sibling worktree also uses. The
-# zero-attachment guard bounds this: only an EMPTY network is ever removed, and
-# compose recreates `<project>_default` on the sibling's next `up`. Nothing
-# in use is touched.
-#
-# Networks are removed, whereas session volumes are KEPT, and that asymmetry is
-# deliberate: a compose network is cheap to recreate (the next `compose up`
-# rebuilds `<project>_default`), whereas a session volume holds state (bin/dev's
-# Claude history) that no `up` would bring back. Leaked empty networks are also
-# a real hazard — they accumulate until docker's default address pool is
-# subnetted out and `compose up` fails everywhere with "all predefined address
-# pools have been fully subnetted".
-#
-# NOTE: a bare `docker network prune` is NOT the fix. It would also delete empty
-# hand-created `external:` networks, which compose does NOT recreate. This
-# targeted, label-scoped sweep touches only this worktree's own networks.
+# Design and rationale — why provable-ownership over a bare `docker ps` sweep,
+# the network sweep and its same-basename collision, why networks are swept but
+# volumes kept, and the ownership reclaim — live in docs/nono/docker-teardown.md.
 
 set -u
 
@@ -128,14 +83,11 @@ fi
 
 targets=""
 
-# Source 1 — compose containers owned by this worktree. Enumerate every
-# container carrying a project working_dir label, then keep only those whose
-# value is $wt or a path beneath it. `-a` so stopped-but-lingering containers
-# are caught too. The tab-delimited format keeps ID and label value paired.
+# Source 1 — compose containers whose project working_dir label is $wt or a
+# path beneath it. `-a` catches stopped-but-lingering containers too.
 wd_label="com.docker.compose.project.working_dir"
 proj_label="com.docker.compose.project"
-# Compose project names collected from matched containers. These are provably
-# this worktree's and seed the network sweep further down.
+# Project names of matched containers — provably ours; seed the network sweep.
 compose_projects=""
 while IFS=$'\t' read -r id wd proj; do
     [ -n "$id" ] || continue
@@ -148,9 +100,8 @@ while IFS=$'\t' read -r id wd proj; do
 done < <(docker ps -a --filter "label=$wd_label" \
     --format "{{.ID}}"$'\t'"{{.Label \"$wd_label\"}}"$'\t'"{{.Label \"$proj_label\"}}" 2>/dev/null)
 
-# Source 2 — the bin/dev container for this worktree+branch. bin/dev names it
-# `<repo>-<branch>` where repo is the worktree dir basename and branch has
-# '/' rewritten to '-'. Only attempt this when a branch was supplied.
+# Source 2 — the bin/dev container for this worktree+branch, named
+# `<basename $wt>-<branch>` (branch '/' -> '-'). Only when a branch was supplied.
 if [ -n "$branch" ]; then
     dev_name="$(basename "$wt")-$(printf '%s' "$branch" | tr '/' '-')"
     # Anchor the name filter so `dot-files-feature` doesn't also match
@@ -159,10 +110,8 @@ if [ -n "$branch" ]; then
     [ -n "$dev_id" ] && targets="$targets $dev_id"
 fi
 
-# Dedup to one ID per line. A dev container has no compose label, so overlap
-# is unexpected, but guarding is cheap. The `^[0-9a-f]+$` filter keeps only
-# real container IDs (docker's are lowercase hex), so a stray token from a
-# mis-parsed row can never reach `docker rm -f`.
+# Dedup to one ID per line. Invariant: the `^[0-9a-f]+$` filter keeps only real
+# container IDs (lowercase hex), so a stray token can never reach `docker rm -f`.
 targets="$(printf '%s' "$targets" | tr ' ' '\n' | grep -E '^[0-9a-f]+$' | sort -u)"
 
 if [ -z "$targets" ]; then
@@ -178,10 +127,8 @@ else
         done <<<"$targets"
     else
         echo "docker-teardown: removing $count container(s) owned by $wt"
-        # `rm -f` stops (SIGKILL) then removes; volumes are intentionally left
-        # in place (bin/dev's session volume persists Claude history across
-        # runs). $targets is one non-empty ID per line here, so xargs always
-        # runs once.
+        # `rm -f` stops then removes; volumes are intentionally kept (bin/dev's
+        # session volume persists Claude history). See the doc for why.
         if ! printf '%s\n' "$targets" | xargs docker rm -f >/dev/null 2>&1; then
             echo "docker-teardown: warning: one or more containers could not be removed" >&2
         fi
@@ -190,21 +137,16 @@ fi
 
 # --- compose network sweep -----------------------------------------------
 #
-# Runs regardless of whether any containers matched above: the real leak is a
-# `<project>_default` network whose containers are long gone, so there is
-# nothing for Source 1/2 to find — only the network survives. Candidate project
-# names come from two sources: the labels of the containers matched above
-# (provably ours), and the compose default project name inferred from the
-# worktree dir basename (normalized the way compose stores it: lowercased, with
-# characters outside [a-z0-9_-] dropped). A network is removed only if it has
-# zero attached containers, so an in-use network is never touched and re-runs
-# are no-ops. Networks are kept in their own pipeline, never folded into
-# $targets (whose grep filters to hex container IDs).
+# Removes only this worktree's own empty compose networks; runs even when no
+# containers matched (the common leak is a `<project>_default` whose containers
+# are long gone). Candidate projects: the matched containers' labels, plus the
+# compose default project inferred from the worktree basename (lowercased, chars
+# outside [a-z0-9_-] dropped). Zero-attachment guard below is what makes it
+# safe. Full rationale: docs/nono/docker-teardown.md.
 proj_fallback="$(basename "$wt" | tr '[:upper:]' '[:lower:]' | tr -cd 'a-z0-9_-')"
 
-# Dedup the candidate project names from both sources. $compose_projects is
-# left unquoted on purpose so it word-splits into separate names; disable glob
-# expansion around it so a name can never be expanded as a pathname pattern.
+# $compose_projects is unquoted on purpose to word-split into names; `set -f`
+# disables globbing so a name can't expand as a pathname pattern.
 set -f
 candidate_projects="$(printf '%s\n' $compose_projects "$proj_fallback" \
     | grep -v '^$' | sort -u)"
@@ -237,10 +179,8 @@ if [ -n "$net_targets" ]; then
         done <<<"$net_targets"
     else
         echo "docker-teardown: removing $net_count network(s) owned by $wt"
-        # There is no `-f` for network rm; the zero-attachment guard above
-        # already ensures nothing is attached. Warn (don't abort) on failure.
-        # The `^[0-9a-f]+$` allowlist mirrors the container path: only real
-        # docker IDs (lowercase hex) reach `docker network rm`.
+        # No `-f` for network rm; the zero-attachment guard above already ensures
+        # nothing is attached. Same `^[0-9a-f]+$` ID allowlist as the container path.
         net_ids="$(printf '%s\n' "$net_targets" | cut -f1 | grep -E '^[0-9a-f]+$')"
         if ! printf '%s\n' "$net_ids" | xargs docker network rm >/dev/null 2>&1; then
             echo "docker-teardown: warning: one or more networks could not be removed" >&2
@@ -250,20 +190,11 @@ fi
 
 # --- ownership reclaim ---------------------------------------------------
 #
-# A compose service that bind-mounts a directory from the worktree (a database
-# data dir, a certbot state dir) runs as root inside the container and creates
-# those files as root on the host. `git worktree remove --force` then dies with
-# "Permission denied" partway through the delete — and by then it has already
-# removed .git and unregistered the worktree, so what's left is an orphaned
-# directory tree that `git worktree list` no longer knows about. That is the
-# only thing standing between a clean teardown and a manual `sudo rm -rf`.
-#
-# Fix it the same way it was caused: a throwaway container running as root,
-# with the worktree bind-mounted, chowning the offending paths back to us. No
-# sudo, no password prompt.
-#
-# Runs even when no containers were found: the container that wrote the files
-# may have been removed days ago, or by a previous run of this script.
+# Files a compose service wrote as root (bind-mounted data dirs) would make
+# `git worktree remove` die "Permission denied" mid-delete. Fix it the way it
+# was caused: a throwaway root container, worktree bind-mounted, chowns them
+# back. Runs even when no containers matched. Why this is the fix and why it
+# leaves an orphaned tree otherwise: docs/nono/docker-teardown.md.
 
 if [ ! -d "$wt" ]; then
     echo "docker-teardown: done"
@@ -273,18 +204,14 @@ fi
 uid="$(id -u)"
 gid="$(id -g)"
 
-# Cheap detection first, so the common case never starts a container. A
-# root-owned directory we cannot descend into is itself reported by this find,
-# so being unable to read its contents costs us nothing. .git is skipped: it is
-# ours by construction and never bind-mounted.
+# Cheap detection first, so the common case never starts a container. .git is
+# skipped: ours by construction, never bind-mounted.
 if ! find "$wt" -name .git -prune -o ! -user "$uid" -print 2>/dev/null | grep -q .; then
     echo "docker-teardown: done"
     exit 0
 fi
 
-# Pick an image that is already local before falling back to pulling one — a
-# teardown should not stall on a registry round trip if anything tiny is at
-# hand.
+# Prefer an already-local image so teardown never stalls on a registry pull.
 reclaim_image=""
 for img in alpine:latest busybox:latest alpine busybox; do
     if docker image inspect "$img" >/dev/null 2>&1; then
@@ -302,11 +229,10 @@ if [ "$dry" = 1 ]; then
 fi
 
 echo "docker-teardown: reclaiming root-owned paths under $wt"
-# The find runs *inside* the container, as root, so it reaches paths the host
-# find cannot descend into. -h chowns symlinks themselves rather than their
-# targets, which keeps a link pointing outside the worktree from redirecting
-# the chown there. The mount is the worktree and nothing else, so the blast
-# radius is exactly the tree we are about to delete.
+# The find runs inside the container as root, reaching paths the host find
+# can't. Invariant: `-h` chowns symlinks themselves, not their targets, so a
+# link pointing outside the worktree can't redirect the chown there; the mount
+# is the worktree and nothing else.
 if ! docker run --rm --network none -v "$wt:/wt" "$reclaim_image" \
     sh -c "find /wt -name .git -prune -o ! -user $uid -print0 | xargs -0 -r chown -h $uid:$gid" \
     >/dev/null 2>&1; then

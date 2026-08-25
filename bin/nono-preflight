@@ -4,71 +4,49 @@ set -eu -o pipefail
 
 # Preflight for nn/nono on kernels older than Linux 6.12.
 #
-# nono v0.74.0's supervised credential-proxy mode (which every network-enabled
-# profile enters) hard-requires Landlock ABI V6 (LANDLOCK_SCOPE_SIGNAL), first
-# shipped in Linux 6.12. On an older kernel (e.g. the Ubuntu 24.04 GA 6.8 line,
-# which reports Landlock V4) the sandbox aborts at init with a misleading error
-# that points at the network fd handoff:
+# nono's supervised credential-proxy mode (entered by every network-enabled
+# profile) hard-requires Landlock ABI V6, first shipped in Linux 6.12. On an
+# older kernel (e.g. Ubuntu 24.04's GA 6.8, which reports Landlock V4) the
+# sandbox aborts at init with a misleading error that blames the network fd
+# handoff, not the kernel:
 #
-#   Failed to receive required network seccomp notify fd number from child:
-#   ... recv_raw_fd_number failed: failed to fill whole buffer
+#   recv_raw_fd_number failed: failed to fill whole buffer
 #
-# The real cause only surfaces from the supervised child:
-#
-#   SignalMode::AllowSameSandbox requires Landlock ABI V6+
-#   (LANDLOCK_SCOPE_SIGNAL), but this kernel does not support process scoping.
-#
-# This check surfaces that up front. It asks nono itself two questions rather
-# than parsing `uname`, so a backported kernel, a future nono that degrades
-# instead of hard-failing, or a post-upgrade kernel are all handled without
-# code changes here:
-#
+# This check surfaces the real cause first. It asks nono two questions rather
+# than parsing `uname`, so backported, degrading, or post-upgrade kernels all
+# work with no change here:
 #   1. Is Landlock signal scoping supported? (kernel ABI >= V6)
 #   2. Does the resolved profile run the filtering proxy (supervised mode)?
-#      Direct-network and net-blocked profiles never enter supervised mode and
-#      survive on V4, so they must NOT be blocked.
+# Only when scoping is unsupported AND the profile is proxy-supervised do we
+# block — direct-network and net-blocked profiles survive on V4 and must not be.
 #
-# Only when signal scoping is unsupported AND the profile is proxy-supervised
-# do we block. See https://github.com/oalders/dot-files/issues/1024.
+# Invariant: fail OPEN on any uncertainty (no profile, nono missing, empty or
+# unexpected query result) so the check never breaks a launch it can't
+# positively diagnose. See https://github.com/oalders/dot-files/issues/1024.
 #
-# Usage: nono-preflight <profile>
-#   Exit 0: safe to proceed. This is also the answer on any uncertainty (no
-#           profile, nono missing, an unexpected/empty query result) — fail
-#           open so the check never breaks a launch it can't positively
-#           diagnose.
-#   Exit 1: positive detection of the affected combination. The real cause and
-#           the fix are printed to stderr first.
+# Usage: nono-preflight <profile>   (exit 0 = safe/uncertain; exit 1 = blocked,
+# with the real cause and fix printed to stderr).
 
 profile="${1:-}"
 
-# Without a profile we can't run the proxy probe, so there's nothing to check.
+# No profile / no nono: nothing to probe, and a missing nono fails the launch
+# for an obvious reason anyway. Fail open.
 [[ -n $profile ]] || exit 0
-
-# nono is the thing being guarded; if it isn't installed the launch fails for a
-# different, obvious reason and there's nothing to preflight.
 command -v nono >/dev/null 2>&1 || exit 0
 
-# (1) Landlock signal scoping. `nono why --scope signal` prints a "Supported:"
-# line (true/false). Only a literal "false" is a positive "kernel lacks V6"; an
-# empty or unexpected value means we can't tell, so fall through and fail open.
-# `|| true` keeps a nono error from tripping pipefail/set -e into a false block.
+# (1) Landlock signal scoping. Only a literal "false" is a positive "kernel
+# lacks V6"; anything else means we can't tell, so fall through and fail open.
+# `|| true` keeps a nono error from tripping set -e into the false branch.
 signal_supported=$(
     nono why --scope signal 2>/dev/null |
         awk -F': *' '/^[[:space:]]*Supported:/ { print $2; exit }' || true
 )
 [[ $signal_supported == false ]] || exit 0
 
-# (2) Supervised proxy mode. Probe a host that can't be in any allowlist: a
-# proxy-supervised profile answers "DENIED / Reason: proxy_filtered" (the
-# filtering proxy is active), a direct-network profile answers
-# "network_allowed", and a net-blocked profile answers with a block reason.
-# Only proxy_filtered means this launch enters the mode that needs V6.
-#
-# The probe host uses the RFC 2606-reserved .invalid TLD, so it can never be in
-# a profile's allow_domain list — a proxy-supervised profile always reports
-# proxy_filtered for it. A profile with unrestricted outbound would instead
-# report network_allowed, which is correct: no filtering proxy means no
-# supervised mode, so there is nothing to block.
+# (2) Supervised proxy mode. Probe a host in the RFC 2606-reserved .invalid TLD
+# so it can never be in a profile's allow_domain: a proxy-supervised profile
+# reports `proxy_filtered` (the mode that needs V6), while unrestricted-outbound
+# and net-blocked profiles report something else and correctly fall through.
 probe=$(nono why --host nono-preflight-probe.invalid --profile "$profile" 2>/dev/null || true)
 grep -q 'proxy_filtered' <<<"$probe" || exit 0
 

@@ -41,7 +41,7 @@ These are global infrastructure — MCP servers Claude relies on, and their runt
 | ------------------- | -------------------------------------------------------------------------------------- |
 | `oalders-uv`        | `~/.local/share/uv` (uv runtime — used by `uvx` and `uv tool install`). Net-free; PyPI domains live in `oalders-net`. |
 | `oalders-serena`    | `~/.serena` (serena MCP config/logs/memories)                                          |
-| `oalders-playwright`| `~/.cache/ms-playwright` (host Chromium bundle, **read-only**), `/dev/shm` (browser IPC). `bin/nn` sets `PLAYWRIGHT_BROWSERS_PATH=$HOME/.cache/ms-playwright` so every worktree (and the in-sandbox MCP) shares the one host bundle instead of re-downloading ~265 MB into each worktree's `XDG_CACHE_HOME` (#975). The bundle is **read-only** to the sandbox: a session executes browser binaries but can never write them, so there is nothing to poison — not for a later host/un-sandboxed `playwright` run, and not for another sandboxed session sharing the bundle. Seeded and kept current on the host by `installer/playwright-mcp.sh` (`playwright install`); keep the host Playwright in step with the versions projects pin (this is a single-user dev box, so that's a deliberate, accepted maintenance task rather than something to engineer around). An in-sandbox `playwright install` for a not-yet-seeded build fails loudly against the read-only path — the cue to refresh the bundle on the host. Net-free; the browser-download CDN hosts live in the paired `oalders-playwright-net` (composed into `oalders.json`'s `extends`, not `oalders-core`'s, so only the default chain gets them). |
+| `oalders-playwright`| `~/.cache/ms-playwright` (host Chromium bundle, **read-only**), `/dev/shm` (browser IPC). `bin/nn` sets `PLAYWRIGHT_BROWSERS_PATH` so every worktree and the in-sandbox MCP share the one bundle instead of re-downloading ~265 MB each (#975). Read-only so a session executes browsers but can never poison the shared bundle; seeded/updated on the host by `installer/playwright-mcp.sh`. An in-sandbox `playwright install` for an unseeded build fails loudly against the read-only path — the cue to refresh on the host. Net-free; CDN hosts live in the paired `oalders-playwright-net`. |
 | `oalders-chrome`    | `/opt/google/chrome` (browser binary), `~/.cache/superpowers` (browser session dirs), `~/.config/google-chrome/Crash Reports` (crashpad database — grant + `bypass_protection`; see "superpowers-chrome (full Chrome) under the sandbox") |
 
 ### Project-detected (mixed in by `nn`)
@@ -53,7 +53,7 @@ These are global infrastructure — MCP servers Claude relies on, and their runt
 | `oalders-perl`  | `cpanfile`, `Makefile.PL`, `dist.ini` | plenv (`~/.plenv`), local::lib (`~/perl5`), Dist::Zilla (`~/.dzil`, `~/dot-files/dzil`), prove (`~/.proverc`), XS system C headers (`/usr/include`, `/usr/local/include`). Net-free; CPAN/MetaCPAN/MagPie network is in the paired `oalders-perl-net` (appended alongside it by `nn`). |
 | `oalders-node`  | `package.json`                        | `*.npmjs.org`, `registry.npmjs.org` (npm registry network access for installs)     |
 | `oalders-go`    | `go.mod`                              | Go toolchain (`go_runtime` group), build/module/lint caches (`~/.cache/go-build`, `~/.cache/golangci-lint`, `~/go/pkg/mod`), module proxy + checksum DB (`proxy.golang.org`, `sum.golang.org`), and cgo system headers (`/usr/include`, `/usr/local/include`, `/opt/homebrew/include`, pkg-config dirs, `/Library/Developer/CommandLineTools`) |
-| `oalders-docker` | `docker-compose.yml` / `docker-compose.yaml` / `compose.yml` / `compose.yaml` | `/usr/libexec/docker/cli-plugins` (read) — the actual fix for #1002 and the **only load-bearing grant** in the mixin: `docker compose` and `docker buildx` are CLI *plugins* (standalone binaries in that dir), not subcommands of the `docker` binary, so without this read they fail with `docker: unknown command` while plain `docker` works. `~/.docker` is deliberately narrowed to `contexts/` (read) and `config.json` (read) rather than a directory-wide read, and no `~/.docker` path is granted for write; `config.json` is duplicated from `oalders-core` so the sibling stands alone. Buildx state, which used to need `buildx/` (write), is redirected into the worktree via `BUILDX_CONFIG` in `bin/nn` (#1004) — see the blast-radius note below. Both `/var/run/docker.sock` and `/run/docker.sock` (`allow_file`) are **defensive only** — see below. Net-free: image pulls are done by the daemon, which runs **outside** the sandbox, so nothing traverses the session proxy. A bare `Dockerfile` is deliberately **not** a marker. |
+| `oalders-docker` | `docker-compose.yml` / `docker-compose.yaml` / `compose.yml` / `compose.yaml` | `/usr/libexec/docker/cli-plugins` (read) — the only load-bearing grant, the fix for #1002 (compose/buildx are CLI plugins that fail `docker: unknown command` without it). `~/.docker` narrowed to `contexts/` + `config.json` (read), no write; buildx state redirected to the worktree via `BUILDX_CONFIG` (#1004). The two `docker.sock` `allow_file` entries are defensive only. Net-free (the daemon pulls images, outside the sandbox). A bare `Dockerfile` is **not** a marker. **The mixin makes docker *work*, not a security boundary — see [docs/nono/docker-under-the-sandbox.md](../docs/nono/docker-under-the-sandbox.md).** |
 | `oalders-hugo`  | `hugo.toml` / `hugo.yaml` / `hugo.json`, or `config.toml` + `themes/` | Hugo cache (`~/.cache/hugo_cache`). When Hugo matches, `nn` also appends `oalders-snap` to the mixin list because Hugo on Linux is typically snap-installed, and — if the host is on a tailnet — opens Hugo's serve ports over the tailscale IP (see §2c). |
 | `oalders-snap`  | (no markers of its own — `nn` appends it alongside any snap-backed sibling like `oalders-hugo`) | Reads for snap-confined binaries: `/snap`, `/var/lib/snapd`, `/etc/fstab` (snapd's startup checks parse the mount table). |
 
@@ -65,81 +65,26 @@ Example wrapper for a Node + Perl repo (`package.json` + `cpanfile` at top):
 
 #### `oalders-docker`: the socket grants contain nothing
 
-Read this before reasoning about what the Docker mixin does or doesn't gate.
+Rules (full evidence and rationale:
+[docs/nono/docker-under-the-sandbox.md](../docs/nono/docker-under-the-sandbox.md)):
 
-**The plugins dir is the whole fix.** `/usr/libexec/docker/cli-plugins` (read)
-is the only grant in `oalders-docker` that fixes #1002 — but not the only one
-that changes what a session can do: see the buildx caveat below.
-`compose` and `buildx` ship as separate executables in that directory and the
-`docker` binary `exec`s them by path, so a session without the read grant gets
-`docker: unknown command` for exactly those two — and nothing else about Docker
-is broken. It's narrowed to `cli-plugins/` rather than all of
-`/usr/libexec/docker`, which also holds daemon-side helpers the CLI never
-needs.
-
-**The daemon socket is reachable from every session, profile regardless.**
-Landlock's rights model covers path `open()`, not `connect(AF_UNIX)` (verified against nono 0.73.0; see the tmux socket entry below for what 0.74.0 changed), so a
-grant on `docker.sock` is not what lets the CLI reach the daemon — and
-withholding it does not withhold access. Verified empirically from a live
-session whose profile did **not** include this mixin:
-
-- `nono why --path /run/docker.sock --op write --profile oalders` →
-  `DENIED / path_not_granted`
-- …and yet `docker ps` succeeds in that same session, reaching the host daemon
-  (server 29.1.3) and listing host containers.
-- Only `docker compose version` and `docker buildx version` fail there, both
-  with `docker: unknown command` — the plugin-dir symptom, nothing socket-shaped.
-
-The two `allow_file` entries therefore stay as **defensive, non-load-bearing**
-grants: kept so the profile is correct-by-construction if nono ever mediates
-socket `connect()`, and so it stays portable to layouts where `/var/run` is not
-a symlink to `/run` (on Linux it is, and `nono why` reports the resolved path).
-They are not what makes Docker work today, and `test/nono-profiles.bats` guards
-them on that basis and no other.
-
-**Treat every session on this box as uncontained with respect to Docker.** The
-daemon runs as root *outside* the sandbox, so any session that can talk to it
-can do `docker run --privileged -v /:/host` and have host root — which, per the
-above, is every session. This is pre-existing; the mixin neither introduces nor
-widens it. Tracked with the full evidence and candidate mitigations (namespace
-shim around `nono run`, a Docker `AuthZ` plugin, rootless Docker) in #1003 —
-none of them fixable in a profile. A corollary worth carrying beyond Docker:
-`nono why` returns `DENIED` for an access the sandbox permits here, so its
-verdict is unreliable for sockets, FIFOs, and device nodes. Verify those
-empirically rather than trusting the check.
-
-**Buildx state is redirected out of `~/.docker`, not granted there (#1004).**
-Buildx keeps its builder instances and current-builder pointer under
-`~/.docker/buildx` by default, and granting that home path for write would be
-the mixin's only write to outlive the session — a host-side blast radius. A
-session could persist a `remote`-driver builder pointing at an endpoint it
-chooses and mark it current; a later **un-sandboxed** `docker buildx build` on
-the host would then ship that build context — source, `.env` files — to the
-endpoint, surviving deletion of the worktree that created it. Note the
-asymmetry it would create with `~/.docker/contexts`, kept read-only for exactly
-this reason. So `bin/nn` exports `BUILDX_CONFIG="$PWD/.tmp/buildx"` whenever the
-resolved profile lists `oalders-docker` in its `extends` — the same redirect it
-already does for `SERENA_HOME` and `ANSIBLE_LOCAL_TEMP` — and the profile grants
-no `~/.docker` write at all. The `.tmp` target is covered by `--allow-cwd`, so
-no new grant is needed; the only trade-off is that builders no longer persist
-across worktrees, matching the accepted trade-off for serena's memories. This
-was low priority (per #1003 host root is reachable anyway, so it was never the
-weakest link) but is cheap, correct hygiene now done.
-
-**Which is why detection is automatic.** Keying on compose files rather than
-making the mixin opt-in costs no containment: the escape is already universal,
-so an opt-in gate would gate a privilege sessions already hold and buy nothing
-but friction. The mixin exists to make `docker compose` *work*, not to gate
-access to the daemon — do not read opt-in-vs-auto here as a security boundary
-in either direction. One honest caveat on the residual delta: auto-detect
-grants no *capability* a session lacked, but it does raise *likelihood* — a
-cloned repo's own `compose.yaml` becomes directly runnable via the exact
-command its README suggests, and a compose file can legitimately carry
-`privileged: true` or `volumes: ["/:/host"]`. That's an ergonomics trade, not
-a containment one, but it is the reason to keep treating a strange repo's
-compose file as untrusted content rather than a build script. A bare `Dockerfile` is still deliberately not a marker: a
-repo that only builds an image has no compose/buildx workflow to fix, so the
-grant would be noise.
+- **The plugins-dir read is the whole fix (#1002).** compose/buildx are CLI
+  plugins the `docker` binary `exec`s by path; without the read they fail
+  `docker: unknown command`. Nothing else about Docker is broken.
+- **The daemon socket is reachable from every session regardless.** Landlock
+  covers path `open()`, not `connect(AF_UNIX)` (nono 0.73.0), so the two
+  `docker.sock` `allow_file` entries are defensive only. Corollary: `nono why`
+  is unreliable for sockets/FIFOs/device nodes — verify those empirically.
+- **Every session is uncontained w.r.t. Docker.** The daemon runs as root
+  outside the sandbox, so any session reaching it has host root (#1003). The
+  mixin neither introduces nor widens this.
+- **Buildx state is redirected to the worktree, not granted in `~/.docker`
+  (#1004)** — `bin/nn` sets `BUILDX_CONFIG=$PWD/.tmp/buildx` to avoid a
+  host-side write that could outlive the session.
+- **Detection is automatic** because the escape is already universal, so an
+  opt-in gate would buy only friction. It raises *likelihood* not *capability* —
+  keep treating a strange repo's compose file as untrusted. A bare `Dockerfile`
+  is still not a marker.
 
 ### Opt-in only (no auto-detection)
 
@@ -191,9 +136,7 @@ Dropped from the gist:
 Added for Linux:
 - `NO_PROXY=localhost,127.0.0.1` reset inside `nn` before claude launches. Nono injects `network.allow_domain` entries into the sandbox's `NO_PROXY`, which makes HTTP clients bypass the nono proxy — and Landlock then blocks the direct TCP. Resetting forces traffic through the proxy, where `allow_domain` actually takes effect.
 - `filesystem.allow: ["/tmp/claude-1000"]`. The base profile grants `/tmp` write-only; Claude Code's Bash tool writes output files to `/tmp/claude-$UID/<project>/...` and then reads them back, so the subtree needs r+w. Hardcoded to UID 1000; bump if the account's UID ever changes.
-- `filesystem.unix_socket_dir: ["/tmp/tmux-1000"]`. Since nono 0.74.0 a sandboxed process cannot `connect()` to the tmux control socket, so `tmux display-message` fails with `Permission denied` and any best-effort session-name capture silently records an empty string. This is intended nono behaviour, not a regression: the `--allow-unix-socket*` capability family is byte-identical between 0.73.0 and 0.74.0, but 0.74.0 added fail-closed inode-type validation to prepared Landlock rules, closing the hole where a broad `/tmp` grant let the connect through. **Do not pin back to v0.73.0** — capture worked there only because of the fail-open gap. `unix_socket_dir` beats `unix_socket` on an exact path because the socket filename varies by tmux server instance, and beats the `unix_socket_subtree*` and `*_bind` variants because it grants `connect()` only — no `bind()`, no declared subtree. `nono why` suggests `--allow-file`, which is neither sufficient nor necessary. Hardcoded to UID 1000 like the `/tmp/claude-1000` entry above; bump if the account's UID ever changes.
-  Two caveats the key name undersells. First, `nono profile schema` calls `unix_socket_dir` non-recursive, but `nono run --help` is more precise: *"Non-recursive on macOS and future Linux AF_UNIX mediation; current Linux Landlock filesystem fallback is recursive."* On this box the enforced grant is therefore recursive over `/tmp/tmux-1000`, not direct-children-only — harmless today (the dir is `drwx------`, uid 1000, flat socket files only) but it would silently swallow any subdirectory a future tool colocates there. Second, the grant implies **read on the directory**, so a sandboxed process can also *list* it and enumerate socket filenames for every tmux server under this UID.
-  **Security tradeoff, accepted deliberately (#1022):** this grant is not scoped to reading a session name. A process holding the tmux socket can also `tmux send-keys` into any pane on that server, including panes running unsandboxed shells — a sandbox escape. It lives in `oalders-core`, so every sandboxed session inherits it. Accepted on the grounds that the panes in question are our own; revisit by moving it to a narrow opt-in sibling profile if that stops being true.
+- `filesystem.unix_socket_dir: ["/tmp/tmux-1000"]`. Lets a sandboxed process `connect()` to the tmux control socket (session-name capture), which nono 0.74.0 otherwise blocks. **Do not pin back to v0.73.0** (capture worked there only via a fail-open gap). **Security tradeoff, accepted (#1022):** this also permits `tmux send-keys` into any pane on the server — a sandbox escape into our own unsandboxed panes; it lives in `oalders-core`, so every session inherits it. UID 1000 hardcoded. Why `unix_socket_dir` over the alternatives, the recursive-grant caveat, and the full tradeoff: [docs/nono/tmux-socket-grant.md](../docs/nono/tmux-socket-grant.md).
 - `filesystem.read_file: ["/etc/gitconfig"]`. The base `git_config` group covers `~/.gitconfig` and `~/.config/git/ignore` but not the system-wide gitconfig. Without it, every `git` invocation fails with `fatal: unknown error occurred while reading the configuration files`.
 - `filesystem.read: ["~/.config/gh"]`. Needed for `git push` over HTTPS when gh is the credential helper — gh reads `config.yml` and `hosts.yml` (OAuth token) to answer git's username/password prompt. Read-only is enough for pushes; bump to `allow` if a workflow needs gh to update its own state.
 - `nn` passes `--allow $(git rev-parse --git-common-dir)` when cwd is a git worktree. The worktree's `.git` lives under the main repo (`<main>/.git/worktrees/<name>`), outside cwd — so `--allow-cwd` alone leaves git unable to read objects/refs.
@@ -202,77 +145,29 @@ Added for Linux:
 
 ## Why `network_profile` is set to `null`
 
-The `claude-code` network bundle (`network.network_profile`) sets up nono's reverse proxy and injects `ANTHROPIC_BASE_URL=http://127.0.0.1:<port>/anthropic`. The `anthropic` route demands `env://ANTHROPIC_API_KEY`; Max/OAuth users have no API key, so the proxy returns `407 Proxy Authentication Required` with body `{"error":"Proxy Authentication Required"}`. The startup `WARN ... requests will proceed without credential injection` is misleading — actual behavior is hard-reject.
+`oalders-net.json` sets `"network_profile": null` and lists outbound rules as an explicit `allow_domain` set (Anthropic, GitHub, npm, Go module proxy) instead of the curated `claude-code` bundle. That bundle's reverse proxy hard-rejects Max/OAuth users (no API key → `407`), despite a misleading "proceeds without credential injection" warning. **Do not restore the curated bundle without re-testing** — the reject returns.
 
-Surfaced 2026-04-30 after claude auto-updated to a version that respects `ANTHROPIC_BASE_URL`. Earlier claude went to `api.anthropic.com` directly and tunneled through `HTTPS_PROXY`, dodging the intercept.
-
-Workaround: set `"network_profile": null` in `oalders-net.json` (where all outbound rules now live) and replace the curated bundle with an explicit `allow_domain` list (Anthropic, GitHub, npm, Go module proxy). The explicit `null` is the documented opt-out pattern — see nono's `docs/cli/clients/claude-code.mdx` (`claude-code-netopen` example). Today the parent `claude-code` profile doesn't set `network_profile`, so omitting the field would also work, but `null` is defensive against a future nono release adding it back.
-
-Upstream to watch:
-- https://github.com/always-further/nono/issues/793 — exec-sourced credentials (covers `apiKeyHelper` shape)
-- https://github.com/always-further/nono/issues/770 — refreshable credential backend
-- https://github.com/always-further/nono/issues/724 — 3rd-party provider profiles
-
-Re-test on each nono release: temporarily flip `"network_profile": null` to `"claude-code"` in `oalders-net.json` and run from `$TMPDIR`:
-```
-cd "${TMPDIR:-/tmp}" && nono run --profile oalders --allow-cwd -- curl -s -o /dev/null -w "%{http_code}\n" \
-  -X POST "$ANTHROPIC_BASE_URL/v1/messages" -d '{}'
-```
-Non-407 means the route became OAuth-aware and you can re-adopt the curated bundle. While `network_profile` is null, the `NO_PROXY` reset in `bin/nn` is vestigial (no proxy is started) but harmless — it re-becomes load-bearing the moment the curated bundle is restored.
+Why the bundle rejects, the re-test command to run on each nono release, and the upstream issues to watch: [docs/nono/network-profile-null.md](../docs/nono/network-profile-null.md).
 
 ## superpowers-chrome (full Chrome) under the sandbox
 
-The `superpowers-chrome` MCP (opt-in via `nn --chrome`) drives the **full** Google Chrome build, not Playwright's headless shell. Two things break it under the sandbox; `bin/nn` and `oalders-chrome.json` fix both, gated on `--chrome` (#970).
+The `superpowers-chrome` MCP (opt-in via `nn --chrome`) drives the **full** Google Chrome build, not Playwright's headless shell. `bin/nn` and `oalders-chrome.json` fix two launch failures, gated on `--chrome` (#970):
 
-### 1. Crashpad crash database
+- **Crashpad crash DB.** Full Chrome SIGTRAPs on startup (exit 133) when denied `~/.config/google-chrome/Crash Reports`. `oalders-chrome.json` grants and `bypass_protection`s **only** that subdir (leaving `Default/` denied), and `bin/nn` pre-creates it (a grant can't create the dir). The Playwright MCP hits the same crash and is fixed differently — its `bin/npx` wrapper drives Playwright's bundled Chromium (`--browser chromium --headless`), where the denied dir is non-fatal.
+- **`Socket path too long`.** In a deep worktree, Chromium's `SingletonSocket` under `TMPDIR=$PWD/.tmp` overruns the ~108-char `sun_path` limit. The `bin/npx` wrapper redirects **just the browser's** `TMPDIR` to the short `/tmp/claude-<uid>` base.
 
-Full Chrome writes its crash database to **`~/.config/google-chrome/Crash Reports`** — a fixed path derived from the default config dir, *independent of `--user-data-dir`* (so pointing the session dir at `~/.cache/superpowers` doesn't move it). The base `claude-code` profile denies that tree via the `deny_browser_data_linux` group. When Chrome can't write there it launches its crashpad handler without a `--database` argument; the handler aborts with `chrome_crashpad_handler: --database is required` (plus `recvmsg: Connection reset by peer`), and the browser **SIGTRAPs on startup** (exit 133). The Playwright headless shell is immune because it ships no separate crashpad handler.
+Details (why crashpad flags don't help, exact symptoms, the Chrome-for-Testing switch): [docs/nono/chrome-under-the-sandbox.md](../docs/nono/chrome-under-the-sandbox.md).
 
-The fix is narrow:
+### Ports `bin/nn` opens
 
-- `oalders-chrome.json` grants **only** the `Crash Reports` subdir (`filesystem.allow`) and lifts the deny on it (`filesystem.bypass_protection`). nono rejects a `bypass_protection` path that has no matching grant, so the two must name the **same** path — you can't bypass the parent `~/.config/google-chrome` and allow only the child. Keeping the grant on the subdir leaves the sibling `Default/` (cookies, saved passwords, sessions) denied, which is the whole point of `deny_browser_data_linux`.
-- A grant can't *create* the dir (its parent stays denied), so `bin/nn` pre-creates `~/.config/google-chrome/Crash Reports` outside the sandbox before launch (same pattern as `.tmp`/`.serena-home`). Without the dir, Chrome can't establish the database and the crash returns.
+Every non-default grant uses repeated `nono run --open-port` (localhost connect + listen), scoped so idle sandboxes keep the port closed. Rationale for each — the name-only `extends` limit that forces the CLI flag, and per-feature scoping — is in [docs/nono/chrome-under-the-sandbox.md](../docs/nono/chrome-under-the-sandbox.md).
 
-The crashpad-disabling flags the issue floated (`--disable-crashpad`, `--no-crashpad`, `--disable-crash-reporter`, `--disable-features=Crashpad`) do **not** prevent the handler from spawning on this Chrome build — confirmed by experiment — so disabling crashpad is not a viable alternative to the grant.
-
-**The Playwright MCP hits the *same* crash by default, and is fixed differently.** `@playwright/mcp` defaults to the `chrome` channel — system Google Chrome at `/opt/google/chrome/chrome` — which SIGTRAPs on the crashpad database exactly as above (symptom: `nn --playwright` → `browser crashed on launch (SIGTRAP)` before any page loads, and running `/opt/google/chrome/chrome --headless --no-sandbox` directly reproduces exit 133). The Playwright MCP is *not* granted the `Crash Reports` dir (that's `--chrome`-only), so the fix is to point it away from system Chrome entirely: the `installer/playwright-mcp.sh`-generated `~/dot-files/bin/npx` wrapper execs `playwright-mcp --browser chromium --headless`, driving Playwright's own bundled Chrome for Testing from the shared `~/.cache/ms-playwright` bundle. That build hits the identical denied crash-reports dir (`~/.config/google-chrome-for-testing/Crash Reports`) but only logs a **non-fatal** permission error and keeps running — so no grant is needed, just the switch off system Chrome. (`--headless` because the sandbox has no display; the empirically-observed launch is the full `chrome-linux64/chrome` binary in headless mode, not the separate `chrome-headless-shell`.)
-
-**And once it launches, a deep worktree trips a second failure: `Socket path too long`.** Chromium's process-singleton opens a Unix domain socket at `<user-data-dir>/SingletonSocket`, and Playwright creates that user-data-dir under `$TMPDIR`. `bin/nn` sets `TMPDIR=$PWD/.tmp` (to keep scratch inside `--allow-cwd`), so in a dated worktree like `~/.worktree/<repo>/<date>/<name>` the prefix plus `org.chromium.Chromium.XXXXXX/SingletonSocket` overruns the ~108-char `sun_path` limit and Chromium FATALs (`process_singleton_posix.cc: Socket path too long`) before any page loads. The same `bin/npx` wrapper redirects **just the browser's** `TMPDIR` to the short, already-granted `/tmp/claude-<uid>` scratch base (`oalders-core` `filesystem.allow`) so the socket fits; the session-wide `TMPDIR` and every other tool's scratch stay in `$PWD/.tmp`. The redirect is guarded by `mkdir -p`, so a context where that base isn't writable just falls back to the inherited `TMPDIR`.
-
-### Ports `bin/nn` opens (overview)
-
-Every localhost port `bin/nn` grants, and its trigger. All non-default grants use repeated `nono run --open-port` (localhost connect + listen), scoped so idle sandboxes keep them closed; the per-feature sections below carry the rationale.
-
-| Port(s) | Opened when | For | Section |
-| --- | --- | --- | --- |
-| `80`, `5000`, `5001`, `8080` | always (default chain) | `oalders-net`'s baseline `open_port` | `oalders-net.json` |
-| `9222` | `--chrome` | Chrome DevTools endpoint the superpowers-chrome MCP drives | §2 |
-| `9323`–`9342` | `playwright_enabled` (e2e markers or `--playwright`) | Playwright HTML report / trace viewer (`9323`) + preview / `webServer` (`9324`–`9342`) | §2b |
-| `1313`–`1316` | Hugo detected **and** host has a tailscale IPv4 | `hugo server` reachable over the tailnet | §2c |
-
-### 2. DevTools TCP port
-
-The MCP serves the Chrome DevTools endpoint over a localhost TCP port (its default range is 9222–12111), but the default chain only opens `[80, 5000, 5001, 8080]` (`oalders-net`'s `open_port`). The `bind()` fails with `Cannot start http server for devtools` and the MCP can't drive the browser. (The **Playwright MCP** sidesteps *this* by talking to the browser over a stdio pipe, not a TCP port — which is also why the headless shell "just works" — but see the Playwright note below: running actual Playwright *tests* still needs ports.)
-
-`bin/nn` pins the MCP to one fixed port via `CHROME_WS_PORT=9222` and opens exactly that port with `nono run --open-port 9222` (localhost connect + listen). Done via the CLI flag rather than a dedicated `*-net` sibling because nono's `extends` resolves by **name only** (not path), so a net sibling can't compose onto the path-based profiles `nn` builds (`.nono/profile.json` wrappers, `--profile` overrides); the flag is conditional by construction and works for every profile shape. Scoped to `--chrome` so idle and non-browser sandboxes keep the port closed.
-
-### 2b. Playwright test ports (9323–9342)
-
-The Playwright MCP drives the browser over a pipe, so it needs no port — but running actual Playwright **tests** in the sandbox does. Two consumers bind localhost TCP the default chain doesn't cover, so `bind()` is Landlock-denied (`permission denied 127.0.0.1:<port>`): Playwright's HTML report / trace viewer (preferredPort `9323`, increments when busy) and any local preview / `config.webServer` that serves the build for the browser to load.
-
-`bin/nn` opens a 20-port block `9323–9342` with repeated `nono run --open-port` (same CLI-flag rationale as the DevTools port above). `9323` is Playwright's own default so the reporter works untouched; `9324–9342` are free for a preview/`webServer` — **serve within this range** (e.g. `python -m http.server 9324 --bind 127.0.0.1`), since a bind outside it is still denied. Scoped to `playwright_enabled` (e2e markers present, or `--playwright`) so idle/non-e2e sandboxes keep the ports closed.
-
-### 2c. Hugo serve ports over Tailscale (1313–1316)
-
-`hugo server` binds a single interface. To preview a build from another tailnet device (phone, laptop), it must bind the host's **tailscale IPv4** rather than loopback: `hugo server --bind $TAILSCALE_IP --baseURL http://$TAILSCALE_IP:1313/`. nono's network mediation is port-based, so serving on that IP just needs the serve port opened; the default chain's `open_port [80, 5000, 5001, 8080]` doesn't cover Hugo's default `1313`.
-
-When Hugo is detected (same markers as the `oalders-hugo` mixin: `hugo.toml`/`yaml`/`json`, `config/_default/`, or `config.toml` + `themes/`) **and** the host has a tailscale IPv4, `bin/nn`:
-
-- opens the `1313–1316` block with repeated `nono run --open-port` (same CLI-flag rationale as the ports above) — the small range leaves room for a second instance or a custom `--port` near the default;
-- exports `TAILSCALE_IP` so the `--bind`/`--baseURL` command above is copy-pasteable and scripts can reference it;
-- appends the tailscale IP to `NO_PROXY`, so an **in-sandbox** client (curl, the Playwright MCP) reaches the served site directly instead of routing through the credential proxy — which has no `allow_domain` entry for it and would block the connection.
-
-The IPv4 comes from `tailscale ip -4` (cross-platform), falling back to the Linux `tailscale0` interface via `ip addr`. Gated on a tailscale IP actually existing, so non-tailnet Hugo sandboxes keep the ports closed and `NO_PROXY` at loopback. Detection lives near the top of `bin/nn` (not only in the mixin auto-gen block) so the grant still fires when a pre-generated `.nono/profile.json` or a `--profile` override skips that block — the serve grant follows the project, not the profile shape.
+| Port(s) | Opened when | For |
+| --- | --- | --- |
+| `80`, `5000`, `5001`, `8080` | always (default chain) | `oalders-net`'s baseline `open_port` |
+| `9222` | `--chrome` | Chrome DevTools endpoint (`CHROME_WS_PORT=9222`) the superpowers-chrome MCP drives |
+| `9323`–`9342` | `playwright_enabled` (e2e markers or `--playwright`) | Playwright HTML report / trace viewer (`9323`) + preview / `webServer` (`9324`–`9342`); serve within this range |
+| `1313`–`1316` | Hugo detected **and** host has a tailscale IPv4 | `hugo server` bound to `$TAILSCALE_IP` (also exported), reachable over the tailnet |
 
 ## Kernel requirement
 
