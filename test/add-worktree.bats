@@ -56,6 +56,33 @@ setup() {
     [ -f "$worktree/mysub/sub-file" ]
 }
 
+@test "add-worktree skips submodules with traversal names in .gitmodules" {
+    # #1030: a .gitmodules section name is not validated by git, so a crafted
+    # name like ../ could make ref_gitdir resolve outside .git/modules. The
+    # script must skip such names (and not pass them to git submodule update)
+    # rather than build a --reference path from them.
+    setup_git_repo
+    # Hand-craft a .gitmodules with a traversal name; no real submodule needed
+    # since the script must bail before touching it.
+    cat >.gitmodules <<'EOF'
+[submodule "../../evil"]
+	path = evil
+	url = ./nowhere
+EOF
+    git add .gitmodules
+    git -c commit.gpgsign=false commit -q -m "add crafted .gitmodules"
+
+    run "$ADD_WORKTREE" feature-branch
+    [ "$status" -eq 0 ]
+    [[ "$output" == *"Skipping submodule with suspicious name: ../../evil"* ]]
+
+    local date_stamp repo_name worktree
+    date_stamp="$(date +%Y-%m-%d)"
+    repo_name="$(basename "$REPO_DIR")"
+    worktree="$HOME/.worktree/$repo_name/$date_stamp/feature-branch"
+    [ -d "$worktree" ]
+}
+
 @test "add-worktree refuses to run outside a git repository" {
     # BATS_TEST_TMPDIR is not a git repo and GIT_CEILING_DIRECTORIES (set in
     # setup) stops git from finding a parent one, so this exercises the

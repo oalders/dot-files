@@ -123,6 +123,15 @@ if [[ -f .gitmodules ]]; then
     while IFS= read -r section; do
         name="${section#submodule.}"
         name="${name%.path}"
+        # `name` comes straight from .gitmodules, which bypasses git's
+        # submodule-name validation. Skip traversal names so a crafted
+        # section can't point --reference outside .git/modules (#1030).
+        case $name in
+            */* | *..*)
+                echo "Skipping submodule with suspicious name: $name" >&2
+                continue
+                ;;
+        esac
         sm_path="$(git config -f .gitmodules --get "submodule.$name.path")"
         ref_gitdir="$repo_root/.git/modules/$name"
         if [[ -d "$ref_gitdir" ]]; then
