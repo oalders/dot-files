@@ -310,10 +310,23 @@ fi
 if [[ -n "$close_mode" ]]; then
     # Only if origin has it — close mode tolerates a never-pushed or
     # already-deleted branch, so a missing ref is normal, not a warning. Full
-    # ref path avoids the tail-match pitfall; `--exit-code`'s "ref absent"
-    # status is consumed by the `if` and never aborts under `set -e`.
-    if git ls-remote --exit-code origin "refs/heads/$branch" >/dev/null 2>&1; then
-        if ! git push origin --delete "$branch"; then
+    # ref path avoids the tail-match pitfall; capture the SHA `--exit-code`
+    # printed (its "ref absent" status is consumed by the `if` and never aborts
+    # under `set -e`).
+    if remote_ref=$(git ls-remote --exit-code origin "refs/heads/$branch" 2>/dev/null); then
+        remote_sha=${remote_ref%%$'\t'*}
+        # Delete only what we know. ls-remote proves the ref exists, not that it
+        # is the branch this PR was about: a merged branch name recreated on
+        # origin with new commits still resolves the old MERGED PR via `gh pr
+        # view`, so a bare delete would drop commits we never saw (#1020).
+        # Refuse when origin/<branch> holds commits HEAD does not contain. It's
+        # an ancestry test, not equality — close mode deliberately tolerates
+        # unpushed local commits (local ahead of remote is normal). A remote SHA
+        # we never fetched isn't a local object, so --is-ancestor errors here and
+        # we skip too: origin has history we don't, which is exactly when to stop.
+        if ! git merge-base --is-ancestor "$remote_sha" HEAD 2>/dev/null; then
+            echo "merge-pr: warning: 'origin/$branch' has commits not in HEAD; leaving the remote branch in place." >&2
+        elif ! git push origin --delete "$branch"; then
             echo "merge-pr: warning: could not delete remote branch 'origin/$branch'; continuing with local cleanup." >&2
         fi
     fi

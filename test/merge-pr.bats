@@ -632,6 +632,100 @@ esac
     [ -z "$output" ]
 }
 
+# #1020: close mode must not delete origin/<branch> when the remote holds
+# commits HEAD does not contain — the branch name may have been recreated on
+# origin after the old PR merged. Advance origin/feature past local HEAD (the
+# extra commit's object IS present locally here), then close: the delete is
+# refused with a warning, the remote branch survives, local teardown still runs.
+@test "close: --close leaves origin/<branch> alone when it has commits not in HEAD" {
+    _ready_repo
+    setup_feature_worktree
+    unset TMUX
+    stub_command tmux 'exit 0'
+    # Push an extra commit to origin/feature, then rewind local so HEAD lacks it.
+    git -c commit.gpgsign=false commit -q --allow-empty -m "advance origin only"
+    git push -q origin feature
+    git reset -q --hard HEAD~1
+    stub_command gh '
+case "$2" in
+    view) printf "OPEN\tmain\n" ;;
+    close) : >"$BATS_TEST_TMPDIR/close-was-called" ;;
+esac
+'
+
+    run "$MERGE_PR" --close
+    [ "$status" -eq 0 ]
+    [ -e "$BATS_TEST_TMPDIR/close-was-called" ]
+    [[ "$output" == *"has commits not in HEAD; leaving the remote branch in place"* ]]
+    # Local teardown still runs; only the remote branch is spared.
+    [ ! -d "$WORKTREE_DIR" ]
+    cd "$REPO_DIR"
+    run git ls-remote "$UPSTREAM_DIR" refs/heads/feature
+    [ -n "$output" ]
+}
+
+# #1020: the fail-closed variant — origin/<branch> points at a commit this repo
+# never fetched (a genuinely recreated branch), so its object is absent locally
+# and `git merge-base --is-ancestor` errors rather than returning cleanly. The
+# suppressed error must still be treated as "remote has history we don't" and
+# spare the branch, not fall through to the delete.
+@test "close: --close leaves origin/<branch> alone when its tip was never fetched" {
+    _ready_repo
+    setup_feature_worktree
+    unset TMUX
+    stub_command tmux 'exit 0'
+    # A separate clone advances origin/feature; our repo never fetches the object.
+    local other="$BATS_TEST_TMPDIR/other-clone"
+    git clone -q "$UPSTREAM_DIR" "$other"
+    git -C "$other" checkout -q feature
+    git -C "$other" config user.email "other@example.com"
+    git -C "$other" config user.name "Other"
+    git -C "$other" -c commit.gpgsign=false commit -q --allow-empty -m "someone else's commit"
+    git -C "$other" push -q origin feature
+    stub_command gh '
+case "$2" in
+    view) printf "OPEN\tmain\n" ;;
+    close) : >"$BATS_TEST_TMPDIR/close-was-called" ;;
+esac
+'
+
+    run "$MERGE_PR" --close
+    [ "$status" -eq 0 ]
+    [ -e "$BATS_TEST_TMPDIR/close-was-called" ]
+    [[ "$output" == *"has commits not in HEAD; leaving the remote branch in place"* ]]
+    [ ! -d "$WORKTREE_DIR" ]
+    cd "$REPO_DIR"
+    run git ls-remote "$UPSTREAM_DIR" refs/heads/feature
+    [ -n "$output" ]
+}
+
+# #1020 regression guard: the ancestry test must NOT over-refuse the legitimate
+# local-ahead case. Local HEAD holds an unpushed commit beyond origin/feature,
+# so the remote tip IS an ancestor of HEAD — the delete must still proceed.
+@test "close: --close still deletes origin/<branch> when local is ahead of it" {
+    _ready_repo
+    setup_feature_worktree
+    unset TMUX
+    stub_command tmux 'exit 0'
+    # One unpushed local commit: origin/feature is now behind HEAD (its ancestor).
+    git -c commit.gpgsign=false commit -q --allow-empty -m "unpushed local commit"
+    stub_command gh '
+case "$2" in
+    view) printf "OPEN\tmain\n" ;;
+    close) : >"$BATS_TEST_TMPDIR/close-was-called" ;;
+esac
+'
+
+    run "$MERGE_PR" --close
+    [ "$status" -eq 0 ]
+    [ -e "$BATS_TEST_TMPDIR/close-was-called" ]
+    [[ "$output" != *"leaving the remote branch in place"* ]]
+    [ ! -d "$WORKTREE_DIR" ]
+    cd "$REPO_DIR"
+    run git ls-remote "$UPSTREAM_DIR" refs/heads/feature
+    [ -z "$output" ]
+}
+
 # #966: when merge-pr is run from the MAIN working tree (not a linked
 # worktree), it must still merge and clean up the branch, but skip the
 # worktree-removal step instead of emitting a `fatal:` + failure message.
