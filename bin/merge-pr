@@ -180,7 +180,20 @@ git_common_dir=$(git rev-parse --git-common-dir)
 # (physical path) so it matches `--show-toplevel`, which is already
 # symlink-resolved — otherwise a cwd reached through a symlink would make
 # the two diverge and break the main-working-tree comparison below.
-main_repo=$(cd "$git_common_dir" && cd .. && pwd -P)
+#
+# A submodule breaks that "parent of the git dir" assumption: --git-common-dir
+# points into the superproject's .git/modules/<name>, whose parent is
+# .git/modules — not a working tree at all. `git worktree remove` run from
+# there resolves the superproject, which doesn't own the worktree, and aborts
+# "is not a working tree" (#1029-style). The submodule's own main working tree
+# is recorded as core.worktree in that git dir; use it when set (unset for a
+# plain repo).
+if submodule_worktree=$(git -C "$git_common_dir" config core.worktree 2>/dev/null) &&
+    [[ -n "$submodule_worktree" ]]; then
+    main_repo=$(cd "$git_common_dir" && cd "$submodule_worktree" && pwd -P)
+else
+    main_repo=$(cd "$git_common_dir" && cd .. && pwd -P)
+fi
 
 # PR lookup: state + baseRefName in a single call. `no_pr` records the
 # close-mode case where there's no PR at all; teardown still runs, but the

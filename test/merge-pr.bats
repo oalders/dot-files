@@ -234,6 +234,25 @@ _ready_repo() {
     [ -z "$output" ]
 }
 
+# A worktree *of* a submodule lives under the superproject's
+# .git/modules/<name>, so `git rev-parse --git-common-dir` points there.
+# Teardown must resolve the submodule's own main working tree (via
+# core.worktree), not `git_common_dir/..` (which is .git/modules — not a
+# working tree at all), or `git worktree remove` aborts with "is not a
+# working tree" and the worktree is stranded.
+@test "cleanup: removes a clean worktree of a submodule" {
+    setup_submodule_feature_worktree
+    unset TMUX
+    stub_command tmux 'exit 0'
+    stub_command gh 'printf "MERGED\tmain\n"'
+
+    run "$MERGE_PR"
+    [ "$status" -eq 0 ]
+    [ ! -d "$WORKTREE_DIR" ]
+    run git -C "$SUBMODULE_MAIN" branch --list feature
+    [ -z "$output" ]
+}
+
 @test "cleanup: removes a clean worktree without submodules" {
     _ready_repo
     setup_feature_worktree

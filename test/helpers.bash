@@ -106,3 +106,55 @@ setup_feature_worktree() {
 
     git push -q -u origin feature
 }
+
+# Set up a worktree *of* a submodule (as opposed to a worktree that merely
+# contains one). Mirrors the real workflow where add-worktree is run from
+# inside a submodule checkout: the linked worktree lives under the
+# superproject's .git/modules/<name>, so merge-pr's teardown must resolve the
+# submodule's own main working tree — not the superproject (#1029-style).
+# Self-contained; does not require setup_git_repo first. After this:
+#   - SUBMODULE_MAIN holds the submodule's main working tree (super/sub);
+#   - WORKTREE_DIR holds a worktree of the submodule on branch "feature",
+#     pushed to the submodule's origin with no unpushed commits;
+#   - the caller's cwd is the worktree.
+setup_submodule_feature_worktree() {
+    local super="$BATS_TEST_TMPDIR/super"
+    local sub_src="$BATS_TEST_TMPDIR/submodule-src"
+    local sub_upstream="$BATS_TEST_TMPDIR/sub-upstream.git"
+
+    # The submodule's origin repo, with one commit.
+    mkdir -p "$sub_src"
+    git -C "$sub_src" init -q -b main
+    git -C "$sub_src" config user.email "test@example.com"
+    git -C "$sub_src" config user.name "Test"
+    echo "sub" >"$sub_src/subfile"
+    git -C "$sub_src" add subfile
+    git -C "$sub_src" -c commit.gpgsign=false commit -q -m "sub init"
+
+    # Superproject embedding the submodule at path "sub". Local file adds
+    # require protocol.file.allow=always on modern git.
+    mkdir -p "$super"
+    git -C "$super" init -q -b main
+    git -C "$super" config user.email "test@example.com"
+    git -C "$super" config user.name "Test"
+    echo "top" >"$super/top"
+    git -C "$super" add top
+    git -C "$super" -c commit.gpgsign=false commit -q -m "init"
+    git -C "$super" -c protocol.file.allow=always submodule add -q "$sub_src" sub
+    git -C "$super" -c commit.gpgsign=false commit -q -m "add submodule"
+
+    SUBMODULE_MAIN="$super/sub"
+
+    # A bare origin for the submodule so merge-pr's push pre-flight resolves.
+    # `submodule add` already set origin to sub_src; repoint it at the bare
+    # upstream (a non-bare origin would reject the branch push).
+    git init --bare -q "$sub_upstream"
+    git -C "$SUBMODULE_MAIN" remote set-url origin "$sub_upstream"
+    git -C "$SUBMODULE_MAIN" push -q -u origin main
+
+    # The worktree of the submodule, on a pushed "feature" branch.
+    WORKTREE_DIR="$BATS_TEST_TMPDIR/sub-feature-wt"
+    git -C "$SUBMODULE_MAIN" worktree add -q "$WORKTREE_DIR" -b feature
+    git -C "$WORKTREE_DIR" push -q -u origin feature
+    cd "$WORKTREE_DIR"
+}
