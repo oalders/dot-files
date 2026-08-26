@@ -315,22 +315,16 @@ if [[ -n "$close_mode" ]]; then
     # under `set -e`).
     if remote_ref=$(git ls-remote --exit-code origin "refs/heads/$branch" 2>/dev/null); then
         remote_sha=${remote_ref%%$'\t'*}
-        # Delete only what we know. ls-remote proves the ref exists, not that it
-        # is the branch this PR was about: a merged branch name recreated on
-        # origin with new commits still resolves the old MERGED PR via `gh pr
-        # view`, so a bare delete would drop commits we never saw (#1020).
-        # Refuse when origin/<branch> holds commits HEAD does not contain. It's
-        # an ancestry test, not equality — close mode deliberately tolerates
-        # unpushed local commits (local ahead of remote is normal). A remote SHA
-        # we never fetched isn't a local object, so --is-ancestor errors here and
-        # we skip too: origin has history we don't, which is exactly when to stop.
+        # Refuse the delete unless origin/<branch> is an ancestor of HEAD: a
+        # merged branch name recreated on origin resolves the old MERGED PR via
+        # `gh pr view`, so a bare delete drops commits we never saw (#1020).
+        # Ancestry, not equality — close mode tolerates unpushed local commits.
+        # A never-fetched remote SHA errors here, which correctly fails closed.
         if ! git merge-base --is-ancestor "$remote_sha" HEAD 2>/dev/null; then
             echo "merge-pr: warning: 'origin/$branch' has commits not in HEAD; leaving the remote branch in place." >&2
-        # Bind the delete to the SHA we checked. --is-ancestor validated a
-        # snapshot from the ls-remote above, but the ref can still move in the
-        # sub-second gap before this push; --force-with-lease makes origin reject
-        # the delete if refs/heads/$branch no longer points at $remote_sha, so a
-        # concurrent push can't slip an unverified ref through the guard (#1020).
+        # Bind the delete to the SHA we checked: --force-with-lease makes origin
+        # reject it if the ref moved in the sub-second gap since ls-remote,
+        # closing the TOCTOU a bare `--delete` would leave open (#1020).
         elif ! git push --force-with-lease="refs/heads/$branch:$remote_sha" origin --delete "$branch"; then
             echo "merge-pr: warning: could not delete remote branch 'origin/$branch'; continuing with local cleanup." >&2
         fi
