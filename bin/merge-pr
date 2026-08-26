@@ -297,11 +297,26 @@ fi
 if [[ -n "$close_mode" ]]; then
     # Only if origin has it — close mode tolerates a never-pushed or
     # already-deleted branch, so a missing ref is normal, not a warning. Full
-    # ref path avoids the tail-match pitfall; `--exit-code`'s "ref absent"
-    # status is consumed by the `if` and never aborts under `set -e`.
-    if git ls-remote --exit-code origin "refs/heads/$branch" >/dev/null 2>&1; then
-        if ! git push origin --delete "$branch"; then
-            echo "merge-pr: warning: could not delete remote branch 'origin/$branch'; continuing with local cleanup." >&2
+    # ref path avoids the tail-match pitfall. Capture the SHA now so the delete
+    # is guarded by the same read (a ref-less or unreachable origin yields an
+    # empty line and is skipped, matching the old `--exit-code` behavior).
+    remote_line="$(git ls-remote origin "refs/heads/$branch" 2>/dev/null)" || remote_line=""
+    if [[ -n "$remote_line" ]]; then
+        remote_sha="${remote_line%%$'\t'*}"
+        # Delete only what we know: refuse when origin/<branch> carries commits
+        # not in HEAD. A merged branch name recreated on origin still resolves
+        # the OLD PR via `gh pr view`, so an unguarded delete drops commits this
+        # PR never saw (#1020). Ancestry, not equality — close mode tolerates
+        # unpushed local commits, so "remote behind local" (remote_sha an
+        # ancestor of HEAD) is the normal, deletable case. A missing object
+        # also fails the test, which is the safe direction: we can't prove
+        # ancestry, so we leave the branch alone.
+        if git merge-base --is-ancestor "$remote_sha" HEAD 2>/dev/null; then
+            if ! git push origin --delete "$branch"; then
+                echo "merge-pr: warning: could not delete remote branch 'origin/$branch'; continuing with local cleanup." >&2
+            fi
+        else
+            echo "merge-pr: warning: 'origin/$branch' has commits not in HEAD; leaving the remote branch in place." >&2
         fi
     fi
 fi
