@@ -312,11 +312,15 @@ if [[ -n "$close_mode" ]]; then
         # also fails the test, which is the safe direction: we can't prove
         # ancestry, so we leave the branch alone.
         if git merge-base --is-ancestor "$remote_sha" HEAD 2>/dev/null; then
-            if ! git push origin --delete "$branch"; then
-                echo "merge-pr: warning: could not delete remote branch 'origin/$branch'; continuing with local cleanup." >&2
+            # --force-with-lease pins the delete to the SHA we just vetted, so a
+            # push landing on origin/<branch> in the ls-remote→delete window is
+            # rejected (stale lease) rather than silently dropped — closes the
+            # TOCTOU the ancestry check alone leaves open.
+            if ! git push origin --delete --force-with-lease="refs/heads/$branch:$remote_sha" "$branch"; then
+                echo "merge-pr: warning: could not delete remote branch 'origin/$branch' (it may have moved since); continuing with local cleanup." >&2
             fi
         else
-            echo "merge-pr: warning: 'origin/$branch' has commits not in HEAD; leaving the remote branch in place." >&2
+            echo "merge-pr: warning: 'origin/$branch' is not a known ancestor of HEAD; leaving the remote branch in place." >&2
         fi
     fi
 fi

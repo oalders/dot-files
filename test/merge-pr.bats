@@ -540,7 +540,7 @@ esac
 
     run "$MERGE_PR" --close
     [ "$status" -eq 0 ]
-    [[ "$output" == *"has commits not in HEAD"* ]]
+    [[ "$output" == *"is not a known ancestor of HEAD"* ]]
     [ -e "$BATS_TEST_TMPDIR/close-was-called" ]
     # Local teardown still ran ...
     [ ! -d "$WORKTREE_DIR" ]
@@ -548,6 +548,43 @@ esac
     cd "$REPO_DIR"
     run git ls-remote "$UPSTREAM_DIR" refs/heads/feature
     [[ "$output" == "$recreated"$'\t'refs/heads/feature ]]
+}
+
+# #1020, exit-128 path: the real scenario is origin/<branch> carrying commits
+# this clone never fetched, so `merge-base --is-ancestor` errors on the unknown
+# object rather than returning "not an ancestor". A second clone pushes the
+# foreign commit so it stays out of the main repo's object store. The guard
+# must treat "can't resolve the object" the same as divergence: warn and skip.
+@test "close: --close leaves origin/<branch> alone when its commits were never fetched" {
+    _ready_repo
+    setup_feature_worktree
+    unset TMUX
+    stub_command tmux 'exit 0'
+    stub_command gh '
+case "$2" in
+    view) printf "OPEN\tmain\n" ;;
+    close) : >"$BATS_TEST_TMPDIR/close-was-called" ;;
+esac
+'
+    # Push a commit to origin/feature from a separate clone; the main repo never
+    # fetches it, so its object is absent locally.
+    git clone -q "$UPSTREAM_DIR" "$BATS_TEST_TMPDIR/other"
+    git -C "$BATS_TEST_TMPDIR/other" config user.email "test@example.com"
+    git -C "$BATS_TEST_TMPDIR/other" config user.name "Test"
+    git -C "$BATS_TEST_TMPDIR/other" checkout -q feature
+    git -C "$BATS_TEST_TMPDIR/other" -c commit.gpgsign=false commit -q --allow-empty -m "foreign commit"
+    git -C "$BATS_TEST_TMPDIR/other" push -q origin feature
+    local foreign
+    foreign="$(git -C "$BATS_TEST_TMPDIR/other" rev-parse HEAD)"
+
+    run "$MERGE_PR" --close
+    [ "$status" -eq 0 ]
+    [[ "$output" == *"is not a known ancestor of HEAD"* ]]
+    [ -e "$BATS_TEST_TMPDIR/close-was-called" ]
+    [ ! -d "$WORKTREE_DIR" ]
+    cd "$REPO_DIR"
+    run git ls-remote "$UPSTREAM_DIR" refs/heads/feature
+    [[ "$output" == "$foreign"$'\t'refs/heads/feature ]]
 }
 
 # #1020: the guard is an ancestry test, not equality. Close mode tolerates
