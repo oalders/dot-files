@@ -726,6 +726,47 @@ esac
     [ -z "$output" ]
 }
 
+# #1020: the delete must be bound to the SHA the ancestry check validated, via
+# --force-with-lease, so a ref that moves in the gap before the push is rejected
+# server-side instead of blindly deleted. Wrap `git` to record the delete push's
+# arguments (delegating every other call to the real git) and assert the lease
+# names refs/heads/feature at exactly the SHA origin held at check time.
+@test "close: --close binds the remote delete to the checked SHA with --force-with-lease" {
+    _ready_repo
+    setup_feature_worktree
+    unset TMUX
+    stub_command tmux 'exit 0'
+    # Capture origin's feature SHA (== worktree HEAD) with the real git, before
+    # the wrapper is installed, so this lookup isn't itself recorded.
+    local expected_sha real_git
+    expected_sha=$(git rev-parse HEAD)
+    real_git=$(command -v git)
+    # Wrapper: record only the (single) push in close mode — the remote delete —
+    # then hand off to the real git so behavior is otherwise unchanged.
+    stub_command git "
+if [ \"\$1\" = push ]; then
+    printf '%s\n' \"\$*\" >\"\$BATS_TEST_TMPDIR/push-args\"
+fi
+exec $real_git \"\$@\"
+"
+    stub_command gh '
+case "$2" in
+    view) printf "OPEN\tmain\n" ;;
+    close) : >"$BATS_TEST_TMPDIR/close-was-called" ;;
+esac
+'
+
+    run "$MERGE_PR" --close
+    [ "$status" -eq 0 ]
+    [ -e "$BATS_TEST_TMPDIR/push-args" ]
+    [[ "$(cat "$BATS_TEST_TMPDIR/push-args")" == *"--force-with-lease=refs/heads/feature:$expected_sha"* ]]
+    [[ "$(cat "$BATS_TEST_TMPDIR/push-args")" == *"--delete feature"* ]]
+    # The lease matched (no concurrent move), so the delete still went through.
+    cd "$REPO_DIR"
+    run git ls-remote "$UPSTREAM_DIR" refs/heads/feature
+    [ -z "$output" ]
+}
+
 # #966: when merge-pr is run from the MAIN working tree (not a linked
 # worktree), it must still merge and clean up the branch, but skip the
 # worktree-removal step instead of emitting a `fatal:` + failure message.
