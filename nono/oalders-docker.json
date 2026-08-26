@@ -1,7 +1,7 @@
 {
   "meta": {
     "name": "oalders-docker",
-    "description": "Docker CLI mixin: the CLI plugins dir (/usr/libexec/docker/cli-plugins — where `docker compose` and `docker buildx` actually live) plus a narrow read-only slice of ~/.docker (contexts, config.json). No home path is granted for write: buildx state is redirected into the worktree via BUILDX_CONFIG in bin/nn (#1004), so the mixin has no write that outlives the session. The two daemon socket allow_file entries are defensive only: Landlock mediates path open(), not connect(AF_UNIX), so the daemon is reachable from any session regardless of profile. Net-free: image pulls run in the daemon outside the sandbox, so nothing traverses the session proxy."
+    "description": "Docker CLI mixin: the CLI plugins dir (/usr/libexec/docker/cli-plugins — where `docker compose` and `docker buildx` actually live) plus a narrow read-only slice of ~/.docker (contexts, config.json). No home path is granted for write: buildx state is redirected into the worktree via BUILDX_CONFIG in bin/nn (#1004), so the mixin has no write that outlives the session. Reaching the daemon takes two grants that cover different syscalls: allow_file covers open() on the socket node, and unix_socket covers connect(AF_UNIX). The unix_socket entries are load-bearing now that nono default-denies AF_UNIX pathname connects (the mediation that closes #1003) — without them every connect() to /run/docker.sock is blocked. Security tradeoff, accepted: a session that can reach the socket can `docker run --privileged -v /:/host` to host root, so this mixin is a deliberate escape hatch scoped to the sessions that load it, not a global grant. Net-free: image pulls run in the daemon outside the sandbox, so nothing traverses the session proxy."
   },
   "filesystem": {
     "read": [
@@ -12,6 +12,10 @@
       "~/.docker/config.json"
     ],
     "allow_file": [
+      "/run/docker.sock",
+      "/var/run/docker.sock"
+    ],
+    "unix_socket": [
       "/run/docker.sock",
       "/var/run/docker.sock"
     ]
