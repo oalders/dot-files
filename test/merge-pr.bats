@@ -631,6 +631,50 @@ esac
     [ -z "$output" ]
 }
 
+# The delete must be bound to the SHA the ancestry check validated, via
+# --force-with-lease, so a ref that moves in the ls-remote->delete gap is
+# rejected server-side instead of blindly deleted. Wrap `git` to record the
+# (single) push's arguments — delegating every other call to the real git — and
+# assert the lease names refs/heads/feature at exactly the SHA origin held at
+# check time. Guards the lease wiring against silent removal.
+@test "close: --close binds the remote delete to the checked SHA with --force-with-lease" {
+    _ready_repo
+    setup_feature_worktree
+    unset TMUX
+    stub_command tmux 'exit 0'
+    # Capture origin's feature SHA (== worktree HEAD) with the real git, before
+    # the wrapper is installed, so this lookup isn't itself recorded.
+    local expected_sha real_git
+    expected_sha=$(git rev-parse HEAD)
+    real_git=$(command -v git)
+    # Wrapper: record only the (single) push in close mode — the remote delete —
+    # then hand off to the real git so behavior is otherwise unchanged.
+    stub_command git "
+if [ \"\$1\" = push ]; then
+    printf '%s\n' \"\$*\" >\"\$BATS_TEST_TMPDIR/push-args\"
+fi
+exec $real_git \"\$@\"
+"
+    stub_command gh '
+case "$2" in
+    view) printf "OPEN\tmain\n" ;;
+    close) : >"$BATS_TEST_TMPDIR/close-was-called" ;;
+esac
+'
+
+    run "$MERGE_PR" --close
+    [ "$status" -eq 0 ]
+    [ -e "$BATS_TEST_TMPDIR/push-args" ]
+    # Order-independent: assert the lease value and the delete flag, not their
+    # positions (the arg order around --delete is an implementation detail).
+    [[ "$(cat "$BATS_TEST_TMPDIR/push-args")" == *"--force-with-lease=refs/heads/feature:$expected_sha"* ]]
+    [[ "$(cat "$BATS_TEST_TMPDIR/push-args")" == *"--delete"* ]]
+    # The lease matched (no concurrent move), so the delete still went through.
+    cd "$REPO_DIR"
+    run git ls-remote "$UPSTREAM_DIR" refs/heads/feature
+    [ -z "$output" ]
+}
+
 # delete_branch_on_merge normally removes the remote branch before we get
 # here, making the close-mode delete a silent no-op. Simulate that repo by
 # deleting origin/feature first: teardown must still exit 0 without warning.
