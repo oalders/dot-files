@@ -46,7 +46,7 @@ jobs:
         run: sudo chmod -R 777 /var/cache/apt/archives
 
       - name: Cache apt archives
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: /var/cache/apt/archives/*.deb
           key: apt-${{ runner.os }}-${{ hashFiles('installer/linux.sh') }}
