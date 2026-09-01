@@ -46,12 +46,6 @@ else
     repo_root="$(cd "$git_dir/.." && pwd)"
 fi
 
-# shellcheck disable=SC2153
-if [[ $MY_INSIDE_TMUX == true ]]; then
-    echo "Detach from tmux before running this command"
-    exit
-fi
-
 cd "$repo_root" || exit 1
 
 repo_name="$(basename "$repo_root")"
@@ -153,16 +147,21 @@ if [[ -n $(pgrep tmux) ]]; then
     . ~/dot-files/bash_functions.sh
 
     tmux_session_name # exports $SESSION_NAME
-    if [[ -n $(pgrep tmux) ]]; then
-        tmux new -s "$SESSION_NAME" -d
-        # Worktree startup is baked in rather than read from a per-worktree
-        # .tmux-start file: that file was sourced from the checked-out tree, so
-        # an external PR could ship one and get its lines executed here. These
-        # commands live in reviewed code instead.
-        tmux rename-window -t "$SESSION_NAME" claude
-        tmux send-keys -t "$SESSION_NAME" nn Enter
-        tmux attach -t "$SESSION_NAME"
+    tmux new -s "$SESSION_NAME" -d
+    # Worktree startup is baked in rather than read from a per-worktree
+    # .tmux-start file: that file was sourced from the checked-out tree, so
+    # an external PR could ship one and get its lines executed here. These
+    # commands live in reviewed code instead.
+    tmux rename-window -t "$SESSION_NAME" claude
+    tmux send-keys -t "$SESSION_NAME" nn Enter
+    # Attaching from inside tmux would nest sessions, so leave the new session
+    # detached (running nn) and just print its name to switch to on your own
+    # schedule. The source above re-derives MY_INSIDE_TMUX from $TMUX_PANE, so
+    # this reads the ground truth. Outside tmux, attach into it as before.
+    # shellcheck disable=SC2153
+    if [[ $MY_INSIDE_TMUX == true ]]; then
+        echo "Created detached tmux session: $SESSION_NAME (running nn)"
     else
-        tmux new -s "$SESSION_NAME" -d
+        tmux attach -t "$SESSION_NAME"
     fi
 fi

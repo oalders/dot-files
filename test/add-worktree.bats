@@ -10,9 +10,12 @@ setup() {
     HOME="$BATS_TEST_TMPDIR/home"
     mkdir -p "$HOME"
     export HOME
-    # bin/add-worktree refuses to run from inside a tmux session and
-    # tries to start one if tmux is around. Force neither path.
+    # bin/add-worktree starts a tmux session if tmux is around. Default to
+    # tmux being absent (pgrep fails) so most tests never enter that block.
+    # Unset TMUX_PANE so running the suite from inside tmux doesn't leak into
+    # the tmux-block tests, which set it explicitly.
     export MY_INSIDE_TMUX=false
+    unset TMUX_PANE
     stub_command pgrep 'exit 1'
     # Tests use generic branch names so the fix-/gh- branches that call
     # `gh issue edit` / `gh pr checkout` aren't exercised; stub anyway.
@@ -285,6 +288,50 @@ exit 0'
     worktree="$HOME/.worktree/$repo_name/$date_stamp/feature-branch"
 
     [ -d "$worktree" ]
+}
+
+# Stand up the tmux-block dependencies: pretend tmux is running, record every
+# tmux invocation, and provide a minimal ~/dot-files/bash_functions.sh (HOME is
+# the sandbox) since the script sources it. The stand-in mirrors the real
+# detect_posh_settings, deriving MY_INSIDE_TMUX from $TMUX_PANE.
+_stub_tmux_env() {
+    mkdir -p "$HOME/dot-files"
+    cat >"$HOME/dot-files/bash_functions.sh" <<'EOF'
+if test "${TMUX_PANE+x}"; then MY_INSIDE_TMUX=true; else MY_INSIDE_TMUX=false; fi
+export MY_INSIDE_TMUX
+tmux_session_name() { SESSION_NAME="test-session"; export SESSION_NAME; }
+EOF
+    export TMUX_LOG="$BATS_TEST_TMPDIR/tmux.log"
+    stub_command pgrep 'echo 123' # pretend tmux is running
+    stub_command tmux 'printf "%s\n" "$*" >>"$TMUX_LOG"'
+}
+
+@test "add-worktree creates a detached session but does not attach when inside tmux" {
+    setup_git_repo
+    _stub_tmux_env
+    export TMUX_PANE="%0" # inside tmux
+
+    run "$ADD_WORKTREE" feature-branch
+    [ "$status" -eq 0 ]
+
+    # It sets up the session and starts nn, but must NOT attach (that nests).
+    grep -q "new -s" "$TMUX_LOG"
+    grep -q "rename-window" "$TMUX_LOG"
+    grep -q "send-keys" "$TMUX_LOG"
+    ! grep -q "attach" "$TMUX_LOG"
+    # And it prints the session name so you can switch to it later.
+    [[ "$output" == *"test-session"* ]]
+}
+
+@test "add-worktree attaches to the new session when not inside tmux" {
+    setup_git_repo
+    _stub_tmux_env
+    # TMUX_PANE unset (from setup) -> MY_INSIDE_TMUX=false via the sourced stub.
+
+    run "$ADD_WORKTREE" feature-branch
+    [ "$status" -eq 0 ]
+
+    grep -q "attach -t" "$TMUX_LOG"
 }
 
 @test "add-worktree queues nothing for non-fix branches" {
