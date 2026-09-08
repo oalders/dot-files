@@ -147,7 +147,9 @@ Added for Linux:
 
 `oalders-net.json` sets `"network_profile": null` and lists outbound rules as an explicit `allow_domain` set (Anthropic, GitHub, npm, Go module proxy) instead of the curated `claude-code` bundle. That bundle's reverse proxy hard-rejects Max/OAuth users (no API key → `407`), despite a misleading "proceeds without credential injection" warning. **Do not restore the curated bundle without re-testing** — the reject returns.
 
-Why the bundle rejects, the re-test command to run on each nono release, and the upstream issues to watch: [docs/nono/network-profile-null.md](../docs/nono/network-profile-null.md).
+Because the proxy is then default-deny, `allow_domain` must list every OAuth host too: Claude 2.1.x refreshes at `platform.claude.com/v1/oauth/token`, so `*.claude.com` + `claude.com` are load-bearing — dropping them makes the sandbox silently fail to refresh (session shows "logged out" ~every 6–8h until host-Claude heals it).
+
+Why the bundle rejects, the OAuth-host requirement, the re-test command to run on each nono release, and the upstream issues to watch: [docs/nono/network-profile-null.md](../docs/nono/network-profile-null.md).
 
 ## superpowers-chrome (full Chrome) under the sandbox
 

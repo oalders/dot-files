@@ -29,6 +29,25 @@ While `network_profile` is null, the `NO_PROXY` reset in `bin/nn` is vestigial
 (no proxy is started) but harmless — it re-becomes load-bearing the moment the
 curated bundle is restored.
 
+## OAuth auth hosts must stay in `allow_domain`
+
+Once `network_profile` is null, nono's proxy is default-deny, so the
+`allow_domain` list must include every host Claude's OAuth flow touches — not
+just `api.anthropic.com`. Claude Code 2.1.x refreshes the token at
+`POST https://platform.claude.com/v1/oauth/token` (authorize on
+`platform.claude.com` / `claude.com`). `*.claude.com` + `claude.com` cover this.
+
+If they are missing, the running sandbox can't refresh: the access token expires
+(~6–8h), the session shows "logged out" while a still-valid refresh token sits on
+disk, and opening host-Claude (full outbound) refreshes and heals the sandbox via
+`~/.claude/.credentials.json` with no restart. The allowlist predated the move off
+`console.anthropic.com` / `claude.ai`, so a Claude upgrade silently relocated the
+auth host. On each Claude upgrade, re-check the endpoint and keep it allowed:
+
+```sh
+strings ~/.local/share/claude/versions/* | grep -oE 'https://[a-z.]+/v1/oauth/token' | sort -u
+```
+
 ## Upstream to watch
 
 - <https://github.com/always-further/nono/issues/793> — exec-sourced credentials
