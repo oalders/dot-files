@@ -21,6 +21,7 @@ set -x
 
 if ! is there apt; then
     sudo dnf install -y -q \
+        bubblewrap \
         chafa \
         cpanminus \
         curl \
@@ -39,6 +40,7 @@ else
     debounce 12 h sudo apt-get update -q
 
     packages=(
+        bubblewrap
         build-essential
         chafa
         cpanminus

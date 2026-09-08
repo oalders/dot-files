@@ -56,6 +56,7 @@ run_general_installers() {
         ./configure/vim.sh
         ./configure/tmux.sh
         ./installer/npm.sh
+        ./installer/codex.sh
         ./installer/cpan.sh
         ./installer/cargo.sh
         ./installer/imgcat.sh
