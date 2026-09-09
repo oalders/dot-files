@@ -5,14 +5,20 @@ set -eu -o pipefail
 # Parse nn-specific flags out of $@ before forwarding the rest to claude.
 # --chrome enables the superpowers-chrome MCP for this session only.
 # --playwright force-enables the playwright MCP regardless of e2e/ markers.
-# --clodhopper wires clodhopper's hooks into .claude/settings.local.json
-# (gitignored) for this session, so shared project repos stay clean.
+# --clodhopper / --no-clodhopper control clodhopper's session-observability
+# hooks (wired into .claude/settings.local.json, gitignored, so shared repos
+# stay clean). Wiring is ON by default: a plain nn run wires it unless
+# clodhopper already fires (committed settings.json or an existing
+# settings.local.json — see the block below) or clodhopper isn't installed.
+# --clodhopper forces the wiring; --no-clodhopper (or CLODHOPPER_DISABLED=1)
+# skips it and wins if both flags are passed.
 # --profile <name|path> overrides profile discovery entirely: an existing
 # file is resolved to an absolute path, anything else is passed through as
 # a profile name for nono's ~/.config/nono/profiles lookup.
 chrome_enabled=0
 playwright_forced=0
 clodhopper_enabled=0
+clodhopper_disabled=0
 profile_override=""
 forwarded_args=()
 while [[ $# -gt 0 ]]; do
@@ -20,6 +26,7 @@ while [[ $# -gt 0 ]]; do
         --chrome) chrome_enabled=1 ;;
         --playwright) playwright_forced=1 ;;
         --clodhopper) clodhopper_enabled=1 ;;
+        --no-clodhopper) clodhopper_disabled=1 ;;
         --profile)
             [[ $# -ge 2 && -n "$2" ]] || {
                 echo "nn: --profile requires a value" >&2
@@ -419,16 +426,37 @@ if [[ -f $profile ]] && jq -e '[.extends] | flatten | any(. == "oalders-docker")
     echo "🗯️nn: docker mixin — BUILDX_CONFIG=$buildx_config" >&2
 fi
 
-# Opt-in clodhopper wiring. clodhopper init --local writes the hooks into
-# .claude/settings.local.json (gitignored). --settings adds a settings source;
-# it doesn't replace the project hierarchy, so claude still loads
-# settings.local.json alongside it. Runs outside the sandbox, same as the rest
-# of this setup, so it can write under cwd freely. Failing here aborts the
-# launch (set -e) by design: --clodhopper is an explicit opt-in for session
-# observability, so a wiring failure should surface, not silently launch
-# unwired.
-if ((clodhopper_enabled)); then
+# clodhopper session-observability wiring, ON by default. clodhopper init
+# --local writes the hooks into .claude/settings.local.json (gitignored).
+# --settings adds a settings source; it doesn't replace the project hierarchy,
+# so claude still loads settings.local.json alongside it. Runs outside the
+# sandbox, same as the rest of this setup, so it can write under cwd freely.
+#
+# Precedence: opt-out ▸ explicit force ▸ already-wired skip ▸ default-on.
+#   - --no-clodhopper / CLODHOPPER_DISABLED=1: skip (opt-out wins over --clodhopper).
+#   - --clodhopper: force. Unguarded, so a wiring failure aborts the launch
+#     (set -e) rather than silently launching unwired — an explicit request
+#     should surface its failure.
+#   - already wired: skip. init --local only inspects the file it writes, so on
+#     a repo that commits the hooks into settings.json it would append a full
+#     duplicate set and ingest would fire twice per event. The skip also avoids
+#     a redundant (idempotent) rewrite when settings.local.json already has them.
+#   - default: wire, but only when clodhopper is installed, so a machine without
+#     it gets a silent no-op each launch instead of a set -e abort.
+clodhopper_wired() {
+    grep -Fq "clodhopper ingest" "$1/.claude/settings.json" 2>/dev/null && return 0
+    grep -Fq "clodhopper ingest" "$1/.claude/settings.local.json" 2>/dev/null && return 0
+    return 1
+}
+if ((clodhopper_disabled)) || [[ ${CLODHOPPER_DISABLED-} == 1 ]]; then
+    : # opted out for this session
+elif ((clodhopper_enabled)); then
     echo "🗯️nn: wiring clodhopper into .claude/settings.local.json" >&2
+    clodhopper init --local
+elif clodhopper_wired "$project_root"; then
+    : # already firing (committed settings.json or existing local) — no double-wire
+elif command -v clodhopper >/dev/null 2>&1; then
+    echo "🗯️nn: wiring clodhopper into .claude/settings.local.json (default; --no-clodhopper to skip)" >&2
     clodhopper init --local
 fi
 

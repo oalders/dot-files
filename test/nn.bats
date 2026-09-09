@@ -24,6 +24,11 @@ setup() {
     # tests non-hermetic). The Hugo-over-tailscale test overrides tailscale.
     stub_command tailscale 'exit 0'
     stub_command ip 'exit 0'
+    # clodhopper wiring is ON by default, so every nn launch now shells out to
+    # clodhopper; stub it to a no-op so the suite stays hermetic regardless of
+    # whether the real binary is installed. Tests that assert on wiring override
+    # this with a recording stub.
+    stub_command clodhopper 'true'
     # Clean cwd outside any git work tree.
     mkdir -p "$BATS_TEST_TMPDIR/work"
     cd "$BATS_TEST_TMPDIR/work"
@@ -101,9 +106,66 @@ STUB
     grep -Fxq -- "--resume" "$BATS_TEST_TMPDIR/nono-argv"
 }
 
-@test "bin/nn does not run clodhopper without the flag" {
-    # If clodhopper were invoked, this stub would fail the test by exiting 1.
-    stub_command clodhopper 'echo "clodhopper should not run" >&2; exit 1'
+@test "bin/nn wires clodhopper by default without any flag" {
+    # Wiring is ON by default: a plain launch runs clodhopper init --local so
+    # sessions report to the observability roster without remembering the flag.
+    stub_command clodhopper 'printf "%s\n" "$@" > "$BATS_TEST_TMPDIR/clodhopper-argv"'
+    run "$NN"
+    [ "$status" -eq 0 ]
+    [ -f "$BATS_TEST_TMPDIR/clodhopper-argv" ]
+    grep -Fxq -- "init" "$BATS_TEST_TMPDIR/clodhopper-argv"
+    grep -Fxq -- "--local" "$BATS_TEST_TMPDIR/clodhopper-argv"
+}
+
+@test "bin/nn --no-clodhopper skips wiring" {
+    stub_command clodhopper 'printf "%s\n" "$@" > "$BATS_TEST_TMPDIR/clodhopper-argv"'
+    run "$NN" --no-clodhopper
+    [ "$status" -eq 0 ]
+    [ ! -f "$BATS_TEST_TMPDIR/clodhopper-argv" ]
+}
+
+@test "bin/nn --no-clodhopper overrides --clodhopper" {
+    # Opt-out wins over the explicit force when both flags are passed.
+    stub_command clodhopper 'printf "%s\n" "$@" > "$BATS_TEST_TMPDIR/clodhopper-argv"'
+    run "$NN" --clodhopper --no-clodhopper
+    [ "$status" -eq 0 ]
+    [ ! -f "$BATS_TEST_TMPDIR/clodhopper-argv" ]
+}
+
+@test "bin/nn skips wiring when CLODHOPPER_DISABLED=1" {
+    stub_command clodhopper 'printf "%s\n" "$@" > "$BATS_TEST_TMPDIR/clodhopper-argv"'
+    export CLODHOPPER_DISABLED=1
+    run "$NN"
+    [ "$status" -eq 0 ]
+    [ ! -f "$BATS_TEST_TMPDIR/clodhopper-argv" ]
+}
+
+@test "bin/nn --no-clodhopper is consumed, not forwarded to claude" {
+    stub_command clodhopper 'true'
+    run "$NN" --no-clodhopper --resume
+    [ "$status" -eq 0 ]
+    ! grep -Fxq -- "--no-clodhopper" "$BATS_TEST_TMPDIR/nono-argv"
+    grep -Fxq -- "--resume" "$BATS_TEST_TMPDIR/nono-argv"
+}
+
+@test "bin/nn skips default wiring when settings.json already wires clodhopper" {
+    # A repo that commits the hooks into .claude/settings.json (clodhopper init
+    # --project) already fires ingest; init --local would append a full
+    # duplicate set and double-fire, so default-on must detect and skip it.
+    stub_command clodhopper 'printf "%s\n" "$@" > "$BATS_TEST_TMPDIR/clodhopper-argv"'
+    mkdir -p .claude
+    printf '{"PreToolUse":[{"hooks":[{"command":"clodhopper ingest --source-app x"}]}]}\n' >.claude/settings.json
+    run "$NN"
+    [ "$status" -eq 0 ]
+    [ ! -f "$BATS_TEST_TMPDIR/clodhopper-argv" ]
+}
+
+@test "bin/nn skips default wiring when settings.local.json already wires clodhopper" {
+    # Idempotent skip: init --local would be a no-op if the local settings
+    # already hold the hooks, so skip it and keep the launch quiet.
+    stub_command clodhopper 'printf "%s\n" "$@" > "$BATS_TEST_TMPDIR/clodhopper-argv"'
+    mkdir -p .claude
+    printf '{"PreToolUse":[{"hooks":[{"command":"clodhopper ingest --source-app x"}]}]}\n' >.claude/settings.local.json
     run "$NN"
     [ "$status" -eq 0 ]
     [ ! -f "$BATS_TEST_TMPDIR/clodhopper-argv" ]
