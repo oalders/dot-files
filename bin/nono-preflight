@@ -29,6 +29,15 @@ set -eu -o pipefail
 
 profile="${1:-}"
 
+# Linux-only premise. Landlock is a Linux kernel feature; on macOS (and any
+# other non-Linux host) `nono why --scope signal` reports Supported: false
+# simply because Landlock doesn't exist there — not because the kernel is an
+# old pre-V6 Linux. Without this guard that false reading trips the V4/V6 check
+# below and blocks the launch with a nonsensical "kernel too old / Landlock V4"
+# message quoting the Darwin uname. The whole check only makes sense on Linux,
+# so fail open everywhere else (and if `is` is unavailable, that too fails open).
+is os name eq linux || exit 0
+
 # No profile / no nono: nothing to probe, and a missing nono fails the launch
 # for an obvious reason anyway. Fail open.
 [[ -n $profile ]] || exit 0
