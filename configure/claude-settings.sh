@@ -44,6 +44,23 @@ set_key() {
     echo "set $key=$value in $SETTINGS"
 }
 
+# Like set_key, but for a key nested one level under a top-level object (e.g.
+# .attribution.sessionUrl). Merges into the parent object so sibling keys the
+# user set themselves survive rather than being clobbered.
+set_nested_key() {
+    local parent=$1 key=$2 value=$3
+
+    if jq -e --arg p "$parent" --arg k "$key" --argjson v "$value" \
+        '.[$p][$k] == $v' "$SETTINGS" >/dev/null; then
+        return
+    fi
+
+    jq --arg p "$parent" --arg k "$key" --argjson v "$value" \
+        '.[$p][$k] = $v' "$SETTINGS" >"$SETTINGS.tmp"
+    mv "$SETTINGS.tmp" "$SETTINGS"
+    echo "set $parent.$key=$value in $SETTINGS"
+}
+
 # Pin the claude binary; installer/claude.sh owns which version we land on.
 set_env_key DISABLE_AUTOUPDATER 1
 
@@ -89,3 +106,8 @@ set_key model '"claude-opus-4-8"'
 # CLAUDE_CODE_EFFORT_LEVEL override for a single session. Accepts
 # low/medium/high/xhigh (no "max").
 set_key effortLevel '"medium"'
+
+# Drop the Claude-Session URL trailer from commit messages. This zeroes out only
+# the session link; the Co-Authored-By trailer (default-on, not stored here)
+# stays. attribution.* is the current key -- includeCoAuthoredBy is deprecated.
+set_nested_key attribution sessionUrl false
