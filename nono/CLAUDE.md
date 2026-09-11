@@ -160,12 +160,6 @@ The `superpowers-chrome` MCP (opt-in via `nn --chrome`) drives the **full** Goog
 
 Details (why crashpad flags don't help, exact symptoms, the Chrome-for-Testing switch): [docs/nono/chrome-under-the-sandbox.md](../docs/nono/chrome-under-the-sandbox.md).
 
-### Chromium's ProcessSingleton socket bind
-
-Chromium `bind()`s an AF_UNIX `SingletonSocket` in its user-data-dir on startup; nono blocks all `bind()` by default, so a bundled-chromium `launch()` dies with an opaque `Target page, context or browser has been closed` and no hint the cause is a socket grant (#1047). The Playwright MCP's `bin/npx` wrapper points the browser `TMPDIR` at `/tmp/claude-1000/pw-mcp`, so `oalders-playwright` grants `unix_socket_subtree_bind` on exactly that base — recursive because the `org.chromium.Chromium.XXXX` leaf is randomized per launch. Kept pinned to the pw-mcp subdir, **not** all of `/tmp`: a `/tmp`-wide bind would reach the tmux control socket and other sessions' scratch. No crashpad grant is needed here — bundled chromium's crashpad DB lives inside the ephemeral profile under the same base.
-
-The full-Chrome `--chrome` path launches with a `~/.cache/superpowers` profile (already granted rw), so if it ever needs the same grant the socket would land there — deliberately **not** added while `nn --chrome` starts fine (the crashpad fix already gets it past startup); if it begins failing to launch, add a matching `unix_socket_subtree_bind` on `~/.cache/superpowers` (#1047).
-
 ### Ports `bin/nn` opens
 
 Every non-default grant uses repeated `nono run --open-port` (localhost connect + listen), scoped so idle sandboxes keep the port closed. Rationale for each — the name-only `extends` limit that forces the CLI flag, and per-feature scoping — is in [docs/nono/chrome-under-the-sandbox.md](../docs/nono/chrome-under-the-sandbox.md).
@@ -176,6 +170,12 @@ Every non-default grant uses repeated `nono run --open-port` (localhost connect 
 | `9222` | `--chrome` | Chrome DevTools endpoint (`CHROME_WS_PORT=9222`) the superpowers-chrome MCP drives |
 | `9323`–`9342` | `playwright_enabled` (e2e markers or `--playwright`) | Playwright HTML report / trace viewer (`9323`) + preview / `webServer` (`9324`–`9342`); serve within this range |
 | `1313`–`1316` | Hugo detected **and** host has a tailscale IPv4 | `hugo server` bound to `$TAILSCALE_IP` (also exported), reachable over the tailnet |
+
+## Chromium's ProcessSingleton socket bind
+
+Chromium `bind()`s an AF_UNIX `SingletonSocket` in its user-data-dir on startup; nono blocks all `bind()` by default, so a bundled-chromium `launch()` dies with an opaque `Target page, context or browser has been closed` and no hint the cause is a socket grant (#1047). The Playwright MCP's `bin/npx` wrapper points the browser `TMPDIR` at `/tmp/claude-1000/pw-mcp` (the same short base as the `Socket path too long` fix above, one level down at `pw-mcp`), so `oalders-playwright` grants `unix_socket_subtree_bind` on exactly that base — recursive because the `org.chromium.Chromium.XXXX` leaf is randomized per launch. UID 1000 hardcoded, as in the `/tmp/claude-1000` grant above — bump if the account's UID ever changes. Kept pinned to the pw-mcp subdir, **not** all of `/tmp`: a `/tmp`-wide bind would reach the tmux control socket and other sessions' scratch. No crashpad grant is needed here — bundled chromium's crashpad DB lives inside the ephemeral profile under the same base.
+
+The full-Chrome `--chrome` path launches with a `~/.cache/superpowers` profile (already granted rw), so if it ever needs the same grant the socket would land there — deliberately **not** added while `nn --chrome` starts fine (the crashpad fix already gets it past startup). Symptom TBD: the `bind()`-denied failure has not been observed with full Chrome (unlike the bundled build's `Target page ... closed`), so if `nn --chrome` starts failing to launch, suspect the singleton bind and add a matching `unix_socket_subtree_bind` on `~/.cache/superpowers` (#1047).
 
 ## Kernel requirement
 
