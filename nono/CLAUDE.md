@@ -41,7 +41,7 @@ These are global infrastructure — MCP servers Claude relies on, and their runt
 | ------------------- | -------------------------------------------------------------------------------------- |
 | `oalders-uv`        | `~/.local/share/uv` (uv runtime — used by `uvx` and `uv tool install`). Net-free; PyPI domains live in `oalders-net`. |
 | `oalders-serena`    | `~/.serena` (serena MCP config/logs/memories)                                          |
-| `oalders-playwright`| `~/.cache/ms-playwright` (host Chromium bundle, **read-only**), `/dev/shm` (browser IPC). `bin/nn` sets `PLAYWRIGHT_BROWSERS_PATH` so every worktree and the in-sandbox MCP share the one bundle instead of re-downloading ~265 MB each (#975). Read-only so a session executes browsers but can never poison the shared bundle; seeded/updated on the host by `installer/playwright-mcp.sh`, kept in step with the versions projects pin — an accepted manual task on this single-user box, not something to automate. An in-sandbox `playwright install` for an unseeded build fails loudly against the read-only path — the cue to refresh on the host. Net-free; CDN hosts live in the paired `oalders-playwright-net`. |
+| `oalders-playwright`| `~/.cache/ms-playwright` (host Chromium bundle, **read-only**), `/dev/shm` (browser IPC), `unix_socket_subtree_bind` on `/tmp/claude-1000/pw-mcp` (Chromium's ProcessSingleton bind — see below). `bin/nn` sets `PLAYWRIGHT_BROWSERS_PATH` so every worktree and the in-sandbox MCP share the one bundle instead of re-downloading ~265 MB each (#975). Read-only so a session executes browsers but can never poison the shared bundle; seeded/updated on the host by `installer/playwright-mcp.sh`, kept in step with the versions projects pin — an accepted manual task on this single-user box, not something to automate. An in-sandbox `playwright install` for an unseeded build fails loudly against the read-only path — the cue to refresh on the host. Net-free; CDN hosts live in the paired `oalders-playwright-net`. |
 | `oalders-chrome`    | `/opt/google/chrome` (browser binary), `~/.cache/superpowers` (browser session dirs), `~/.config/google-chrome/Crash Reports` (crashpad database — grant + `bypass_protection`; see "superpowers-chrome (full Chrome) under the sandbox") |
 
 ### Project-detected (mixed in by `nn`)
@@ -159,6 +159,12 @@ The `superpowers-chrome` MCP (opt-in via `nn --chrome`) drives the **full** Goog
 - **`Socket path too long`.** In a deep worktree, Chromium's `SingletonSocket` under `TMPDIR=$PWD/.tmp` overruns the ~108-char `sun_path` limit. The `bin/npx` wrapper redirects **just the browser's** `TMPDIR` to the short `/tmp/claude-<uid>` base.
 
 Details (why crashpad flags don't help, exact symptoms, the Chrome-for-Testing switch): [docs/nono/chrome-under-the-sandbox.md](../docs/nono/chrome-under-the-sandbox.md).
+
+### Chromium's ProcessSingleton socket bind
+
+Chromium `bind()`s an AF_UNIX `SingletonSocket` in its user-data-dir on startup; nono blocks all `bind()` by default, so a bundled-chromium `launch()` dies with an opaque `Target page, context or browser has been closed` and no hint the cause is a socket grant (#1047). The Playwright MCP's `bin/npx` wrapper points the browser `TMPDIR` at `/tmp/claude-1000/pw-mcp`, so `oalders-playwright` grants `unix_socket_subtree_bind` on exactly that base — recursive because the `org.chromium.Chromium.XXXX` leaf is randomized per launch. Kept pinned to the pw-mcp subdir, **not** all of `/tmp`: a `/tmp`-wide bind would reach the tmux control socket and other sessions' scratch. No crashpad grant is needed here — bundled chromium's crashpad DB lives inside the ephemeral profile under the same base.
+
+The full-Chrome `--chrome` path launches with a `~/.cache/superpowers` profile (already granted rw), so if it ever needs the same grant the socket would land there — deliberately **not** added while `nn --chrome` starts fine (the crashpad fix already gets it past startup); if it begins failing to launch, add a matching `unix_socket_subtree_bind` on `~/.cache/superpowers` (#1047).
 
 ### Ports `bin/nn` opens
 
