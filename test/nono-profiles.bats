@@ -39,6 +39,37 @@ SYMLINKS="$SCRIPT_DIR/installer/symlinks.sh"
     [ "$status" -ne 0 ]
 }
 
+# Chromium's ProcessSingleton must bind() an AF_UNIX socket in its user-data-dir
+# on startup; nono blocks all bind() by default, so a bundled-chromium launch()
+# dies with an opaque "Target ... has been closed" (#1047). The Playwright MCP's
+# npx wrapper (installer/playwright-mcp.sh) points the browser TMPDIR at the short
+# /tmp/claude-1000/pw-mcp base (sun_path limit), so that's where the socket lands.
+@test "oalders-playwright.json grants the ProcessSingleton socket-bind on the pw-mcp base" {
+    run jq empty "$NONO_DIR/oalders-playwright.json"
+    [ "$status" -eq 0 ]
+    run jq -e '.filesystem.unix_socket_subtree_bind | index("/tmp/claude-1000/pw-mcp")' \
+        "$NONO_DIR/oalders-playwright.json"
+    [ "$status" -eq 0 ]
+}
+
+# The bind grant must stay pinned to the pw-mcp subdir. Widening to /tmp (as the
+# issue's simple variant proposed) or to the shared /tmp/claude-1000 base would
+# let a sandboxed process bind sockets across paths other sessions and the tmux
+# control socket live under -- exactly the widening every guard here rejects (#1047).
+@test "oalders-playwright.json keeps the socket-bind narrow (not /tmp or the shared base)" {
+    run jq empty "$NONO_DIR/oalders-playwright.json"
+    [ "$status" -eq 0 ]
+    run jq -e '
+        [.filesystem.unix_socket_bind[]?,
+         .filesystem.unix_socket_subtree_bind[]?,
+         .filesystem.unix_socket_dir_bind[]?]
+        | map(sub("/$"; ""))
+        | any(. == "/tmp" or . == "/tmp/claude-1000")
+    ' "$NONO_DIR/oalders-playwright.json"
+    # jq -e exits non-zero when the result is false/null: that is the pass.
+    [ "$status" -ne 0 ]
+}
+
 @test "oalders.json extends oalders-playwright-net" {
     run grep -Fq '"oalders-playwright-net"' "$NONO_DIR/oalders.json"
     [ "$status" -eq 0 ]
@@ -55,6 +86,25 @@ SYMLINKS="$SCRIPT_DIR/installer/symlinks.sh"
             false
         }
     done
+}
+
+# The only traffic to storage.googleapis.com is the signed GET that cdn.playwright.dev
+# 307-redirects the chromium download to, so it's scoped to GET/HEAD (nono's
+# AllowDomainWithEndpoints object form) to drop it as an upload vector at zero
+# functional cost (#1047). This guards against a revert to the bare-string form
+# (which allows every method) or a widening that re-adds a mutating verb.
+@test "oalders-playwright-net.json scopes storage.googleapis.com to GET/HEAD only" {
+    run jq empty "$NONO_DIR/oalders-playwright-net.json"
+    [ "$status" -eq 0 ]
+    run jq -e '
+        [.network.allow_domain[]
+         | select((type == "object" and .domain == "storage.googleapis.com")
+                  or (type == "string" and . == "storage.googleapis.com"))] as $m
+        | ($m | length) == 1
+          and ($m[0] | type) == "object"
+          and (($m[0].endpoints | map(.method) | unique | sort) == ["GET", "HEAD"])
+    ' "$NONO_DIR/oalders-playwright-net.json"
+    [ "$status" -eq 0 ]
 }
 
 # Full Chrome writes its crash database to ~/.config/google-chrome/Crash

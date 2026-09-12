@@ -1,7 +1,7 @@
 {
   "meta": {
     "name": "oalders-playwright",
-    "description": "Playwright: read-only shared host Chromium bundle and browser IPC shared-memory"
+    "description": "Playwright: read-only shared host Chromium bundle, browser IPC shared-memory, and the Chromium ProcessSingleton AF_UNIX socket bind under the MCP's short TMPDIR base (/tmp/claude-1000/pw-mcp, set by the installer/playwright-mcp.sh npx wrapper; nono blocks bind() by default, so a bundled-chromium launch dies without it)"
   },
   "filesystem": {
     "read": [
@@ -9,6 +9,9 @@
     ],
     "allow": [
       "/dev/shm"
+    ],
+    "unix_socket_subtree_bind": [
+      "/tmp/claude-1000/pw-mcp"
     ]
   }
 }
