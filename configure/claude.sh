@@ -13,17 +13,17 @@ claude plugin marketplace add anthropics/claude-plugins-official
 claude plugin marketplace add oalders/talk-about-us
 claude plugin marketplace add oalders/kitchen-sink
 
-claude plugin install superpowers@superpowers-marketplace
-claude plugin install superpowers-chrome@superpowers-marketplace
-claude plugin install superpowers-lab@superpowers-marketplace
-claude plugin install elements-of-style@superpowers-marketplace
-claude plugin install superpowers-developing-for-claude-code@superpowers-marketplace
 claude plugin install commit-commands@claude-plugins-official
+claude plugin install elements-of-style@superpowers-marketplace
 claude plugin install frontend-design@claude-plugins-official
 claude plugin install gopls-lsp@claude-plugins-official
+claude plugin install kitchen-sink@kitchen-sink
 claude plugin install playwright@claude-plugins-official
 claude plugin install pr-review-toolkit@claude-plugins-official
 claude plugin install serena@claude-plugins-official
-claude plugin install typescript-lsp@claude-plugins-official
+claude plugin install superpowers@superpowers-marketplace
+claude plugin install superpowers-chrome@superpowers-marketplace
+claude plugin install superpowers-developing-for-claude-code@superpowers-marketplace
+claude plugin install superpowers-lab@superpowers-marketplace
 claude plugin install talk-about-us@talk-about-us
-claude plugin install kitchen-sink@kitchen-sink
+claude plugin install typescript-lsp@claude-plugins-official
