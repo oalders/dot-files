@@ -4,7 +4,7 @@ set -eu -o pipefail
 
 usage() {
     cat <<'EOF'
-Usage: merge-pr [-f|--force] [--close] [gh pr merge/close args...]
+Usage: merge-pr [-f|--force] [--close] [--punt] [gh pr merge/close args...]
 
 Merges the current branch's PR via `gh pr merge`, then removes the
 worktree, deletes the local branch, and kills the tmux session for the
@@ -24,6 +24,13 @@ Options:
                 branch is abandoned. Extra args pass through to
                 `gh pr close`. Teardown still runs if the PR is already
                 MERGED/CLOSED or no PR exists.
+  --punt        Tear down the worktree, local branch, and tmux session but
+                leave the PR OPEN and the remote branch in place, so the work
+                can be revisited later (re-create a worktree from
+                origin/<branch>). Does not run `gh pr merge`/`gh pr close`.
+                Unlike --close, keeps the unpushed-commits pre-flight so
+                nothing revisitable is lost. Mutually exclusive with --close.
+                Requires an existing PR.
 
 Refuses:
   --auto, --auto-merge   gh pr merge would exit 0 while the PR stays
@@ -34,11 +41,12 @@ Refuses:
 EOF
 }
 
-# Parse our own --force/-f and --close from anywhere in the argument list.
-# Refuse --auto / --auto-merge. --close and -f/--force are consumed here and
-# must NOT be forwarded to gh; everything else passes through in gh_args.
+# Parse our own --force/-f, --close, and --punt from anywhere in the argument
+# list. Refuse --auto / --auto-merge. These flags are consumed here and must
+# NOT be forwarded to gh; everything else passes through in gh_args.
 force=""
 close_mode=""
+punt_mode=""
 gh_args=()
 for arg in "$@"; do
     case "$arg" in
@@ -47,6 +55,9 @@ for arg in "$@"; do
             ;;
         --close)
             close_mode="1"
+            ;;
+        --punt)
+            punt_mode="1"
             ;;
         --auto | --auto-merge)
             echo "merge-pr: refusing $arg — cleanup would run before the merge completes" >&2
@@ -61,6 +72,15 @@ for arg in "$@"; do
             ;;
     esac
 done
+
+# Post-loop, not an in-loop arm: the loop sets close_mode/punt_mode one at a
+# time in argument order, so neither arm can see the other flag reliably. If
+# both survived, the remote-delete block (gated on close_mode alone) would
+# delete origin/<branch> — exactly what --punt promises to keep.
+if [[ -n "$punt_mode" && -n "$close_mode" ]]; then
+    echo "merge-pr: refusing --punt with --close — they are mutually exclusive" >&2
+    exit 2
+fi
 
 # Pre-flight: must be inside a git work tree.
 if ! git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
@@ -262,45 +282,56 @@ fi
 # is refused. Skipped entirely when there's no PR (close mode, `no_pr`) —
 # there's nothing to act on, only teardown remains.
 if [[ -z "$no_pr" ]]; then
-    case "$pr_state" in
-        OPEN)
-            if [[ -n "$close_mode" ]]; then
-                # Unlike `gh pr merge`, `gh pr close` has no implicit
-                # current-branch detection — its positional PR arg is
-                # required — so pass "$branch" explicitly. Any extra
-                # positional/flag args still pass through after it.
-                gh pr close "$branch" "${gh_args[@]}"
-            else
-                gh pr merge "${gh_args[@]}"
-            fi
-            ;;
-        MERGED)
-            if [[ -n "$close_mode" ]]; then
-                # Closing a merged PR is a no-op, but the rest of --close's
-                # teardown is still wanted — skip just the remote action and
-                # fall through rather than making the user re-run bare merge-pr.
-                # Any extra gh_args have no consumer here and are silently
-                # ignored, as in merge mode.
-                echo "merge-pr: PR already MERGED — closing is a no-op, proceeding to cleanup"
-            else
-                echo "merge-pr: PR already MERGED — proceeding to cleanup"
-            fi
-            ;;
-        CLOSED)
-            # Only meaningful in close mode; in merge mode this falls through
-            # to the `*` refusal below (preserving the existing message).
-            if [[ -n "$close_mode" ]]; then
-                echo "merge-pr: PR already CLOSED — proceeding to cleanup"
-            else
+    if [[ -n "$punt_mode" ]]; then
+        # --punt leaves the PR untouched in every state (no gh call, no remote
+        # delete). State-aware wording so we never assert "OPEN" for a
+        # MERGED/CLOSED PR.
+        if [[ "$pr_state" == "OPEN" ]]; then
+            echo "merge-pr: leaving PR OPEN (--punt) — proceeding to cleanup"
+        else
+            echo "merge-pr: leaving PR ($pr_state) untouched (--punt) — proceeding to cleanup"
+        fi
+    else
+        case "$pr_state" in
+            OPEN)
+                if [[ -n "$close_mode" ]]; then
+                    # Unlike `gh pr merge`, `gh pr close` has no implicit
+                    # current-branch detection — its positional PR arg is
+                    # required — so pass "$branch" explicitly. Any extra
+                    # positional/flag args still pass through after it.
+                    gh pr close "$branch" "${gh_args[@]}"
+                else
+                    gh pr merge "${gh_args[@]}"
+                fi
+                ;;
+            MERGED)
+                if [[ -n "$close_mode" ]]; then
+                    # Closing a merged PR is a no-op, but the rest of --close's
+                    # teardown is still wanted — skip just the remote action and
+                    # fall through rather than making the user re-run bare merge-pr.
+                    # Any extra gh_args have no consumer here and are silently
+                    # ignored, as in merge mode.
+                    echo "merge-pr: PR already MERGED — closing is a no-op, proceeding to cleanup"
+                else
+                    echo "merge-pr: PR already MERGED — proceeding to cleanup"
+                fi
+                ;;
+            CLOSED)
+                # Only meaningful in close mode; in merge mode this falls through
+                # to the `*` refusal below (preserving the existing message).
+                if [[ -n "$close_mode" ]]; then
+                    echo "merge-pr: PR already CLOSED — proceeding to cleanup"
+                else
+                    echo "merge-pr: refusing to act on PR in state '$pr_state'" >&2
+                    exit 1
+                fi
+                ;;
+            *)
                 echo "merge-pr: refusing to act on PR in state '$pr_state'" >&2
                 exit 1
-            fi
-            ;;
-        *)
-            echo "merge-pr: refusing to act on PR in state '$pr_state'" >&2
-            exit 1
-            ;;
-    esac
+                ;;
+        esac
+    fi
 fi
 
 # Close mode only: delete the remote branch explicitly. GitHub's

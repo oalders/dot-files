@@ -960,3 +960,211 @@ esac
     [ "$status" -eq 0 ]
     [[ "$output" == *"--close"* ]]
 }
+
+# --punt tears down the worktree but leaves the PR OPEN and origin/<branch>
+# in place, for revisiting later. Distinct from --close: no gh action, no
+# remote-branch delete.
+@test "punt: --punt on an OPEN PR tears down but leaves PR and remote branch" {
+    _ready_repo
+    setup_feature_worktree
+    unset TMUX
+    stub_command tmux 'exit 0'
+    stub_command gh '
+case "$2" in
+    view) printf "OPEN\tmain\n" ;;
+    merge) : >"$BATS_TEST_TMPDIR/merge-was-called" ;;
+    close) : >"$BATS_TEST_TMPDIR/close-was-called" ;;
+esac
+'
+
+    run "$MERGE_PR" --punt
+    [ "$status" -eq 0 ]
+    [[ "$output" == *"leaving PR OPEN (--punt)"* ]]
+    [ ! -e "$BATS_TEST_TMPDIR/merge-was-called" ]
+    [ ! -e "$BATS_TEST_TMPDIR/close-was-called" ]
+    [ ! -d "$WORKTREE_DIR" ]
+    run git -C "$REPO_DIR" branch --list feature
+    [ -z "$output" ]
+    cd "$REPO_DIR"
+    run git ls-remote "$UPSTREAM_DIR" refs/heads/feature
+    [ -n "$output" ]
+}
+
+# --punt discards local state, so revisitable work must be on origin first:
+# an unpushed commit blocks teardown (contrast --close, which skips this).
+@test "punt: --punt refuses on unpushed commits" {
+    _ready_repo
+    setup_feature_worktree
+    unset TMUX
+    stub_command tmux 'exit 0'
+    git -c commit.gpgsign=false commit -q --allow-empty -m "extra unpushed"
+    stub_command gh 'printf "OPEN\tmain\n"'
+
+    run "$MERGE_PR" --punt
+    [ "$status" -eq 1 ]
+    [[ "$output" == *"unpushed commit"* ]]
+    [ -d "$WORKTREE_DIR" ]
+}
+
+# --punt and --close are mutually exclusive terminal modes. The refusal is a
+# POST-LOOP check, so it catches both orderings; if it didn't, the remote-delete
+# block (gated on close_mode alone) would delete origin/<branch> — the exact
+# thing --punt promises to keep. Assert the remote survives.
+@test "punt: --punt with --close refuses (both orders) and touches nothing" {
+    _ready_repo
+    setup_feature_worktree
+    unset TMUX
+    stub_command tmux 'exit 0'
+    stub_command gh ': >"$BATS_TEST_TMPDIR/gh-was-called"'
+
+    run "$MERGE_PR" --punt --close
+    [ "$status" -eq 2 ]
+    [[ "$output" == *"mutually exclusive"* ]]
+
+    run "$MERGE_PR" --close --punt
+    [ "$status" -eq 2 ]
+    [[ "$output" == *"mutually exclusive"* ]]
+
+    [ ! -e "$BATS_TEST_TMPDIR/gh-was-called" ]
+    [ -d "$WORKTREE_DIR" ]
+    cd "$REPO_DIR"
+    run git ls-remote "$UPSTREAM_DIR" refs/heads/feature
+    [ -n "$output" ]
+}
+
+# --force still discards a dirty worktree during punt teardown (same as merge
+# mode); the PR is still not acted on.
+@test "punt: --punt --force tears down a dirty worktree, PR untouched" {
+    _ready_repo
+    setup_feature_worktree
+    unset TMUX
+    stub_command tmux 'exit 0'
+    stub_command gh '
+case "$2" in
+    view) printf "OPEN\tmain\n" ;;
+    merge) : >"$BATS_TEST_TMPDIR/merge-was-called" ;;
+    close) : >"$BATS_TEST_TMPDIR/close-was-called" ;;
+esac
+'
+    echo "dirty" >>file
+
+    run "$MERGE_PR" --punt --force
+    [ "$status" -eq 0 ]
+    [ ! -d "$WORKTREE_DIR" ]
+    [ ! -e "$BATS_TEST_TMPDIR/merge-was-called" ]
+    [ ! -e "$BATS_TEST_TMPDIR/close-was-called" ]
+}
+
+# --punt's premise is an OPEN PR to leave open. With no PR it exits 1 (the
+# differentiator from --close, which proceeds on no PR).
+@test "punt: --punt refuses when no PR exists" {
+    _ready_repo
+    setup_feature_worktree
+    unset TMUX
+    stub_command tmux 'exit 0'
+    stub_command gh 'exit 1'
+
+    run "$MERGE_PR" --punt
+    [ "$status" -eq 1 ]
+    [[ "$output" == *"no PR found"* ]]
+    [ -d "$WORKTREE_DIR" ]
+}
+
+# On a MERGED PR --punt does not act on the PR (already terminal); it degrades
+# to plain teardown, does not delete the remote branch, and its info line says
+# "untouched", not "OPEN".
+@test "punt: --punt on a MERGED PR tears down and leaves the remote branch" {
+    _ready_repo
+    setup_feature_worktree
+    unset TMUX
+    stub_command tmux 'exit 0'
+    stub_command gh '
+case "$2" in
+    view) printf "MERGED\tmain\n" ;;
+    merge) : >"$BATS_TEST_TMPDIR/merge-was-called" ;;
+    close) : >"$BATS_TEST_TMPDIR/close-was-called" ;;
+esac
+'
+
+    run "$MERGE_PR" --punt
+    [ "$status" -eq 0 ]
+    [[ "$output" == *"untouched"* ]]
+    [[ "$output" != *"leaving PR OPEN"* ]]
+    [ ! -e "$BATS_TEST_TMPDIR/merge-was-called" ]
+    [ ! -e "$BATS_TEST_TMPDIR/close-was-called" ]
+    [ ! -d "$WORKTREE_DIR" ]
+    cd "$REPO_DIR"
+    run git ls-remote "$UPSTREAM_DIR" refs/heads/feature
+    [ -n "$output" ]
+}
+
+# On a CLOSED PR --punt likewise tears down without acting, leaving the remote.
+@test "punt: --punt on a CLOSED PR tears down and leaves the remote branch" {
+    _ready_repo
+    setup_feature_worktree
+    unset TMUX
+    stub_command tmux 'exit 0'
+    stub_command gh 'printf "CLOSED\tmain\n"'
+
+    run "$MERGE_PR" --punt
+    [ "$status" -eq 0 ]
+    [[ "$output" == *"untouched"* ]]
+    [ ! -d "$WORKTREE_DIR" ]
+    cd "$REPO_DIR"
+    run git ls-remote "$UPSTREAM_DIR" refs/heads/feature
+    [ -n "$output" ]
+}
+
+# The base-branch refusal still applies to --punt (tearing down the base
+# branch's own worktree is nonsensical).
+@test "punt: --punt refuses on the base branch" {
+    _ready_repo
+    setup_feature_worktree
+    unset TMUX
+    stub_command tmux 'exit 0'
+    stub_command gh 'printf "OPEN\tfeature\n"'
+
+    run "$MERGE_PR" --punt
+    [ "$status" -eq 1 ]
+    [[ "$output" == *"refusing to merge from base branch 'feature'"* ]]
+    [ -d "$WORKTREE_DIR" ]
+}
+
+# From the MAIN working tree (not a linked worktree), --punt switches to base,
+# deletes the local branch, and skips worktree removal — while leaving the PR
+# and origin/<branch> in place.
+@test "punt: --punt from the main working tree deletes branch, keeps PR and remote" {
+    _ready_repo
+    cd "$REPO_DIR"
+    git checkout -q -b feature
+    git push -q -u origin feature
+    unset TMUX
+    stub_command tmux 'exit 0'
+    stub_command gh '
+case "$2" in
+    view) printf "OPEN\tmain\n" ;;
+    merge) : >"$BATS_TEST_TMPDIR/merge-was-called" ;;
+    close) : >"$BATS_TEST_TMPDIR/close-was-called" ;;
+esac
+'
+
+    run "$MERGE_PR" --punt
+    [ "$status" -eq 0 ]
+    [ ! -e "$BATS_TEST_TMPDIR/merge-was-called" ]
+    [ ! -e "$BATS_TEST_TMPDIR/close-was-called" ]
+    [[ "$output" != *"fatal"* ]]
+    [[ "$output" == *"main working tree"* ]]
+    [ -d "$REPO_DIR" ]
+    run git -C "$REPO_DIR" branch --list feature
+    [ -z "$output" ]
+    run git -C "$REPO_DIR" rev-parse --abbrev-ref HEAD
+    [[ "$output" == "main" ]]
+    run git ls-remote "$UPSTREAM_DIR" refs/heads/feature
+    [ -n "$output" ]
+}
+
+@test "punt: usage mentions --punt" {
+    run "$MERGE_PR" -h
+    [ "$status" -eq 0 ]
+    [[ "$output" == *"--punt"* ]]
+}
