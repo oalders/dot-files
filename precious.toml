@@ -1,6 +1,6 @@
 [commands.shfmt]
 type     = "both"
-include  = "**/*.sh"
+include  = [ "**/*.sh", "bin/merge-pr" ]
 cmd = [ "shfmt" ]
 ok_exit_codes = [0]
 lint_failure_exit_codes = [1]
