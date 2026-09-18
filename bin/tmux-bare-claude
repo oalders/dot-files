@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+# List tmux sessions running a "bare" claude (not wrapped in `nono run`).
+set -eu -o pipefail
+
+# pane_pid -> "session\twindow.pane" (tab-delimited: session names contain spaces)
+declare -A pane_loc
+while IFS=$'\t' read -r pid sess loc; do
+    pane_loc[$pid]="$sess	$loc"
+done < <(tmux list-panes -a -F '#{pane_pid}	#{session_name}	#{window_index}.#{pane_index}')
+
+# pid -> ppid and pid -> comm, for the whole process table
+declare -A ppid comm
+while read -r pid pp cmd; do
+    ppid[$pid]=$pp
+    comm[$pid]=$cmd
+done < <(ps -eo pid=,ppid=,comm=)
+
+# Walk from a claude pid up to init: report the owning pane (if any) and
+# whether a `nono` process sits anywhere in the ancestry.
+for pid in $(pgrep -x claude); do
+    p=$pid
+    loc=""
+    sandboxed=0
+    while [[ -n ${p:-} && $p -ne 0 && -n ${ppid[$p]:-} ]]; do
+        [[ ${comm[$p]:-} == nono ]] && sandboxed=1
+        [[ -n ${pane_loc[$p]:-} ]] && loc=${pane_loc[$p]}
+        p=${ppid[$p]}
+    done
+    [[ $sandboxed -eq 1 ]] && continue
+    [[ -z $loc ]] && continue
+    printf '%s\tpid=%s\n' "$loc" "$pid"
+done | sort -u
