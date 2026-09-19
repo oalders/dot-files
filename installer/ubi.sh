@@ -152,8 +152,12 @@ fi
 #     gh extension install github/gh-copilot || true
 # fi
 
-if is there gh && ! gh extension list | grep --quiet gh-dash; then
-    db gh extension install dlvhdr/gh-dash || true
+if is there gh; then
+    if ! gh extension list | grep --quiet gh-dash; then
+        db gh extension install dlvhdr/gh-dash || true
+    fi
+    # `extension install` never upgrades, so keep all extensions current here.
+    db gh extension upgrade --all || true
 fi
 
 # ensure is completions are up to date

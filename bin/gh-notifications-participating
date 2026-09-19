@@ -1,0 +1,40 @@
+#!/usr/bin/env bash
+
+set -eu -o pipefail
+
+# Tame the notification firehose. Sets your subscription on repos to
+# "not watching" (subscribed=false, ignored=false), so you still get
+# @mentions and participating notifications but not every push/PR/issue.
+#
+# Dry-run by default: prints what it would change. Pass --apply to act.
+# Optionally pass an owner/org as a non-flag arg to target that owner's
+# repos instead of your own.
+
+apply=false
+owner=""
+for arg in "$@"; do
+    case $arg in
+        --apply) apply=true ;;
+        -*)
+            echo "Unknown flag: $arg" >&2
+            exit 1
+            ;;
+        *) owner=$arg ;;
+    esac
+done
+
+gh repo list ${owner:+"$owner"} --limit 1000 --no-archived --json nameWithOwner --jq '.[].nameWithOwner' | \
+    while IFS= read -r repo; do
+        if [ "$apply" = true ]; then
+            echo "Setting participating-only: $repo"
+            gh api "repos/$repo/subscription" -X PUT -F subscribed=false -F ignored=false --silent \
+                || echo "  failed: $repo"
+        else
+            echo "[dry-run] would set participating-only: $repo"
+        fi
+    done
+
+if [ "$apply" = false ]; then
+    echo
+    echo "Dry run only. Re-run with --apply to make these changes."
+fi

@@ -13,6 +13,7 @@ directories=(
     ~/.claude/themes
     ~/.config/oh-my-posh/themes
     ~/.config/claude-pulse
+    ~/.config/gh-dash
     ~/.config/mcphub
     ~/.config/nix
     ~/.config/nono/profiles
@@ -93,6 +94,7 @@ ln -sf $prefix/claude/themes/tokyo-night.json ~/.claude/themes/tokyo-night.json
 ln -sf $prefix/cpanreporter/config.ini ~/.cpanreporter/config.ini
 ln -sf $prefix/oh-my-posh/themes/local.omp.json ~/.config/oh-my-posh/themes/local.omp.json
 ln -sf $prefix/claude-pulse/config.json ~/.config/claude-pulse/config.json
+ln -sf $prefix/gh-dash/config.yml ~/.config/gh-dash/config.yml
 ln -sf $prefix/mcphub/servers.json ~/.config/mcphub/servers.json
 ln -sf $prefix/nix/nix.conf ~/.config/nix/nix.conf
 ln -sf $prefix/nono/oalders-ansible.json ~/.config/nono/profiles/oalders-ansible.json
@@ -134,6 +136,8 @@ fi
 
 ln -sf $prefix/bin/add-worktree "$HOME/local/bin/add-worktree"
 ln -sf $prefix/bin/dev "$HOME/local/bin/dev"
+ln -sf $prefix/bin/gh-notifications-participating "$HOME/local/bin/gh-notifications-participating"
+ln -sf $prefix/bin/gh-triage "$HOME/local/bin/gh-triage"
 ln -sf $prefix/bin/nn "$HOME/local/bin/nn"
 ln -sf $prefix/bin/remove-worktree "$HOME/local/bin/remove-worktree"
 ln -sf $prefix/bin/tm "$HOME/local/bin/tm"

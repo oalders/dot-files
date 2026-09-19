@@ -1,0 +1,33 @@
+# gh-dash dashboard config. Symlinked to ~/.config/gh-dash/config.yml.
+# Run `gh dash` for the interactive TUI. Sections mirror bin/gh-triage.
+prSections:
+  - title: Needs My Review
+    filters: is:open review-requested:@me
+  - title: My PRs
+    filters: is:open author:@me
+  - title: Changes Requested
+    filters: is:open author:@me review:changes_requested
+  # author:app/dependabot is not self-scoping like the @me filters above, so it
+  # must be constrained to your repos. user:/org: qualifiers OR together — add
+  # more (e.g. org:metacpan) for orgs whose dependency PRs you also manage.
+  - title: Dependabot
+    filters: is:open author:app/dependabot user:oalders
+
+issueSections:
+  - title: Assigned To Me
+    filters: is:open assignee:@me
+  - title: Mentioning Me
+    filters: is:open mentions:@me
+
+defaults:
+  preview:
+    open: true
+    width: 60
+  prsLimit: 20
+  issuesLimit: 20
+  view: prs
+  refetchIntervalMinutes: 30
+
+# Don't auto-scope sections to the current repo when launched inside one; these
+# sections span all your repos. Toggle per-session with the `t` key.
+smartFilteringAtLaunch: false

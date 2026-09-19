@@ -1,0 +1,71 @@
+#!/usr/bin/env bash
+
+set -eu -o pipefail
+
+# One-shot GitHub triage report: what actually needs your attention across all
+# repos. Non-interactive companion to `gh dash`. Results are grouped by repo;
+# each title is an OSC 8 hyperlink to the PR/issue (clickable in wezterm etc.),
+# so no raw URLs clutter the output.
+#
+# Color and hyperlinks are emitted only to a TTY, and color honours NO_COLOR,
+# so piping (`gh-triage | less`) yields plain text.
+#
+# Override the per-section result cap with GH_TRIAGE_LIMIT (default 30).
+
+limit=${GH_TRIAGE_LIMIT:-30}
+width=${COLUMNS:-$(tput cols 2>/dev/null || echo 100)}
+
+if [ -t 1 ]; then link=1; else link=0; fi
+if [ -t 1 ] && [ -z "${NO_COLOR:-}" ]; then
+    c_head=$'\e[1;35m'
+    c_repo=$'\e[2m'
+    c_num=$'\e[36m'
+    c_reset=$'\e[0m'
+else
+    c_head='' c_repo='' c_num='' c_reset=''
+fi
+
+query() {
+    local kind=$1
+    shift
+    gh search "$kind" --state open --limit "$limit" \
+        --json repository,number,title,url \
+        --jq '.[] | [.repository.nameWithOwner,(.number|tostring),.title,.url] | @tsv' "$@" |
+        sort -t "$(printf '\t')" -k1,1 -s
+}
+
+render() {
+    awk -F'\t' \
+        -v W="$width" -v link="$link" -v hdr="$1" \
+        -v ch="$c_head" -v cr="$c_repo" -v cn="$c_num" -v rst="$c_reset" '
+        BEGIN { print ch hdr rst; last = "" }
+        {
+            repo = $1; num = $2; ttl = $3; url = $4
+            if (repo != last) { print "  " cr repo rst; last = repo }
+            avail = W - (7 + length(num)) - 1
+            if (avail < 10) avail = 10
+            if (length(ttl) > avail) ttl = substr(ttl, 1, avail - 1) "\342\200\246"
+            head = "    " cn "#" num rst "  "
+            if (link == "1")
+                print head "\033]8;;" url "\a" ttl "\033]8;;\a"
+            else
+                print head ttl
+        }
+        END { if (last == "") print "  " cr "(none)" rst }
+    '
+}
+
+section() {
+    local hdr=$1 kind=$2
+    shift 2
+    local rows
+    rows=$(query "$kind" "$@") || rows=""
+    if [ -n "$rows" ]; then printf '%s\n' "$rows"; fi | render "$hdr"
+    echo
+}
+
+section "PRs needing your review" prs --review-requested=@me
+section "Your open PRs" prs --author=@me
+section "Your PRs with changes requested" prs --author=@me --review=changes_requested
+section "Issues assigned to you" issues --assignee=@me
+section "Issues mentioning you" issues --mentions=@me
