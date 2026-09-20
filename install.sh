@@ -33,6 +33,7 @@ run_mac_installers() {
         # ./installer/dockutil.sh
         #./configure/dock.sh
         ./configure/macos.sh
+        ./configure/spotlight.sh
         ./installer/spoon-installer.sh
         ./installer/tailscale.sh
     )
