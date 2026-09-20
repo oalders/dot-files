@@ -127,10 +127,12 @@ ln -sf $prefix/yamllint.yml ~/.config/yamllint/config
 if is os name eq darwin; then
     ln -sf "$LINK_FLAG" $prefix/hammerspoon ~/.hammerspoon
 
-    # This pops up a karabiner dialogue asking you to choose a keyboard, so
-    # we'll only create the link if it doesn't already exist.
-    if [ ! -L ~/.config/karabiner/karabiner.json ]; then
-        ln -sf $prefix/karabiner/karabiner.json ~/.config/karabiner/karabiner.json
+    # Karabiner rewrites karabiner.json in place (it doesn't honor symlinks),
+    # replacing our link with a real file and dropping the device keyboard_type,
+    # which makes it re-prompt for the keyboard type on the next run. So seed it
+    # once from the repo and let Karabiner own the live file thereafter.
+    if [ ! -e ~/.config/karabiner/karabiner.json ]; then
+        cp $prefix/karabiner/karabiner.json ~/.config/karabiner/karabiner.json
     fi
 fi
 
