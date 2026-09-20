@@ -127,7 +127,10 @@ else
     maybe_install dandavison/delta --matching musl
 fi
 
-maybe_install eza-community/eza
+# eza ships no macOS binaries, so on darwin it comes from Homebrew (brew/defaults).
+if ! is os name eq darwin; then
+    maybe_install eza-community/eza
+fi
 
 if is os name eq darwin; then
     if ! is there bat || is cli version bat ne 0.24.0; then
