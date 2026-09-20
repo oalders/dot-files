@@ -38,7 +38,14 @@ run_mac_installers() {
     )
 
     run_installers "${mac_installers[@]}"
-    debounce 1 d ./installer/homebrew.sh
+    # Ventura (macOS 13) is past Homebrew's bottle support, so `brew upgrade`
+    # recompiles dependencies (llvm, etc.) from source and grinds the disk for
+    # hours. Throttle it to roughly once a year there; daily on supported macOS.
+    if is os version-codename eq ventura; then
+        debounce 365 d ./installer/homebrew.sh
+    else
+        debounce 1 d ./installer/homebrew.sh
+    fi
 }
 
 run_general_installers() {
