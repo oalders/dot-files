@@ -9,8 +9,9 @@ source ~/dot-files/bash_functions.sh
 # disk, especially after big Homebrew source builds churn the Cellar. mdutil -i
 # off is Apple's supported, reboot-persistent way to disable indexing. An OS
 # update can silently re-enable it, so re-assert on every run -- but only sudo
-# when something is still enabled, to avoid a needless password prompt.
-is os name eq darwin || exit 0
+# when something is still enabled, to avoid a needless password prompt. Scoped
+# to this old Ventura box; newer machines can keep Spotlight.
+is os version-codename eq ventura || exit 0
 
 if mdutil -a -s 2>/dev/null | grep -q 'Indexing enabled'; then
     sudo mdutil -a -i off
