@@ -117,6 +117,10 @@ if is cli output stdout hostname eq wolfblitzer; then
         ubi --url https://github.com/dandavison/delta/releases/download/${delta_version}/git-delta_${delta_version}_amd64.deb --in /tmp/ubi
         sudo dpkg -i /tmp/ubi/delta
     fi
+elif is os name eq darwin && is arch eq amd64; then
+    # delta stopped shipping x86_64 macOS binaries after 0.18.2, so this Intel
+    # Mac must pin to the last release that has one.
+    maybe_install dandavison/delta --tag 0.18.2
 elif is os name eq darwin || is os id eq ubuntu; then
     maybe_install dandavison/delta
 else

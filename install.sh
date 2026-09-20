@@ -84,6 +84,16 @@ if is os name eq darwin; then
     fi
     defaults write com.knollsoft.Rectangle screenEdgeGapTop -int 0
     debounce 30 d ./configure/screenshots.sh
+
+    # On this old Ventura (macOS 13) box, photoanalysisd grinds the disk for
+    # days and never finishes; keep it disabled since an OS update can silently
+    # re-enable it. print-disabled needs no sudo, so only pay the sudo prompt
+    # when it has actually been re-enabled. See memory: photoanalysisd-disabled.
+    if is os version --major eq 13 &&
+        ! launchctl print-disabled "gui/$(id -u)" |
+        grep -q '"com.apple.photoanalysisd" => disabled'; then
+        sudo launchctl disable "gui/$(id -u)/com.apple.photoanalysisd"
+    fi
 fi
 
 run_general_installers
