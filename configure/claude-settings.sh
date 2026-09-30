@@ -99,7 +99,7 @@ set_key availableModels '["claude-opus-4-8","opus","sonnet","haiku"]'
 # Default new sessions to Opus 4.8 rather than whatever the "opus" alias points
 # at today (Opus 5). /model overwrites this in ~/.claude/settings.json for the
 # session; --model and ANTHROPIC_MODEL override for a single run.
-set_key model '"claude-opus-4-8"'
+set_key model '"claude-opus-5-5"'
 
 # Default new sessions to medium reasoning effort to trim thinking-token spend.
 # /effort overwrites this in ~/.claude/settings.json; --effort and
