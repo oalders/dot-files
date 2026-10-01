@@ -223,6 +223,7 @@ tmux_session_name() {
         branch=$(git rev-parse --abbrev-ref HEAD)
         display_name=$(get_github_display_name "$branch")
         current_dir=${PWD##*/}
+        raw_dir=$current_dir
         current_dir=$(printf "%-18s" "$current_dir")
 
         declare -A fileToPrefix=(
@@ -299,7 +300,16 @@ tmux_session_name() {
                 break
             fi
         done
-        SESSION_NAME="$prefix  $current_dir   $display_name"
+        # Worktree dirs are named after their branch; don't say it twice.
+        if [[ $display_name == "$raw_dir" ]]; then
+            SESSION_NAME="$prefix  $raw_dir"
+        else
+            SESSION_NAME="$prefix  $current_dir   $display_name"
+        fi
+        pr_number=$(gh pr view --json number,state -q 'select(.state == "OPEN") | .number' 2>/dev/null) || pr_number=""
+        if [[ $pr_number ]]; then
+            SESSION_NAME+="  #$pr_number"
+        fi
     else
         SESSION_NAME=$(pwd)
         strip="$HOME/"
