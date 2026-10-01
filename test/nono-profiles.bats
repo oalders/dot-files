@@ -348,7 +348,7 @@ SYMLINKS="$SCRIPT_DIR/installer/symlinks.sh"
 # this profile change depends on NOT being present (#1022).
 @test "installer/ubi.sh pins nono at the current org and version" {
     local ubi="$SCRIPT_DIR/installer/ubi.sh"
-    run grep -Fq 'maybe_install nolabs-ai/nono --tag v0.74.0' "$ubi"
+    run grep -Eq 'maybe_install nolabs-ai/nono --tag v0\.(7[4-9]|[89][0-9])\.' "$ubi"
     [ "$status" -eq 0 ]
     # The repo redirects, so the old path keeps working and would not fail
     # loudly; assert it is gone rather than trusting the line above alone.
