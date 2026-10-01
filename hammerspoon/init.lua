@@ -297,4 +297,5 @@ if hs.host.operatingSystemVersion().major == 13 then
     photoanalysisdReaper = hs.timer.doEvery(600, function()
         hs.task.new('/usr/bin/killall', nil, { 'photoanalysisd' }):start()
     end)
+    photoanalysisdReaper:fire()
 end
