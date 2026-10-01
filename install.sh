@@ -69,6 +69,7 @@ run_general_installers() {
         ./installer/cargo.sh
         ./installer/imgcat.sh
         ./configure/bat.sh
+        ./installer/claude.sh
         ./configure/claude-settings.sh
         ./installer/oh-my-posh.sh
     )
