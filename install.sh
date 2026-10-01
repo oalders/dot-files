@@ -76,6 +76,7 @@ run_general_installers() {
     run_installers "${installers[@]}"
     debounce 30 days ./configure/eza.sh
     debounce 7 d ./installer/maintenance.sh
+    debounce 1 d ./installer/nono.sh
 
     # Seed the shared Playwright Chromium bundle only on the dev box that runs
     # browser-driven tests under nono. See nono/CLAUDE.md.
