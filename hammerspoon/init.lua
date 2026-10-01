@@ -290,3 +290,11 @@ hs.hotkey.bind(hyper, 'n', function()
     -- and move the window to the next screen setting the same unitRect
     win:move(win:frame():toUnitRect(screen:frame()), screen:next(), true, 0)
 end)
+
+-- Ventura only (the old Mac): launchd respawns photoanalysisd on XPC events
+-- even when disabled, and SIP blocks bootout, so keep killing it.
+if hs.host.operatingSystemVersion().major == 13 then
+    photoanalysisdReaper = hs.timer.doEvery(600, function()
+        hs.task.new('/usr/bin/killall', nil, { 'photoanalysisd' }):start()
+    end)
+end
