@@ -50,6 +50,8 @@ if [[ ! "$(command -v curl)" && "$(command -v apt-get)" ]]; then
     sudo apt-get install curl --autoremove -y
 fi
 
+# `is` isn't installed yet on a fresh box (it comes from ubi, below), so this is
+# one of the few places that has to fall back to `command -v`.
 if [ -z "${GITHUB_TOKEN:-}" ] && command -v gh &>/dev/null && gh auth token &>/dev/null; then
     GITHUB_TOKEN="$(gh auth token)"
     export GITHUB_TOKEN

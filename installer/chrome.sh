@@ -10,7 +10,7 @@ if [[ $(uname -s) != Linux ]]; then
     exit 0
 fi
 
-if command -v google-chrome >/dev/null; then
+if is there google-chrome; then
     exit 0
 fi
 

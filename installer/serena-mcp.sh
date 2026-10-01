@@ -7,7 +7,7 @@ set -eu -o pipefail
 # MCP launch. Assumes serena-agent is already installed via `uv tool install`
 # (installer/claude.sh owns that).
 
-if ! command -v serena-mcp-server >/dev/null; then
+if ! is there serena-mcp-server; then
     echo "serena-mcp-server not in PATH — run installer/claude.sh first" >&2
     exit 1
 fi

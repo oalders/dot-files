@@ -9,7 +9,7 @@ set -eu -o pipefail
 # every MCP launch. ~/dot-files/bin is ahead of ~/dot-files/node_modules/.bin in
 # PATH, so the wrapper wins over the npm-installed npx without reordering PATH.
 
-if ! command -v npm >/dev/null; then
+if ! is there npm; then
     echo "npm not in PATH — install node first" >&2
     exit 1
 fi

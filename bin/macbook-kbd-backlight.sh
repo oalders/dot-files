@@ -75,7 +75,7 @@ set_brightness() {
     local value
     value=$(clamp "$1")
 
-    if command -v brightnessctl &>/dev/null; then
+    if is there brightnessctl; then
         brightnessctl --device="$LED_NAME" set "$value" >/dev/null
     elif [ -w "$LED/brightness" ]; then
         echo "$value" >"$LED/brightness"

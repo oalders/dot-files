@@ -124,7 +124,7 @@ HARNESS_OPTIONS="j1:c"
 # with symlinks.
 RIPGREP_CONFIG_PATH=~/dot-files/ripgreprc
 
-if [[ $(command -v nproc) ]]; then
+if is there nproc; then
     MY_PROCS="$(nproc)"
     export MY_PROCS
 fi

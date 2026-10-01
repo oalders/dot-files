@@ -45,9 +45,9 @@ if [[ -z $expected ]]; then
     exit 1
 fi
 
-if command -v sha256sum &>/dev/null; then
+if is there sha256sum; then
     echo "$expected  $filename" | sha256sum --check --strict
-elif command -v shasum &>/dev/null; then
+elif is there shasum; then
     echo "$expected  $filename" | shasum -a 256 --check
 fi
 
