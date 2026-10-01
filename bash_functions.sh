@@ -5,6 +5,9 @@ source ~/dot-files/path_functions.sh
 
 add_path "/usr/local/go/bin"
 add_path "$HOME/local/bin"
+# npm's global prefix (~/.npmrc) is ~/.npm-packages on every platform; put its
+# bin on PATH so globally-installed CLIs (codex, pnpm) are reachable by name.
+add_path "$HOME/.npm-packages/bin"
 
 detect_posh_settings() {
     inside_ssh=false

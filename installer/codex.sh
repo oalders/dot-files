@@ -12,18 +12,14 @@ source ~/dot-files/bash_functions.sh
 # release assets (codex, codex-app-server, codex-responses-api-proxy, ...).
 CODEX_VERSION=0.153.4
 
-# Requested for Linux boxes only; npm (node) is installed earlier by npm.sh.
-is os name eq linux || exit 0
+# Linux and macOS; npm (node) is installed earlier by npm.sh.
+is os name eq linux || is os name eq darwin || exit 0
 is there npm || exit 0
 
 if is there codex && is cli version codex eq "$CODEX_VERSION"; then
     exit 0
 fi
 
-# npm's global prefix is /usr on the system node, so the global install needs
-# root; fall back to a plain global install where the prefix is user-writable.
-if is user sudoer; then
-    sudo npm install -g "@openai/codex@$CODEX_VERSION"
-else
-    npm install -g "@openai/codex@$CODEX_VERSION"
-fi
+# A plain user-level global install: ~/.npmrc pins npm's prefix to
+# ~/.npm-packages (a user-writable dir) on every platform, so no sudo needed.
+npm install -g "@openai/codex@$CODEX_VERSION"
