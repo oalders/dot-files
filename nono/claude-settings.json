@@ -1,5 +1,6 @@
 {
   "sandbox": {
     "enabled": false
-  }
+  },
+  "autoMemoryEnabled": false
 }

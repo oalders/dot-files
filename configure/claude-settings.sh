@@ -111,3 +111,7 @@ set_key effortLevel '"medium"'
 # the session link; the Co-Authored-By trailer (default-on, not stored here)
 # stays. attribution.* is the current key -- includeCoAuthoredBy is deprecated.
 set_nested_key attribution sessionUrl false
+
+# No local auto-memory files; nono/claude-settings.json mirrors this for
+# sandboxed sessions, which can't read this file.
+set_key autoMemoryEnabled false
