@@ -136,14 +136,6 @@ if is os name eq darwin; then
     fi
 fi
 
-ln -sf $prefix/bin/add-worktree "$HOME/local/bin/add-worktree"
-ln -sf $prefix/bin/dev "$HOME/local/bin/dev"
-ln -sf $prefix/bin/gh-notifications-participating "$HOME/local/bin/gh-notifications-participating"
-ln -sf $prefix/bin/gh-triage "$HOME/local/bin/gh-triage"
-ln -sf $prefix/bin/nn "$HOME/local/bin/nn"
-ln -sf $prefix/bin/remove-worktree "$HOME/local/bin/remove-worktree"
-ln -sf $prefix/bin/tm "$HOME/local/bin/tm"
-
 user_dir="$HOME/Library/Application Support/Code/User"
 if is os name eq darwin && [ -d "$user_dir" ]; then
     settings="$user_dir/settings.json"

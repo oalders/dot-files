@@ -1,6 +1,6 @@
 # nono config
 
-Wraps Claude Code in the [nono](https://nono.sh/) sandbox. Invoke via `nn` (from `bin/nn`, symlinked to `~/local/bin/nn`).
+Wraps Claude Code in the [nono](https://nono.sh/) sandbox. Invoke via `nn` (from `bin/nn`, on `PATH` via `~/dot-files/bin`).
 
 ## Files
 

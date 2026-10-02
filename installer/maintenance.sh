@@ -7,6 +7,11 @@ rm -f ~/.cargo/bin/bat
 rm -f ~/.cargo/bin/precious
 rm -f ~/local/bin/golangci-lint # now installed via Mason
 
+# ~/dot-files/bin is on PATH directly now
+for script in add-worktree dev gh-notifications-participating gh-triage nn remove-worktree tm; do
+    [ -L ~/local/bin/$script ] && rm ~/local/bin/$script
+done
+
 if is os name eq darwin; then
     rm -f ~/.cargo/bin/fd
     if is there brew; then
