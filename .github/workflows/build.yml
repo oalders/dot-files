@@ -54,7 +54,9 @@ jobs:
             apt-${{ runner.os }}-
 
       - name: Install tmux deps
-        run: sudo apt install libevent-dev
+        # The runner image's package index goes stale; without an update apt
+        # requests superseded .debs that the mirror has dropped (404).
+        run: sudo apt-get update && sudo apt-get install -y libevent-dev
 
       - name: Install
         run: ./install.sh
