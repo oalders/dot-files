@@ -24,6 +24,12 @@ fi
 debounce --local 1 d npm install npm@latest
 debounce --local 1 d npm install
 
+# npm 12 skipped the binary download before allowScripts listed tree-sitter-cli,
+# and npm install won't retry it for an already-installed package.
+if ! node_modules/.bin/tree-sitter --version >/dev/null 2>&1; then
+    npm rebuild tree-sitter-cli
+fi
+
 if [[ $IS_GITHUB == false ]] && is os name eq darwin; then
     mkdir -p "$HOME/.npm-packages/lib"
     npx --yes npm-merge-driver install --global

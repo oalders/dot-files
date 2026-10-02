@@ -32,7 +32,7 @@
     "markdownlint-cli": "^0.49.0",
     "mcp-hub": "^4.2.1",
     "normalize-url": "^9.0.1",
-    "npm": "^12.1.0",
+    "npm": "^12.2.0",
     "prettier": "^3.9.6",
     "tree-sitter-cli": "^0.26.13",
     "typescript": "^7.0.2",
@@ -48,5 +48,8 @@
   },
   "devDependencies": {
     "opencode-ai": "^1.18.25"
+  },
+  "allowScripts": {
+    "tree-sitter-cli": true
   }
 }
