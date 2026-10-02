@@ -22,11 +22,25 @@ for a in "$@"; do
 done >"$OUT"'
     BODY_FILE="$BATS_TEST_TMPDIR/body.md"
     printf 'from a file\n' >"$BODY_FILE"
+    # The wrapper reads the running model from this session's transcript.
+    export CLAUDE_CONFIG_DIR="$BATS_TEST_TMPDIR/claude"
+    export CLAUDE_CODE_SESSION_ID=0f8e2a1c-test-session
+    TRANSCRIPT_DIR="$CLAUDE_CONFIG_DIR/projects/-proj"
+    mkdir -p "$TRANSCRIPT_DIR"
+    write_transcript "$TRANSCRIPT_DIR/$CLAUDE_CODE_SESSION_ID.jsonl" claude-opus-5-5
+}
+
+write_transcript() {
+    printf '{"type":"assistant","message":{"model":"claude-sonnet-4-6"}}\n' >"$1"
+    printf '{"type":"assistant","message":{"model":"%s"}}\n' "$2" >>"$1"
+    printf '{"type":"user","message":{"content":[{"input":{"model":"sonnet"}}]}}\n' >>"$1"
 }
 
 assert_generated() { grep -q 'Generated with \[Claude Code\]' "$OUT"; }
 assert_review() { grep -q 'Review by \[Claude Code\]' "$OUT"; }
 assert_no_footer() { ! grep -q '\[Claude Code\]' "$OUT"; }
+# A bare `! cmd` never fails a bats test (set -e ignores negation).
+refute() { ! "$@"; }
 footer_count() { grep -c 'Generated with \[Claude Code\]' "$OUT"; }
 
 @test "pr comment --body gets footer" {
@@ -54,9 +68,9 @@ footer_count() { grep -c 'Generated with \[Claude Code\]' "$OUT"; }
     [ "$status" -eq 0 ]
     grep -q '^FILE:from a file$' "$OUT"
     assert_generated
-    ! grep -q "^ARG:$BODY_FILE$" "$OUT"
+    refute grep -q "^ARG:$BODY_FILE$" "$OUT"
     # Original file untouched.
-    ! grep -q 'Claude Code' "$BODY_FILE"
+    refute grep -q 'Claude Code' "$BODY_FILE"
 }
 
 @test "--body-file= and -F forms get footer" {
@@ -151,7 +165,7 @@ footer_count() { grep -c 'Generated with \[Claude Code\]' "$OUT"; }
 @test "api -f body=@file is a literal, not a file" {
     run "$GH" api -X POST repos/o/r/issues/1/comments -f "body=@$BODY_FILE"
     [ "$status" -eq 0 ]
-    ! grep -q '^FILE:' "$OUT"
+    refute grep -q '^FILE:' "$OUT"
     assert_generated
 }
 
@@ -236,8 +250,8 @@ footer_count() { grep -c 'Generated with \[Claude Code\]' "$OUT"; }
     grep -q '^FILE:.*héllo' "$OUT"
     grep -q '"event":"COMMENT"' "$OUT"
     assert_review
-    ! grep -q "^ARG:$json$" "$OUT"
-    ! grep -q 'Claude Code' "$json"
+    refute grep -q "^ARG:$json$" "$OUT"
+    refute grep -q 'Claude Code' "$json"
 }
 
 @test "api --input= glued form gets footer" {
@@ -252,7 +266,7 @@ footer_count() { grep -c 'Generated with \[Claude Code\]' "$OUT"; }
 @test "api --input - reads stdin and footers it" {
     run "$GH" api repos/o/r/issues/1/comments --input - <<<'{"body":"hi"}'
     [ "$status" -eq 0 ]
-    ! grep -q '^ARG:-$' "$OUT"
+    refute grep -q '^ARG:-$' "$OUT"
     grep -q '^FILE:{"body":"hi' "$OUT"
     assert_generated
 }
@@ -273,10 +287,76 @@ footer_count() { grep -c 'Generated with \[Claude Code\]' "$OUT"; }
     assert_no_footer
 }
 
-@test "api --input with an existing footer is not doubled" {
+@test "api --input with a model-less footer gets exactly one model footer" {
     json="$BATS_TEST_TMPDIR/in.json"
     printf '{"body":"hi\\n\\n---\\nGenerated with [Claude Code](https://claude.com/claude-code)"}' >"$json"
     run "$GH" api repos/o/r/issues/1/comments --input "$json"
     [ "$status" -eq 0 ]
-    grep -q "^ARG:$json$" "$OUT"
+    [ "$(grep -o 'Generated with' "$OUT" | wc -l)" -eq 1 ]
+    grep -q 'claude-code) · Opus 5.5' "$OUT"
+}
+
+@test "footer names the running model" {
+    run "$GH" pr comment 1 --body hi
+    [ "$status" -eq 0 ]
+    grep -q '^🤖 Generated with \[Claude Code\](https://claude.com/claude-code) · Opus 5.5$' "$OUT"
+}
+
+@test "newest transcript wins, so a subagent is attributed to its own model" {
+    sub="$TRANSCRIPT_DIR/$CLAUDE_CODE_SESSION_ID/subagents"
+    mkdir -p "$sub"
+    write_transcript "$sub/agent-x.jsonl" claude-sonnet-5
+    touch -d '1 minute ago' "$TRANSCRIPT_DIR/$CLAUDE_CODE_SESSION_ID.jsonl"
+    run "$GH" pr comment 1 --body hi
+    [ "$status" -eq 0 ]
+    grep -q '· Sonnet 5$' "$OUT"
+}
+
+@test "dated and bracketed model ids are shortened" {
+    write_transcript "$TRANSCRIPT_DIR/$CLAUDE_CODE_SESSION_ID.jsonl" claude-haiku-4-5-20251001
+    run "$GH" pr comment 1 --body hi
+    grep -q '· Haiku 4.5$' "$OUT"
+    write_transcript "$TRANSCRIPT_DIR/$CLAUDE_CODE_SESSION_ID.jsonl" 'claude-opus-4-8[1m]'
+    run "$GH" pr comment 1 --body hi
+    grep -q '· Opus 4.8$' "$OUT"
+}
+
+@test "unresolvable model blocks the post" {
+    rm "$TRANSCRIPT_DIR/$CLAUDE_CODE_SESSION_ID.jsonl"
+    run "$GH" pr comment 1 --body hi
+    [ "$status" -eq 1 ]
+    [[ "$output" == *"cannot determine the running Claude model"* ]]
+    [ ! -e "$OUT" ]
+}
+
+@test "a footer naming the wrong model, or none, is replaced" {
+    body=$'hi\n\n---\n🤖 Generated with [Claude Code](https://claude.com/claude-code) · Opus 4.1'
+    run "$GH" pr comment 1 --body "$body"
+    [ "$(footer_count)" -eq 1 ]
+    refute grep -q 'Opus 4.1' "$OUT"
+    grep -q '· Opus 5.5$' "$OUT"
+}
+
+@test "session ids and links are stripped" {
+    body=$'hi\nhttps://claude.ai/code/session_01AbCdEfGhIjKl\nSession: 0f8e2a1c-test-session\nref session_01ZyXwVuTsRq\nkeep this line about session ids'
+    run "$GH" pr comment 1 --body "$body"
+    [ "$status" -eq 0 ]
+    refute grep -q 'session_01' "$OUT"
+    refute grep -q "$CLAUDE_CODE_SESSION_ID" "$OUT"
+    grep -q 'keep this line about session ids' "$OUT"
+    grep -q '^ARG:hi$' "$OUT"
+}
+
+@test "an existing Review by footer keeps its kind" {
+    body=$'lgtm\n\n---\n🤖 Review by [Claude Code](https://claude.com/claude-code)'
+    run "$GH" pr comment 1 --body "$body"
+    grep -q '^🤖 Review by .* · Opus 5.5$' "$OUT"
+    refute grep -q 'Generated with' "$OUT"
+}
+
+@test "an already-correct body file is passed through as-is" {
+    printf 'hi\n\n---\n🤖 Generated with [Claude Code](https://claude.com/claude-code) · Opus 5.5\n' >"$BODY_FILE"
+    run "$GH" pr comment 1 --body-file "$BODY_FILE"
+    [ "$status" -eq 0 ]
+    grep -q "^ARG:$BODY_FILE$" "$OUT"
 }

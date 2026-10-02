@@ -10,6 +10,10 @@
 # and substitution — so that whole fragility class disappears. The hook stays as
 # a secondary backstop; this is the real guarantee.
 #
+# Every footered body is normalised: existing attribution lines are replaced by
+# one footer naming the running model (resolved from the session transcript),
+# and session ids/links are stripped. No model resolvable → refuse to post.
+#
 # Scope: only mutating writes (`issue`/`pr` create|comment|edit, and `gh api`
 # POST/PATCH to comment/issue/pull/review/reply endpoints) whose body we can
 # resolve. Everything else — and every invocation outside a Claude session
@@ -25,9 +29,8 @@ use JSON::PP   ();
 
 # The bytes below intentionally hold the raw UTF-8 of the robot-face emoji; the
 # whole script treats bodies as byte strings, so no `use utf8`/encoding step.
-my $ANCHOR           = '[Claude Code](https://claude.com/claude-code)';
-my $FOOTER_GENERATED = "\n\n---\n\xF0\x9F\xA4\x96 Generated with $ANCHOR\n";
-my $FOOTER_REVIEW    = "\n\n---\n\xF0\x9F\xA4\x96 Review by $ANCHOR\n";
+my $ANCHOR = '[Claude Code](https://claude.com/claude-code)';
+my $ROBOT  = "\xF0\x9F\xA4\x96";
 
 # Endpoints whose `gh api` POST/PATCH bodies are user-visible GitHub content.
 my @API_ENDPOINT_NEEDLES = qw( /comments /issues /pulls /reviews /replies );
@@ -66,16 +69,72 @@ sub run_real {
     };
 }
 
-sub has_anchor { return index( $_[0], $ANCHOR ) >= 0 }
-
 # Block only when a body was explicitly given but we cannot read it (stdin, a
 # pipe, an unreadable file) — never for the no-body case (`--fill`, an editor),
 # which is legitimate and attributed elsewhere.
 sub block {
     my ($why) = @_;
     print {*STDERR} "gh-wrapper: refusing to post — $why. "
-        . "Put the body in a file (with the attribution footer) and use --body-file.\n";
+        . "Put the body in a file and use --body-file.\n";
     exit 1;
+}
+
+# Display version of the running model, e.g. "Opus 5.5", from the newest
+# transcript of this session (subagents have their own, with their own model).
+my $MODEL;
+
+sub model {
+    return $MODEL if defined $MODEL;
+    my $sid = $ENV{CLAUDE_CODE_SESSION_ID} // q{};
+    my $dir = $ENV{CLAUDE_CONFIG_DIR} // "$ENV{HOME}/.claude";
+    my $newest;
+    if ( $sid =~ /\A[\w-]+\z/ ) {
+        ($newest) = sort { -M $a <=> -M $b } grep { -f } (
+            glob("$dir/projects/*/$sid.jsonl"),
+            glob("$dir/projects/*/$sid/subagents/*.jsonl"),
+        );
+    }
+
+    my $id;
+    if ( defined $newest && open my $fh, '<:raw', $newest ) {
+        my $size = -s $fh;
+        seek $fh, ( $size > 4_000_000 ? $size - 4_000_000 : 0 ), 0;
+        local $/;
+        my $tail = <$fh> // q{};
+        ($id) = $tail =~ /.*"model":"(claude-[^"]+)"/s;
+    }
+    if ( !defined $id ) {
+        print {*STDERR} "gh-wrapper: refusing to post — cannot determine the "
+            . "running Claude model for the attribution footer.\n";
+        exit 1;
+    }
+
+    # claude-opus-5-5 → Opus 5.5; claude-haiku-4-5-20251001 → Haiku 4.5
+    ( my $name = $id ) =~ s/\A claude- | \[.*\z//gx;
+    my @parts   = grep { !/\A\d{8}\z/ } split /-/, $name;
+    my @family  = map  { ucfirst } grep { /\D/ } @parts;
+    my @version = grep { /\A\d+\z/ } @parts;
+    return $MODEL = join q{ }, @family, join q{.}, @version;
+}
+
+# Normalise the attribution of $body: drop session ids/links and any existing
+# attribution lines, then append one footer naming the running model. $kind is
+# 'review' or 'generated'; an existing "Review by" footer keeps review.
+sub attribute {
+    my ( $body, $kind ) = @_;
+    my $sid = $ENV{CLAUDE_CODE_SESSION_ID};
+    $kind = 'review' if $body =~ /Review by \Q$ANCHOR\E/;
+
+    my @lines = grep {
+        index( $_, $ANCHOR ) < 0
+            && !m{claude\.ai/code/session|\bsession_[0-9A-Za-z]{8,}}
+            && !( $sid && index( $_, $sid ) >= 0 )
+    } split /\n/, $body, -1;
+    $body = join "\n", @lines;
+    $body =~ s/(?:\s*^---[ \t]*)*\s*\z//m;
+
+    my $verb = $kind eq 'review' ? 'Review by' : 'Generated with';
+    return "$body\n\n---\n$ROBOT $verb $ANCHOR \xC2\xB7 " . model() . "\n";
 }
 
 sub slurp {
@@ -104,7 +163,7 @@ sub temp_body {
 # file path to substitute, or undef to leave the argument alone. Stdin is always
 # copied to a temp file, since reading it here consumes it.
 sub footer_json_input {
-    my ( $path, $footer ) = @_;
+    my ( $path, $kind ) = @_;
     my $raw;
     if ( $path eq q{-} ) {
         binmode STDIN, ':raw';
@@ -118,14 +177,15 @@ sub footer_json_input {
 
     my $json = JSON::PP->new->utf8;
     my $data = eval { $json->decode($raw) };
-    if (   ref $data eq 'HASH'
-        && defined $data->{body}
-        && !ref $data->{body}
-        && !has_anchor( $data->{body} ) ) {
-        my $chars = $footer;
-        utf8::decode($chars);
-        $data->{body} .= $chars;
-        return temp_body( $json->encode($data) );
+    if ( ref $data eq 'HASH' && defined $data->{body} && !ref $data->{body} ) {
+        my $bytes = $data->{body};
+        utf8::encode($bytes);
+        my $new = attribute( $bytes, $kind );
+        if ( $new ne $bytes ) {
+            utf8::decode($new);
+            $data->{body} = $new;
+            return temp_body( $json->encode($data) );
+        }
     }
     return $path eq q{-} ? temp_body($raw) : undef;
 }
@@ -133,24 +193,21 @@ sub footer_json_input {
 # Rewrite @argv so the resolved body carries the footer, then hand off to gh.
 # Given the index of a body flag, its inline value or file, mutate in place.
 sub ensure_footer_on_flag {
-    my ( $argv, $idx, $kind, $footer ) = @_;
+    my ( $argv, $idx, $how ) = @_;
 
-    if ( $kind eq 'inline' ) {
-        my $body = $argv->[$idx];
-        return if has_anchor($body);
-        $argv->[$idx] = $body . $footer;
+    if ( $how eq 'inline' ) {
+        $argv->[$idx] = attribute( $argv->[$idx], 'generated' );
     }
-    elsif ( $kind eq 'inline_eq' ) {    # --body=... / --field=body=...
-        my ( $pre, $body ) = @{$idx};    # [ index, prefix-length ]
-        my $val = substr $argv->[$pre], $body;
-        return if has_anchor($val);
-        substr( $argv->[$pre], $body ) = $val . $footer;
+    elsif ( $how eq 'inline_eq' ) {    # --body=... / -bTEXT
+        my ( $pos, $len ) = @{$idx};    # [ index, prefix-length ]
+        substr( $argv->[$pos], $len )
+            = attribute( substr( $argv->[$pos], $len ), 'generated' );
     }
-    elsif ( $kind eq 'file' ) {
+    elsif ( $how eq 'file' ) {
         my $body = slurp( $argv->[$idx] );
         block("body file '$argv->[$idx]' is unreadable") if !defined $body;
-        return                                           if has_anchor($body);
-        $argv->[$idx] = temp_body( $body . $footer );
+        my $new = attribute( $body, 'generated' );
+        $argv->[$idx] = temp_body($new) if $new ne $body;
     }
     return;
 }
@@ -182,27 +239,20 @@ if ( $sub eq 'issue' || $sub eq 'pr' ) {
         my $tok = $argv[$j];
         last if $tok eq '--';    # the rest are positional, not flags
         if ( $tok eq '--body' || $tok eq '-b' ) {
-            ensure_footer_on_flag(
-                \@argv, $j + 1, 'inline',
-                $FOOTER_GENERATED
-            ) if $j + 1 < @argv;
+            ensure_footer_on_flag( \@argv, $j + 1, 'inline' ) if $j + 1 < @argv;
         }
         elsif ( $tok =~ /^(--body=|-b)./s ) {
-            ensure_footer_on_flag(
-                \@argv,      [ $j, length $1 ],
-                'inline_eq', $FOOTER_GENERATED
-            );
+            ensure_footer_on_flag( \@argv, [ $j, length $1 ], 'inline_eq' );
         }
         elsif ( $tok eq '--body-file' || $tok eq '-F' ) {
-            ensure_footer_on_flag( \@argv, $j + 1, 'file', $FOOTER_GENERATED )
-                if $j + 1 < @argv;
+            ensure_footer_on_flag( \@argv, $j + 1, 'file' ) if $j + 1 < @argv;
         }
         elsif ( $tok =~ /^(--body-file=|-F)(.+)/s ) {
             my ( $prefix, $path ) = ( $1, $2 );
             my $body = slurp($path);
             block("body file '$path' is unreadable") if !defined $body;
-            $argv[$j] = $prefix . temp_body( $body . $FOOTER_GENERATED )
-                if !has_anchor($body);
+            my $new = attribute( $body, 'generated' );
+            $argv[$j] = $prefix . temp_body($new) if $new ne $body;
         }
     }
 
@@ -212,7 +262,7 @@ if ( $sub eq 'issue' || $sub eq 'pr' ) {
 
 if ( $sub eq 'api' ) {
     my ( $method, $endpoint );
-    my $footer = $FOOTER_GENERATED;
+    my $kind = 'generated';
 
     # First pass: resolve method + endpoint so we know whether to act. Value-
     # taking flags must eat their operand or it would be taken as the endpoint.
@@ -247,11 +297,11 @@ if ( $sub eq 'api' ) {
     run_real(@argv)
         if !defined $endpoint
         || !grep { index( $endpoint, $_ ) >= 0 } @API_ENDPOINT_NEEDLES;
-    $footer = $FOOTER_REVIEW if $endpoint =~ m{/(?:reviews|replies)\b};
+    $kind = 'review' if $endpoint =~ m{/(?:reviews|replies)\b};
 
     if ( defined $input_pos ) {
         my $path = substr $argv[$input_pos], length $input_glued;
-        my $new  = footer_json_input( $path, $footer );
+        my $new  = footer_json_input( $path, $kind );
         $argv[$input_pos] = $input_glued . $new if defined $new;
     }
 
@@ -287,12 +337,12 @@ if ( $sub eq 'api' ) {
         if ( $is_field && $body_val =~ /^\@(.*)/s ) {    # -F body=@file
             my $body = slurp($1);
             block("api body file '$1' is unreadable") if !defined $body;
-            next                                      if has_anchor($body);
-            $new_val = 'body=@' . temp_body( $body . $footer );
+            my $new = attribute( $body, $kind );
+            next if $new eq $body;
+            $new_val = 'body=@' . temp_body($new);
         }
         else {                                           # literal body= value
-            next if has_anchor($body_val);
-            $new_val = 'body=' . $body_val . $footer;
+            $new_val = 'body=' . attribute( $body_val, $kind );
         }
 
         $argv[$pos] = defined $glued ? $glued . $new_val : $new_val;
