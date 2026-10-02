@@ -21,6 +21,7 @@ use warnings;
 
 use Cwd        qw( realpath );
 use File::Temp qw( tempfile );
+use JSON::PP   ();
 
 # The bytes below intentionally hold the raw UTF-8 of the robot-face emoji; the
 # whole script treats bodies as byte strings, so no `use utf8`/encoding step.
@@ -99,6 +100,36 @@ sub temp_body {
     return $path;
 }
 
+# Footer the top-level "body" of a `gh api --input` JSON payload. Returns a temp
+# file path to substitute, or undef to leave the argument alone. Stdin is always
+# copied to a temp file, since reading it here consumes it.
+sub footer_json_input {
+    my ( $path, $footer ) = @_;
+    my $raw;
+    if ( $path eq q{-} ) {
+        binmode STDIN, ':raw';
+        local $/;
+        $raw = <STDIN> // q{};
+    }
+    else {
+        $raw = slurp($path);
+        block("api input file '$path' is unreadable") if !defined $raw;
+    }
+
+    my $json = JSON::PP->new->utf8;
+    my $data = eval { $json->decode($raw) };
+    if (   ref $data eq 'HASH'
+        && defined $data->{body}
+        && !ref $data->{body}
+        && !has_anchor( $data->{body} ) ) {
+        my $chars = $footer;
+        utf8::decode($chars);
+        $data->{body} .= $chars;
+        return temp_body( $json->encode($data) );
+    }
+    return $path eq q{-} ? temp_body($raw) : undef;
+}
+
 # Rewrite @argv so the resolved body carries the footer, then hand off to gh.
 # Given the index of a body flag, its inline value or file, mutate in place.
 sub ensure_footer_on_flag {
@@ -149,6 +180,7 @@ if ( $sub eq 'issue' || $sub eq 'pr' ) {
     # glued shorthands (-bTEXT, -FFILE) are valid pflag syntax.
     for ( my $j = $i + 2 ; $j < @argv ; $j++ ) {
         my $tok = $argv[$j];
+        last if $tok eq '--';    # the rest are positional, not flags
         if ( $tok eq '--body' || $tok eq '-b' ) {
             ensure_footer_on_flag(
                 \@argv, $j + 1, 'inline',
@@ -184,12 +216,12 @@ if ( $sub eq 'api' ) {
 
     # First pass: resolve method + endpoint so we know whether to act. Value-
     # taking flags must eat their operand or it would be taken as the endpoint.
-    # gh defaults to POST when any field is passed.
+    # gh defaults to POST when any field or --input is passed.
     my %VALUE_FLAG = map { $_ => 1 } qw(
         -H --header -q --jq -t --template --input --cache -p --preview
         --hostname -f --raw-field -F --field
     );
-    my $has_field = 0;
+    my ( $has_field, $input_pos, $input_glued ) = (0);
     for ( my $j = $i + 1 ; $j < @argv ; $j++ ) {
         my $tok = $argv[$j];
         if ( ( $tok eq '-X' || $tok eq '--method' ) && $j + 1 < @argv ) {
@@ -197,6 +229,12 @@ if ( $sub eq 'api' ) {
         }
         elsif ( $tok =~ /^--method=(.*)/s ) { $method = $1 }
         elsif ( $tok =~ /^-X(.+)/s )        { $method = $1 }
+        elsif ( $tok eq '--input' && $j + 1 < @argv ) {
+            ( $has_field, $input_pos, $input_glued ) = ( 1, ++$j, q{} );
+        }
+        elsif ( $tok =~ /^--input=/ ) {
+            ( $has_field, $input_pos, $input_glued ) = ( 1, $j, '--input=' );
+        }
         elsif ( $VALUE_FLAG{$tok} ) {
             $has_field = 1 if $tok =~ /^(?:-[fF]|--(?:raw-)?field)$/;
             $j++;
@@ -210,6 +248,12 @@ if ( $sub eq 'api' ) {
         if !defined $endpoint
         || !grep { index( $endpoint, $_ ) >= 0 } @API_ENDPOINT_NEEDLES;
     $footer = $FOOTER_REVIEW if $endpoint =~ m{/(?:reviews|replies)\b};
+
+    if ( defined $input_pos ) {
+        my $path = substr $argv[$input_pos], length $input_glued;
+        my $new  = footer_json_input( $path, $footer );
+        $argv[$input_pos] = $input_glued . $new if defined $new;
+    }
 
     # Second pass: footer every `body=` field. `-F/--field` treats a leading
     # `@` as a file; `-f/--raw-field` is always a literal. $glued is the prefix

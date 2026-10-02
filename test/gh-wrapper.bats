@@ -15,6 +15,7 @@ for a in "$@"; do
     case $a in
         body=@*) f=${a#body=@} ;;
         --body-file=*) f=${a#--body-file=} ;;
+        --input=*) f=${a#--input=} ;;
         *) f=$a ;;
     esac
     if [[ -f $f ]]; then printf "FILE:%s\n" "$(cat "$f")"; fi
@@ -218,4 +219,64 @@ footer_count() { grep -c 'Generated with \[Claude Code\]' "$OUT"; }
     stub_command gh 'kill -TERM $$'
     run "$GH" pr comment 1 --body-file "$BODY_FILE"
     [ "$status" -eq 143 ]
+}
+
+@test "args after -- are positional, not body flags" {
+    run "$GH" issue create --title t -- --body hi
+    [ "$status" -eq 0 ]
+    grep -q '^ARG:hi$' "$OUT"
+    assert_no_footer
+}
+
+@test "api --input JSON body gets footer, defaulting to POST" {
+    json="$BATS_TEST_TMPDIR/in.json"
+    printf '{"body":"héllo","event":"COMMENT"}' >"$json"
+    run "$GH" api repos/o/r/pulls/1/reviews --input "$json"
+    [ "$status" -eq 0 ]
+    grep -q '^FILE:.*héllo' "$OUT"
+    grep -q '"event":"COMMENT"' "$OUT"
+    assert_review
+    ! grep -q "^ARG:$json$" "$OUT"
+    ! grep -q 'Claude Code' "$json"
+}
+
+@test "api --input= glued form gets footer" {
+    json="$BATS_TEST_TMPDIR/in.json"
+    printf '{"body":"hi"}' >"$json"
+    run "$GH" api -X POST repos/o/r/issues/1/comments "--input=$json"
+    [ "$status" -eq 0 ]
+    grep -q '^ARG:--input=.*gh-body-' "$OUT"
+    assert_generated
+}
+
+@test "api --input - reads stdin and footers it" {
+    run "$GH" api repos/o/r/issues/1/comments --input - <<<'{"body":"hi"}'
+    [ "$status" -eq 0 ]
+    ! grep -q '^ARG:-$' "$OUT"
+    grep -q '^FILE:{"body":"hi' "$OUT"
+    assert_generated
+}
+
+@test "api --input without a body key passes the file through" {
+    json="$BATS_TEST_TMPDIR/in.json"
+    printf '{"title":"t"}' >"$json"
+    run "$GH" api repos/o/r/issues --input "$json"
+    [ "$status" -eq 0 ]
+    grep -q "^ARG:$json$" "$OUT"
+    assert_no_footer
+}
+
+@test "api --input - with non-JSON stdin is forwarded unchanged" {
+    run "$GH" api repos/o/r/issues/1/comments --input - <<<'not json'
+    [ "$status" -eq 0 ]
+    grep -q '^FILE:not json$' "$OUT"
+    assert_no_footer
+}
+
+@test "api --input with an existing footer is not doubled" {
+    json="$BATS_TEST_TMPDIR/in.json"
+    printf '{"body":"hi\\n\\n---\\nGenerated with [Claude Code](https://claude.com/claude-code)"}' >"$json"
+    run "$GH" api repos/o/r/issues/1/comments --input "$json"
+    [ "$status" -eq 0 ]
+    grep -q "^ARG:$json$" "$OUT"
 }
