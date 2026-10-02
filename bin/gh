@@ -148,14 +148,15 @@ sub attribute {
     for my $line ( split /\n/, $body, -1 ) {
         next if index( $line, $ANCHOR ) >= 0;
         my $orig = $line;
-        my $link = qr{(?:https?://)?(?:www\.)?claude\.ai/code/
-            (?:session|[0-9a-f]{8}-[0-9a-f-]{27})[^\s)\]>"']*}xi;
-        $line =~ s{\[([^\]]*)\]\(\s*$link\s*\)}{$1}g;    # keep link text
+        my $link = qr{(?:https?://)?(?:[a-z0-9-]+\.)?claude\.ai/code/
+            (?:session|[0-9a-f]{8}-[0-9a-f-]{27})
+            (?:[^\s)\]>"']*[^\s)\]>"'.,;:!?])?}xi;
+        $line =~ s{\[([^\]]*)\]\(\s*$link(?:\s+"[^"]*")?\s*\)}{$1}g;    # keep link text
         $line =~ s{$link}{}g;
         $line =~ s{session_01[0-9A-Za-z]{16,}}{}g;
         $line =~ s{\Q$sid\E}{}gi if $sid;
         $line =~ s{\b[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}\b}{}gi
-            if $line =~ /session/i;
+            if $orig =~ /\bsession/i;
 
         # A line that held only a session reference ("Session: <id>") goes.
         if ( $line ne $orig ) {

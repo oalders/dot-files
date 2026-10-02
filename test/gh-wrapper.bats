@@ -427,3 +427,11 @@ footer_count() { grep -c 'Generated with \[Claude Code\]' "$OUT"; }
     [ "$status" -eq 1 ]
     [ -z "$(ls -A "$TMPDIR")" ]
 }
+
+@test "session stripping spares neighbours: punctuation, obsession, titles" {
+    run "$GH" pr comment 1 --body $'See https://app.claude.ai/code/session_01AbCdEfGhIjKlMnOpQrSt, then go.\nan obsession with order 12345678-1234-1234-1234-123456789012\n[11111111-2222-3333-4444-555555555555](https://claude.ai/code/session_x "t") here'
+    [ "$status" -eq 0 ]
+    grep -q '^ARG:See , then go.$' "$OUT"
+    grep -q 'obsession with order 12345678-1234-1234-1234-123456789012$' "$OUT"
+    refute grep -q 'claude.ai\|11111111' "$OUT"
+}
