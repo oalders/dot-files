@@ -11,10 +11,18 @@ source ~/dot-files/bash_functions.sh
 # versioning and are upgraded via `nono update` / `nono outdated`.
 is there nono || exit 0
 
-# nolabs-ai replaced the always-further namespace, and `nono update` never
-# crosses namespaces, so an old always-further/claude install must be removed
-# by hand (`nono remove always-further/claude`) before this pull succeeds.
-if ! nono list --installed | grep -q '^nolabs-ai/claude\b'; then
+# nolabs-ai replaced the always-further namespace and `nono update` never
+# crosses namespaces. The old pack is broken under nono >= 0.77 and `nono pull`
+# refuses to overwrite its files, so remove it before pulling the new one.
+has_pack() {
+    nono list --installed | awk -F'\t' -v p="$1" '$1 == p { f = 1 } END { exit !f }'
+}
+
+if has_pack always-further/claude; then
+    nono remove always-further/claude
+fi
+
+if ! has_pack nolabs-ai/claude; then
     nono pull nolabs-ai/claude
 fi
 
