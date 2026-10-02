@@ -24,6 +24,7 @@ use strict;
 use warnings;
 
 use Cwd        qw( realpath );
+use File::Glob qw( bsd_glob );
 use File::Temp qw( tempfile );
 use JSON::PP   ();
 
@@ -87,21 +88,34 @@ sub model {
     return $MODEL if defined $MODEL;
     my $sid = $ENV{CLAUDE_CODE_SESSION_ID} // q{};
     my $dir = $ENV{CLAUDE_CONFIG_DIR} // "$ENV{HOME}/.claude";
+    # Subagents share the parent's env, so the most recently written
+    # transcript is our best guess at the caller; concurrent subagents on
+    # different models can race here.
     my $newest;
     if ( $sid =~ /\A[\w-]+\z/ ) {
         ($newest) = sort { -M $a <=> -M $b } grep { -f } (
-            glob("$dir/projects/*/$sid.jsonl"),
-            glob("$dir/projects/*/$sid/subagents/*.jsonl"),
+            bsd_glob("$dir/projects/*/$sid.jsonl"),
+            bsd_glob("$dir/projects/*/$sid/subagents/*.jsonl"),
         );
     }
 
     my $id;
     if ( defined $newest && open my $fh, '<:raw', $newest ) {
         my $size = -s $fh;
-        seek $fh, ( $size > 4_000_000 ? $size - 4_000_000 : 0 ), 0;
-        local $/;
-        my $tail = <$fh> // q{};
-        ($id) = $tail =~ /.*"model":"(claude-[^"]+)"/s;
+        my $skip = $size > 4_000_000;
+        seek $fh, $size - 4_000_000, 0 if $skip;
+        my @lines = <$fh>;
+        shift @lines if $skip;    # partial line at the seek point
+
+        # Only an assistant entry's own model counts: tool inputs (e.g. an
+        # Agent call's model override) can carry "model" too.
+        for my $line ( reverse @lines ) {
+            next if index( $line, '"assistant"' ) < 0;
+            my $entry = eval { JSON::PP::decode_json($line) } or next;
+            next if ( $entry->{type} // q{} ) ne 'assistant';
+            my $m = ref $entry->{message} eq 'HASH' && $entry->{message}{model};
+            if ( $m && $m =~ /\Aclaude-/ ) { $id = $m; last }
+        }
     }
     if ( !defined $id ) {
         print {*STDERR} "gh-wrapper: refusing to post — cannot determine the "
@@ -125,11 +139,22 @@ sub attribute {
     my $sid = $ENV{CLAUDE_CODE_SESSION_ID};
     $kind = 'review' if $body =~ /Review by \Q$ANCHOR\E/;
 
-    my @lines = grep {
-        index( $_, $ANCHOR ) < 0
-            && !m{claude\.ai/code/session|\bsession_[0-9A-Za-z]{8,}}
-            && !( $sid && index( $_, $sid ) >= 0 )
-    } split /\n/, $body, -1;
+    my @lines;
+    for my $line ( split /\n/, $body, -1 ) {
+        next if index( $line, $ANCHOR ) >= 0;
+        my $orig = $line;
+        $line =~ s{\S*claude\.ai/code/(?:session|[0-9a-f]{8}-[0-9a-f-]{27})\S*}{}gi;
+        $line =~ s{session_01[0-9A-Za-z]{16,}}{}g;
+        $line =~ s{\Q$sid\E}{}gi if $sid;
+
+        # A line that held only a session reference ("Session: <id>") goes.
+        if ( $line ne $orig ) {
+            ( my $rest = $line )
+                =~ s/\b(?:claude|code|session|id|link|url|view|see)\b//gi;
+            next if $rest !~ /\w/;
+        }
+        push @lines, $line;
+    }
     $body = join "\n", @lines;
     $body =~ s/(?:\s*^---[ \t]*)*\s*\z//m;
 

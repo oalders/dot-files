@@ -338,13 +338,38 @@ footer_count() { grep -c 'Generated with \[Claude Code\]' "$OUT"; }
 }
 
 @test "session ids and links are stripped" {
-    body=$'hi\nhttps://claude.ai/code/session_01AbCdEfGhIjKl\nSession: 0f8e2a1c-test-session\nref session_01ZyXwVuTsRq\nkeep this line about session ids'
+    body=$'hi\nhttps://claude.ai/code/session_01AbCdEfGhIjKlMnOpQrSt\nSession: 0F8E2A1C-TEST-SESSION\nsee https://claude.ai/code/1b2c3d4e-0000-4000-8000-123456789abc\nfixed in session_01ZyXwVuTsRqPoNmLkJi today\nkeep this line about session ids'
     run "$GH" pr comment 1 --body "$body"
     [ "$status" -eq 0 ]
-    refute grep -q 'session_01' "$OUT"
-    refute grep -q "$CLAUDE_CODE_SESSION_ID" "$OUT"
+    refute grep -qi 'session_01\|test-session\|claude.ai/code\|1b2c3d4e' "$OUT"
+    refute grep -qi '^Session' "$OUT"
+    grep -q '^fixed in  today$' "$OUT"
     grep -q 'keep this line about session ids' "$OUT"
     grep -q '^ARG:hi$' "$OUT"
+}
+
+@test "ordinary session_ tokens in content are kept" {
+    run "$GH" pr comment 1 --body 'Set cookie session_8f7a9b3c2d1e4f5a and reload'
+    [ "$status" -eq 0 ]
+    grep -q '^ARG:Set cookie session_8f7a9b3c2d1e4f5a and reload$' "$OUT"
+}
+
+@test "a model named in a tool input is not mistaken for the running one" {
+    t="$TRANSCRIPT_DIR/$CLAUDE_CODE_SESSION_ID.jsonl"
+    write_transcript "$t" claude-opus-5-5
+    printf '{"type":"assistant","message":{"model":"claude-opus-5-5","content":[{"type":"tool_use","input":{"model":"claude-haiku-4-5"}}]}}\n' >>"$t"
+    printf '{"type":"user","message":{"content":[{"type":"tool_result","content":"{\\"model\\":\\"claude-haiku-4-5\\"}"}]}}\n' >>"$t"
+    run "$GH" pr comment 1 --body hi
+    grep -q '· Opus 5.5$' "$OUT"
+}
+
+@test "a config dir with a space in it still resolves the model" {
+    new="$BATS_TEST_TMPDIR/my claude"
+    mv "$CLAUDE_CONFIG_DIR" "$new"
+    export CLAUDE_CONFIG_DIR="$new"
+    run "$GH" pr comment 1 --body hi
+    [ "$status" -eq 0 ]
+    grep -q '· Opus 5.5$' "$OUT"
 }
 
 @test "an existing Review by footer keeps its kind" {
