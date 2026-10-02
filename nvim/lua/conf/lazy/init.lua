@@ -443,10 +443,13 @@ require('lazy').setup({
             end,
         },
         {
+            -- master is archived and breaks on Neovim 0.12+ (directives get node lists)
             'nvim-treesitter/nvim-treesitter',
-            build = ':TSUpdate | :TSInstall diff',
-            opts = {
-                ensure_installed = {
+            branch = 'main',
+            lazy = false,
+            build = ':TSUpdate',
+            config = function()
+                require('nvim-treesitter').install({
                     'bash',
                     'diff',
                     'dockerfile',
@@ -466,8 +469,8 @@ require('lazy').setup({
                     'typescript',
                     'vim',
                     'yaml',
-                },
-            },
+                })
+            end,
         }, -- recommend updating parsers on update
         -- { 'olimorris/persisted.nvim',        opts = {} },           -- session management
         -- session management
