@@ -37,6 +37,7 @@ my $ROBOT  = "\xF0\x9F\xA4\x96";
 my @API_ENDPOINT_NEEDLES = qw( /comments /issues /pulls /reviews /replies );
 
 my @temp_files;
+END { unlink @temp_files if @temp_files }    # also on refuse-to-post exits
 
 # Resolve the real gh: first executable named `gh` on PATH that is not this
 # wrapper. Fall back to the usual system path so we never recurse into ourself.
@@ -59,7 +60,6 @@ sub run_real {
     my @cmd = ( real_gh(), @_ );
     if (@temp_files) {
         my $status = system { $cmd[0] } @cmd;
-        unlink @temp_files;
         exit 1               if $status == -1;
         exit 128 + ( $status & 127 ) if $status & 127;
         exit $status >> 8;
@@ -91,11 +91,12 @@ sub model {
     # Subagents share the parent's env, so the most recently written
     # transcript is our best guess at the caller; concurrent subagents on
     # different models can race here.
+    ( my $lit = $dir ) =~ s/([\\\[\]{}*?~])/\\$1/g;
     my $newest;
     if ( $sid =~ /\A[\w-]+\z/ ) {
         ($newest) = sort { -M $a <=> -M $b } grep { -f } (
-            bsd_glob("$dir/projects/*/$sid.jsonl"),
-            bsd_glob("$dir/projects/*/$sid/subagents/*.jsonl"),
+            bsd_glob("$lit/projects/*/$sid.jsonl"),
+            bsd_glob("$lit/projects/*/$sid/subagents/*.jsonl"),
         );
     }
 
@@ -114,7 +115,11 @@ sub model {
             my $entry = eval { JSON::PP::decode_json($line) } or next;
             next if ( $entry->{type} // q{} ) ne 'assistant';
             my $m = ref $entry->{message} eq 'HASH' && $entry->{message}{model};
-            if ( $m && $m =~ /\Aclaude-/ ) { $id = $m; last }
+            # Strict shape: this string is posted verbatim-ish to GitHub.
+            if ( $m && $m =~ /\Aclaude(?:-[a-z0-9]+)+(?:\[[\w.]*\])?\z/ ) {
+                $id = $m;
+                last;
+            }
         }
     }
     if ( !defined $id ) {
@@ -143,9 +148,14 @@ sub attribute {
     for my $line ( split /\n/, $body, -1 ) {
         next if index( $line, $ANCHOR ) >= 0;
         my $orig = $line;
-        $line =~ s{\S*claude\.ai/code/(?:session|[0-9a-f]{8}-[0-9a-f-]{27})\S*}{}gi;
+        my $link = qr{(?:https?://)?(?:www\.)?claude\.ai/code/
+            (?:session|[0-9a-f]{8}-[0-9a-f-]{27})[^\s)\]>"']*}xi;
+        $line =~ s{\[([^\]]*)\]\(\s*$link\s*\)}{$1}g;    # keep link text
+        $line =~ s{$link}{}g;
         $line =~ s{session_01[0-9A-Za-z]{16,}}{}g;
         $line =~ s{\Q$sid\E}{}gi if $sid;
+        $line =~ s{\b[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}\b}{}gi
+            if $line =~ /session/i;
 
         # A line that held only a session reference ("Session: <id>") goes.
         if ( $line ne $orig ) {
@@ -200,6 +210,8 @@ sub footer_json_input {
         block("api input file '$path' is unreadable") if !defined $raw;
     }
 
+    # Only a top-level "body" is footered; anything else (e.g. a review with
+    # only inline comments[]) passes through as-is.
     my $json = JSON::PP->new->utf8;
     my $data = eval { $json->decode($raw) };
     if ( ref $data eq 'HASH' && defined $data->{body} && !ref $data->{body} ) {

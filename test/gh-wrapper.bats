@@ -385,3 +385,45 @@ footer_count() { grep -c 'Generated with \[Claude Code\]' "$OUT"; }
     [ "$status" -eq 0 ]
     grep -q "^ARG:$BODY_FILE$" "$OUT"
 }
+
+@test "a session link inside a markdown link keeps the link text" {
+    run "$GH" pr comment 1 --body 'See [the session log](https://claude.ai/code/session_01AbCdEfGhIjKlMnOpQrSt) for details.'
+    [ "$status" -eq 0 ]
+    grep -q '^ARG:See the session log for details.$' "$OUT"
+}
+
+@test "a bare session UUID is stripped, other UUIDs are kept" {
+    run "$GH" pr comment 1 --body $'from session 11111111-2222-3333-4444-555555555555 today\nrequest 66666666-7777-4888-9999-000000000000 failed'
+    [ "$status" -eq 0 ]
+    refute grep -q '11111111-2222' "$OUT"
+    grep -q '^ARG:from session  today$' "$OUT"
+    grep -q 'request 66666666-7777-4888-9999-000000000000 failed' "$OUT"
+}
+
+@test "a malformed model string blocks rather than being posted" {
+    printf '{"type":"assistant","message":{"model":"claude-x <img src=y>"}}\n' \
+        >"$TRANSCRIPT_DIR/$CLAUDE_CODE_SESSION_ID.jsonl"
+    run "$GH" pr comment 1 --body hi
+    [ "$status" -eq 1 ]
+    [ ! -e "$OUT" ]
+}
+
+@test "glob characters in the config dir are taken literally" {
+    new="$BATS_TEST_TMPDIR/c{la,x}ude*"
+    mv "$CLAUDE_CONFIG_DIR" "$new"
+    mkdir -p "$BATS_TEST_TMPDIR/cxude/projects/p"
+    write_transcript "$BATS_TEST_TMPDIR/cxude/projects/p/$CLAUDE_CODE_SESSION_ID.jsonl" claude-haiku-4-5
+    export CLAUDE_CONFIG_DIR="$new"
+    run "$GH" pr comment 1 --body hi
+    [ "$status" -eq 0 ]
+    grep -q '· Opus 5.5$' "$OUT"
+}
+
+@test "temp bodies are removed when the post is refused" {
+    export TMPDIR="$BATS_TEST_TMPDIR/tmp"
+    mkdir -p "$TMPDIR"
+    # stdin --input is copied to a temp file before the bad -F file blocks
+    run bash -c "printf '{}' | '$GH' api repos/o/r/issues/1/comments --input - -F body=@'$BATS_TEST_TMPDIR/missing'"
+    [ "$status" -eq 1 ]
+    [ -z "$(ls -A "$TMPDIR")" ]
+}
