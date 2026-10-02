@@ -12,22 +12,8 @@ if ! is there serena-mcp-server; then
     exit 1
 fi
 
-# On startup Serena tries to open a browser for its web dashboard. Silence it
-# so MCP handshakes don't hang in headless environments and don't spawn tabs
-# on every launch on desktop.
-mkdir -p "$HOME/.serena"
-config="$HOME/.serena/serena_config.yml"
-if [[ -f $config ]]; then
-    sed -i -E \
-        -e 's/^(web_dashboard):[[:space:]]*true/\1: false/' \
-        -e 's/^(web_dashboard_open_on_launch):[[:space:]]*true/\1: false/' \
-        "$config"
-else
-    cat >"$config" <<'EOF'
-web_dashboard: false
-web_dashboard_open_on_launch: false
-EOF
-fi
+# The web dashboard config (~/.serena/serena_config.yml) is owned by
+# configure/serena.sh.
 
 # Wrap uvx so the plugin's `uvx --from git+...oraios/serena serena start-mcp-server`
 # call short-circuits to the already-installed binary. The real uvx is kept

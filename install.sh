@@ -71,6 +71,7 @@ run_general_installers() {
         ./configure/bat.sh
         ./installer/claude.sh
         ./configure/claude-settings.sh
+        ./configure/serena.sh
         ./installer/oh-my-posh.sh
     )
 
