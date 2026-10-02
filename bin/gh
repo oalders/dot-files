@@ -55,7 +55,9 @@ sub run_real {
     if (@temp_files) {
         my $status = system { $cmd[0] } @cmd;
         unlink @temp_files;
-        exit( $status == -1 ? 1 : $status >> 8 );
+        exit 1               if $status == -1;
+        exit 128 + ( $status & 127 ) if $status & 127;
+        exit $status >> 8;
     }
     exec { $cmd[0] } @cmd or do {
         print {*STDERR} "gh-wrapper: cannot exec $cmd[0]: $!\n";
@@ -143,35 +145,31 @@ if ( $sub eq 'issue' || $sub eq 'pr' ) {
     run_real(@argv)
         if $action ne 'create' && $action ne 'comment' && $action ne 'edit';
 
-    # Find the body flag among the remaining args and ensure the footer.
-    my $found = 0;
+    # Find the body flag among the remaining args and ensure the footer. The
+    # glued shorthands (-bTEXT, -FFILE) are valid pflag syntax.
     for ( my $j = $i + 2 ; $j < @argv ; $j++ ) {
         my $tok = $argv[$j];
         if ( $tok eq '--body' || $tok eq '-b' ) {
-            $found = 1;
             ensure_footer_on_flag(
                 \@argv, $j + 1, 'inline',
                 $FOOTER_GENERATED
             ) if $j + 1 < @argv;
         }
-        elsif ( $tok =~ /^--body=/ ) {
-            $found = 1;
+        elsif ( $tok =~ /^(--body=|-b)./s ) {
             ensure_footer_on_flag(
-                \@argv,      [ $j, length '--body=' ],
+                \@argv,      [ $j, length $1 ],
                 'inline_eq', $FOOTER_GENERATED
             );
         }
         elsif ( $tok eq '--body-file' || $tok eq '-F' ) {
-            $found = 1;
             ensure_footer_on_flag( \@argv, $j + 1, 'file', $FOOTER_GENERATED )
                 if $j + 1 < @argv;
         }
-        elsif ( $tok =~ /^--body-file=(.*)/s ) {
-            $found = 1;
-            my $body = slurp($1);
-            block("body file '$1' is unreadable") if !defined $body;
-            $argv[$j]
-                = '--body-file=' . temp_body( $body . $FOOTER_GENERATED )
+        elsif ( $tok =~ /^(--body-file=|-F)(.+)/s ) {
+            my ( $prefix, $path ) = ( $1, $2 );
+            my $body = slurp($path);
+            block("body file '$path' is unreadable") if !defined $body;
+            $argv[$j] = $prefix . temp_body( $body . $FOOTER_GENERATED )
                 if !has_anchor($body);
         }
     }
@@ -184,16 +182,29 @@ if ( $sub eq 'api' ) {
     my ( $method, $endpoint );
     my $footer = $FOOTER_GENERATED;
 
-    # First pass: resolve method + endpoint so we know whether to act.
+    # First pass: resolve method + endpoint so we know whether to act. Value-
+    # taking flags must eat their operand or it would be taken as the endpoint.
+    # gh defaults to POST when any field is passed.
+    my %VALUE_FLAG = map { $_ => 1 } qw(
+        -H --header -q --jq -t --template --input --cache -p --preview
+        --hostname -f --raw-field -F --field
+    );
+    my $has_field = 0;
     for ( my $j = $i + 1 ; $j < @argv ; $j++ ) {
         my $tok = $argv[$j];
         if ( ( $tok eq '-X' || $tok eq '--method' ) && $j + 1 < @argv ) {
             $method = $argv[ ++$j ];
         }
-        elsif ( $tok =~ /^--method=(.*)/s )          { $method   = $1 }
-        elsif ( $tok =~ /^-X(.+)/s )                 { $method   = $1 }
-        elsif ( $tok !~ /^-/ && !defined $endpoint ) { $endpoint = $tok }
+        elsif ( $tok =~ /^--method=(.*)/s ) { $method = $1 }
+        elsif ( $tok =~ /^-X(.+)/s )        { $method = $1 }
+        elsif ( $VALUE_FLAG{$tok} ) {
+            $has_field = 1 if $tok =~ /^(?:-[fF]|--(?:raw-)?field)$/;
+            $j++;
+        }
+        elsif ( $tok =~ /^(?:-[fF].|--(?:raw-)?field=)/ ) { $has_field = 1 }
+        elsif ( $tok !~ /^-/ && !defined $endpoint )      { $endpoint  = $tok }
     }
+    $method //= 'POST' if $has_field;
     run_real(@argv) if !defined $method || uc($method) !~ /^(?:POST|PATCH)$/;
     run_real(@argv)
         if !defined $endpoint

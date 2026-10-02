@@ -178,3 +178,44 @@ footer_count() { grep -c 'Generated with \[Claude Code\]' "$OUT"; }
     grep -q '^ARG:title=t$' "$OUT"
     assert_generated
 }
+
+@test "glued -bTEXT and -FFILE forms get footer" {
+    run "$GH" pr comment 1 -bhi
+    [ "$status" -eq 0 ]
+    grep -q '^ARG:-bhi$' "$OUT"
+    assert_generated
+    run "$GH" issue comment 1 "-F$BODY_FILE"
+    [ "$status" -eq 0 ]
+    grep -q '^ARG:-F.*gh-body-' "$OUT"
+}
+
+@test "api with fields and no -X defaults to POST" {
+    run "$GH" api repos/o/r/issues/1/comments -f body=hi
+    [ "$status" -eq 0 ]
+    assert_generated
+}
+
+@test "api value-taking flags before the endpoint are skipped" {
+    run "$GH" api -H 'Accept: application/vnd.github+json' --jq .id \
+        repos/o/r/issues/1/comments -f body=hi
+    [ "$status" -eq 0 ]
+    assert_generated
+    run "$GH" api -f body=hi repos/o/r/issues/1/comments
+    [ "$status" -eq 0 ]
+    assert_generated
+}
+
+@test "api GET with explicit -X and fields passes through" {
+    run "$GH" api -X GET repos/o/r/issues/comments -f since=2026-01-01
+    [ "$status" -eq 0 ]
+    assert_no_footer
+}
+
+@test "exit status of real gh is propagated after temp-file rewrite" {
+    stub_command gh 'exit 3'
+    run "$GH" pr comment 1 --body-file "$BODY_FILE"
+    [ "$status" -eq 3 ]
+    stub_command gh 'kill -TERM $$'
+    run "$GH" pr comment 1 --body-file "$BODY_FILE"
+    [ "$status" -eq 143 ]
+}
