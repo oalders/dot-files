@@ -16,13 +16,16 @@
 #   🤖 Generated with [Claude Code](https://claude.com/claude-code) · Opus 5.5
 #   🤖 Review by [Claude Code](https://claude.com/claude-code) · Opus 5.5
 #
-# "Review by" is required on review/reply endpoints, "Generated with" elsewhere.
-# Bodies containing a Claude Code session link or id are refused too.
+# "Review by" is required for reviews and review replies, "Generated with"
+# elsewhere. Merge commit bodies, release notes and titles need no trailer,
+# but like every body they are refused if they hold a Claude Code session
+# link or id.
 #
-# Scope: only mutating writes (`issue`/`pr` create|comment|edit, and `gh api`
-# POST/PATCH to comment/issue/pull/review/reply endpoints) that carry a body.
-# Everything else — and every invocation outside a Claude session ($CLAUDECODE
-# unset), i.e. the human's own `gh` use — passes through untouched.
+# Scope: `issue`/`pr` create|new|edit|comment|close, `pr review`, `pr merge`,
+# `release` create|edit, and `gh api` POST/PATCH/PUT to comment/issue/pull/
+# review/reply endpoints or GraphQL mutations. Everything else — and every
+# invocation outside a Claude session ($CLAUDECODE unset), i.e. the human's
+# own `gh` use — passes through untouched.
 
 use strict;
 use warnings;
@@ -37,7 +40,7 @@ my $ROBOT  = "\xF0\x9F\xA4\x96";
 my $DOT    = "\xC2\xB7";
 my $MODEL  = qr/(?:Opus|Sonnet|Haiku|Fable) \d+(?:\.\d+)?/;
 
-# Endpoints whose `gh api` POST/PATCH bodies are user-visible GitHub content.
+# Endpoints whose `gh api` write bodies are user-visible GitHub content.
 my @API_ENDPOINT_NEEDLES = qw( /comments /issues /pulls /reviews /replies );
 
 my @temp_files;
@@ -57,15 +60,28 @@ sub real_gh {
     return '/usr/bin/gh';
 }
 
-# Hand off to the real gh. We system()+exit rather than exec() whenever we
-# wrote a temp file, so END can clean it up; a pure pass-through still exec()s.
+# Hand off to the real gh. Whenever we wrote a temp file we fork and wait
+# rather than exec(), so END can clean it up; TERM/HUP are forwarded to gh so
+# we outlive it and still clean up. A pure pass-through exec()s.
 sub run_real {
     my @cmd = ( real_gh(), @_ );
     if (@temp_files) {
-        my $status = system { $cmd[0] } @cmd;
-        exit 1               if $status == -1;
-        exit 128 + ( $status & 127 ) if $status & 127;
-        exit $status >> 8;
+        my $pid = fork;
+        if ( !defined $pid ) {
+            print {*STDERR} "gh-wrapper: cannot fork: $!\n";
+            exit 1;
+        }
+        if ( !$pid ) {
+            exec { $cmd[0] } @cmd or do {
+                print {*STDERR} "gh-wrapper: cannot exec $cmd[0]: $!\n";
+                exit 127;
+            };
+        }
+        local $SIG{TERM} = local $SIG{HUP}  = sub { kill $_[0] => $pid };
+        local $SIG{INT}  = local $SIG{QUIT} = 'IGNORE';    # as system() does
+        waitpid $pid, 0;
+        exit 128 + ( $? & 127 ) if $? & 127;
+        exit $? >> 8;
     }
     exec { $cmd[0] } @cmd or do {
         print {*STDERR} "gh-wrapper: cannot exec $cmd[0]: $!\n";
@@ -79,16 +95,24 @@ sub block {
     exit 1;
 }
 
-# Refuse unless $body ends with the trailer for $verb and leaks no session.
+# Refuse if $text leaks a Claude Code session link or id.
+sub check_leak {
+    my ($text) = @_;
+    my $sid = $ENV{CLAUDE_CODE_SESSION_ID};
+    block('the text must not contain a Claude Code session link or id')
+        if $text =~ m{claude\.ai/code/(?:session|[0-9a-f]{8}-[0-9a-f]{4}-)}i
+        || $text =~ /session_01[0-9A-Za-z]{16,}/
+        || ( $sid && $text =~ /\Q$sid\E/i );
+}
+
+# Refuse unless $body leaks no session and, when $verb is given, ends with the
+# trailer for $verb.
 sub check {
     my ( $body, $verb ) = @_;
-    my $sid = $ENV{CLAUDE_CODE_SESSION_ID};
-    block('the body must not contain a Claude Code session link or id')
-        if $body =~ m{claude\.ai/code/(?:session|[0-9a-f]{8}-[0-9a-f]{4}-)}i
-        || $body =~ /session_01[0-9A-Za-z]{16,}/
-        || ( $sid && $body =~ /\Q$sid\E/i );
+    check_leak($body);
+    return if !defined $verb;
     return if $body =~ /^\Q$ROBOT $verb $ANCHOR $DOT \E$MODEL[ \t]*\s*\z/m;
-    block( "the body must end with the attribution trailer, e.g.\n"
+    block(    "the body must end with the attribution trailer, e.g.\n"
             . "  $ROBOT $verb $ANCHOR $DOT Opus 5.5\n"
             . "using the name and version of the model you are running as" );
 }
@@ -107,7 +131,8 @@ sub read_body {
         open $fh, '<', $path or block("body file '$path' is unreadable");
     }
     binmode $fh, ':raw';
-    my $body = do { local $/; <$fh> } // q{};
+    my $body = do { local $/; <$fh> }
+        // q{};
     return ( $body, $path ) if $path ne q{-} && -f $path;
 
     my ( $out, $tmp )
@@ -119,143 +144,313 @@ sub read_body {
     return ( $body, $tmp );
 }
 
+# Find every value-taking flag in @$argv from $start on, the way pflag parses
+# them: `--long v`, `--long=v`, `-sv`, `-s=v`, `-s v`, and stacked booleans
+# such as `-ds v`. %$spec maps long name => [ short letter, role ]; flags not
+# in it are booleans (or unknown, which makes gh itself fail). Returns a list
+# of { name, role, pos, prefix } — the value is substr $argv[pos], length
+# prefix — and the positional arguments.
+sub parse_flags {
+    my ( $argv, $start, $spec ) = @_;
+    my %short = map { $spec->{$_}[0] ? ( $spec->{$_}[0] => $_ ) : () }
+        keys %$spec;
+    my ( @found, @positional );
+    for ( my $j = $start ; $j < @$argv ; $j++ ) {
+        my $tok = $argv->[$j];
+        if ( $tok eq '--' ) {
+            push @positional, @{$argv}[ $j + 1 .. $#$argv ];
+            last;
+        }
+        if ( $tok =~ /^--([^=]+)(=?)/ ) {
+            my $name = $1;
+            next if !$spec->{$name};
+            my %f = ( name => $name, role => $spec->{$name}[1] );
+            if ($2) { push @found, { %f, pos => $j, prefix => "--$name=" } }
+            elsif ( $j + 1 < @$argv ) {
+                push @found, { %f, pos => ++$j, prefix => q{} };
+            }
+        }
+        elsif ( $tok =~ /^-./s ) {
+            for my $k ( 1 .. length($tok) - 1 ) {
+                my $name = $short{ substr $tok, $k, 1 };
+                if ( !$name ) {
+
+                    # `-d=T` gives boolean -d a value; the rest isn't flags.
+                    last if substr( $tok, $k + 1, 1 ) eq '=';
+                    next;
+                }
+                my %f = ( name => $name, role => $spec->{$name}[1] );
+                if ( $k + 1 < length $tok ) {
+                    my $prefix = substr $tok, 0, $k + 1;
+                    $prefix .= '=' if substr( $tok, $k + 1, 1 ) eq '=';
+                    push @found, { %f, pos => $j, prefix => $prefix };
+                }
+                elsif ( $j + 1 < @$argv ) {
+                    push @found, { %f, pos => ++$j, prefix => q{} };
+                }
+                last;
+            }
+        }
+        else { push @positional, $tok }
+    }
+    return ( \@found, \@positional );
+}
+
+sub value_of {
+    my ( $argv, $f ) = @_;
+    return substr $argv->[ $f->{pos} ], length $f->{prefix};
+}
+
+# Check the `body`/`file`/`leak` flags of an issue/pr/release command. `body`
+# and `file` values need the $verb trailer (if any); `leak` values are only
+# scanned for session links. Body files are swapped for the path to pass on.
+sub check_flags {
+    my ( $argv, $start, $spec, $verb ) = @_;
+    my ($found) = parse_flags( $argv, $start, $spec );
+    for my $f (@$found) {
+        my $val = value_of( $argv, $f );
+        if    ( $f->{role} eq 'body' ) { check( $val, $verb ) }
+        elsif ( $f->{role} eq 'leak' ) { check_leak($val) }
+        elsif ( $f->{role} eq 'file' ) {
+            my ( $body, $path ) = read_body($val);
+            check( $body, $verb );
+            $argv->[ $f->{pos} ] = $f->{prefix} . $path;
+        }
+    }
+}
+
+sub values_spec {
+    map { $_ => [ undef, 'value' ] } @_;
+}
+
+my %REPO = ( repo => [ 'R', 'value' ] );
+
+my %ISSUE_PR_WRITE = (
+    %REPO,
+    values_spec(
+        qw( attach recover blocked-by blocking parent type ),
+        map { ( "add-$_", "remove-$_" ) }
+            qw( assignee label project reviewer blocked-by blocking sub-issue )
+    ),
+    body        => [ 'b', 'body' ],
+    'body-file' => [ 'F', 'file' ],
+    title       => [ 't', 'leak' ],
+    assignee    => [ 'a', 'value' ],
+    base        => [ 'B', 'value' ],
+    head        => [ 'H', 'value' ],
+    label       => [ 'l', 'value' ],
+    milestone   => [ 'm', 'value' ],
+    project     => [ 'p', 'value' ],
+    reviewer    => [ 'r', 'value' ],
+    template    => [ 'T', 'value' ],
+);
+
+# action => [ spec, trailer verb or undef ]
+my %ISSUE_PR = (
+    (
+        map { $_ => [ \%ISSUE_PR_WRITE, 'Generated with' ] }
+            qw( create new edit comment )
+    ),
+    (
+        map {
+            $_ => [
+                {
+                    %REPO, values_spec('duplicate-of'),
+                    comment => [ 'c', 'body' ],
+                    reason  => [ 'r', 'value' ],
+                },
+                'Generated with'
+            ]
+        } qw( close reopen )
+    ),
+);
+my %PR_ONLY = (
+    review => [
+        { %REPO, body => [ 'b', 'body' ], 'body-file' => [ 'F', 'file' ] },
+        'Review by'
+    ],
+    revert => [
+        {
+            %REPO,
+            body        => [ 'b', 'body' ],
+            'body-file' => [ 'F', 'file' ],
+            title       => [ 't', 'leak' ],
+        },
+        'Generated with'
+    ],
+    merge => [
+        {
+            %REPO, values_spec('match-head-commit'),
+            body           => [ 'b', 'body' ],
+            'body-file'    => [ 'F', 'file' ],
+            subject        => [ 't', 'leak' ],
+            'author-email' => [ 'A', 'value' ],
+        },
+        undef
+    ],
+);
+my %RELEASE_SPEC = (
+    %REPO,
+    values_spec(qw( discussion-category notes-start-tag target tag )),
+    notes        => [ 'n', 'body' ],
+    'notes-file' => [ 'F', 'file' ],
+    title        => [ 't', 'leak' ],
+);
+
 my @argv = @ARGV;
 
 # Outside a Claude session, or with no args, do nothing but hand off.
 run_real(@argv) if !$ENV{CLAUDECODE} || !@argv;
 
-# gh accepts global flags before the subcommand (e.g. `gh --repo o/r issue ...`).
-# Skip them to find the real subcommand; value-taking globals eat their operand.
+# gh accepts global flags before the subcommand (e.g. `gh --repo o/r issue ...`)
+# and `-R` between subcommand and action. Skip them to find each word.
 my %VALUE_GLOBAL = map { $_ => 1 } qw( -R --repo --hostname );
-my $i            = 0;
-while ( $i < @argv && $argv[$i] =~ /^-/ ) {
-    $i += ( $VALUE_GLOBAL{ $argv[$i] } && $argv[$i] !~ /=/ ) ? 2 : 1;
+
+sub next_word {
+    my ($j) = @_;
+    while ( $j < @argv && $argv[$j] =~ /^-/ ) {
+        $j += $VALUE_GLOBAL{ $argv[$j] } ? 2 : 1;
+    }
+    return $j;
 }
+
+my $i = next_word(0);
 run_real(@argv) if $i >= @argv;
+my $sub    = $argv[$i];
+my $action = $argv[ next_word( $i + 1 ) ] // q{};
 
-my $sub = $argv[$i];
-
-if ( $sub eq 'issue' || $sub eq 'pr' ) {
-    my $action = $argv[ $i + 1 ] // q{};
-    run_real(@argv)
-        if $action ne 'create' && $action ne 'comment' && $action ne 'edit';
-
-    # Check every body flag. The glued shorthands (-bTEXT, -FFILE) are valid
-    # pflag syntax. No body flag at all → editor/--fill; leave it alone.
-    for ( my $j = $i + 2 ; $j < @argv ; $j++ ) {
-        my $tok = $argv[$j];
-        last if $tok eq '--';    # the rest are positional, not flags
-        if ( ( $tok eq '--body' || $tok eq '-b' ) && $j + 1 < @argv ) {
-            check( $argv[ ++$j ], 'Generated with' );
-        }
-        elsif ( $tok =~ /^(?:--body=|-b)(.+)/s ) {
-            check( $1, 'Generated with' );
-        }
-        elsif ( ( $tok eq '--body-file' || $tok eq '-F' ) && $j + 1 < @argv ) {
-            $j++;
-            ( my $body, $argv[$j] ) = read_body( $argv[$j] );
-            check( $body, 'Generated with' );
-        }
-        elsif ( $tok =~ /^(--body-file=|-F)(.+)/s ) {
-            my $prefix = $1;
-            my ( $body, $path ) = read_body($2);
-            check( $body, 'Generated with' );
-            $argv[$j] = $prefix . $path;
-        }
-    }
+my $cmd
+    = $sub eq 'issue' ? $ISSUE_PR{$action}
+    : $sub eq 'pr'    ? $ISSUE_PR{$action} // $PR_ONLY{$action}
+    : $sub eq 'release'
+    ? ( $action =~ /^(?:create|new|edit)$/ && [ \%RELEASE_SPEC, undef ] )
+    : undef;
+if ($cmd) {
+    check_flags( \@argv, $i + 1, @$cmd );
     run_real(@argv);
 }
 
-if ( $sub eq 'api' ) {
-    my ( $method, $endpoint );
+run_real(@argv) if $sub ne 'api';
 
-    # First pass: resolve method + endpoint so we know whether to act. Value-
-    # taking flags must eat their operand or it would be taken as the endpoint.
-    # gh defaults to POST when any field or --input is passed.
-    my %VALUE_FLAG = map { $_ => 1 } qw(
-        -H --header -q --jq -t --template --input --cache -p --preview
-        --hostname -f --raw-field -F --field
-    );
-    my ( $has_field, $input_pos, $input_glued ) = (0);
-    for ( my $j = $i + 1 ; $j < @argv ; $j++ ) {
-        my $tok = $argv[$j];
-        if ( ( $tok eq '-X' || $tok eq '--method' ) && $j + 1 < @argv ) {
-            $method = $argv[ ++$j ];
-        }
-        elsif ( $tok =~ /^--method=(.*)/s ) { $method = $1 }
-        elsif ( $tok =~ /^-X(.+)/s )        { $method = $1 }
-        elsif ( $tok eq '--input' && $j + 1 < @argv ) {
-            ( $has_field, $input_pos, $input_glued ) = ( 1, ++$j, q{} );
-        }
-        elsif ( $tok =~ /^--input=/ ) {
-            ( $has_field, $input_pos, $input_glued ) = ( 1, $j, '--input=' );
-        }
-        elsif ( $VALUE_FLAG{$tok} ) {
-            $has_field = 1 if $tok =~ /^(?:-[fF]|--(?:raw-)?field)$/;
-            $j++;
-        }
-        elsif ( $tok =~ /^(?:-[fF].|--(?:raw-)?field=)/ ) { $has_field = 1 }
-        elsif ( $tok !~ /^-/ && !defined $endpoint )      { $endpoint  = $tok }
+my ( $found, $positional ) = parse_flags(
+    \@argv,
+    $i + 1,
+    {
+        values_spec(qw( cache hostname )),
+        method      => [ 'X',   'method' ],
+        field       => [ 'F',   'field' ],
+        'raw-field' => [ 'f',   'field' ],
+        input       => [ undef, 'input' ],
+        header      => [ 'H',   'value' ],
+        jq          => [ 'q',   'value' ],
+        template    => [ 't',   'value' ],
+        preview     => [ 'p',   'value' ],
     }
-    $method //= 'POST' if $has_field;
-    run_real(@argv) if !defined $method || uc($method) !~ /^(?:POST|PATCH)$/;
-    run_real(@argv)
-        if !defined $endpoint
-        || !grep { index( $endpoint, $_ ) >= 0 } @API_ENDPOINT_NEEDLES;
+);
+my ($endpoint) = @$positional;
+my ($method)   = map { value_of( \@argv, $_ ) }
+    grep { $_->{role} eq 'method' } reverse @$found;
+$method //= 'POST' if grep { $_->{role} =~ /^(?:field|input)$/ } @$found;
+my $graphql = defined $endpoint && $endpoint =~ m{(?:^|/)graphql(?:[?#]|\z)};
+run_real(@argv) if !defined $method || uc($method) !~ /^(?:POST|PATCH|PUT)$/;
+run_real(@argv)
+    if !$graphql
+    && ( !defined $endpoint
+    || !grep { index( $endpoint, $_ ) >= 0 } @API_ENDPOINT_NEEDLES );
+
+# Resolve every field to its content; `-F key=@file` reads a file. All of it is
+# scanned for session links, and %field keeps the content by key.
+my %field;
+my $input;
+for my $f (@$found) {
+    my $val = value_of( \@argv, $f );
+    if ( $f->{role} eq 'input' ) {
+        my ( $raw, $path ) = read_body($val);
+        $argv[ $f->{pos} ] = $f->{prefix} . $path;
+        check_leak($raw);
+        $input = eval { JSON::PP->new->utf8->decode($raw) };
+        if ( ref $input ) {
+            my @todo = ($input);
+            while ( defined( my $v = shift @todo ) ) {
+                if    ( ref $v eq 'HASH' )  { push @todo, values %$v }
+                elsif ( ref $v eq 'ARRAY' ) { push @todo, @$v }
+                elsif ( !ref $v ) {
+                    utf8::encode( my $s = $v );
+                    check_leak($s);
+                }
+            }
+        }
+        next;
+    }
+    next if $f->{role} ne 'field' || $val !~ /^([^=]*)=(.*)/s;
+    my ( $key, $content ) = ( $1, $2 );
+    if ( $f->{name} eq 'field' && $content =~ /^\@(.*)/s ) {
+        ( $content, my $path ) = read_body($1);
+        $argv[ $f->{pos} ] = $f->{prefix} . "$key=\@$path";
+    }
+    check_leak($content);
+    $field{$key} = $content;
+}
+
+# A JSON string value as bytes, or undef.
+sub json_str {
+    my ($v) = @_;
+    return undef if !defined $v || ref $v;
+    utf8::encode( my $s = $v );
+    return $s;
+}
+
+if ( !$graphql ) {
     my $verb
-        = $endpoint =~ m{/(?:reviews|replies)\b} ? 'Review by' : 'Generated with';
+        = $endpoint =~ m{/(?:reviews|replies)\b}
+        ? 'Review by'
+        : 'Generated with';
 
-    # --input JSON: only a top-level "body" is checked; anything else (e.g. a
-    # review with only inline comments[]) passes through as-is.
-    if ( defined $input_pos ) {
-        my ( $raw, $path )
-            = read_body( substr $argv[$input_pos], length $input_glued );
-        $argv[$input_pos] = $input_glued . $path;
-        my $data = eval { JSON::PP->new->utf8->decode($raw) };
-        if ( ref $data eq 'HASH' && defined $data->{body} && !ref $data->{body} ) {
-            utf8::encode( my $body = $data->{body} );
-            check( $body, $verb );
-        }
-    }
-
-    # Second pass: check every `body=` field. `-F/--field` treats a leading `@`
-    # as a file; `-f/--raw-field` is always a literal. $glued is the prefix to
-    # preserve when the value lives inside the flag token itself.
-    for ( my $j = $i + 1 ; $j < @argv ; $j++ ) {
-        my $tok = $argv[$j];
-        my ( $is_field, $pos, $glued );
-        if ( ( $tok eq '-F' || $tok eq '--field' ) && $j + 1 < @argv ) {
-            ( $is_field, $pos ) = ( 1, ++$j );
-        }
-        elsif ( ( $tok eq '-f' || $tok eq '--raw-field' ) && $j + 1 < @argv )
-        {
-            ( $is_field, $pos ) = ( 0, ++$j );
-        }
-        elsif ( $tok =~ /^(--field|--raw-field)=/ ) {
-            ( $is_field, $pos, $glued ) = ( $1 eq '--field', $j, "$1=" );
-        }
-        elsif ( $tok =~ /^-([fF])./ ) {
-            ( $is_field, $pos, $glued ) = ( $1 eq 'F', $j, "-$1" );
-        }
-        else { next }
-
-        $glued //= q{};
-        my $val = substr $argv[$pos], length $glued;
-        next if $val !~ /^body=(.*)/s;
-        my $body_val = $1;
-
-        if ( $is_field && $body_val =~ /^\@(.*)/s ) {    # -F body=@file
-            my ( $body, $path ) = read_body($1);
-            check( $body, $verb );
-            $argv[$pos] = $glued . 'body=@' . $path;
-        }
-        else {                                           # literal body= value
-            check( $body_val, $verb );
-        }
-    }
-
+    # Only a top-level body needs the trailer; inline review comments[] don't.
+    check( $field{body}, $verb ) if defined $field{body};
+    my $body = ref $input eq 'HASH' ? json_str( $input->{body} ) : undef;
+    check( $body, $verb ) if defined $body;
     run_real(@argv);
 }
 
-# Non-write subcommand: hand off unchanged.
+# GraphQL: a mutation's body must come from a variable (`body: $x`), so it can
+# be checked; inline string bodies are refused. Variables come from fields or
+# --input's "variables"; `input: $in` with `in[body]=...` is followed too. As
+# on REST, bodies inside lists (review threads[]) need no trailer.
+my $vars
+    = ref $input eq 'HASH' && ref $input->{variables} eq 'HASH'
+    ? $input->{variables}
+    : {};
+my $query = $field{query}
+    // ( ref $input eq 'HASH' ? json_str( $input->{query} ) : undef );
+run_real(@argv) if !defined $query || $query !~ /\bmutation\b/;
+
+# GraphQL ignores commas and `#` comments; drop them so they can't hide a body.
+( my $q = $query ) =~ s/#[^\n]*//g;
+$q =~ tr/,/ /;
+block('pass GraphQL mutation bodies as a variable (body: $body, -f body=...)')
+    if $q =~ /\bbody\s*:\s*"/;
+$q =~ s/"(?:[^"\\]|\\.)*"/""/gs;    # strings can't unbalance the [ ] count
+
+my $verb
+    = $q =~ /\b\w*(?:PullRequestReview|ReviewThreadReply)\w*\s*\(/
+    ? 'Review by'
+    : 'Generated with';
+while ( $q =~ /\bbody\s*:\s*\$(\w+)/g ) {
+    my $var    = $1;
+    my $before = substr $q, 0, $-[0];
+    next if ( () = $before =~ /\[/g ) > ( () = $before =~ /\]/g );
+    my @bodies = grep { defined } $field{$var}, json_str( $vars->{$var} );
+    block("supply the GraphQL variable \$$var holding the body") if !@bodies;
+    check( $_, $verb ) for @bodies;
+}
+for my $var ( $q =~ /\binput\s*:\s*\$(\w+)/g ) {
+    my $in = $vars->{$var};
+    for my $body (
+        $field{"${var}[body]"},
+        ref $in eq 'HASH' ? json_str( $in->{body} ) : undef
+    ) {
+        check( $body, $verb ) if defined $body;
+    }
+}
 run_real(@argv);
