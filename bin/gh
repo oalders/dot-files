@@ -1,0 +1,393 @@
+#!/usr/bin/env perl
+
+# gh wrapper: guarantee Claude's attribution footer on mutating `gh` writes.
+#
+# Why a wrapper and not (only) the kitchen-sink PreToolUse hook: that hook
+# inspects the raw *shell command string*, so it fails open on the common case
+# where the body is built with a heredoc or the command is compound/redirected
+# (exactly how an LLM tends to write `gh` calls). This wrapper runs as `gh` and
+# sees the *final argv* — after the shell has expanded every heredoc, variable,
+# and substitution — so that whole fragility class disappears. The hook stays as
+# a secondary backstop; this is the real guarantee.
+#
+# Every footered body is normalised: existing attribution lines are replaced by
+# one footer naming the running model (resolved from the session transcript),
+# and session ids/links are stripped. No model resolvable → refuse to post.
+#
+# Scope: only mutating writes (`issue`/`pr` create|comment|edit, and `gh api`
+# POST/PATCH to comment/issue/pull/review/reply endpoints) whose body we can
+# resolve. Everything else — and every invocation outside a Claude session
+# ($CLAUDECODE unset), i.e. the human's own `gh` use — passes through untouched,
+# so nothing the user writes by hand is ever falsely attributed to Claude.
+
+use strict;
+use warnings;
+
+use Cwd        qw( realpath );
+use File::Glob qw( bsd_glob );
+use File::Temp qw( tempfile );
+use JSON::PP   ();
+
+# The bytes below intentionally hold the raw UTF-8 of the robot-face emoji; the
+# whole script treats bodies as byte strings, so no `use utf8`/encoding step.
+my $ANCHOR = '[Claude Code](https://claude.com/claude-code)';
+my $ROBOT  = "\xF0\x9F\xA4\x96";
+
+# Endpoints whose `gh api` POST/PATCH bodies are user-visible GitHub content.
+my @API_ENDPOINT_NEEDLES = qw( /comments /issues /pulls /reviews /replies );
+
+my @temp_files;
+END { unlink @temp_files if @temp_files }    # also on refuse-to-post exits
+
+# Resolve the real gh: first executable named `gh` on PATH that is not this
+# wrapper. Fall back to the usual system path so we never recurse into ourself.
+sub real_gh {
+    my $self = realpath($0) // $0;
+    for my $dir ( split /:/, ( $ENV{PATH} // q{} ) ) {
+        next if $dir eq q{};
+        my $cand = "$dir/gh";
+        next if !-x $cand || -d $cand;
+        next if ( realpath($cand) // $cand ) eq $self;
+        return $cand;
+    }
+    return '/usr/bin/gh';
+}
+
+# Replace the current process with the real gh, cleaning up any temp bodies. We
+# system()+exit rather than exec() whenever we wrote a temp file, so the rewrite
+# is not leaked into the worktree; a pure pass-through still exec()s.
+sub run_real {
+    my @cmd = ( real_gh(), @_ );
+    if (@temp_files) {
+        my $status = system { $cmd[0] } @cmd;
+        exit 1               if $status == -1;
+        exit 128 + ( $status & 127 ) if $status & 127;
+        exit $status >> 8;
+    }
+    exec { $cmd[0] } @cmd or do {
+        print {*STDERR} "gh-wrapper: cannot exec $cmd[0]: $!\n";
+        exit 1;
+    };
+}
+
+# Block only when a body was explicitly given but we cannot read it (stdin, a
+# pipe, an unreadable file) — never for the no-body case (`--fill`, an editor),
+# which is legitimate and attributed elsewhere.
+sub block {
+    my ($why) = @_;
+    print {*STDERR} "gh-wrapper: refusing to post — $why. "
+        . "Put the body in a file and use --body-file.\n";
+    exit 1;
+}
+
+# Display version of the running model, e.g. "Opus 5.5", from the newest
+# transcript of this session (subagents have their own, with their own model).
+my $MODEL;
+
+sub model {
+    return $MODEL if defined $MODEL;
+    my $sid = $ENV{CLAUDE_CODE_SESSION_ID} // q{};
+    my $dir = $ENV{CLAUDE_CONFIG_DIR} // "$ENV{HOME}/.claude";
+    # Subagents share the parent's env, so the most recently written
+    # transcript is our best guess at the caller; concurrent subagents on
+    # different models can race here.
+    ( my $lit = $dir ) =~ s/([\\\[\]{}*?~])/\\$1/g;
+    my $newest;
+    if ( $sid =~ /\A[\w-]+\z/ ) {
+        ($newest) = sort { -M $a <=> -M $b } grep { -f } (
+            bsd_glob("$lit/projects/*/$sid.jsonl"),
+            bsd_glob("$lit/projects/*/$sid/subagents/*.jsonl"),
+        );
+    }
+
+    my $id;
+    if ( defined $newest && open my $fh, '<:raw', $newest ) {
+        my $size = -s $fh;
+        my $skip = $size > 4_000_000;
+        seek $fh, $size - 4_000_000, 0 if $skip;
+        my @lines = <$fh>;
+        shift @lines if $skip;    # partial line at the seek point
+
+        # Only an assistant entry's own model counts: tool inputs (e.g. an
+        # Agent call's model override) can carry "model" too.
+        for my $line ( reverse @lines ) {
+            next if index( $line, '"assistant"' ) < 0;
+            my $entry = eval { JSON::PP::decode_json($line) } or next;
+            next if ( $entry->{type} // q{} ) ne 'assistant';
+            my $m = ref $entry->{message} eq 'HASH' && $entry->{message}{model};
+            # Strict shape: this string is posted verbatim-ish to GitHub.
+            if ( $m && $m =~ /\Aclaude(?:-[a-z0-9]+)+(?:\[[\w.]*\])?\z/ ) {
+                $id = $m;
+                last;
+            }
+        }
+    }
+    if ( !defined $id ) {
+        print {*STDERR} "gh-wrapper: refusing to post — cannot determine the "
+            . "running Claude model for the attribution footer.\n";
+        exit 1;
+    }
+
+    # claude-opus-5-5 → Opus 5.5; claude-haiku-4-5-20251001 → Haiku 4.5
+    ( my $name = $id ) =~ s/\A claude- | \[.*\z//gx;
+    my @parts   = grep { !/\A\d{8}\z/ } split /-/, $name;
+    my @family  = map  { ucfirst } grep { /\D/ } @parts;
+    my @version = grep { /\A\d+\z/ } @parts;
+    return $MODEL = join q{ }, @family, join q{.}, @version;
+}
+
+# Normalise the attribution of $body: drop session ids/links and any existing
+# attribution lines, then append one footer naming the running model. $kind is
+# 'review' or 'generated'; an existing "Review by" footer keeps review.
+sub attribute {
+    my ( $body, $kind ) = @_;
+    my $sid = $ENV{CLAUDE_CODE_SESSION_ID};
+    $kind = 'review' if $body =~ /Review by \Q$ANCHOR\E/;
+
+    my @lines;
+    for my $line ( split /\n/, $body, -1 ) {
+        next if index( $line, $ANCHOR ) >= 0;
+        my $orig = $line;
+        my $link = qr{(?:https?://)?(?:[a-z0-9-]+\.)*claude\.ai/code/
+            (?:session|[0-9a-f]{8}-[0-9a-f-]{27})
+            (?:[^\s)\]>"']*[^\s)\]>"'.,;:!?])?}xi;
+        $line =~ s{\[([^\]]*)\]\(\s*$link(?:\s+(?:"[^"]*"|'[^']*'))?\s*\)}{$1}g;    # keep link text
+        $line =~ s{$link}{}g;
+        $line =~ s{session_01[0-9A-Za-z]{16,}}{}g;
+        $line =~ s{\Q$sid\E}{}gi if $sid;
+        $line =~ s{\b[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}\b}{}gi
+            if $orig =~ /\bsession/i;
+
+        # A line that held only a session reference ("Session: <id>") goes.
+        if ( $line ne $orig ) {
+            ( my $rest = $line )
+                =~ s/\b(?:claude|code|session|id|link|url|view|see)\b//gi;
+            next if $rest !~ /\w/;
+        }
+        push @lines, $line;
+    }
+    $body = join "\n", @lines;
+    $body =~ s/(?:\s*^---[ \t]*)*\s*\z//m;
+
+    my $verb = $kind eq 'review' ? 'Review by' : 'Generated with';
+    return "$body\n\n---\n$ROBOT $verb $ANCHOR \xC2\xB7 " . model() . "\n";
+}
+
+sub slurp {
+    my ($path) = @_;
+    return undef if $path eq q{-} || !-f $path || !-r _;
+    open my $fh, '<:raw', $path or return undef;
+    local $/;
+    my $data = <$fh>;
+    close $fh;
+    return $data;
+}
+
+# Write $body to a fresh temp file and return its path (tracked for cleanup).
+sub temp_body {
+    my ($body) = @_;
+    my ( $fh, $path )
+        = tempfile( 'gh-body-XXXXXX', TMPDIR => 1, SUFFIX => '.md' );
+    binmode $fh, ':raw';
+    print {$fh} $body;
+    close $fh;
+    push @temp_files, $path;
+    return $path;
+}
+
+# Footer the top-level "body" of a `gh api --input` JSON payload. Returns a temp
+# file path to substitute, or undef to leave the argument alone. Stdin is always
+# copied to a temp file, since reading it here consumes it.
+sub footer_json_input {
+    my ( $path, $kind ) = @_;
+    my $raw;
+    if ( $path eq q{-} ) {
+        binmode STDIN, ':raw';
+        local $/;
+        $raw = <STDIN> // q{};
+    }
+    else {
+        $raw = slurp($path);
+        block("api input file '$path' is unreadable") if !defined $raw;
+    }
+
+    # Only a top-level "body" is footered; anything else (e.g. a review with
+    # only inline comments[]) passes through as-is.
+    my $json = JSON::PP->new->utf8;
+    my $data = eval { $json->decode($raw) };
+    if ( ref $data eq 'HASH' && defined $data->{body} && !ref $data->{body} ) {
+        my $bytes = $data->{body};
+        utf8::encode($bytes);
+        my $new = attribute( $bytes, $kind );
+        if ( $new ne $bytes ) {
+            utf8::decode($new);
+            $data->{body} = $new;
+            return temp_body( $json->encode($data) );
+        }
+    }
+    return $path eq q{-} ? temp_body($raw) : undef;
+}
+
+# Rewrite @argv so the resolved body carries the footer, then hand off to gh.
+# Given the index of a body flag, its inline value or file, mutate in place.
+sub ensure_footer_on_flag {
+    my ( $argv, $idx, $how ) = @_;
+
+    if ( $how eq 'inline' ) {
+        $argv->[$idx] = attribute( $argv->[$idx], 'generated' );
+    }
+    elsif ( $how eq 'inline_eq' ) {    # --body=... / -bTEXT
+        my ( $pos, $len ) = @{$idx};    # [ index, prefix-length ]
+        substr( $argv->[$pos], $len )
+            = attribute( substr( $argv->[$pos], $len ), 'generated' );
+    }
+    elsif ( $how eq 'file' ) {
+        my $body = slurp( $argv->[$idx] );
+        block("body file '$argv->[$idx]' is unreadable") if !defined $body;
+        my $new = attribute( $body, 'generated' );
+        $argv->[$idx] = temp_body($new) if $new ne $body;
+    }
+    return;
+}
+
+my @argv = @ARGV;
+
+# Outside a Claude session, or with no args, do nothing but hand off.
+run_real(@argv) if !$ENV{CLAUDECODE} || !@argv;
+
+# gh accepts global flags before the subcommand (e.g. `gh --repo o/r issue ...`).
+# Skip them to find the real subcommand; value-taking globals eat their operand.
+my %VALUE_GLOBAL = map { $_ => 1 } qw( -R --repo --hostname );
+my $i            = 0;
+while ( $i < @argv && $argv[$i] =~ /^-/ ) {
+    $i += ( $VALUE_GLOBAL{ $argv[$i] } && $argv[$i] !~ /=/ ) ? 2 : 1;
+}
+run_real(@argv) if $i >= @argv;
+
+my $sub = $argv[$i];
+
+if ( $sub eq 'issue' || $sub eq 'pr' ) {
+    my $action = $argv[ $i + 1 ] // q{};
+    run_real(@argv)
+        if $action ne 'create' && $action ne 'comment' && $action ne 'edit';
+
+    # Find the body flag among the remaining args and ensure the footer. The
+    # glued shorthands (-bTEXT, -FFILE) are valid pflag syntax.
+    for ( my $j = $i + 2 ; $j < @argv ; $j++ ) {
+        my $tok = $argv[$j];
+        last if $tok eq '--';    # the rest are positional, not flags
+        if ( $tok eq '--body' || $tok eq '-b' ) {
+            ensure_footer_on_flag( \@argv, $j + 1, 'inline' ) if $j + 1 < @argv;
+        }
+        elsif ( $tok =~ /^(--body=|-b)./s ) {
+            ensure_footer_on_flag( \@argv, [ $j, length $1 ], 'inline_eq' );
+        }
+        elsif ( $tok eq '--body-file' || $tok eq '-F' ) {
+            ensure_footer_on_flag( \@argv, $j + 1, 'file' ) if $j + 1 < @argv;
+        }
+        elsif ( $tok =~ /^(--body-file=|-F)(.+)/s ) {
+            my ( $prefix, $path ) = ( $1, $2 );
+            my $body = slurp($path);
+            block("body file '$path' is unreadable") if !defined $body;
+            my $new = attribute( $body, 'generated' );
+            $argv[$j] = $prefix . temp_body($new) if $new ne $body;
+        }
+    }
+
+    # No body flag at all → editor/--fill; leave it alone.
+    run_real(@argv);
+}
+
+if ( $sub eq 'api' ) {
+    my ( $method, $endpoint );
+    my $kind = 'generated';
+
+    # First pass: resolve method + endpoint so we know whether to act. Value-
+    # taking flags must eat their operand or it would be taken as the endpoint.
+    # gh defaults to POST when any field or --input is passed.
+    my %VALUE_FLAG = map { $_ => 1 } qw(
+        -H --header -q --jq -t --template --input --cache -p --preview
+        --hostname -f --raw-field -F --field
+    );
+    my ( $has_field, $input_pos, $input_glued ) = (0);
+    for ( my $j = $i + 1 ; $j < @argv ; $j++ ) {
+        my $tok = $argv[$j];
+        if ( ( $tok eq '-X' || $tok eq '--method' ) && $j + 1 < @argv ) {
+            $method = $argv[ ++$j ];
+        }
+        elsif ( $tok =~ /^--method=(.*)/s ) { $method = $1 }
+        elsif ( $tok =~ /^-X(.+)/s )        { $method = $1 }
+        elsif ( $tok eq '--input' && $j + 1 < @argv ) {
+            ( $has_field, $input_pos, $input_glued ) = ( 1, ++$j, q{} );
+        }
+        elsif ( $tok =~ /^--input=/ ) {
+            ( $has_field, $input_pos, $input_glued ) = ( 1, $j, '--input=' );
+        }
+        elsif ( $VALUE_FLAG{$tok} ) {
+            $has_field = 1 if $tok =~ /^(?:-[fF]|--(?:raw-)?field)$/;
+            $j++;
+        }
+        elsif ( $tok =~ /^(?:-[fF].|--(?:raw-)?field=)/ ) { $has_field = 1 }
+        elsif ( $tok !~ /^-/ && !defined $endpoint )      { $endpoint  = $tok }
+    }
+    $method //= 'POST' if $has_field;
+    run_real(@argv) if !defined $method || uc($method) !~ /^(?:POST|PATCH)$/;
+    run_real(@argv)
+        if !defined $endpoint
+        || !grep { index( $endpoint, $_ ) >= 0 } @API_ENDPOINT_NEEDLES;
+    $kind = 'review' if $endpoint =~ m{/(?:reviews|replies)\b};
+
+    if ( defined $input_pos ) {
+        my $path = substr $argv[$input_pos], length $input_glued;
+        my $new  = footer_json_input( $path, $kind );
+        $argv[$input_pos] = $input_glued . $new if defined $new;
+    }
+
+    # Second pass: footer every `body=` field. `-F/--field` treats a leading
+    # `@` as a file; `-f/--raw-field` is always a literal. $glued is the prefix
+    # to preserve when the value lives inside the flag token itself.
+    for ( my $j = $i + 1 ; $j < @argv ; $j++ ) {
+        my $tok = $argv[$j];
+        my ( $is_field, $pos, $glued );
+        if ( ( $tok eq '-F' || $tok eq '--field' ) && $j + 1 < @argv ) {
+            ( $is_field, $pos ) = ( 1, ++$j );
+        }
+        elsif ( ( $tok eq '-f' || $tok eq '--raw-field' ) && $j + 1 < @argv )
+        {
+            ( $is_field, $pos ) = ( 0, ++$j );
+        }
+        elsif ( $tok =~ /^(--field|--raw-field)=/ ) {
+            ( $is_field, $pos, $glued ) = ( $1 eq '--field', $j, "$1=" );
+        }
+        elsif ( $tok =~ /^-([fF])./ ) {
+            ( $is_field, $pos, $glued ) = ( $1 eq 'F', $j, "-$1" );
+        }
+        else { next }
+
+        my $val
+            = defined $glued
+            ? substr( $argv[$pos], length $glued )
+            : $argv[$pos];
+        next if $val !~ /^body=(.*)/s;
+        my $body_val = $1;
+
+        my $new_val;
+        if ( $is_field && $body_val =~ /^\@(.*)/s ) {    # -F body=@file
+            my $body = slurp($1);
+            block("api body file '$1' is unreadable") if !defined $body;
+            my $new = attribute( $body, $kind );
+            next if $new eq $body;
+            $new_val = 'body=@' . temp_body($new);
+        }
+        else {                                           # literal body= value
+            $new_val = 'body=' . attribute( $body_val, $kind );
+        }
+
+        $argv[$pos] = defined $glued ? $glued . $new_val : $new_val;
+    }
+
+    run_real(@argv);
+}
+
+# Non-write subcommand: hand off unchanged.
+run_real(@argv);
