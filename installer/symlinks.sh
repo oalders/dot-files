@@ -14,6 +14,7 @@ directories=(
     ~/.config/oh-my-posh/themes
     ~/.config/claude-pulse
     ~/.config/gh-dash
+    ~/.config/lazygit
     ~/.config/mcphub
     ~/.config/nix
     ~/.config/nono/profiles
@@ -95,6 +96,7 @@ ln -sf $prefix/cpanreporter/config.ini ~/.cpanreporter/config.ini
 ln -sf $prefix/oh-my-posh/themes/local.omp.json ~/.config/oh-my-posh/themes/local.omp.json
 ln -sf $prefix/claude-pulse/config.json ~/.config/claude-pulse/config.json
 ln -sf $prefix/gh-dash/config.yml ~/.config/gh-dash/config.yml
+ln -sf $prefix/lazygit/config.yml ~/.config/lazygit/config.yml
 ln -sf $prefix/mcphub/servers.json ~/.config/mcphub/servers.json
 ln -sf $prefix/nix/nix.conf ~/.config/nix/nix.conf
 ln -sf $prefix/nono/oalders-ansible.json ~/.config/nono/profiles/oalders-ansible.json

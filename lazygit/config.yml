@@ -1,0 +1,6 @@
+---
+# OSC 52 so copying works over SSH/tmux, where there is no xclip/xsel.
+os:
+  copyToClipboardCmd: >-
+    printf "\033]52;c;$(printf %s {{text}} | base64 | tr -d '\n')\a"
+    > /dev/tty
