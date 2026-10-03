@@ -278,9 +278,16 @@ fi
 add_path ~/dot-files/bin
 posh_me
 
-export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"                   # This loads nvm
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion" # This loads nvm bash_completion
+# Per-project Node from package.json "engines"; system node everywhere else.
+if is there fnm; then
+    eval "$(fnm env --use-on-cd --resolve-engines --version-file-strategy=recursive --shell bash)"
+    # bash caches the old node's path, so the switch is invisible without hash -r.
+    __fnm_use_if_file_found() {
+        fnm use --silent-if-unchanged
+        hash -r
+    }
+    __fnm_use_if_file_found
+fi
 
 # get better diagnostic messages from JSON formatted Go stack traces
 better() {

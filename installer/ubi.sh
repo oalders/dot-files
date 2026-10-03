@@ -103,6 +103,7 @@ maybe_install kubernetes-sigs/kustomize
 maybe_install mgdm/htmlq
 maybe_install oalders/clodhopper
 maybe_install oalders/is
+maybe_install Schniz/fnm
 maybe_install sigstore/cosign
 maybe_install tummychow/git-absorb
 
