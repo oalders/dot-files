@@ -21,6 +21,11 @@ if is os name eq linux && is there apt && (! is there node || is cli version nod
     sudo apt-get install -y nodejs
 fi
 
+# Without a default, fnm errors on every cd outside a project with an engines pin.
+if is there fnm && ! fnm list | grep -q default; then
+    fnm default system
+fi
+
 debounce --local 1 d npm install npm@latest
 debounce --local 1 d npm install
 
