@@ -93,6 +93,7 @@ maybe_install charmbracelet/gum
 maybe_install cloudflare/cloudflared
 maybe_install crate-ci/typos
 maybe_install golangci/golangci-lint
+maybe_install hetznercloud/cli --exe hcloud
 maybe_install houseabsolute/omegasort
 maybe_install houseabsolute/precious
 maybe_install jesseduffield/lazydocker
