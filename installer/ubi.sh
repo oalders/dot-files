@@ -103,7 +103,16 @@ maybe_install kubernetes-sigs/kustomize
 maybe_install mgdm/htmlq
 maybe_install oalders/clodhopper
 maybe_install oalders/is
-maybe_install Schniz/fnm
+# fnm-linux.zip is x86_64-only, but ubi will pick it on any Linux arch.
+if is os name eq linux && is arch eq arm64; then
+    maybe_install Schniz/fnm --matching arm64
+else
+    maybe_install Schniz/fnm
+fi
+# Without a default, fnm errors on every cd outside a project with a Node pin.
+if is there fnm && ! fnm list | grep -q default; then
+    fnm default system
+fi
 maybe_install sigstore/cosign
 maybe_install tummychow/git-absorb
 
