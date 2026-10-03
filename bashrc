@@ -128,6 +128,9 @@ add_path "$HOME/.cargo/bin"
 # Haskell binaries installed via cabal
 add_path "$HOME/.cabal/bin"
 
+add_path "$HOME/local/otp/current/bin"
+add_path "$HOME/local/elixir/current/bin"
+
 add_path "$HOME/dot-files/src/git-fuzzy/bin"
 
 localperlbin=~/perl5/bin
