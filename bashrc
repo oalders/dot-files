@@ -280,12 +280,19 @@ posh_me
 
 # Per-project Node from package.json "engines"; system node everywhere else.
 if is there fnm; then
-    eval "$(fnm env --use-on-cd --resolve-engines --version-file-strategy=recursive --shell bash)"
+    # No --use-on-cd: its built-in initial `fnm use` prints "Bypassing fnm"
+    # on every (re)source, ignoring --log-level. The cd hook lives below.
+    eval "$(fnm env --resolve-engines --version-file-strategy=recursive --shell bash)"
     # bash caches the old node's path, so the switch is invisible without hash -r.
     __fnm_use_if_file_found() {
-        fnm use --silent-if-unchanged
+        fnm use --silent-if-unchanged --log-level=error
         hash -r
     }
+    __fnmcd() {
+        \cd "$@" || return $?
+        __fnm_use_if_file_found
+    }
+    alias cd=__fnmcd
     __fnm_use_if_file_found
 fi
 
