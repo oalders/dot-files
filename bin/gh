@@ -13,8 +13,11 @@
 # The wrapper validates; it never writes the trailer. The caller knows which
 # model it is, so it writes the trailer and this only checks the shape:
 #
-#   🤖 Generated with [Claude Code](https://claude.com/claude-code) · Opus 5.5
-#   🤖 Review by [Claude Code](https://claude.com/claude-code) · Opus 5.5
+#   🤖 Generated with [Claude Code](https://claude.com/claude-code) · <Model>
+#   🤖 Review by [Claude Code](https://claude.com/claude-code) · <Model>
+#
+# <Model> is whichever model writes the body (e.g. Opus 5.5, Sonnet 5); any
+# Opus/Sonnet/Haiku/Fable name passes.
 #
 # "Review by" is required for reviews and review replies, "Generated with"
 # elsewhere. Merge commit bodies, release notes and titles need no trailer,
@@ -112,9 +115,10 @@ sub check {
     check_leak($body);
     return if !defined $verb;
     return if $body =~ /^\Q$ROBOT $verb $ANCHOR $DOT \E$MODEL[ \t]*\s*\z/m;
-    block(    "the body must end with the attribution trailer, e.g.\n"
-            . "  $ROBOT $verb $ANCHOR $DOT Opus 5.5\n"
-            . "using the name and version of the model you are running as" );
+    block(    "the body must end with the attribution trailer:\n"
+            . "  $ROBOT $verb $ANCHOR $DOT <Model>\n"
+            . "where <Model> is the model you are running as (e.g. Opus 5.5,\n"
+            . "Sonnet 5); name yourself, not another model" );
 }
 
 # Read a body source: a file path, or `-` for stdin. Returns the body and the
