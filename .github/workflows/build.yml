@@ -63,3 +63,10 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ github.token }}
           PREFER_PKGS: 1
+
+      - name: Put installed tools on PATH
+        run: echo "$HOME/local/bin" >> "$GITHUB_PATH"
+
+      - name: Run bats
+        # tag-release tests would otherwise write to this job's real outputs.
+        run: env -u GITHUB_OUTPUT -u GITHUB_STEP_SUMMARY node_modules/.bin/bats test/

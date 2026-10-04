@@ -88,8 +88,9 @@ esac'
     # no nono present, to exercise the `command -v nono` fail-open branch.
     local toolbin="$BATS_TEST_TMPDIR/toolbin"
     mkdir -p "$toolbin"
-    for tool in bash awk grep uname cat; do
-        ln -sf "$(command -v "$tool")" "$toolbin/$tool"
+    # type -P: an interactive shell may define grep as a function.
+    for tool in bash awk grep uname cat is; do
+        ln -sf "$(type -P "$tool")" "$toolbin/$tool"
     done
     PATH="$toolbin" run "$PREFLIGHT" oalders
     [ "$status" -eq 0 ]
