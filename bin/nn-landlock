@@ -1,0 +1,7 @@
+#!/bin/bash
+
+set -eu -o pipefail
+
+# Make bin/nn launch this repo's sandbox with --sandbox-policy landlock.
+git config --local nn.sandboxPolicy landlock
+echo "nn.sandboxPolicy set to landlock for $(git rev-parse --show-toplevel)"

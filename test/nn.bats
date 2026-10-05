@@ -766,3 +766,28 @@ STUB
     [ "$status" -eq 0 ]
     [ -f "$BATS_TEST_TMPDIR/nono-argv" ]
 }
+
+# --- per-repo nono --sandbox-policy via git config -------------------------
+
+@test "bin/nn passes nn.sandboxPolicy from the repo's local git config" {
+    git init -q .
+    git config --local nn.sandboxPolicy landlock
+    run "$NN"
+    [ "$status" -eq 0 ]
+    grep -Fxq -- "--sandbox-policy" "$BATS_TEST_TMPDIR/nono-argv"
+    [ "$(grep -Fx -A1 -- "--sandbox-policy" "$BATS_TEST_TMPDIR/nono-argv" | tail -1)" = "landlock" ]
+}
+
+@test "bin/nn ignores nn.sandboxPolicy set in global git config" {
+    git init -q .
+    git config --global nn.sandboxPolicy landlock
+    run "$NN"
+    [ "$status" -eq 0 ]
+    ! grep -Fxq -- "--sandbox-policy" "$BATS_TEST_TMPDIR/nono-argv"
+}
+
+@test "bin/nn omits --sandbox-policy outside a git repo" {
+    run "$NN"
+    [ "$status" -eq 0 ]
+    ! grep -Fxq -- "--sandbox-policy" "$BATS_TEST_TMPDIR/nono-argv"
+}

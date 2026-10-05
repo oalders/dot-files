@@ -55,6 +55,15 @@ if common_dir=$(git rev-parse --path-format=absolute --git-common-dir 2>/dev/nul
     extra_allow=(--allow "$common_dir")
 fi
 
+# Per-repo nono --sandbox-policy (auto|landlock|external), opted into with
+# `git config --local nn.sandboxPolicy landlock`. --local on purpose: a global
+# value would silently change the sandbox for every repo. nono validates the value.
+sandbox_policy_args=()
+if sandbox_policy=$(git config --local --get nn.sandboxPolicy 2>/dev/null); then
+    sandbox_policy_args=(--sandbox-policy "$sandbox_policy")
+    echo "🗯️nn: using sandbox policy $sandbox_policy (git config nn.sandboxPolicy)" >&2
+fi
+
 # Prefer a project-local profile at .nono/profile.json over the global
 # oalders profile. Walk up from cwd to the git toplevel (or stay at cwd if
 # not in a repo) so the profile is picked up from any subdirectory.
@@ -537,6 +546,7 @@ set -x
 # claude launches. Granting it here keeps the wrapper's own dependency out
 # of every override profile. Redundant grants are harmless.
 exec nono run --profile "$profile" --allow-cwd --workdir . \
+    "${sandbox_policy_args[@]+"${sandbox_policy_args[@]}"}" \
     --read-file /usr/bin/env "${chrome_run_args[@]+"${chrome_run_args[@]}"}" \
     "${playwright_run_args[@]+"${playwright_run_args[@]}"}" \
     "${hugo_run_args[@]+"${hugo_run_args[@]}"}" "${extra_allow[@]+"${extra_allow[@]}"}" -- \
