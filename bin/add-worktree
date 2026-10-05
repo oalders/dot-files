@@ -136,11 +136,13 @@ if [[ -f .gitmodules ]]; then
     done < <(git config -f .gitmodules --name-only --get-regexp '^submodule\..*\.path$')
 fi
 
-if [[ -f package.json ]]; then
-    npm i && git co package-lock.json
-fi
+# init.sh owns dependency setup when present: it may pin Node (e.g. via fnm),
+# and fnm's cd hook doesn't fire here, so a bare `npm i` would use the wrong
+# node.
 if [[ -f scripts/init.sh ]]; then
     ./scripts/init.sh
+elif [[ -f package.json ]]; then
+    npm i && git co package-lock.json
 fi
 
 if [[ -n $(pgrep tmux) ]]; then

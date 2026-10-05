@@ -346,3 +346,28 @@ EOF
 
     [ ! -f "$worktree/.tmp/fix-gh-issue.pending" ]
 }
+
+@test "add-worktree leaves npm install to scripts/init.sh when it exists" {
+    # init.sh may pin Node (e.g. via fnm); a bare `npm i` first would run
+    # under whatever node is on PATH and warn EBADENGINE.
+    setup_git_repo
+    export NPM_LOG="$BATS_TEST_TMPDIR/npm.log"
+    stub_command npm 'printf "%s\n" "$*" >>"$NPM_LOG"'
+    mkdir -p "$REPO_DIR/scripts"
+    echo '{}' >"$REPO_DIR/package.json"
+    printf '%s\n' '#!/usr/bin/env bash' 'touch init-ran' >"$REPO_DIR/scripts/init.sh"
+    chmod +x "$REPO_DIR/scripts/init.sh"
+    git add package.json scripts/init.sh
+    git -c commit.gpgsign=false commit -q -m "add package.json and init"
+
+    run "$ADD_WORKTREE" feature-branch
+    [ "$status" -eq 0 ]
+
+    local date_stamp repo_name worktree
+    date_stamp="$(date +%Y-%m-%d)"
+    repo_name="$(basename "$REPO_DIR")"
+    worktree="$HOME/.worktree/$repo_name/$date_stamp/feature-branch"
+
+    [ -f "$worktree/init-ran" ]
+    [ ! -e "$NPM_LOG" ]
+}
