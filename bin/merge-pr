@@ -13,6 +13,9 @@ worktree. Run from inside the worktree's tmux session.
 If the PR is already MERGED, the merge is skipped and teardown runs even
 when the branch is no longer on origin — no push required.
 
+After a merge (or an already-MERGED PR), an "in progress" label
+(case-insensitive) is removed from each issue the PR closes. Best-effort.
+
 Options:
   -f, --force   Discard uncommitted changes in the worktree when
                 removing it.
@@ -331,6 +334,30 @@ if [[ -z $no_pr ]]; then
             exit 1
             ;;
         esac
+    fi
+fi
+
+# Merge mode only: drop the "in progress" label from issues this PR closes.
+# Best-effort — a label failure must never abort teardown. Runs before the
+# main-working-tree block, which can exit.
+if [[ -z $no_pr && -z $close_mode && -z $punt_mode ]] &&
+    [[ $pr_state == "OPEN" || $pr_state == "MERGED" ]]; then
+    if closing_issues=$(gh pr view "$branch" --json closingIssuesReferences \
+        -q '.closingIssuesReferences[].url' 2>/dev/null); then
+        while IFS= read -r issue_url; do
+            [[ -z $issue_url ]] && continue
+            label=$(gh issue view "$issue_url" --json labels \
+                -q '.labels[].name | select(ascii_downcase == "in progress")' 2>/dev/null) || label=""
+            if [[ -n $label ]]; then
+                if gh issue edit "$issue_url" --remove-label "$label" >/dev/null; then
+                    echo "merge-pr: removed '$label' label from $issue_url"
+                else
+                    echo "merge-pr: warning: could not remove '$label' label from $issue_url" >&2
+                fi
+            fi
+        done <<<"$closing_issues"
+    else
+        echo "merge-pr: warning: could not list issues closed by this PR; skipping label cleanup" >&2
     fi
 fi
 

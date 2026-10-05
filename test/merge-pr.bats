@@ -1168,3 +1168,163 @@ esac
     [ "$status" -eq 0 ]
     [[ "$output" == *"--punt"* ]]
 }
+
+# #1059: merge mode drops the "in progress" label from issues the PR closes.
+# The stub answers the state lookup and the closingIssuesReferences query
+# separately, serves per-issue labels from $LABELS_<n>, and logs each
+# `gh issue edit` (args one per line) so we can assert on them.
+_label_gh_stub() {
+    local state=$1
+    stub_command gh '
+log="$BATS_TEST_TMPDIR/gh.log"
+echo "$*" >>"$log"
+case "$1 $2" in
+    "pr view")
+        if [[ "$*" == *closingIssuesReferences* ]]; then
+            [[ -e "$BATS_TEST_TMPDIR/closing-fails" ]] && exit 1
+            cat "$BATS_TEST_TMPDIR/closing" 2>/dev/null
+        else
+            printf "'"$state"'\tmain\n"
+        fi
+        ;;
+    "issue view")
+        n="${3##*/}"
+        cat "$BATS_TEST_TMPDIR/labels-$n" 2>/dev/null
+        ;;
+    "issue edit")
+        printf "%s\n" "$@" >>"$BATS_TEST_TMPDIR/edit.log"
+        echo >>"$BATS_TEST_TMPDIR/edit.log"
+        [[ -e "$BATS_TEST_TMPDIR/edit-fails" ]] && exit 1
+        ;;
+    "pr merge") : >"$BATS_TEST_TMPDIR/merge-was-called" ;;
+esac
+exit 0
+'
+}
+
+_label_setup() {
+    _ready_repo
+    setup_feature_worktree
+    unset TMUX
+    stub_command tmux 'exit 0'
+    _label_gh_stub "$1"
+}
+
+ISSUE1=https://github.com/o/r/issues/1
+ISSUE2=https://github.com/o/r/issues/2
+
+@test "labels: merging an OPEN PR removes 'in progress' from its closing issue" {
+    _label_setup OPEN
+    echo "$ISSUE1" >"$BATS_TEST_TMPDIR/closing"
+    echo "in progress" >"$BATS_TEST_TMPDIR/labels-1"
+
+    run "$MERGE_PR"
+    [ "$status" -eq 0 ]
+    [ -e "$BATS_TEST_TMPDIR/merge-was-called" ]
+    [[ "$output" == *"merge-pr: removed 'in progress' label from $ISSUE1"* ]]
+    run cat "$BATS_TEST_TMPDIR/edit.log"
+    [ "$output" == "$(printf 'issue\nedit\n%s\n--remove-label\nin progress\n' "$ISSUE1")" ]
+    [ ! -d "$WORKTREE_DIR" ]
+}
+
+@test "labels: matches case-insensitively and removes by exact name" {
+    _label_setup OPEN
+    echo "$ISSUE1" >"$BATS_TEST_TMPDIR/closing"
+    echo "In Progress" >"$BATS_TEST_TMPDIR/labels-1"
+
+    run "$MERGE_PR"
+    [ "$status" -eq 0 ]
+    [[ "$output" == *"removed 'In Progress' label from $ISSUE1"* ]]
+    grep -qx -- "In Progress" "$BATS_TEST_TMPDIR/edit.log"
+}
+
+@test "labels: an already-MERGED PR still removes the label" {
+    _label_setup MERGED
+    echo "$ISSUE1" >"$BATS_TEST_TMPDIR/closing"
+    echo "in progress" >"$BATS_TEST_TMPDIR/labels-1"
+
+    run "$MERGE_PR"
+    [ "$status" -eq 0 ]
+    [[ "$output" == *"PR already MERGED"* ]]
+    [[ "$output" == *"removed 'in progress' label from $ISSUE1"* ]]
+    [ ! -e "$BATS_TEST_TMPDIR/merge-was-called" ]
+    [ ! -d "$WORKTREE_DIR" ]
+}
+
+@test "labels: an issue without the label is not edited" {
+    _label_setup OPEN
+    echo "$ISSUE1" >"$BATS_TEST_TMPDIR/closing"
+    # Real gh applies the jq filter, so a non-matching label yields nothing.
+    : >"$BATS_TEST_TMPDIR/labels-1"
+
+    run "$MERGE_PR"
+    [ "$status" -eq 0 ]
+    [[ "$output" != *"removed"* ]]
+    [ ! -e "$BATS_TEST_TMPDIR/edit.log" ]
+    [ ! -d "$WORKTREE_DIR" ]
+}
+
+@test "labels: handles multiple closing issues" {
+    _label_setup OPEN
+    printf '%s\n%s\n' "$ISSUE1" "$ISSUE2" >"$BATS_TEST_TMPDIR/closing"
+    echo "in progress" >"$BATS_TEST_TMPDIR/labels-1"
+    echo "IN PROGRESS" >"$BATS_TEST_TMPDIR/labels-2"
+
+    run "$MERGE_PR"
+    [ "$status" -eq 0 ]
+    [[ "$output" == *"removed 'in progress' label from $ISSUE1"* ]]
+    [[ "$output" == *"removed 'IN PROGRESS' label from $ISSUE2"* ]]
+    grep -qx -- "$ISSUE1" "$BATS_TEST_TMPDIR/edit.log"
+    grep -qx -- "$ISSUE2" "$BATS_TEST_TMPDIR/edit.log"
+}
+
+@test "labels: --close skips label cleanup" {
+    _label_setup OPEN
+    echo "$ISSUE1" >"$BATS_TEST_TMPDIR/closing"
+    echo "in progress" >"$BATS_TEST_TMPDIR/labels-1"
+
+    run "$MERGE_PR" --close
+    [ "$status" -eq 0 ]
+    run grep -c closingIssuesReferences "$BATS_TEST_TMPDIR/gh.log"
+    [ "$output" = "0" ]
+    [ ! -e "$BATS_TEST_TMPDIR/edit.log" ]
+    [ ! -d "$WORKTREE_DIR" ]
+}
+
+@test "labels: --punt skips label cleanup" {
+    _label_setup OPEN
+    echo "$ISSUE1" >"$BATS_TEST_TMPDIR/closing"
+    echo "in progress" >"$BATS_TEST_TMPDIR/labels-1"
+
+    run "$MERGE_PR" --punt
+    [ "$status" -eq 0 ]
+    run grep -c closingIssuesReferences "$BATS_TEST_TMPDIR/gh.log"
+    [ "$output" = "0" ]
+    [ ! -e "$BATS_TEST_TMPDIR/edit.log" ]
+    [ ! -d "$WORKTREE_DIR" ]
+}
+
+@test "labels: a failed label edit warns and teardown continues" {
+    _label_setup OPEN
+    echo "$ISSUE1" >"$BATS_TEST_TMPDIR/closing"
+    echo "in progress" >"$BATS_TEST_TMPDIR/labels-1"
+    : >"$BATS_TEST_TMPDIR/edit-fails"
+
+    run "$MERGE_PR"
+    [ "$status" -eq 0 ]
+    [[ "$output" == *"merge-pr: warning: could not remove 'in progress' label from $ISSUE1"* ]]
+    [ ! -d "$WORKTREE_DIR" ]
+    run git -C "$REPO_DIR" branch --list feature
+    [ -z "$output" ]
+}
+
+@test "labels: a failed closing-issues lookup warns and teardown continues" {
+    _label_setup OPEN
+    : >"$BATS_TEST_TMPDIR/closing-fails"
+
+    run "$MERGE_PR"
+    [ "$status" -eq 0 ]
+    [[ "$output" == *"merge-pr: warning: could not list issues closed by this PR"* ]]
+    [ ! -e "$BATS_TEST_TMPDIR/edit.log" ]
+    [ ! -d "$WORKTREE_DIR" ]
+}
