@@ -8,7 +8,8 @@
     "oalders-uv",
     "oalders-serena",
     "oalders-playwright",
-    "oalders-chrome"
+    "oalders-chrome",
+    "oalders-codex"
   ],
   "security": {
     "signal_mode": "allow_same_sandbox",

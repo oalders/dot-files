@@ -43,6 +43,7 @@ These are global infrastructure — MCP servers Claude relies on, and their runt
 | `oalders-serena`    | `~/.serena` (serena MCP config/logs/memories)                                          |
 | `oalders-playwright`| `~/.cache/ms-playwright` (host Chromium bundle, **read-only**), `/dev/shm` (browser IPC), `unix_socket_subtree_bind` on `/tmp/claude-1000/pw-mcp` (Chromium's ProcessSingleton bind — see below). `bin/nn` sets `PLAYWRIGHT_BROWSERS_PATH` so every worktree and the in-sandbox MCP share the one bundle instead of re-downloading ~265 MB each (#975). Read-only so a session executes browsers but can never poison the shared bundle; seeded/updated on the host by `installer/playwright-mcp.sh`, kept in step with the versions projects pin — an accepted manual task on this single-user box, not something to automate. An in-sandbox `playwright install` for an unseeded build fails loudly against the read-only path — the cue to refresh on the host. Net-free; CDN hosts live in the paired `oalders-playwright-net`. |
 | `oalders-chrome`    | `/opt/google/chrome` (browser binary), `~/.cache/superpowers` (browser session dirs), `~/.config/google-chrome/Crash Reports` (crashpad database — grant + `bypass_protection`; see "superpowers-chrome (full Chrome) under the sandbox") |
+| `oalders-codex`     | `~/.codex` (read+write: Codex CLI config, ChatGPT login in `auth.json`, SQLite state, sessions, `tmp/`), so `codex exec review` (the kitchen-sink `codex-review-loop` skill) runs in-sandbox. Net-free; `chatgpt.com` + `auth.openai.com` live in `oalders-net`. **Accepted escape** — see "Codex under the sandbox". |
 
 ### Project-detected (mixed in by `nn`)
 
@@ -170,6 +171,14 @@ Every non-default grant uses repeated `nono run --open-port` (localhost connect 
 | `9222` | `--chrome` | Chrome DevTools endpoint (`CHROME_WS_PORT=9222`) the superpowers-chrome MCP drives |
 | `9323`–`9342` | `playwright_enabled` (e2e markers or `--playwright`) | Playwright HTML report / trace viewer (`9323`) + preview / `webServer` (`9324`–`9342`); serve within this range |
 | `1313`–`1316` | Hugo detected **and** host has a tailscale IPv4 | `hugo server` bound to `$TAILSCALE_IP` (also exported), reachable over the tailnet |
+
+## Codex under the sandbox
+
+`oalders-codex` grants read+write on all of `~/.codex`. Codex needs write on the directory itself, not just files: it keeps SQLite databases (with `-wal`/`-shm` siblings created on the fly) at the top level, refreshes the ChatGPT token in `auth.json`, and writes `tmp/arg0` and `sessions/`. With ChatGPT auth it talks to `chatgpt.com` (backend API) and `auth.openai.com` (token refresh), both in `oalders-net`.
+
+**Security tradeoff, accepted:** the grant also makes `config.toml`, `rules/`, `skills/` and `plugins/` writable from any session. Codex runs a `notify` program from `config.toml`, so a session could plant a command that later runs **unsandboxed** when Codex is used on the host. Same class as the tmux grant (#1022). Landlock can't allow `~/.codex` while keeping `config.toml` read-only inside it (deny-overlap). The alternative, a per-session `CODEX_HOME` seeded from dot-files, was rejected: refresh tokens rotate, so `auth.json` can't be copied, and sharing it as a symlink breaks if Codex replaces the file by rename.
+
+Codex's own sandbox (bubblewrap) can't start inside nono, so `codex-review-loop` passes `--dangerously-bypass-approvals-and-sandbox` under nono; nono still confines it.
 
 ## Chromium's ProcessSingleton socket bind
 

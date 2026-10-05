@@ -1,0 +1,11 @@
+{
+  "meta": {
+    "name": "oalders-codex",
+    "description": "Codex CLI home (~/.codex): config, ChatGPT login, SQLite state, sessions, tmp. Net-free; OpenAI hosts live in oalders-net. Grants write to config.toml, which Codex on the host trusts (accepted tradeoff, see CLAUDE.md)."
+  },
+  "filesystem": {
+    "allow": [
+      "~/.codex"
+    ]
+  }
+}
