@@ -94,7 +94,11 @@ set_env_key CLAUDE_CODE_MAX_CONCURRENT_SUBAGENTS 5
 # is honored; harmless if ignored since it only narrows an allowlist. The pinned
 # opus id below is listed explicitly so it matches the allowlist exactly rather
 # than relying on the "opus" family alias, which resolves to the newest Opus.
-set_key availableModels '["claude-opus-4-8","opus","sonnet","haiku"]'
+set_key availableModels '["claude-opus-4-8","claude-mythos-5-1","opus","sonnet","haiku"]'
+
+# availableModels only filters the /model picker; this is what adds Mythos to it.
+set_env_key ANTHROPIC_CUSTOM_MODEL_OPTION claude-mythos-5-1
+set_env_key ANTHROPIC_CUSTOM_MODEL_OPTION_NAME 'Mythos 5.1'
 
 # Default new sessions to Opus 4.8 rather than whatever the "opus" alias points
 # at today (Opus 5). /model overwrites this in ~/.claude/settings.json for the
