@@ -63,6 +63,10 @@ if is os name eq darwin; then
 else
     chmod u+x $download_file
     mv $download_file "$HOME/local/bin/nvim"
+    # Containers have no FUSE, so the AppImage can't mount itself.
+    if [[ ! -e /dev/fuse ]]; then
+        export APPIMAGE_EXTRACT_AND_RUN=1
+    fi
 fi
 
 echo "done nvim install"
