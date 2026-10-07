@@ -58,6 +58,12 @@ STUB
     grep -Fxq "NPM_CONFIG_CACHE=$BATS_TEST_TMPDIR/work/.tmp/cache/npm" "$BATS_TEST_TMPDIR/nono-argv"
 }
 
+@test "bin/nn injects XDG_RUNTIME_DIR pointing at \$PWD/.tmp/run" {
+    run "$NN"
+    [ "$status" -eq 0 ]
+    grep -Fxq "XDG_RUNTIME_DIR=$BATS_TEST_TMPDIR/work/.tmp/run" "$BATS_TEST_TMPDIR/nono-argv"
+}
+
 @test "bin/nn detects Hugo via the modular config/_default/ layout" {
     # Detection keys on the config/_default/ directory existing, not on the
     # file inside it; the hugo.toml here just mirrors a real modular-layout

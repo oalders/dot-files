@@ -309,14 +309,12 @@ SYMLINKS="$SCRIPT_DIR/installer/symlinks.sh"
     [ "$status" -eq 0 ]
 }
 
-# bashrc's `fnm env` symlinks a per-shell dir here; without write access every
-# sandboxed shell prints an error and fnm's Node never lands on PATH (#1062).
-@test "oalders-core.json grants the fnm multishell directory" {
-    run jq empty "$NONO_DIR/oalders-core.json"
-    [ "$status" -eq 0 ]
-    run jq -e '.filesystem.allow | index("/run/user/1000/fnm_multishells")' \
-        "$NONO_DIR/oalders-core.json"
-    [ "$status" -eq 0 ]
+# Host shells' PATH runs through /run/user/1000/fnm_multishells, so a write
+# grant would let the sandbox repoint host node/npm; nn redirects fnm instead (#1062).
+@test "no nono profile grants the host fnm multishell directory" {
+    # Exactly 1 (no match): 2 would mean grep errored, not that it's clean.
+    run grep -l fnm_multishells "$NONO_DIR"/*.json
+    [ "$status" -eq 1 ]
 }
 
 # unix_socket_dir grants connect() on the socket's own directory. The exact
