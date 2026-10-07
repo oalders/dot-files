@@ -28,6 +28,11 @@ sources_list=/etc/apt/sources.list.d/hashicorp.list
 
 set -x
 
+# Missing from minimal images such as the Docker test's ubuntu.
+if ! is there gpg || ! is there lsb_release; then
+    sudo apt-get install -y -q --no-install-recommends gnupg lsb-release
+fi
+
 if [[ ! -f $keyring ]]; then
     sudo install -m 0755 -d /etc/apt/keyrings
     curl -fsSL https://apt.releases.hashicorp.com/gpg |
