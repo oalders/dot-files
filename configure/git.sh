@@ -10,6 +10,10 @@ git config --global user.name "Olaf Alders"
 git config --global --replace remote.origin.fetch "+refs/pull/*/head:refs/remotes/origin/pull-requests/*"
 
 git config --global branch.autosetuprebase always
+
+# Versioned hooks; core.hooksPath replaces .git/hooks entirely.
+git -C ~/dot-files config core.hooksPath .githooks
+
 git config --global branch.sort -committerdate
 
 git config --global color.ui auto
