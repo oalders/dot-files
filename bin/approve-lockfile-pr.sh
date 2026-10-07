@@ -57,7 +57,11 @@ else
     echo "No package-lock.json changes between $remote/$base_branch and $remote/$branch."
 fi
 
-read -n 1 -t 30 -s -r -p "Approve PR? Press y to continue, r to rebase, n to exit." input
+if ! read -n 1 -t 30 -s -r -p "Approve PR? Press y to continue, r to rebase, n to exit." input; then
+    echo
+    echo "Timed out waiting for input. Exiting."
+    exit 1
+fi
 
 if [[ $input == "y" ]]; then
     file=$(mktemp)
