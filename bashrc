@@ -57,6 +57,7 @@ alias pine=alpine
 alias s='source ~/.bash_profile && source ~/dot-files/fzf_functions.sh'
 # http://stackoverflow.com/questions/13064613/how-to-prune-local-tracking-branches-that-do-not-exist-on-remote-anymore
 alias show-merged-branches='git branch --no-color --merged | grep -v "\*" | grep -v master | grep -v main | grep -v -e "^+" | grep -v -e "^*"'
+alias sink='claude plugin marketplace update kitchen-sink && claude plugin update kitchen-sink@kitchen-sink'
 alias ssh-fingerprints='ls ~/.ssh/*.pub | safe_xargs -L 1 ssh-keygen -l -f'
 # https://stackoverflow.com/a/19280187/406224
 alias takeover="tmux detach -a"
