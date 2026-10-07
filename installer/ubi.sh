@@ -117,11 +117,12 @@ fi
 maybe_install sigstore/cosign
 maybe_install tummychow/git-absorb
 
-# hugo only ships .pkg archives for macOS, which ubi can't extract, so on darwin
-# it is installed via Homebrew (see brew/defaults). Linux gets the extended
-# tar.gz via ubi.
+# On darwin these come from Homebrew (brew/defaults): eza ships no macOS
+# binaries, and hugo only ships .pkg archives, which ubi can't extract.
 if ! is os name eq darwin; then
+    maybe_install eza-community/eza
     maybe_install gohugoio/hugo --matching extended --tag v0.161.1
+    maybe_install hadolint/hadolint
 fi
 
 if is cli output stdout hostname eq wolfblitzer; then
@@ -138,11 +139,6 @@ elif is os name eq darwin || is os id eq ubuntu; then
     maybe_install dandavison/delta
 else
     maybe_install dandavison/delta --matching musl
-fi
-
-# eza ships no macOS binaries, so on darwin it comes from Homebrew (brew/defaults).
-if ! is os name eq darwin; then
-    maybe_install eza-community/eza
 fi
 
 if is os name eq darwin; then
