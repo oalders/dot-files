@@ -151,7 +151,9 @@ if ! is there git-lfs; then
             sudo apt-get install git-lfs || git lfs update --force
         fi
     fi
-    git lfs install
+fi
+if is there git-lfs; then
+    git lfs install --skip-repo
 fi
 
 exit 0
