@@ -221,7 +221,8 @@ CLAUDE_MOCK
 @test "rejects detached HEAD without GitHub Actions context" {
     cd "$REPO" || return
     git checkout --quiet --detach HEAD
-    run "$SCRIPT_PATH" --no-summary --dry-run --yes
+    # CI pushes to main export exactly the context this test must lack.
+    run env -u GITHUB_ACTIONS -u GITHUB_REF "$SCRIPT_PATH" --no-summary --dry-run --yes
     [ "$status" -eq 1 ]
     [[ "$output" == *"detached HEAD"* ]]
 }
