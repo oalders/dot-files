@@ -309,11 +309,11 @@ SYMLINKS="$SCRIPT_DIR/installer/symlinks.sh"
     [ "$status" -eq 0 ]
 }
 
-# Host shells' PATH runs through /run/user/1000/fnm_multishells, so a write
-# grant would let the sandbox repoint host node/npm; nn redirects fnm instead (#1062).
-@test "no nono profile grants the host fnm multishell directory" {
+# Host shells' PATH runs through /run/user/1000/fnm_multishells, so a grant
+# there (or on a parent) would let the sandbox repoint host node/npm (#1062).
+@test "no nono profile grants anything under /run/user" {
     # Exactly 1 (no match): 2 would mean grep errored, not that it's clean.
-    run grep -l fnm_multishells "$NONO_DIR"/*.json
+    run grep -l /run/user "$NONO_DIR"/*.json
     [ "$status" -eq 1 ]
 }
 

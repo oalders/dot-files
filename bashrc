@@ -286,7 +286,8 @@ posh_me
 if is there fnm; then
     # No --use-on-cd: its built-in initial `fnm use` prints "Bypassing fnm"
     # on every (re)source, ignoring --log-level. The cd hook lives below.
-    eval "$(fnm env --resolve-engines --version-file-strategy=recursive --shell bash)"
+    # Under nn, scope the runtime-dir redirect to fnm alone (see nono/CLAUDE.md).
+    eval "$(${NN_FNM_RUNTIME_DIR:+env "XDG_RUNTIME_DIR=$NN_FNM_RUNTIME_DIR"} fnm env --resolve-engines --version-file-strategy=recursive --shell bash)"
     # bash caches the old node's path, so the switch is invisible without hash -r.
     __fnm_use_if_file_found() {
         fnm use --silent-if-unchanged --log-level=error

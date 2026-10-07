@@ -517,9 +517,7 @@ set -x
 # via `env` so it lands after nono's injection (calling-shell assignment
 # would be overwritten by nono before claude launches).
 #
-# XDG_RUNTIME_DIR redirects fnm's per-shell multishell symlinks into the
-# worktree: the host dir feeds unsandboxed shells' PATH, so granting it would
-# be a sandbox escape (#1062).
+# NN_FNM_RUNTIME_DIR: bashrc's fnm block uses it; why in nono/CLAUDE.md (#1062).
 #
 # DISABLE_AUTOUPDATER=1 stops claude from auto-updating, pinning the version.
 #
@@ -556,7 +554,7 @@ exec nono run --profile "$profile" --allow-cwd --workdir . \
     "${hugo_run_args[@]+"${hugo_run_args[@]}"}" "${extra_allow[@]+"${extra_allow[@]}"}" -- \
     env NO_PROXY="$no_proxy_value" no_proxy="$no_proxy_value" TMPDIR="$PWD/.tmp" \
     XDG_CACHE_HOME="$PWD/.tmp/cache" \
-    XDG_RUNTIME_DIR="$PWD/.tmp/run" \
+    NN_FNM_RUNTIME_DIR="$PWD/.tmp/run" \
     PLAYWRIGHT_BROWSERS_PATH="$HOME/.cache/ms-playwright" \
     NPM_CONFIG_CACHE="$PWD/.tmp/cache/npm" \
     SERENA_HOME="$PWD/.serena-home" \
