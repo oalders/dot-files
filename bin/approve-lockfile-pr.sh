@@ -63,9 +63,9 @@ if [[ $input == "y" ]]; then
     file=$(mktemp)
     $script \
         --format markdown \
-        "$remote"/"$base_branch" "$remote/$branch" >$file
+        "$remote"/"$base_branch" "$remote/$branch" >"$file"
 
-    gh pr review --approve "$branch" -F $file
+    gh pr review --approve "$branch" -F "$file"
     gh pr merge --merge --delete-branch "$branch" || gh pr merge "$branch" --auto
 elif [[ $input == "r" ]]; then
     dependabot-rebase.sh "$branch"
