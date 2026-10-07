@@ -32,7 +32,8 @@
       "/usr/local/"
     ],
     "allow": [
-      "/tmp/claude-1000"
+      "/tmp/claude-1000",
+      "/run/user/1000/fnm_multishells"
     ],
     "unix_socket_dir": [
       "/tmp/tmux-1000"
