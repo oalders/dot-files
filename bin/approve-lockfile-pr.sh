@@ -22,6 +22,11 @@ fi
 remote="origin"
 
 gh pr view "$branch"
+# UNKNOWN means GitHub hasn't computed it yet; only a known conflict blocks.
+if [[ $(gh pr view "$branch" --json mergeable -q .mergeable) == "CONFLICTING" ]]; then
+    echo "PR has merge conflicts. Rebase it first: dependabot-rebase.sh $branch"
+    exit 1
+fi
 if ! gh pr checks "$branch"; then
     read -n 1 -s -r -p "Checks failed. Press any key to continue or Ctrl-C to abort." _
     echo
