@@ -36,7 +36,7 @@ fi
 
 # Fetch only the specific branches we need for diffing
 echo "Fetching branches for comparison..."
-git fetch origin "$base_branch" "$branch" || true
+git fetch origin "$base_branch" "$branch"
 
 script=diff-lockfiles
 
@@ -46,10 +46,16 @@ is there $script || {
     exit 1
 }
 
-$script \
-    --format table \
-    --color \
-    "$remote"/"$base_branch" "$remote/$branch"
+# diff-lockfiles >= 1.3.0 prints nothing when no package-lock.json changed.
+changed=$(git diff --name-only "$remote/$base_branch" "$remote/$branch")
+if grep -q 'package-lock.json$' <<<"$changed"; then
+    $script \
+        --format table \
+        --color \
+        "$remote"/"$base_branch" "$remote/$branch"
+else
+    echo "No package-lock.json changes between $remote/$base_branch and $remote/$branch."
+fi
 
 read -n 1 -t 30 -s -r -p "Approve PR? Press y to continue, r to rebase, n to exit." input
 
