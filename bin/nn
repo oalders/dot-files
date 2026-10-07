@@ -517,7 +517,7 @@ set -x
 # via `env` so it lands after nono's injection (calling-shell assignment
 # would be overwritten by nono before claude launches).
 #
-# NN_FNM_RUNTIME_DIR: bashrc's fnm block uses it; why in nono/CLAUDE.md (#1062).
+# NN_FNM_RUNTIME_DIR is consumed by bashrc's fnm block; see nono/CLAUDE.md for why (#1062).
 #
 # DISABLE_AUTOUPDATER=1 stops claude from auto-updating, pinning the version.
 #
