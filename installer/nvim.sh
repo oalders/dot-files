@@ -75,7 +75,18 @@ if is var IS_GITHUB true; then
     ldd --version
 else
     # nvim --headless "+Lazy! sync" +qa
-    nvim --headless "+MasonToolsUpdateSync" +qa
+    # On a fresh install this can hang instead of quitting. macOS lacks timeout.
+    if is there timeout; then
+        rc=0
+        timeout 15m nvim --headless "+MasonToolsUpdateSync" +qa || rc=$?
+        if [[ $rc == 124 ]]; then
+            echo "WARNING: nvim --headless +MasonToolsUpdateSync timed out" >&2
+        elif [[ $rc != 0 ]]; then
+            exit $rc
+        fi
+    else
+        nvim --headless "+MasonToolsUpdateSync" +qa
+    fi
 fi
 
 exit 0
