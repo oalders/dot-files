@@ -296,7 +296,7 @@ if is there fnm; then
         # Claude Code's shell snapshot keeps this function but not
         # FNM_MULTISHELL_PATH, so under nn the host's /run/user path inherited
         # by claude comes back and `fnm use` can't relink it. Re-init first.
-        if [[ -n $NN_FNM_RUNTIME_DIR && $FNM_MULTISHELL_PATH != "$NN_FNM_RUNTIME_DIR"/* ]]; then
+        if [[ -n $NN_FNM_RUNTIME_DIR && $FNM_MULTISHELL_PATH != "${NN_FNM_RUNTIME_DIR%/}"/* ]]; then
             __fnm_env
         fi
         fnm use --silent-if-unchanged --log-level=error

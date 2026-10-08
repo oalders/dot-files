@@ -99,6 +99,22 @@ esac'
     [ "$(cat "$BATS_TEST_TMPDIR/fnm-use")" = "$NN_FNM_RUNTIME_DIR/fnm_multishells/existing" ]
 }
 
+@test "bashrc fnm use re-inits when the path is only a sibling-prefix match" {
+    load_bashrc_fnm_functions
+    export NN_FNM_RUNTIME_DIR="$BATS_TEST_TMPDIR/run"
+    export FNM_MULTISHELL_PATH="$BATS_TEST_TMPDIR/run-evil/fnm_multishells/x"
+    __fnm_use_if_file_found
+    [ "$(cat "$BATS_TEST_TMPDIR/fnm-use")" = "$NN_FNM_RUNTIME_DIR/fnm_multishells/new" ]
+}
+
+@test "bashrc fnm use tolerates a trailing slash on NN_FNM_RUNTIME_DIR" {
+    load_bashrc_fnm_functions
+    export NN_FNM_RUNTIME_DIR="$BATS_TEST_TMPDIR/run/"
+    export FNM_MULTISHELL_PATH="$BATS_TEST_TMPDIR/run/fnm_multishells/existing"
+    __fnm_use_if_file_found
+    [ "$(cat "$BATS_TEST_TMPDIR/fnm-use")" = "$BATS_TEST_TMPDIR/run/fnm_multishells/existing" ]
+}
+
 @test "bashrc fnm use leaves the host path alone outside nn" {
     load_bashrc_fnm_functions
     unset NN_FNM_RUNTIME_DIR

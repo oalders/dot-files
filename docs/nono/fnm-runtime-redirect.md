@@ -34,4 +34,6 @@ inherited from the host shell that ran `nn`, which is under `/run/user/1000`.
 `fnm use` then fails to relink it with the same `Permission denied`. Under
 `nn`, the function re-runs the redirected `fnm env` whenever
 `FNM_MULTISHELL_PATH` isn't under `NN_FNM_RUNTIME_DIR`. That leaves one stray
-symlink per tool call in `.tmp/run/fnm_multishells`, which is harmless.
+symlink per tool call in `.tmp/run/fnm_multishells`. Unlike `/run/user`, which is
+cleared at logout, nothing removes them, so they accumulate until `.tmp/run` is
+cleaned.
