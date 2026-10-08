@@ -17,7 +17,6 @@ lint_flags = "--check"
 
 [commands.shellcheck]
 type    = "lint"
-# git-lfs hooks are excluded: they must match git-lfs's generated output verbatim.
 include = [
     ".githooks/pre-commit",
     "**/*.sh",
