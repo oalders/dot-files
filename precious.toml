@@ -14,3 +14,39 @@ include = "**/*.lua"
 ok_exit_codes = [0]
 lint_failure_exit_codes = [1]
 lint_flags = "--check"
+
+[commands.shellcheck]
+type    = "lint"
+include = [
+    "**/*.sh",
+    "bash_profile",
+    "bashrc-docker",
+    "bin/add-worktree",
+    "bin/claude-mcp",
+    "bin/dev",
+    "bin/dl",
+    "bin/dl-audio",
+    "bin/docker-teardown",
+    "bin/fix-docker-sudo",
+    "bin/gh-delete-branch-on-merge",
+    "bin/gh-enable-private-vulnerability-reporting",
+    "bin/gh-notifications-participating",
+    "bin/gh-triage",
+    "bin/kill-worktree-procs",
+    "bin/merge-pr",
+    "bin/new-ssh-key",
+    "bin/nn",
+    "bin/nn-landlock",
+    "bin/nono-preflight",
+    "bin/prune-merged-worktrees",
+    "bin/remove-worktree",
+    "bin/tag-release",
+    "bin/tm",
+    "bin/tmux-bare-claude",
+    "bin/tmux-update-env",
+    "sketchybar/sketchybarrc",
+    "ssh/rc",
+]
+cmd = [ "shellcheck", "-x" ]
+ok_exit_codes = [0]
+lint_failure_exit_codes = [1]
