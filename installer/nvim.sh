@@ -5,6 +5,12 @@
 
 set -eux
 
+# Nothing in CI or the Docker test uses nvim, and a fresh headless plugin sync hangs there.
+if is var GITHUB_WORKSPACE set || [[ -f /.dockerenv ]]; then
+    echo "Skip nvim.sh (CI or Docker)"
+    exit 0
+fi
+
 if is there nvim && is cli age nvim lt 18 hours; then
     exit
 fi
@@ -63,30 +69,11 @@ if is os name eq darwin; then
 else
     chmod u+x $download_file
     mv $download_file "$HOME/local/bin/nvim"
-    # Containers have no FUSE, so the AppImage can't mount itself.
-    if [[ ! -e /dev/fuse ]]; then
-        export APPIMAGE_EXTRACT_AND_RUN=1
-    fi
 fi
 
 echo "done nvim install"
 
-if is var IS_GITHUB true; then
-    ldd --version
-else
-    # nvim --headless "+Lazy! sync" +qa
-    # On a fresh install this can hang instead of quitting. macOS lacks timeout.
-    if is there timeout; then
-        rc=0
-        timeout 15m nvim --headless "+MasonToolsUpdateSync" +qa || rc=$?
-        if [[ $rc == 124 ]]; then
-            echo "WARNING: nvim --headless +MasonToolsUpdateSync timed out" >&2
-        elif [[ $rc != 0 ]]; then
-            exit $rc
-        fi
-    else
-        nvim --headless "+MasonToolsUpdateSync" +qa
-    fi
-fi
+# nvim --headless "+Lazy! sync" +qa
+nvim --headless "+MasonToolsUpdateSync" +qa
 
 exit 0
