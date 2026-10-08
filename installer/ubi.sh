@@ -172,6 +172,9 @@ if is there gh; then
     if ! gh extension list | grep --quiet gh-dash; then
         db gh extension install dlvhdr/gh-dash || true
     fi
+    if ! gh extension list | grep --quiet gh-stack; then
+        db gh extension install github/gh-stack || true
+    fi
     # `extension install` never upgrades, so keep all extensions current here.
     db gh extension upgrade --all || true
 fi
