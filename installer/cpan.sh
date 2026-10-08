@@ -36,16 +36,16 @@ if is os name eq darwin && [[ ! -d /opt/homebrew ]]; then
     export OPENSSL_PREFIX
 elif (is os id eq debian || is os id eq ubuntu) && is user sudoer; then
     # Install development headers on Debian/Ubuntu if not already installed
-    packages_to_install=""
+    packages_to_install=()
     if ! dpkg -l | grep -q libssl-dev; then
-        packages_to_install="$packages_to_install libssl-dev"
+        packages_to_install+=(libssl-dev)
     fi
     if ! dpkg -l | grep -q zlib1g-dev; then
-        packages_to_install="$packages_to_install zlib1g-dev"
+        packages_to_install+=(zlib1g-dev)
     fi
-    if [[ -n "$packages_to_install" ]]; then
+    if [[ ${#packages_to_install[@]} -gt 0 ]]; then
         sudo apt-get -y update
-        sudo apt-get -y install $packages_to_install
+        sudo apt-get -y install "${packages_to_install[@]}"
     fi
 fi
 

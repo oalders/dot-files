@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# shellcheck disable=SC2317 # code after the early exit is disabled on purpose
 
 # Converting master => main
 # via https://www.kiloloco.com/articles/003-From-Master-To-Main/

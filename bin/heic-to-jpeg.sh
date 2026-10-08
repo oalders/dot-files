@@ -11,7 +11,7 @@ if [ "$#" -eq 0 ]; then
     files=$(find . -type f \( -iname '*.heic' -o -iname '*.HEIC' \))
 else
     # Arguments provided, use those as file names
-    files="$@"
+    files="$*"
 fi
 
 for i in $files; do

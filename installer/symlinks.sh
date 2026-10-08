@@ -73,7 +73,7 @@ files=(
 )
 
 for file in "${files[@]}"; do
-    ln -sf "$prefix/$file" ~/.$file
+    ln -sf "$prefix/$file" ~/."$file"
 done
 
 # Copy npmrc instead of symlinking so npm can add auth tokens without affecting the repo

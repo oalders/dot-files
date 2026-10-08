@@ -10,7 +10,7 @@ fi
 
 TARGET=$1
 
-rsync -avz ~/dot-files $TARGET:~/
-rsync -avz ~/.vim/plugged $TARGET:~/.vim/
-rsync -avz ~/.vim/autoload $TARGET:~/.vim/
-rsync -avz ~/.tmux/plugins $TARGET:~/.tmux/
+rsync -avz ~/dot-files "$TARGET":~/
+rsync -avz ~/.vim/plugged "$TARGET":~/.vim/
+rsync -avz ~/.vim/autoload "$TARGET":~/.vim/
+rsync -avz ~/.tmux/plugins "$TARGET":~/.tmux/

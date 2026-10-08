@@ -2,7 +2,7 @@
 
 set -eu -o pipefail
 
-# shellcheck source=../bash_functions.sh
+# shellcheck source=bash_functions.sh
 source ~/dot-files/bash_functions.sh
 
 # Install the Claude Code pack and refresh installed nono packs from the signed

@@ -13,7 +13,7 @@ TERMINFO_FILE="/tmp/${TERM}.ti"
 # exit if this is already configured
 infocmp -l -x | grep Smulx && exit
 
-infocmp >$TERMINFO_FILE
+infocmp >"$TERMINFO_FILE"
 
 if is os name eq darwin; then
     sed -i '' '/smul=\\E\[4m,/a\
