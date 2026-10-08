@@ -56,7 +56,7 @@ echo "  Fetching GitHub IP ranges..."
 gh_ranges=$(curl -s --connect-timeout 3 --max-time 5 https://api.github.com/meta 2>/dev/null || true)
 if [ -n "$gh_ranges" ] && echo "$gh_ranges" | jq -e '.web' >/dev/null 2>&1; then
     while read -r cidr; do
-        [ -n "$cidr" ] && ipset add allowed-domains "$cidr" 2>/dev/null || true
+        [ -z "$cidr" ] || ipset add allowed-domains "$cidr" 2>/dev/null || true
     done < <(echo "$gh_ranges" | jq -r '(.web + .api + .git)[]' 2>/dev/null | grep -E '^[0-9]')
 fi
 
