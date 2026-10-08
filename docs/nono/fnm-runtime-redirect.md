@@ -24,3 +24,14 @@ Claude Code's messaging socket lives at `$XDG_RUNTIME_DIR/cc-socks/`, and
 nono's `claude-code` base profile grants `/run/user/1000/cc-socks`. Moving
 `XDG_RUNTIME_DIR` session-wide would put the socket outside that grant. So
 bashrc applies the redirect to the `fnm env` call alone.
+
+## Why `__fnm_use_if_file_found` re-runs `fnm env`
+
+Claude Code sources bashrc once, then replays a shell snapshot for each Bash
+tool call. The snapshot keeps the `cd` alias and fnm functions but not
+`FNM_MULTISHELL_PATH`. So every tool call sees the value that `claude`
+inherited from the host shell that ran `nn`, which is under `/run/user/1000`.
+`fnm use` then fails to relink it with the same `Permission denied`. Under
+`nn`, the function re-runs the redirected `fnm env` whenever
+`FNM_MULTISHELL_PATH` isn't under `NN_FNM_RUNTIME_DIR`. That leaves one stray
+symlink per tool call in `.tmp/run/fnm_multishells`, which is harmless.

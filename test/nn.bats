@@ -71,6 +71,42 @@ STUB
     grep -Fq 'XDG_RUNTIME_DIR=$NN_FNM_RUNTIME_DIR"} fnm env' "$BIN_DIR/../bashrc"
 }
 
+# Claude Code's shell snapshot keeps bashrc's fnm functions but not
+# FNM_MULTISHELL_PATH, so each Bash tool call sees the host's /run/user path
+# that claude inherited; `fnm use` must not try to relink it.
+load_bashrc_fnm_functions() {
+    stub_command fnm 'case $1 in
+    env) echo "export FNM_MULTISHELL_PATH=$XDG_RUNTIME_DIR/fnm_multishells/new" ;;
+    use) echo "$FNM_MULTISHELL_PATH" >> "$BATS_TEST_TMPDIR/fnm-use" ;;
+esac'
+    eval "$(sed -n -e '/^    __fnm_env() {/,/^    }/p' \
+        -e '/^    __fnm_use_if_file_found() {/,/^    }/p' "$BIN_DIR/../bashrc")"
+}
+
+@test "bashrc fnm use re-inits into NN_FNM_RUNTIME_DIR when the host path leaks in" {
+    load_bashrc_fnm_functions
+    export NN_FNM_RUNTIME_DIR="$BATS_TEST_TMPDIR/run"
+    export FNM_MULTISHELL_PATH=/run/user/1000/fnm_multishells/host
+    __fnm_use_if_file_found
+    [ "$(cat "$BATS_TEST_TMPDIR/fnm-use")" = "$NN_FNM_RUNTIME_DIR/fnm_multishells/new" ]
+}
+
+@test "bashrc fnm use keeps an already-redirected multishell path" {
+    load_bashrc_fnm_functions
+    export NN_FNM_RUNTIME_DIR="$BATS_TEST_TMPDIR/run"
+    export FNM_MULTISHELL_PATH="$NN_FNM_RUNTIME_DIR/fnm_multishells/existing"
+    __fnm_use_if_file_found
+    [ "$(cat "$BATS_TEST_TMPDIR/fnm-use")" = "$NN_FNM_RUNTIME_DIR/fnm_multishells/existing" ]
+}
+
+@test "bashrc fnm use leaves the host path alone outside nn" {
+    load_bashrc_fnm_functions
+    unset NN_FNM_RUNTIME_DIR
+    export FNM_MULTISHELL_PATH=/run/user/1000/fnm_multishells/host
+    __fnm_use_if_file_found
+    [ "$(cat "$BATS_TEST_TMPDIR/fnm-use")" = /run/user/1000/fnm_multishells/host ]
+}
+
 @test "bin/nn detects Hugo via the modular config/_default/ layout" {
     # Detection keys on the config/_default/ directory existing, not on the
     # file inside it; the hugo.toml here just mirrors a real modular-layout
