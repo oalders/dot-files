@@ -148,6 +148,7 @@ proj_fallback="$(basename "$wt" | tr '[:upper:]' '[:lower:]' | tr -cd 'a-z0-9_-'
 # $compose_projects is unquoted on purpose to word-split into names; `set -f`
 # disables globbing so a name can't expand as a pathname pattern.
 set -f
+# shellcheck disable=SC2086
 candidate_projects="$(printf '%s\n' $compose_projects "$proj_fallback" \
     | grep -v '^$' | sort -u)"
 set +f

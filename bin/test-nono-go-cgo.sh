@@ -2,6 +2,7 @@
 
 set -eu -o pipefail
 
+# shellcheck disable=SC2016 # expanded by the inner bash
 nono run --profile oalders-go-cgo-dev -- bash -c '
 set -eu -o pipefail
 d=$(mktemp -d cgo-test.XXXXXX)

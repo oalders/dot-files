@@ -2,8 +2,9 @@
 
 # SC2016: the single-quoted `bash -c` bodies are intentional; $1/$2 are expanded
 #         by the child shell, not here.
-# SC2329: wait_for_input/alfred_metacpan are invoked indirectly via `bash -c`.
-# shellcheck disable=SC2016,SC2329
+# SC2317 (shellcheck <0.10) / SC2329: wait_for_input/alfred_metacpan are
+#         invoked indirectly via `bash -c`.
+# shellcheck disable=SC2016,SC2317,SC2329
 
 set -eu
 

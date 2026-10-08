@@ -31,7 +31,7 @@ model_str=$(printf "${COMMENT}%s${RESET}" "$model")
 folder_str=$(printf "${COMMENT}%s${RESET}" "$folder")
 
 # ── Pipe separator in comment colour ─────────────────────────────────────────
-SEP=$(printf "${COMMENT}|${RESET}")
+SEP=$(printf '%b|%b' "$COMMENT" "$RESET")
 
 # ── Dimmed session segment (UUID truncated to 8 chars) ───────────────────────
 # Only built when session_id is present, so an absent id renders no segment.

@@ -2,7 +2,7 @@
 
 set -euxo pipefail
 
-# shellcheck source=../bash_functions.sh
+# shellcheck source=bash_functions.sh
 source ~/dot-files/bash_functions.sh
 
 # Pin the Codex CLI so re-runs don't silently jump to latest. Bump here to
