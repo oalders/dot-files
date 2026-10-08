@@ -309,6 +309,14 @@ SYMLINKS="$SCRIPT_DIR/installer/symlinks.sh"
     [ "$status" -eq 0 ]
 }
 
+# Host shells' PATH runs through /run/user/1000/fnm_multishells, so a grant
+# there (or on a parent) would let the sandbox repoint host node/npm (#1062).
+@test "no nono profile grants anything under /run/user" {
+    # Exactly 1 (no match): 2 would mean grep errored, not that it's clean.
+    run grep -l /run/user "$NONO_DIR"/*.json
+    [ "$status" -eq 1 ]
+}
+
 # unix_socket_dir grants connect() on the socket's own directory. The exact
 # socket filename varies by tmux server instance, so unix_socket on a fixed
 # path would not survive a server restart; the *_bind variants would add

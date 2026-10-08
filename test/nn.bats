@@ -58,6 +58,19 @@ STUB
     grep -Fxq "NPM_CONFIG_CACHE=$BATS_TEST_TMPDIR/work/.tmp/cache/npm" "$BATS_TEST_TMPDIR/nono-argv"
 }
 
+# Only fnm gets the redirect (via bashrc): a session-wide XDG_RUNTIME_DIR would
+# move Claude Code's cc-socks messaging socket out of its granted dir (#1062).
+@test "bin/nn injects NN_FNM_RUNTIME_DIR, not XDG_RUNTIME_DIR" {
+    run "$NN"
+    [ "$status" -eq 0 ]
+    grep -Fxq "NN_FNM_RUNTIME_DIR=$BATS_TEST_TMPDIR/work/.tmp/run" "$BATS_TEST_TMPDIR/nono-argv"
+    ! grep -q "^XDG_RUNTIME_DIR=" "$BATS_TEST_TMPDIR/nono-argv"
+}
+
+@test "bashrc feeds NN_FNM_RUNTIME_DIR to fnm env as XDG_RUNTIME_DIR" {
+    grep -Fq 'XDG_RUNTIME_DIR=$NN_FNM_RUNTIME_DIR"} fnm env' "$BIN_DIR/../bashrc"
+}
+
 @test "bin/nn detects Hugo via the modular config/_default/ layout" {
     # Detection keys on the config/_default/ directory existing, not on the
     # file inside it; the hugo.toml here just mirrors a real modular-layout

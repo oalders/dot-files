@@ -517,6 +517,8 @@ set -x
 # via `env` so it lands after nono's injection (calling-shell assignment
 # would be overwritten by nono before claude launches).
 #
+# NN_FNM_RUNTIME_DIR is consumed by bashrc's fnm block; see nono/CLAUDE.md for why (#1062).
+#
 # DISABLE_AUTOUPDATER=1 stops claude from auto-updating, pinning the version.
 #
 # FORCE_AUTOUPDATE_PLUGINS=1 keeps plugins updating even though the claude
@@ -555,6 +557,7 @@ exec nono run --profile "$profile" --allow-cwd --workdir . \
     "${hugo_run_args[@]+"${hugo_run_args[@]}"}" "${extra_allow[@]+"${extra_allow[@]}"}" -- \
     env NO_PROXY="$no_proxy_value" no_proxy="$no_proxy_value" TMPDIR="$PWD/.tmp" \
     XDG_CACHE_HOME="$PWD/.tmp/cache" \
+    NN_FNM_RUNTIME_DIR="$PWD/.tmp/run" \
     PLAYWRIGHT_BROWSERS_PATH="$HOME/.cache/ms-playwright" \
     NPM_CONFIG_CACHE="$PWD/.tmp/cache/npm" \
     SERENA_HOME="$PWD/.serena-home" \
