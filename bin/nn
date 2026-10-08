@@ -523,6 +523,9 @@ set -x
 # binary itself is pinned: DISABLE_AUTOUPDATER would otherwise freeze plugins
 # alongside the CLI, so we opt them back in explicitly.
 #
+# DISABLE_TELEMETRY / DISABLE_ERROR_REPORTING stop claude from sending to
+# Statsig and Datadog, which nono's allowlist would deny anyway.
+#
 # PLAYWRIGHT_BROWSERS_PATH pins Playwright's browser bundle to the shared,
 # read-only host bundle at ~/.cache/ms-playwright. Playwright otherwise derives
 # its path from XDG_CACHE_HOME, which is per-worktree ("$PWD/.tmp/cache") — so
@@ -557,6 +560,8 @@ exec nono run --profile "$profile" --allow-cwd --workdir . \
     SERENA_HOME="$PWD/.serena-home" \
     DISABLE_AUTOUPDATER=1 \
     FORCE_AUTOUPDATE_PLUGINS=1 \
+    DISABLE_TELEMETRY=1 \
+    DISABLE_ERROR_REPORTING=1 \
     COLORTERM=truecolor \
     "${chrome_env[@]+"${chrome_env[@]}"}" \
     "${hugo_env[@]+"${hugo_env[@]}"}" \

@@ -68,6 +68,10 @@ set_env_key DISABLE_AUTOUPDATER 1
 # freeze alongside the CLI.
 set_env_key FORCE_AUTOUPDATE_PLUGINS 1
 
+# Opt out of Statsig telemetry and Datadog error reporting.
+set_env_key DISABLE_TELEMETRY 1
+set_env_key DISABLE_ERROR_REPORTING 1
+
 # Compact automatically instead of needing a manual /compact. Compaction fires
 # at window-33k (20k reserved for output, 13k buffer), and the window itself is
 # clamped to the model max -- so on a 200k model anything above 200000 is a
