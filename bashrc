@@ -15,6 +15,7 @@ export HISTTIMEFORMAT="%Y-%m-%d %H:%M:%S  "
 export CLAUDE_CODE_DISABLE_1M_CONTEXT=1
 
 export LANG=en_US.UTF-8
+export LC_TIME=en_GB.UTF-8
 export LSCOLORS=exfxcxdxbxegedabagacad
 
 # http://askubuntu.com/questions/80371/bash-history-handling-with-multiple-terminals
@@ -34,7 +35,6 @@ alias bytes_human='perl -MNumber::Bytes::Human -e "print Number::Bytes::Human::f
 alias c="clear && { [ -n \"\$TMUX\" ] && tmux clear-history; }"
 alias cdr='cd $(git root)'
 alias clean-the-sink='rm -rf ~/.claude/plugins/cache/kitchen-sink'
-alias date='date +"%a %d %b %Y %T %Z"'
 alias delete-merged-branches='show-merged-branches | safe_xargs -n 1 git branch -d'
 alias dangling-dockers='docker rmi -f $(docker images -f "dangling=true" -q)'
 alias dr='NO_JIGSAW=1 HARNESS_OPTIONS="j8:c" dzil release'
