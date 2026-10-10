@@ -14,6 +14,14 @@ claude plugin marketplace add oalders/talk-about-us
 claude plugin marketplace add oalders/kitchen-sink
 claude plugin marketplace add Ovid/paad
 
+# Third-party marketplaces default to autoUpdate off, and FORCE_AUTOUPDATE_PLUGINS
+# does not change that.
+settings=~/.claude/settings.json
+tmp=$(mktemp "${TMPDIR:-/tmp}/claude-settings.XXXXXX")
+jq '.extraKnownMarketplaces |= with_entries(.value.autoUpdate = true)' "$settings" >"$tmp"
+cat "$tmp" >"$settings"
+rm "$tmp"
+
 claude plugin install commit-commands@claude-plugins-official
 claude plugin install elements-of-style@superpowers-marketplace
 claude plugin install frontend-design@claude-plugins-official
