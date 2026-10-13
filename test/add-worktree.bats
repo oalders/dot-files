@@ -334,6 +334,47 @@ EOF
     grep -q "attach -t" "$TMUX_LOG"
 }
 
+@test "add-worktree sets up a worktree and detached session per branch inside tmux" {
+    setup_git_repo
+    _stub_tmux_env
+    export TMUX_PANE="%0"
+
+    run "$ADD_WORKTREE" b1 b2
+    [ "$status" -eq 0 ]
+
+    local all
+    all="$HOME/.worktree/$(basename "$REPO_DIR")/$(date +%Y-%m-%d)"
+    [ -d "$all/b1" ]
+    [ -d "$all/b2" ]
+    [ "$(grep -c "new -s" "$TMUX_LOG")" -eq 2 ]
+    ! grep -q "attach" "$TMUX_LOG"
+}
+
+@test "add-worktree refuses several branches outside tmux" {
+    setup_git_repo
+    _stub_tmux_env
+
+    run "$ADD_WORKTREE" b1 b2
+    [ "$status" -ne 0 ]
+    [[ "$output" == *"inside tmux"* ]]
+    [ ! -d "$HOME/.worktree" ]
+}
+
+@test "add-worktree stops at the first failing branch and prints how to resume" {
+    setup_git_repo
+    _stub_tmux_env
+    export TMUX_PANE="%0"
+    git branch b2 # makes `git worktree add -b b2` fail
+
+    run "$ADD_WORKTREE" b1 b2 b3
+    [ "$status" -ne 0 ]
+    [[ "$output" == *"Done:    b1 (session test-session)"* ]]
+    [[ "$output" == *"Failed:  b2: fatal: a branch named 'b2' already exists"* ]]
+    [[ "$output" == *"Not run: b3"* ]]
+    [[ "$output" == *"Resume:  add-worktree b2 b3"* ]]
+    [ ! -d "$HOME/.worktree/$(basename "$REPO_DIR")/$(date +%Y-%m-%d)/b3" ]
+}
+
 @test "add-worktree queues nothing for non-fix branches" {
     setup_git_repo
     run "$ADD_WORKTREE" feature-branch
