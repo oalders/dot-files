@@ -8,22 +8,19 @@ if [[ "${1:-}" == "-f" ]]; then
     shift
 fi
 
-if [ $# -ne 1 ]; then
-    echo "Usage: add-worktree [-f] branch-name"
+if [ $# -lt 1 ]; then
+    echo "Usage: add-worktree [-f] branch-name..."
     exit
 fi
 
-branch_name="$1"
-number=""
-type=""
-
-# Pattern matching for GitHub issues and PRs
-if [[ $branch_name =~ ^fix-([0-9]+)$ ]]; then
-    number="${BASH_REMATCH[1]}"
-    type="issue"
-elif [[ $branch_name =~ ^gh-([0-9]+)$ ]]; then
-    number="${BASH_REMATCH[1]}"
-    type="pr"
+if [ $# -gt 1 ]; then
+    . ~/dot-files/bash_functions.sh
+    # Outside tmux each branch attaches to its session, blocking the next.
+    # shellcheck disable=SC2153
+    if [[ $MY_INSIDE_TMUX != true ]]; then
+        echo "add-worktree: several branches can only be set up inside tmux" >&2
+        exit 1
+    fi
 fi
 
 if [[ -n "$(git rev-parse --show-superproject-working-tree 2>/dev/null)" ]]; then
@@ -65,105 +62,159 @@ if [[ -f "$repo_root/.claude/settings.local.json" ]]; then
     rm -f "$repo_root/.claude/settings.local.json"
 fi
 
-date_stamp="$(date +%Y-%m-%d)"
+setup_branch() {
+    branch_name="$1"
+    number=""
+    type=""
 
-all_worktrees="$HOME/.worktree/$repo_name/$date_stamp"
-mkdir -p "$all_worktrees"
-
-worktree_dir="$all_worktrees/$branch_name"
-
-if [[ "$type" == "pr" ]]; then
-    # For PR checkouts, create worktree without -b flag (gh pr checkout will create the branch)
-    git worktree add "${force[@]+"${force[@]}"}" "$worktree_dir"
-else
-    git worktree add "${force[@]+"${force[@]}"}" "$worktree_dir" -b "$branch_name"
-fi
-
-cd "$worktree_dir" || exit 1
-
-# Handle GitHub PRs and issues
-if [[ "$type" == "pr" ]]; then
-    gh pr checkout "$number"
-elif [[ "$type" == "issue" ]]; then
-    # The "in progress" label may not exist in the repo yet. Try to create
-    # it first, then label the issue. Neither step should abort worktree
-    # setup: if we lack permission (or the label already exists, or the
-    # issue can't be found), warn and carry on.
-    # 2ECC40 is a traffic-light green.
-    if ! label_out=$(gh label create "in progress" --color 2ECC40 2>&1); then
-        case $label_out in
-            *already\ exists*) ;; # label is already there — nothing to do
-            *) echo "Warning: could not create 'in progress' label: $label_out" >&2 ;;
-        esac
+    # Pattern matching for GitHub issues and PRs
+    if [[ $branch_name =~ ^fix-([0-9]+)$ ]]; then
+        number="${BASH_REMATCH[1]}"
+        type="issue"
+    elif [[ $branch_name =~ ^gh-([0-9]+)$ ]]; then
+        number="${BASH_REMATCH[1]}"
+        type="pr"
     fi
-    if ! gh issue edit "$number" --add-label "in progress"; then
-        echo "Warning: could not add 'in progress' label to issue #$number" >&2
-    fi
-    # Queue the first `nn` launch in this worktree to auto-run
-    # `/kitchen-sink:fix-gh-issue` (it infers issue #$number from the
-    # fix-<n> branch name). bin/nn reads this marker, hands the line to
-    # claude as its initial prompt, then deletes it — so the command fires
-    # exactly once and never re-triggers across tmux/nono sessions. Lives
-    # under .tmp/ (gitignored, worktree-local scratch).
-    mkdir -p .tmp
-    printf '%s\n' '/kitchen-sink:fix-gh-issue' >.tmp/fix-gh-issue.pending
-fi
 
-# `submodule.alternateLocation=superproject` is supposed to share objects with
-# the parent repo, but it's unreliable in worktrees: git computes the alternate
-# path off the worktree gitdir, misses the modules dir, and silently falls back
-# to a network clone. Passing --reference per submodule sidesteps that.
-if [[ -f .gitmodules ]]; then
-    while IFS= read -r section; do
-        name="${section#submodule.}"
-        name="${name%.path}"
-        # `name` comes straight from .gitmodules, which bypasses git's
-        # submodule-name validation. Skip traversal names so a crafted
-        # section can't point --reference outside .git/modules (#1030).
-        case $name in
-            */* | *..*)
-                echo "Skipping submodule with suspicious name: $name" >&2
-                continue
-                ;;
-        esac
-        sm_path="$(git config -f .gitmodules --get "submodule.$name.path")"
-        ref_gitdir="$repo_root/.git/modules/$name"
-        if [[ -d "$ref_gitdir" ]]; then
-            git submodule update --init --recursive --reference "$ref_gitdir" -- "$sm_path"
-        else
-            git submodule update --init --recursive -- "$sm_path"
-        fi
-    done < <(git config -f .gitmodules --name-only --get-regexp '^submodule\..*\.path$')
-fi
+    date_stamp="$(date +%Y-%m-%d)"
 
-# init.sh owns dependency setup when present: it may pin Node (e.g. via fnm),
-# and fnm's cd hook doesn't fire here, so a bare `npm i` would use the wrong
-# node.
-if [[ -f scripts/init.sh ]]; then
-    ./scripts/init.sh
-elif [[ -f package.json ]]; then
-    npm i && git co package-lock.json
-fi
+    all_worktrees="$HOME/.worktree/$repo_name/$date_stamp"
+    mkdir -p "$all_worktrees"
 
-if [[ -n $(pgrep tmux) ]]; then
-    . ~/dot-files/bash_functions.sh
+    worktree_dir="$all_worktrees/$branch_name"
 
-    tmux_session_name # exports $SESSION_NAME
-    tmux new -s "$SESSION_NAME" -d
-    # Worktree startup is baked in rather than read from a per-worktree
-    # .tmux-start file: that file was sourced from the checked-out tree, so
-    # an external PR could ship one and get its lines executed here. These
-    # commands live in reviewed code instead.
-    tmux rename-window -t "$SESSION_NAME" claude
-    tmux send-keys -t "$SESSION_NAME" nn Enter
-    # Attaching from inside tmux would nest sessions, so leave the new session
-    # detached (running nn) and just print its name to switch to on your own
-    # schedule. The source above re-derives MY_INSIDE_TMUX from $TMUX_PANE, so
-    # this reads the ground truth. Outside tmux, attach into it as before.
-    # shellcheck disable=SC2153
-    if [[ $MY_INSIDE_TMUX == true ]]; then
-        echo "Created detached tmux session: $SESSION_NAME (running nn)"
+    if [[ "$type" == "pr" ]]; then
+        # For PR checkouts, create worktree without -b flag (gh pr checkout will create the branch)
+        git worktree add "${force[@]+"${force[@]}"}" "$worktree_dir"
     else
-        tmux attach -t "$SESSION_NAME"
+        git worktree add "${force[@]+"${force[@]}"}" "$worktree_dir" -b "$branch_name"
     fi
+
+    cd "$worktree_dir" || exit 1
+
+    # Handle GitHub PRs and issues
+    if [[ "$type" == "pr" ]]; then
+        gh pr checkout "$number"
+    elif [[ "$type" == "issue" ]]; then
+        # The "in progress" label may not exist in the repo yet. Try to create
+        # it first, then label the issue. Neither step should abort worktree
+        # setup: if we lack permission (or the label already exists, or the
+        # issue can't be found), warn and carry on.
+        # 2ECC40 is a traffic-light green.
+        if ! label_out=$(gh label create "in progress" --color 2ECC40 2>&1); then
+            case $label_out in
+                *already\ exists*) ;; # label is already there — nothing to do
+                *) echo "Warning: could not create 'in progress' label: $label_out" >&2 ;;
+            esac
+        fi
+        if ! gh issue edit "$number" --add-label "in progress"; then
+            echo "Warning: could not add 'in progress' label to issue #$number" >&2
+        fi
+        # Queue the first `nn` launch in this worktree to auto-run
+        # `/kitchen-sink:fix-gh-issue` (it infers issue #$number from the
+        # fix-<n> branch name). bin/nn reads this marker, hands the line to
+        # claude as its initial prompt, then deletes it — so the command fires
+        # exactly once and never re-triggers across tmux/nono sessions. Lives
+        # under .tmp/ (gitignored, worktree-local scratch).
+        mkdir -p .tmp
+        printf '%s\n' '/kitchen-sink:fix-gh-issue' >.tmp/fix-gh-issue.pending
+    fi
+
+    # `submodule.alternateLocation=superproject` is supposed to share objects with
+    # the parent repo, but it's unreliable in worktrees: git computes the alternate
+    # path off the worktree gitdir, misses the modules dir, and silently falls back
+    # to a network clone. Passing --reference per submodule sidesteps that.
+    if [[ -f .gitmodules ]]; then
+        while IFS= read -r section; do
+            name="${section#submodule.}"
+            name="${name%.path}"
+            # `name` comes straight from .gitmodules, which bypasses git's
+            # submodule-name validation. Skip traversal names so a crafted
+            # section can't point --reference outside .git/modules (#1030).
+            case $name in
+                */* | *..*)
+                    echo "Skipping submodule with suspicious name: $name" >&2
+                    continue
+                    ;;
+            esac
+            sm_path="$(git config -f .gitmodules --get "submodule.$name.path")"
+            ref_gitdir="$repo_root/.git/modules/$name"
+            if [[ -d "$ref_gitdir" ]]; then
+                git submodule update --init --recursive --reference "$ref_gitdir" -- "$sm_path"
+            else
+                git submodule update --init --recursive -- "$sm_path"
+            fi
+        done < <(git config -f .gitmodules --name-only --get-regexp '^submodule\..*\.path$')
+    fi
+
+    # init.sh owns dependency setup when present: it may pin Node (e.g. via fnm),
+    # and fnm's cd hook doesn't fire here, so a bare `npm i` would use the wrong
+    # node.
+    if [[ -f scripts/init.sh ]]; then
+        ./scripts/init.sh
+    elif [[ -f package.json ]]; then
+        npm i && git co package-lock.json
+    fi
+
+    if [[ -n $(pgrep tmux) ]]; then
+        . ~/dot-files/bash_functions.sh
+
+        tmux_session_name # exports $SESSION_NAME
+        tmux new -s "$SESSION_NAME" -d
+        if [[ -n ${session_file:-} ]]; then
+            printf '%s\n' "$SESSION_NAME" >"$session_file"
+        fi
+        # Worktree startup is baked in rather than read from a per-worktree
+        # .tmux-start file: that file was sourced from the checked-out tree, so
+        # an external PR could ship one and get its lines executed here. These
+        # commands live in reviewed code instead.
+        tmux rename-window -t "$SESSION_NAME" claude
+        tmux send-keys -t "$SESSION_NAME" nn Enter
+        # Attaching from inside tmux would nest sessions, so leave the new session
+        # detached (running nn) and just print its name to switch to on your own
+        # schedule. The source above re-derives MY_INSIDE_TMUX from $TMUX_PANE, so
+        # this reads the ground truth. Outside tmux, attach into it as before.
+        # shellcheck disable=SC2153
+        if [[ $MY_INSIDE_TMUX == true ]]; then
+            echo "Created detached tmux session: $SESSION_NAME (running nn)"
+        else
+            tmux attach -t "$SESSION_NAME"
+        fi
+    fi
+}
+
+if [ $# -eq 1 ]; then
+    setup_branch "$1"
+    exit
 fi
+
+tmp_dir="$(mktemp -d)"
+trap 'rm -rf "$tmp_dir"' EXIT
+session_file="$tmp_dir/session"
+done_text=""
+while [ $# -gt 0 ]; do
+    rm -f "$session_file"
+    # Subshell isolates setup_branch's cd and errexit; `if !` would disable
+    # errexit inside it, so toggle it around the call instead.
+    set +e
+    (
+        set -e
+        setup_branch "$1"
+    ) 2>"$tmp_dir/err"
+    rc=$?
+    set -e
+    cat "$tmp_dir/err" >&2
+    if [ $rc -ne 0 ]; then
+        error="$(awk 'NF { last = $0 } END { print last }' "$tmp_dir/err")"
+        [[ -n $error ]] || error="exit $rc"
+        [[ -z $done_text ]] || printf '%-9s%s\n' Done: "$done_text"
+        printf '%-9s%s\n' Failed: "$1: $error"
+        [ $# -eq 1 ] || printf '%-9s%s\n' "Not run:" "${*:2}"
+        printf '%-9s%s\n' Resume: "add-worktree ${force[*]+${force[*]} }$*"
+        exit "$rc"
+    fi
+    session=""
+    [[ ! -f $session_file ]] || session=" (session $(<"$session_file"))"
+    done_text+="${done_text:+, }$1$session"
+    shift
+done
