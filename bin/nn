@@ -568,10 +568,10 @@ exec nono run --profile "$profile" --allow-cwd --workdir . \
     GIT_CEILING_DIRECTORIES="${GIT_CEILING_DIRECTORIES:+$GIT_CEILING_DIRECTORIES:}$PWD/.tmp" \
     GIT_CONFIG_COUNT=4 \
     GIT_CONFIG_KEY_0=url.https://github.com/.insteadOf GIT_CONFIG_VALUE_0=git@github.com: \
-    GIT_CONFIG_KEY_1=credential.https://github.com.helper GIT_CONFIG_VALUE_1= \
-    GIT_CONFIG_KEY_2=credential.https://github.com.helper \
-    GIT_CONFIG_VALUE_2='!gh auth git-credential' \
-    GIT_CONFIG_KEY_3=url.https://github.com/.insteadOf GIT_CONFIG_VALUE_3=ssh://git@github.com/ \
+    GIT_CONFIG_KEY_1=url.https://github.com/.insteadOf GIT_CONFIG_VALUE_1=ssh://git@github.com/ \
+    GIT_CONFIG_KEY_2=credential.https://github.com.helper GIT_CONFIG_VALUE_2= \
+    GIT_CONFIG_KEY_3=credential.https://github.com.helper \
+    GIT_CONFIG_VALUE_3='!gh auth git-credential' \
     NN_FNM_RUNTIME_DIR="$PWD/.tmp/run" \
     PLAYWRIGHT_BROWSERS_PATH="$HOME/.cache/ms-playwright" \
     NPM_CONFIG_CACHE="$PWD/.tmp/cache/npm" \
