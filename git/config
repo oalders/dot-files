@@ -42,9 +42,7 @@
 	auto-set-head = remote set-head origin -a
 	b = branch
 	ba = branch -a
-	ca = commit --amend
 	can = commit --amend --no-edit
-	cap = "!git can && git pf"
 	changes = diff --name-status -r
 	ci = commit
 	co = checkout
@@ -56,14 +54,11 @@
 	dom = diff -w -M origin/HEAD...HEAD
 	doms = diff -w -M origin/HEAD...HEAD --stat
 	domo = diff -w -M origin/HEAD...HEAD --name-only
-	exec = "!exec "
 	flog = log --stat --abbrev-commit --relative-date --pretty=oneline
 	from = "!git fetch -p && git rebase origin/HEAD"
-	fromp = "!git from && git pf"
 	mylog = log --author=\"Olaf Alders\"
 	plog = log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit --date=relative
 	pf = push --force-with-lease
-	pt = push --tags
 	rc = rebase --continue
 	rgrep = grep --recurse-submodules
 	revert-file-in-commit = "!f() { git show $2 -- $1 | git apply -R;}; f"
