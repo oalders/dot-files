@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+#
+# Refresh every marketplace, then update each user-scope third-party plugin.
+# claude-plugins-official is skipped because it auto-updates on its own.
+
+set -eu -o pipefail
+
+claude plugin marketplace update
+
+mapfile -t plugins < <(
+    claude plugin list --json |
+        jq -r '.[] | select(.scope == "user") | .id | select(endswith("@claude-plugins-official") | not)' |
+        sort -u
+)
+
+for plugin in "${plugins[@]}"; do
+    claude plugin update "$plugin"
+done
