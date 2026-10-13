@@ -30,7 +30,7 @@ source ~/dot-files/bash_functions.sh
 
 set -x
 
-URL=https://github.com/neovim/neovim/releases/download/nightly/
+URL=https://github.com/neovim/neovim/releases/download/stable/
 
 if is os name eq darwin; then
     if is arch eq arm64; then
