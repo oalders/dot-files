@@ -193,6 +193,7 @@ trap 'rm -rf "$tmp_dir"' EXIT
 session_file="$tmp_dir/session"
 done_text=""
 while [ $# -gt 0 ]; do
+    rm -f "$session_file"
     # Subshell isolates setup_branch's cd and errexit; `if !` would disable
     # errexit inside it, so toggle it around the call instead.
     set +e
@@ -212,6 +213,8 @@ while [ $# -gt 0 ]; do
         printf '%-9s%s\n' Resume: "add-worktree ${force[*]+${force[*]} }$*"
         exit "$rc"
     fi
-    done_text+="${done_text:+, }$1 (session $(cat "$session_file"))"
+    session=""
+    [[ ! -f $session_file ]] || session=" (session $(<"$session_file"))"
+    done_text+="${done_text:+, }$1$session"
     shift
 done

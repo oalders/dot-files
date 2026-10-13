@@ -366,13 +366,26 @@ EOF
     export TMUX_PANE="%0"
     git branch b2 # makes `git worktree add -b b2` fail
 
-    run "$ADD_WORKTREE" b1 b2 b3
+    run "$ADD_WORKTREE" -f b1 b2 b3
     [ "$status" -ne 0 ]
     [[ "$output" == *"Done:    b1 (session test-session)"* ]]
     [[ "$output" == *"Failed:  b2: fatal: a branch named 'b2' already exists"* ]]
     [[ "$output" == *"Not run: b3"* ]]
-    [[ "$output" == *"Resume:  add-worktree b2 b3"* ]]
+    [[ "$output" == *"Resume:  add-worktree -f b2 b3"* ]]
     [ ! -d "$HOME/.worktree/$(basename "$REPO_DIR")/$(date +%Y-%m-%d)/b3" ]
+}
+
+@test "add-worktree prints the summary when no session was created" {
+    setup_git_repo
+    _stub_tmux_env
+    export TMUX_PANE="%0"
+    stub_command pgrep 'exit 1' # no tmux server, so no session file
+    git branch b2
+
+    run "$ADD_WORKTREE" b1 b2
+    [ "$status" -ne 0 ]
+    [[ "$output" == *"Done:    b1"$'\n'* ]]
+    [[ "$output" == *"Failed:  b2: fatal: a branch named 'b2' already exists"* ]]
 }
 
 @test "add-worktree queues nothing for non-fix branches" {
