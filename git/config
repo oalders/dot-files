@@ -44,7 +44,7 @@
 	ba = branch -a
 	ca = commit --amend
 	can = commit --amend --no-edit
-	cap = "!git can; git pf;"
+	cap = "!git can && git pf"
 	changes = diff --name-status -r
 	ci = commit
 	co = checkout
@@ -52,16 +52,17 @@
 	delete-untracked-files = clean -f -d
 	deleted = log --diff-filter=D --
 	diffstat = diff --stat -r
+	# origin/HEAD aliases: run `git auto-set-head` if origin/HEAD is missing or dangling.
 	dom = diff -w -M origin/HEAD...HEAD
 	doms = diff -w -M origin/HEAD...HEAD --stat
 	domo = diff -w -M origin/HEAD...HEAD --name-only
 	exec = "!exec "
 	flog = log --stat --abbrev-commit --relative-date --pretty=oneline
-	from = "!git fetch -p; git rebase origin/HEAD"
-	fromp = "!git from; git pf"
+	from = "!git fetch -p && git rebase origin/HEAD"
+	fromp = "!git from && git pf"
 	mylog = log --author=\"Olaf Alders\"
 	plog = log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit --date=relative
-	prom = pull --rebase origin HEAD
+	prom = "!git fetch origin && git rebase origin/HEAD"
 	pf = push --force-with-lease
 	pt = push --tags
 	rc = rebase --continue
