@@ -52,17 +52,16 @@
 	delete-untracked-files = clean -f -d
 	deleted = log --diff-filter=D --
 	diffstat = diff --stat -r
-	dm = diff -w -M main...HEAD
-	dom = diff -w -M origin/main...HEAD
-	doms = diff -w -M origin/main...HEAD --stat
-	domo = diff -w -M origin/main...HEAD --name-only
+	dom = diff -w -M origin/HEAD...HEAD
+	doms = diff -w -M origin/HEAD...HEAD --stat
+	domo = diff -w -M origin/HEAD...HEAD --name-only
 	exec = "!exec "
 	flog = log --stat --abbrev-commit --relative-date --pretty=oneline
-	from = "!git fetch -p; git rebase origin/main"
+	from = "!git fetch -p; git rebase origin/HEAD"
 	fromp = "!git from; git pf"
 	mylog = log --author=\"Olaf Alders\"
 	plog = log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit --date=relative
-	prom = pull --rebase origin main
+	prom = pull --rebase origin HEAD
 	pf = push --force-with-lease
 	pt = push --tags
 	rc = rebase --continue
