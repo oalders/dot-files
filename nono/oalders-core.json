@@ -20,6 +20,7 @@
     "read": [
       "~/.config/gh",
       "~/dot-files/bin",
+      "~/dot-files/git",
       "~/dot-files/gitignore_global",
       "~/dot-files/node_modules",
       "~/dot-files/nono",

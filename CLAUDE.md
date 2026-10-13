@@ -81,7 +81,8 @@ operations too frequently:
 ### Platform Detection
 
 Uses `is os name eq darwin` pattern for macOS-specific operations and
-cross-platform compatibility.
+cross-platform compatibility. Use `is` (e.g. `is there delta`) rather than
+`command -v` or `which` to check for commands.
 
 ### Modular Design
 

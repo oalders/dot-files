@@ -1,0 +1,86 @@
+[user]
+	email = olaf@wundersolutions.com
+	name = Olaf Alders
+[remote "origin"]
+	fetch = +refs/pull/*/head:refs/remotes/origin/pull-requests/*
+[branch]
+	autosetuprebase = always
+	sort = -committerdate
+[color]
+	ui = auto
+[column]
+	ui = auto
+[commit]
+	verbose = true
+[diff]
+	algorithm = histogram
+	colorMoved = default
+	mnemonicPrefix = true
+	renames = true
+[fetch]
+	prune = true
+	pruneTags = true
+	all = true
+[github]
+	user = oalders
+[help]
+	autocorrect = prompt
+[init]
+	defaultBranch = main
+[push]
+	default = simple
+	autoSetupRemote = true
+	followTags = true
+[rebase]
+	autostash = true
+	autosquash = true
+	instructionFormat = (%an <%ae>) %s
+[rerere]
+	enabled = true
+	autoupdate = true
+[alias]
+	auto-set-head = remote set-head origin -a
+	b = branch
+	ba = branch -a
+	ca = commit --amend
+	can = commit --amend --no-edit
+	cap = "!git can; git pf;"
+	changes = diff --name-status -r
+	ci = commit
+	co = checkout
+	dc = diff --cached
+	delete-untracked-files = clean -f -d
+	deleted = log --diff-filter=D --
+	diffstat = diff --stat -r
+	dm = diff -w -M master...HEAD
+	dom = diff -w -M origin/master...HEAD
+	doms = diff -w -M origin/master...HEAD --stat
+	domo = diff -w -M origin/master...HEAD --name-only
+	exec = "!exec "
+	flog = log --stat --abbrev-commit --relative-date --pretty=oneline
+	from = "!git fetch -p; git rebase origin/master"
+	fromp = "!git from; git pf"
+	mylog = log --author=\"Olaf Alders\"
+	plog = log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit --date=relative
+	prom = pull --rebase origin master
+	pf = push --force-with-lease
+	pt = push --tags
+	rc = rebase --continue
+	rgrep = grep --recurse-submodules
+	revert-file-in-commit = "!f() { git show $2 -- $1 | git apply -R;}; f"
+	root = rev-parse --show-toplevel
+	st = status
+	stu = status --untracked-files=no
+	undo = reset --soft HEAD^
+	view-stash = stash show -p stash@{0}
+	whatis = show -s --pretty='tformat:%h (%s, %ad)' --date=short
+[core]
+	excludesfile = ~/.gitignore_global
+[merge]
+	tool = nvimdiff2
+[grep]
+	lineNumber = true
+	patternType = perl
+[delta]
+	light = false
+	navigate = true
