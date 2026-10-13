@@ -62,7 +62,6 @@
 	fromp = "!git from && git pf"
 	mylog = log --author=\"Olaf Alders\"
 	plog = log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit --date=relative
-	prom = "!git fetch origin && git rebase origin/HEAD"
 	pf = push --force-with-lease
 	pt = push --tags
 	rc = rebase --continue
