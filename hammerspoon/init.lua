@@ -292,9 +292,10 @@ hs.hotkey.bind(hyper, 'n', function()
 end)
 
 -- Ventura only (the old Mac): launchd respawns photoanalysisd on XPC events
--- even when disabled, and SIP blocks bootout, so keep killing it.
+-- even when disabled, and SIP blocks bootout, so keep killing it. Each
+-- respawn grinds the disk until the next kill, so keep the interval short.
 if hs.host.operatingSystemVersion().major == 13 then
-    photoanalysisdReaper = hs.timer.doEvery(600, function()
+    photoanalysisdReaper = hs.timer.doEvery(60, function()
         hs.task.new('/usr/bin/killall', nil, { 'photoanalysisd' }):start()
     end)
     photoanalysisdReaper:fire()
