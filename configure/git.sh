@@ -38,6 +38,12 @@ if ! git config --global --get-all include.path | grep -qxF "$shared"; then
     done
 fi
 
+# Aliases all live in git/config, so any left in the stub are stale (the
+# migration above misses ones since removed from git/config) and would shadow it.
+if git config --global --get-regexp '^alias\.' >/dev/null; then
+    git config --global --remove-section alias
+fi
+
 ginclude "$shared"
 
 # Meld is configured only via `open -a`, so it's macOS-only.
