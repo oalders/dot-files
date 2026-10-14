@@ -27,6 +27,7 @@ if ! is there apt; then
         curl \
         expat-devel \
         fd-find \
+        glibc-langpack-en \
         jq \
         npm \
         pandoc \
@@ -49,6 +50,7 @@ else
         libexpat1-dev
         libnet-ssleay-perl
         libsecret-tools
+        locales
         locate
         luarocks
         pandoc
@@ -73,6 +75,13 @@ else
     fi
 
     sudo apt-get install -y -q --no-install-recommends --autoremove "${packages[@]}"
+
+    # bashrc sets LC_TIME=en_GB.UTF-8 only when this locale exists.
+    if ! locale -a | grep -qix 'en_GB\.utf-\?8'; then
+        grep -qx 'en_GB.UTF-8 UTF-8' /etc/locale.gen ||
+            echo 'en_GB.UTF-8 UTF-8' | sudo tee -a /etc/locale.gen
+        sudo locale-gen
+    fi
 fi
 
 if ! is there go; then

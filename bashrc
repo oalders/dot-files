@@ -15,7 +15,10 @@ export HISTTIMEFORMAT="%Y-%m-%d %H:%M:%S  "
 export CLAUDE_CODE_DISABLE_1M_CONTEXT=1
 
 export LANG=en_US.UTF-8
-export LC_TIME=en_GB.UTF-8
+# Exporting a locale that isn't generated makes every shell warn.
+if locale -a 2>/dev/null | grep -qix 'en_GB\.utf-\?8'; then
+    export LC_TIME=en_GB.UTF-8
+fi
 export LSCOLORS=exfxcxdxbxegedabagacad
 
 # http://askubuntu.com/questions/80371/bash-history-handling-with-multiple-terminals
