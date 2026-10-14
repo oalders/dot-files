@@ -30,7 +30,8 @@ source ~/dot-files/bash_functions.sh
 
 set -x
 
-URL=https://github.com/neovim/neovim/releases/download/stable/
+# Pinned: nightly 0.13-dev left orphaned `nvim --embed` servers hung on exit.
+URL=https://github.com/neovim/neovim/releases/download/v0.12.6/
 
 if is os name eq darwin; then
     if is arch eq arm64; then
@@ -60,6 +61,8 @@ if is os name eq darwin; then
     dest="$HOME/local/bin/nvim-macos"
     rm -rf "$dest"
     mv "$dir" "$dest"
+    # tar keeps the build's mtime, which would defeat the age check above
+    touch "$dest/bin/nvim"
     rm -f "$HOME/local/bin/nvim"
     add_path "$HOME/local/bin/nvim-macos/bin"
 else
