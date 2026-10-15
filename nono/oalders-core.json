@@ -30,6 +30,7 @@
       "~/.local/bin",
       "~/.npm-packages",
       "~/.plenv",
+      "/etc/apt",
       "/usr/libexec/gcc",
       "/usr/local/"
     ],
