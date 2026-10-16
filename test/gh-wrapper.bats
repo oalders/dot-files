@@ -617,3 +617,73 @@ assert_refused() {
     [ "$status" -ne 0 ]
     [[ "$output" == *"pass -R owner/repo"* ]]
 }
+
+@test "a private session's api writes are checked by repo path" {
+    private_repo
+    vis org/proj public
+    gh_run api repos/org/proj/issues -f title=t -f body="$GEN"
+    assert_refused
+    [[ "$output" == *"org/proj is public; ask the user"* ]]
+    gh_run api -X DELETE /repos/org/proj/labels/x
+    assert_refused
+    gh_run api https://api.github.com/repos/org/proj/issues/1/comments -f body="$GEN"
+    assert_refused
+    gh_run api repos/me/secret/issues -f title=t -f body="$GEN"
+    assert_passed
+}
+
+@test "api {owner}/{repo} placeholders resolve to cwd's remotes" {
+    private_repo
+    gh_run api 'repos/{owner}/{repo}/issues/1/comments' -f body="$GEN"
+    assert_passed
+    git remote add upstream git@github.com:org/proj.git
+    vis org/proj public
+    gh_run api 'repos/{owner}/{repo}/issues/1/comments' -f body="$GEN"
+    assert_refused
+    [[ "$output" == *"instead of {owner}/{repo}"* ]]
+}
+
+@test "api writes outside repos/ are refused unless exempt" {
+    private_repo
+    gh_run api gists -f description=x
+    assert_refused
+    [[ "$output" == *"can't be determined"* ]]
+    [[ "$output" != *"-R"* ]]
+    gh_run api markdown -f text=hi
+    assert_passed
+    gh_run api -X PATCH notifications/threads/1
+    assert_passed
+    gh_run api -X PUT user/starred/org/proj
+    assert_passed
+}
+
+@test "api reads are never checked" {
+    private_repo
+    vis org/proj public
+    gh_run api repos/org/proj/issues
+    assert_passed
+    gh_run api -X GET repos/org/proj/issues -f state=open
+    assert_passed
+    refute_lookups
+}
+
+@test "a private session's graphql mutations are judged by cwd's repo" {
+    private_repo
+    q='mutation { resolveReviewThread(input: {threadId: "PRRT_x"}) { clientMutationId } }'
+    gh_run api graphql -f "query=$q"
+    assert_passed
+    git remote add upstream https://github.com/org/proj
+    vis org/proj public
+    gh_run api graphql -f "query=$q"
+    assert_refused
+    [[ "$output" == *"run it from a checkout"* ]]
+    gh_run api graphql -f 'query={ viewer { login } }'
+    assert_passed
+}
+
+@test "public sessions' graphql mutations need no lookup of a target" {
+    q='mutation { resolveReviewThread(input: {threadId: "PRRT_x"}) { clientMutationId } }'
+    gh_run api graphql -f "query=$q"
+    assert_passed
+    refute_lookups
+}

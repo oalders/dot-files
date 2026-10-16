@@ -457,6 +457,20 @@ sub cmd_targets {
     return ( $NAME_IT, default_targets() );
 }
 
+# gh api fills {owner}/{repo} from cwd. Rendering markdown, marking
+# notifications read and starring post nothing, so they are exempt.
+sub api_targets {
+    my ($endpoint) = @_;
+    ( my $e = $endpoint // q{} ) =~ s{^(?:https?://[^/]+)?/*}{};
+    return if $e =~ m{^(?:markdown|notifications|user/starred)(?:[/?#]|\z)};
+    return ( $ASK, undef ) if $e !~ m{^repos/([^/]+)/([^/?#]+)};
+    my ( $owner, $repo ) = ( $1, $2 );
+    return ( 'name the repository instead of {owner}/{repo}',
+        default_targets() )
+        if $owner eq '{owner}';
+    return ( $ASK, repo_name("$owner/$repo") );
+}
+
 # Outside a Claude session, or with no args, do nothing but hand off.
 run_real(@argv) if !$ENV{CLAUDECODE} || !@argv;
 
@@ -527,6 +541,12 @@ my ($method)   = map { value_of( \@argv, $_ ) }
     grep { $_->{role} eq 'method' } reverse @$found;
 $method //= 'POST' if grep { $_->{role} =~ /^(?:field|input)$/ } @$found;
 my $graphql = defined $endpoint && $endpoint =~ m{(?:^|/)graphql(?:[?#]|\z)};
+if ( !$graphql
+    && defined $method
+    && uc($method) =~ /^(?:POST|PATCH|PUT|DELETE)$/ ) {
+    my @targets = api_targets($endpoint);
+    guard_targets(@targets) if @targets;
+}
 run_real(@argv) if !defined $method || uc($method) !~ /^(?:POST|PATCH|PUT)$/;
 run_real(@argv)
     if !$graphql
@@ -599,6 +619,10 @@ my $vars
 my $query = $field{query}
     // ( ref $input eq 'HASH' ? json_str( $input->{query} ) : undef );
 run_real(@argv) if !defined $query || $query !~ /\bmutation\b/;
+
+# Mutations name their target only by node ID; judge them by cwd's repo.
+guard_targets( "run it from a checkout of the repository it writes to, or $ASK",
+    default_targets() );
 
 # GraphQL ignores commas and `#` comments; drop them so they can't hide a body.
 ( my $q = $query ) =~ s/#[^\n]*//g;
