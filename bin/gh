@@ -29,13 +29,19 @@
 # review/reply endpoints or GraphQL mutations. Everything else — and every
 # invocation outside a Claude session ($CLAUDECODE unset), i.e. the human's
 # own `gh` use — passes through untouched.
+#
+# Also, in a session whose repo is private, writes to any repo that is not
+# private/internal (or listed in ~/.config/gh/wrapper-allow-public) are
+# refused: docs/gh-wrapper-visibility.md.
 
 use strict;
 use warnings;
 
 use Cwd        qw( realpath );
+use File::Spec ();
 use File::Temp qw( tempfile );
 use JSON::PP   ();
+use POSIX      ();
 
 # Bodies are treated as byte strings; these hold raw UTF-8 (robot face, middot).
 my $ANCHOR = '[Claude Code](https://claude.com/claude-code)';
@@ -119,6 +125,134 @@ sub check {
             . "  $ROBOT $verb $ANCHOR $DOT <Model>\n"
             . "where <Model> is the model you are running as (e.g. Opus 5.5,\n"
             . "Sonnet 5); name yourself, not another model" );
+}
+
+# A session in a private repo may only write to private/internal repos or
+# allowlisted ones. Why, and what it does not cover: docs/gh-wrapper-visibility.md.
+my $ALLOW_PUBLIC = "$ENV{HOME}/.config/gh/wrapper-allow-public";
+my $PRIVATE      = 'this session works in a private repository';
+my $ASK          = 'ask the user before writing there';
+my $NAME_IT      = 'pass -R owner/repo naming the repository you mean';
+my %visibility;    # owner/repo => lowercase visibility, '' if lookup failed
+my $private_context;
+
+# Output of @cmd, or '' if it fails. stdin/stderr are /dev/null so a lookup
+# neither eats a body piped to us nor clutters the agent's output.
+sub cmd_output {
+    my @cmd = @_;
+    my $pid = open my $fh, '-|';
+    return q{} if !defined $pid;
+    if ( !$pid ) {
+        open STDIN,  '<', File::Spec->devnull;
+        open STDERR, '>', File::Spec->devnull;
+
+        # _exit: END would unlink the parent's temp files.
+        exec { $cmd[0] } @cmd or POSIX::_exit(127);
+    }
+    my $out = do { local $/; <$fh> } // q{};
+    close $fh;
+    return $? ? q{} : $out;
+}
+
+sub gh_output { cmd_output( real_gh(), @_ ) }
+
+# Lowercase "owner/repo" from a -R value, URL, remote or credential path;
+# undef if it names no github.com repository.
+sub repo_name {
+    my ($s) = @_;
+    return undef if !defined $s;
+    $s =~ s{^[a-z+]+://}{}i;
+    $s =~ s{^[^@/]+@}{};
+    if ( $s =~ s{^([^/:]*\.[^/:]*)[:/]}{} ) {
+        return undef if lc $1 ne 'github.com';
+    }
+    $s =~ s{[?#].*}{}s;
+    my ( $owner, $repo ) = split m{/}, $s;
+    return undef if !defined $repo || $owner eq q{} || $repo eq q{};
+    $repo =~ s/\.git\z//;
+    return lc "$owner/$repo";
+}
+
+sub repo_visibility {
+    my ($repo) = @_;
+    return $visibility{$repo} //= do {
+        my $v = lc gh_output( 'repo', 'view', $repo, '--json', 'visibility',
+            '--jq', '.visibility' );
+        $v =~ s/\s+\z//;
+        $v;
+    };
+}
+
+# Git exports GIT_DIR to credential helpers, which would override -C.
+sub git_config_values {
+    my ( $dir, $regexp ) = @_;
+    local %ENV = %ENV;
+    delete @ENV{
+        qw( GIT_DIR GIT_WORK_TREE GIT_COMMON_DIR GIT_INDEX_FILE GIT_PREFIX )};
+    my $out = cmd_output( 'git', '-C', $dir, 'config', '--get-regexp',
+        $regexp );
+    return map { ( split q{ }, $_, 2 )[1] // q{} } split /\n/, $out;
+}
+
+sub github_remotes {
+    my ($dir) = @_;
+    return map { repo_name($_) }
+        grep { m{github\.com[:/]}i }
+        git_config_values( $dir, '^remote\..*\.url$' );
+}
+
+# Where a write goes when nothing names a repo. gh would pick one remote;
+# checking all of them is the conservative reading.
+sub default_targets {
+    return repo_name( $ENV{GH_REPO} ) if $ENV{GH_REPO};
+    return (
+        github_remotes(q{.}),
+        map  { repo_name($_) }
+        grep { $_ ne 'base' }
+            git_config_values( q{.}, '^remote\..*\.gh-resolved$' )
+    );
+}
+
+sub private_context {
+    return $private_context //= do {
+        my %seen;
+        my @remotes = grep { !$seen{ $_ // q{} }++ }
+            map { github_remotes($_) }
+            grep { defined && length } q{.}, $ENV{NN_SESSION_DIR};
+        ( grep { !defined || repo_visibility($_) ne 'public' } @remotes )
+            ? 1
+            : 0;
+    };
+}
+
+sub allowed_public {
+    my ($repo) = @_;
+    open my $fh, '<', $ALLOW_PUBLIC or return 0;
+    while ( my $line = <$fh> ) {
+        $line =~ s/#.*//s;
+        $line =~ s/\s+//g;
+        return 1 if lc $line eq $repo;
+    }
+    return 0;
+}
+
+# Refuse unless every target is private, internal or allowlisted. No targets,
+# or an undef one, means the target couldn't be determined. $hint says what
+# to do instead.
+sub guard_targets {
+    my ( $hint, @targets ) = @_;
+    return if !private_context();
+    block("$PRIVATE and the repository this writes to can't be determined;"
+            . " $hint" )
+        if !@targets || grep { !defined } @targets;
+    for my $repo (@targets) {
+        next if allowed_public($repo);
+        my $vis = repo_visibility($repo);
+        next if $vis eq 'private' || $vis eq 'internal';
+        block("$PRIVATE and looking up $repo failed; retry, or $ASK")
+            if $vis eq q{};
+        block("$PRIVATE and $repo is $vis; $hint");
+    }
 }
 
 # Read a body source: a file path, or `-` for stdin. Returns the body and the
@@ -303,6 +437,26 @@ my %RELEASE_SPEC = (
 
 my @argv = @ARGV;
 
+# A subcommand's targets: -R (before or after the subcommand) and URL
+# arguments, else default_targets(). Returns ( $hint, @repos ).
+sub cmd_targets {
+    my ( $start, $spec ) = @_;
+    my ( $found, $positional ) = parse_flags( \@argv, $start, $spec );
+    my @t = map { repo_name( value_of( \@argv, $_ ) ) }
+        grep { $_->{name} eq 'repo' } @$found;
+    push @t, map { repo_name($_) } grep { m{github\.com/}i } @$positional;
+    for ( my $j = 0 ; $j < $start - 1 ; $j++ ) {
+        if ( $argv[$j] =~ /^(?:-R|--repo)\z/ ) {
+            push @t, repo_name( $argv[ ++$j ] );
+        }
+        elsif ( $argv[$j] =~ /^(?:--repo=|-R=?)(.+)/s ) {
+            push @t, repo_name($1);
+        }
+    }
+    return ( $ASK, @t ) if @t;
+    return ( $NAME_IT, default_targets() );
+}
+
 # Outside a Claude session, or with no args, do nothing but hand off.
 run_real(@argv) if !$ENV{CLAUDECODE} || !@argv;
 
@@ -331,6 +485,22 @@ my $cmd
     : undef;
 if ($cmd) {
     check_flags( \@argv, $i + 1, @$cmd );
+    guard_targets( cmd_targets( $i + 1, $cmd->[0] ) );
+    run_real(@argv);
+}
+if ( $sub eq 'issue' && $action eq 'transfer' ) {
+    my ( undef, $positional ) = parse_flags( \@argv, $i + 1, \%REPO );
+    my ( undef, @from ) = cmd_targets( $i + 1, \%REPO );
+    guard_targets( $ASK, @from, repo_name( $positional->[2] ) );
+    run_real(@argv);
+}
+if ( $sub eq 'release' && $action eq 'upload' ) {
+    guard_targets( cmd_targets( $i + 1, \%REPO ) );
+    run_real(@argv);
+}
+if ( $sub eq 'gist' && $action =~ /^(?:create|new|edit)\z/ ) {
+    block("$PRIVATE and gists are readable by anyone with the link")
+        if private_context();
     run_real(@argv);
 }
 
