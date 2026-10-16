@@ -23,6 +23,7 @@
       "files.pythonhosted.org",
       "github.com",
       "pypi.org",
+      "url.spec.whatwg.org",
       "www.rfc-editor.org"
     ],
     "open_port": [80, 5000, 5001, 8080]
