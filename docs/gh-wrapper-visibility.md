@@ -37,8 +37,11 @@ asks for credentials after a 401, so public fetches never reach it).
 - GraphQL mutations name their target only by node ID; they are judged by
   cwd's repo, so a mutation aimed at a public repo from a private checkout
   passes.
-- Making a repo public (`repo edit --visibility`, `gh api -X PATCH
-  repos/o/r`): deliberate, not an accident.
+- Making a repo public (`repo edit --visibility`): deliberate, not an
+  accident. `gh api -X PATCH repos/o/r` is refused only when the target is
+  already public.
+- `git push` outside `nn`: only `nn` sets `credential.useHttpPath`, so
+  without it git doesn't say which repo it wants credentials for.
 - Content-carrying subcommands the wrapper doesn't classify:
   `workflow run -f`, `repo edit --description`, `project item-create`,
   labels, and the like.

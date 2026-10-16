@@ -497,17 +497,20 @@ my $cmd
     : $sub eq 'release'
     ? ( $action =~ /^(?:create|new|edit)$/ && [ \%RELEASE_SPEC, undef ] )
     : undef;
-if (   $sub eq 'auth'
-    && $action eq 'git-credential'
-    && $argv[-1] eq 'get'
-    && private_context() ) {
+if ( $sub eq 'auth' && $action eq 'git-credential' && $argv[-1] eq 'get' ) {
     my ( $request, $path ) = read_body(q{-});
     my %kv = $request =~ /^(\w+)=(.*)$/mg;
     if ( lc( $kv{host} // q{} ) eq 'github.com' ) {
-        block(    "$PRIVATE and git did not say which repository it wants"
-                . ' credentials for; set credential.useHttpPath=true' )
-            if !defined $kv{path};
-        guard_targets( $ASK, repo_name( $kv{path} ) );
+
+        # nn always sets useHttpPath, so a missing path there means a bypass.
+        if ( !defined $kv{path} ) {
+            block(    "$PRIVATE and git did not say which repository it wants"
+                    . ' credentials for; set credential.useHttpPath=true' )
+                if $ENV{NN_SESSION_DIR} && private_context();
+        }
+        else {
+            guard_targets( $ASK, repo_name( $kv{path} ) );
+        }
     }
     open STDIN, '<', $path or block('cannot replay the credential request');
     run_real(@argv);

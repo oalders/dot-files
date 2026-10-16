@@ -700,9 +700,11 @@ cred() {
     [[ "$output" == *"org/proj is public"* ]]
     [ ! -e "$OUT" ]
     rm -f "$OUT.stdin"
-    REQ='protocol=https\nhost=github.com\npath=me/secret.git\n\n' VERB=get cred
+    export REQ='protocol=https\nhost=github.com\npath=me/secret.git\n\n'
+    VERB=get cred
     [ "$status" -eq 0 ]
-    grep -qx 'path=me/secret.git' "$OUT.stdin"
+    printf '%b' "$REQ" >"$BATS_TEST_TMPDIR/expected"
+    cmp "$OUT.stdin" "$BATS_TEST_TMPDIR/expected"
 }
 
 @test "the push guard reads the session repo despite git's GIT_DIR" {
@@ -719,8 +721,9 @@ cred() {
     [[ "$output" == *"org/proj is public"* ]]
 }
 
-@test "a credential request without a path is refused in a private session" {
+@test "a credential request without a path is refused in an nn private session" {
     private_repo
+    export NN_SESSION_DIR="$PWD"
     REQ='protocol=https\nhost=github.com\n\n' VERB=get cred
     [ "$status" -eq 1 ]
     [[ "$output" == *"useHttpPath"* ]]
@@ -736,8 +739,33 @@ cred() {
     done
 }
 
-@test "public sessions' credential requests pass through without lookups" {
-    REQ='protocol=https\nhost=github.com\npath=org/proj.git\n\n' VERB=get cred
+@test "a credential request without a path passes outside nn" {
+    private_repo
+    unset NN_SESSION_DIR
+    export REQ='protocol=https\nhost=github.com\n\n'
+    VERB=get cred
     [ "$status" -eq 0 ]
-    [ ! -e "$OUT.lookups" ]
+    printf '%b' "$REQ" >"$BATS_TEST_TMPDIR/expected"
+    cmp "$OUT.stdin" "$BATS_TEST_TMPDIR/expected"
+}
+
+@test "credential requests for other hosts do no lookups" {
+    private_repo
+    export REQ='protocol=https\nhost=example.com\npath=org/proj.git\n\n'
+    VERB=get cred
+    [ "$status" -eq 0 ]
+    refute_lookups
+    printf '%b' "$REQ" >"$BATS_TEST_TMPDIR/expected"
+    cmp "$OUT.stdin" "$BATS_TEST_TMPDIR/expected"
+}
+
+@test "a public session's push credentials pass through" {
+    setup_git_repo
+    git remote add origin https://github.com/org/proj.git
+    vis org/proj public
+    export REQ='protocol=https\nhost=github.com\npath=org/proj.git\n\n'
+    VERB=get cred
+    [ "$status" -eq 0 ]
+    printf '%b' "$REQ" >"$BATS_TEST_TMPDIR/expected"
+    cmp "$OUT.stdin" "$BATS_TEST_TMPDIR/expected"
 }
