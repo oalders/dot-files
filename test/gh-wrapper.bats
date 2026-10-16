@@ -601,3 +601,19 @@ assert_refused() {
     [ "$status" -eq 0 ]
     [ -z "$stderr" ]
 }
+
+@test "unset HOME outside a session prints nothing to stderr" {
+    bats_require_minimum_version 1.5.0
+    run --separate-stderr env -u CLAUDECODE -u HOME "$GH" --version
+    [ -z "$stderr" ]
+}
+
+@test "issue transfer from a public remote hints at -R" {
+    private_repo
+    git remote add upstream https://github.com/org/proj
+    vis org/proj public
+    vis me/other private
+    gh_run issue transfer 1 me/other
+    [ "$status" -ne 0 ]
+    [[ "$output" == *"pass -R owner/repo"* ]]
+}

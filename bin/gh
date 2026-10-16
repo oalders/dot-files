@@ -129,7 +129,6 @@ sub check {
 
 # A session in a private repo may only write to private/internal repos or
 # allowlisted ones. Why, and what it does not cover: docs/gh-wrapper-visibility.md.
-my $ALLOW_PUBLIC = "$ENV{HOME}/.config/gh/wrapper-allow-public";
 my $PRIVATE      = 'this session works in a private repository';
 my $ASK          = 'ask the user before writing there';
 my $NAME_IT      = 'pass -R owner/repo naming the repository you mean';
@@ -227,7 +226,8 @@ sub private_context {
 
 sub allowed_public {
     my ($repo) = @_;
-    open my $fh, '<', $ALLOW_PUBLIC or return 0;
+    my $home = $ENV{HOME} // return 0;
+    open my $fh, '<', "$home/.config/gh/wrapper-allow-public" or return 0;
     while ( my $line = <$fh> ) {
         $line =~ s/#.*//s;
         $line =~ s/\s+//g;
@@ -490,8 +490,9 @@ if ($cmd) {
 }
 if ( $sub eq 'issue' && $action eq 'transfer' ) {
     my ( undef, $positional ) = parse_flags( \@argv, $i + 1, \%REPO );
-    my ( undef, @from ) = cmd_targets( $i + 1, \%REPO );
-    guard_targets( $ASK, @from, repo_name( $positional->[2] ) );
+    my @from = cmd_targets( $i + 1, \%REPO );
+    guard_targets(@from);
+    guard_targets( $ASK, repo_name( $positional->[2] ) );
     run_real(@argv);
 }
 if ( $sub eq 'release' && $action eq 'upload' ) {
