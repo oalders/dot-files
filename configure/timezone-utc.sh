@@ -12,6 +12,11 @@ if is os name ne linux; then
     exit 0
 fi
 
+if ! is there timedatectl; then
+    echo "Skip timezone-utc.sh (no timedatectl)"
+    exit 0
+fi
+
 if [[ $(timedatectl show -p Timezone --value) == Etc/UTC ]]; then
     echo "Already on UTC"
     exit 0
