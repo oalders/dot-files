@@ -30,10 +30,20 @@ issue/pr/release writes, `issue transfer`, `release upload`, gists, `gh api`
 REST writes, GraphQL mutations (judged by cwd's repo), and `git push` under
 `nn` (via `gh auth git-credential` with `credential.useHttpPath`; git only
 asks for credentials after a 401, so public fetches never reach it).
+Pushes gh makes itself (`repo create --push`, `pr create`) are covered only
+under `nn`, which sets `GH_PATH` to the wrapper.
+
+Credential gets for fetches do lookups too: the helper can't tell a fetch from
+a push, an exception to the rule that reads do no lookups. A remote URL with a
+username (`https://user@github.com/...`) makes git ask for credentials even on
+a fetch, so fetching a public repo from a private `nn` session can be refused.
 
 ## Not covered
 
-- A session in a repo with no GitHub remote (or none yet) is unrestricted.
+- A session in a repo with no GitHub remote (or none yet) is unrestricted, as
+  is one where `git config` fails (e.g. dubious ownership).
+- Remotes are read as written: `insteadOf` aliases and `pushurl` aren't
+  resolved.
 - GraphQL mutations name their target only by node ID; they are judged by
   cwd's repo, so a mutation aimed at a public repo from a private checkout
   passes.

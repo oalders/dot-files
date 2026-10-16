@@ -614,7 +614,7 @@ assert_refused() {
     vis org/proj public
     vis me/other private
     gh_run issue transfer 1 me/other
-    [ "$status" -ne 0 ]
+    assert_refused
     [[ "$output" == *"pass -R owner/repo"* ]]
 }
 
@@ -676,7 +676,7 @@ assert_refused() {
     vis org/proj public
     gh_run api graphql -f "query=$q"
     assert_refused
-    [[ "$output" == *"run it from a checkout"* ]]
+    [[ "$output" == *"set GH_REPO=owner/repo to the repository it writes to"* ]]
     gh_run api graphql -f 'query={ viewer { login } }'
     assert_passed
 }
@@ -727,6 +727,7 @@ cred() {
     REQ='protocol=https\nhost=github.com\n\n' VERB=get cred
     [ "$status" -eq 1 ]
     [[ "$output" == *"useHttpPath"* ]]
+    [ ! -e "$OUT.stdin" ]
 }
 
 @test "credential store and erase pass through in a private session" {
@@ -768,4 +769,12 @@ cred() {
     [ "$status" -eq 0 ]
     printf '%b' "$REQ" >"$BATS_TEST_TMPDIR/expected"
     cmp "$OUT.stdin" "$BATS_TEST_TMPDIR/expected"
+}
+
+# nn sets GH_PATH to the wrapper; finding the real gh must not follow it.
+@test "GH_PATH naming the wrapper still reaches real gh, which keeps GH_PATH" {
+    stub_command gh 'printf "%s\n" "$GH_PATH" >"$OUT"'
+    GH_PATH="$GH" gh_run auth git-credential get </dev/null
+    [ "$status" -eq 0 ]
+    [ "$(cat "$OUT")" = "$GH" ]
 }

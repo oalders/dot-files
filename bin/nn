@@ -509,6 +509,14 @@ if [[ -f $fix_marker ]]; then
     fi
 fi
 
+# Unset when the wrapper is missing: GH_PATH naming a missing file breaks gh's
+# own pushes.
+gh_wrapper="$HOME/dot-files/bin/gh"
+gh_env=()
+if [[ -x $gh_wrapper ]]; then
+    gh_env=("GH_PATH=$gh_wrapper")
+fi
+
 set -x
 # nono's allow_domain entries are injected into NO_PROXY inside the sandbox,
 # which makes HTTP clients bypass the nono proxy — and Landlock then blocks
@@ -554,7 +562,9 @@ set -x
 # useHttpPath and NN_SESSION_DIR feed bin/gh's private-to-public guard: which
 # repo a push targets, and which repo the session belongs to after a cd.
 # GIT_TERMINAL_PROMPT=0 keeps a refused push from ending in a username prompt
-# that buries the refusal. See docs/gh-wrapper-visibility.md.
+# that buries the refusal. GH_PATH makes the pushes gh runs itself (repo create
+# --push, pr create) name the wrapper, not the real gh, as credential helper.
+# See docs/gh-wrapper-visibility.md.
 #
 # --read-file /usr/bin/env: the sandboxed command below starts with `env`,
 # so the env binary must be readable (read implies exec) under whatever
@@ -583,6 +593,7 @@ NONO_NO_SAVE_PROMPT=1 exec nono run --profile "$profile" --allow-cwd --workdir .
     GIT_CONFIG_KEY_4=credential.https://github.com.useHttpPath GIT_CONFIG_VALUE_4=true \
     GIT_TERMINAL_PROMPT=0 \
     NN_SESSION_DIR="$PWD" \
+    "${gh_env[@]+"${gh_env[@]}"}" \
     NN_FNM_RUNTIME_DIR="$PWD/.tmp/run" \
     PLAYWRIGHT_BROWSERS_PATH="$HOME/.cache/ms-playwright" \
     NPM_CONFIG_CACHE="$PWD/.tmp/cache/npm" \

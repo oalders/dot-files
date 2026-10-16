@@ -24,15 +24,16 @@
 # but like every body they are refused if they hold a Claude Code session
 # link or id.
 #
-# Scope: `issue`/`pr` create|new|edit|comment|close, `pr review`, `pr merge`,
-# `release` create|edit, and `gh api` POST/PATCH/PUT to comment/issue/pull/
-# review/reply endpoints or GraphQL mutations. Everything else — and every
-# invocation outside a Claude session ($CLAUDECODE unset), i.e. the human's
-# own `gh` use — passes through untouched.
+# Trailer scope: `issue`/`pr` create|new|edit|comment|close, `pr review`,
+# `pr merge`, `release` create|edit, and `gh api` POST/PATCH/PUT to comment/
+# issue/pull/review/reply endpoints or GraphQL mutations.
 #
-# Also, in a session whose repo is private, writes to any repo that is not
-# private/internal (or listed in ~/.config/gh/wrapper-allow-public) are
-# refused: docs/gh-wrapper-visibility.md.
+# Also, in a session whose repo is private, writes (including git pushes via
+# `auth git-credential`) to any repo that is not private/internal (or listed in
+# ~/.config/gh/wrapper-allow-public) are refused: docs/gh-wrapper-visibility.md.
+#
+# Everything else, and all use outside a Claude session ($CLAUDECODE unset),
+# passes through untouched.
 
 use strict;
 use warnings;
@@ -57,6 +58,7 @@ END { unlink @temp_files if @temp_files }    # also on refuse-to-post exits
 
 # Resolve the real gh: first executable named `gh` on PATH that is not this
 # wrapper. Fall back to the usual system path so we never recurse into ourself.
+# Never consult GH_PATH: nn points it at this wrapper.
 sub real_gh {
     my $self = realpath($0) // $0;
     for my $dir ( split /:/, ( $ENV{PATH} // q{} ) ) {
@@ -639,7 +641,8 @@ my $query = $field{query}
 run_real(@argv) if !defined $query || $query !~ /\bmutation\b/;
 
 # Mutations name their target only by node ID; judge them by cwd's repo.
-guard_targets( "run it from a checkout of the repository it writes to, or $ASK",
+guard_targets(
+    "set GH_REPO=owner/repo to the repository it writes to, or $ASK",
     default_targets() );
 
 # GraphQL ignores commas and `#` comments; drop them so they can't hide a body.
