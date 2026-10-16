@@ -26,6 +26,7 @@
       "~/dot-files/nono",
       "~/.gitconfig",
       "~/local/bin",
+      "~/.local/share/gh/extensions",
       "~/.local/share/nvim/mason",
       "~/.local/bin",
       "~/.npm-packages",
