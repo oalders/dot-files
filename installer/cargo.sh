@@ -3,7 +3,7 @@
 
 set -eu -o pipefail
 
-if is os id eq raspbian || is os id eq almalinux; then
+if is os id eq raspbian; then
     exit 0
 fi
 

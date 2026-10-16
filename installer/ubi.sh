@@ -160,10 +160,6 @@ if ! is there fzf-tmux; then
     chmod 755 "$target"
 fi
 
-if is os id eq almalinux; then
-    exit
-fi
-
 # if is there gh && ! gh extension list | grep --quiet copilot; then
 #     gh extension install github/gh-copilot || true
 # fi

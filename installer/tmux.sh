@@ -2,10 +2,6 @@
 
 set -eu
 
-if is os id eq almalinux; then
-    exit
-fi
-
 # shellcheck source=bash_functions.sh
 source ~/dot-files/bash_functions.sh
 
@@ -16,11 +12,7 @@ is cli version tmux eq $target_version && exit
 is os name eq darwin && exit
 
 if [[ $IS_SUDOER == true ]]; then
-    if is os id eq almalinux; then
-        sudo dnf install -y bison
-    else
-        sudo apt-get install -y bison libevent-dev libncurses5-dev
-    fi
+    sudo apt-get install -y bison libevent-dev libncurses5-dev
 fi
 
 release="tmux-$target_version"
