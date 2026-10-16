@@ -687,3 +687,57 @@ assert_refused() {
     assert_passed
     refute_lookups
 }
+
+cred() {
+    run env "$@" bash -c "printf '%b' \"\$REQ\" | '$GH' auth git-credential \"\$VERB\""
+}
+
+@test "a private session's git pushes to public repos get no credentials" {
+    private_repo
+    vis org/proj public
+    REQ='protocol=https\nhost=github.com\npath=org/proj.git\n\n' VERB=get cred
+    [ "$status" -eq 1 ]
+    [[ "$output" == *"org/proj is public"* ]]
+    [ ! -e "$OUT" ]
+    rm -f "$OUT.stdin"
+    REQ='protocol=https\nhost=github.com\npath=me/secret.git\n\n' VERB=get cred
+    [ "$status" -eq 0 ]
+    grep -qx 'path=me/secret.git' "$OUT.stdin"
+}
+
+@test "the push guard reads the session repo despite git's GIT_DIR" {
+    private_repo
+    export NN_SESSION_DIR="$PWD"
+    mkdir "$BATS_TEST_TMPDIR/pub"
+    cd "$BATS_TEST_TMPDIR/pub"
+    git init -q
+    git remote add origin https://github.com/org/proj.git
+    vis org/proj public
+    REQ='protocol=https\nhost=github.com\npath=org/proj.git\n\n' VERB=get \
+        cred GIT_DIR="$BATS_TEST_TMPDIR/pub/.git"
+    [ "$status" -eq 1 ]
+    [[ "$output" == *"org/proj is public"* ]]
+}
+
+@test "a credential request without a path is refused in a private session" {
+    private_repo
+    REQ='protocol=https\nhost=github.com\n\n' VERB=get cred
+    [ "$status" -eq 1 ]
+    [[ "$output" == *"useHttpPath"* ]]
+}
+
+@test "credential store and erase pass through in a private session" {
+    private_repo
+    for verb in store erase; do
+        rm -f "$OUT.stdin"
+        REQ='protocol=https\nhost=github.com\nusername=x\npassword=y\n\n' VERB=$verb cred
+        [ "$status" -eq 0 ]
+        grep -qx 'password=y' "$OUT.stdin"
+    done
+}
+
+@test "public sessions' credential requests pass through without lookups" {
+    REQ='protocol=https\nhost=github.com\npath=org/proj.git\n\n' VERB=get cred
+    [ "$status" -eq 0 ]
+    [ ! -e "$OUT.lookups" ]
+}

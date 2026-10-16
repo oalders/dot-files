@@ -497,6 +497,21 @@ my $cmd
     : $sub eq 'release'
     ? ( $action =~ /^(?:create|new|edit)$/ && [ \%RELEASE_SPEC, undef ] )
     : undef;
+if (   $sub eq 'auth'
+    && $action eq 'git-credential'
+    && $argv[-1] eq 'get'
+    && private_context() ) {
+    my ( $request, $path ) = read_body(q{-});
+    my %kv = $request =~ /^(\w+)=(.*)$/mg;
+    if ( lc( $kv{host} // q{} ) eq 'github.com' ) {
+        block(    "$PRIVATE and git did not say which repository it wants"
+                . ' credentials for; set credential.useHttpPath=true' )
+            if !defined $kv{path};
+        guard_targets( $ASK, repo_name( $kv{path} ) );
+    }
+    open STDIN, '<', $path or block('cannot replay the credential request');
+    run_real(@argv);
+}
 if ($cmd) {
     check_flags( \@argv, $i + 1, @$cmd );
     guard_targets( cmd_targets( $i + 1, $cmd->[0] ) );

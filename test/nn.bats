@@ -856,3 +856,13 @@ esac'
     [ "$status" -eq 0 ]
     ! grep -Fxq -- "--sandbox-policy" "$BATS_TEST_TMPDIR/nono-argv"
 }
+
+@test "nn wires the gh wrapper's private-to-public guard" {
+    run "$NN"
+    [ "$status" -eq 0 ]
+    grep -Fxq -- "GIT_CONFIG_COUNT=5" "$BATS_TEST_TMPDIR/nono-argv"
+    grep -Fxq -- "GIT_CONFIG_KEY_4=credential.https://github.com.useHttpPath" "$BATS_TEST_TMPDIR/nono-argv"
+    grep -Fxq -- "GIT_CONFIG_VALUE_4=true" "$BATS_TEST_TMPDIR/nono-argv"
+    grep -Fxq -- "GIT_TERMINAL_PROMPT=0" "$BATS_TEST_TMPDIR/nono-argv"
+    grep -Fxq -- "NN_SESSION_DIR=$PWD" "$BATS_TEST_TMPDIR/nono-argv"
+}
