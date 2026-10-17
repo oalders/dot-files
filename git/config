@@ -1,13 +1,8 @@
 [user]
 	email = olaf@wundersolutions.com
 	name = Olaf Alders
-[remote "origin"]
-	fetch = +refs/pull/*/head:refs/remotes/origin/pull-requests/*
 [branch]
-	autosetuprebase = always
 	sort = -committerdate
-[color]
-	ui = auto
 [column]
 	ui = auto
 [commit]
@@ -16,7 +11,6 @@
 	algorithm = histogram
 	colorMoved = default
 	mnemonicPrefix = true
-	renames = true
 [fetch]
 	prune = true
 	pruneTags = true
@@ -27,14 +21,16 @@
 	autocorrect = prompt
 [init]
 	defaultBranch = main
+[pull]
+	rebase = true
 [push]
-	default = simple
 	autoSetupRemote = true
 	followTags = true
 [rebase]
 	autostash = true
 	autosquash = true
 	instructionFormat = (%an <%ae>) %s
+	updateRefs = true
 [rerere]
 	enabled = true
 	autoupdate = true
@@ -70,8 +66,11 @@
 	whatis = show -s --pretty='tformat:%h (%s, %ad)' --date=short
 [core]
 	excludesfile = ~/.gitignore_global
+	untrackedCache = true
 [merge]
 	tool = nvimdiff2
+[tag]
+	sort = version:refname
 [grep]
 	lineNumber = true
 	patternType = perl

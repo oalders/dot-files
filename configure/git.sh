@@ -46,6 +46,25 @@ fi
 
 ginclude "$shared"
 
+# Left in the stub after the migration above had already run; git/config owns it.
+if git config --global --get push.autoSetupRemote >/dev/null; then
+    git config --global --unset push.autoSetupRemote
+fi
+
+# Retired npm-merge-driver: npm resolves lockfile conflicts on `npm install`.
+if git config --global --get merge.npm-merge-driver.driver >/dev/null; then
+    git config --global --remove-section merge.npm-merge-driver
+fi
+attributes=~/.config/git/attributes
+if [[ -f $attributes ]] && grep -q 'merge=npm-merge-driver' "$attributes"; then
+    grep -v 'merge=npm-merge-driver' "$attributes" >"$attributes.tmp" || true
+    if [[ -s "$attributes.tmp" ]]; then
+        mv "$attributes.tmp" "$attributes"
+    else
+        rm "$attributes.tmp" "$attributes"
+    fi
+fi
+
 # Meld is configured only via `open -a`, so it's macOS-only.
 if is os name eq darwin && [ -d '/Applications/Meld.app' ]; then
     ginclude "$darwin"
