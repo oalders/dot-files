@@ -123,6 +123,7 @@ if ! is os name eq darwin; then
     maybe_install eza-community/eza
     maybe_install gohugoio/hugo --matching extended --tag v0.161.1
     maybe_install hadolint/hadolint
+    maybe_install forgejo-contrib/forgejo-cli --forge forgejo --exe fj
 fi
 
 if is cli output stdout hostname eq wolfblitzer; then
