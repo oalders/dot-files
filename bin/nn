@@ -558,7 +558,11 @@ set -x
 # it; --profile overrides that stand alone don't, and would die before
 # claude launches. Granting it here keeps the wrapper's own dependency out
 # of every override profile. Redundant grants are harmless.
-exec nono run --profile "$profile" --allow-cwd --workdir . \
+#
+# NONO_NO_SAVE_PROMPT: accepting nono's save-profile prompt replaces the
+# symlinked ~/.config/nono/profiles/oalders.json with a serialized copy that
+# a later nono can fail to parse. Grants belong in the repo profiles.
+NONO_NO_SAVE_PROMPT=1 exec nono run --profile "$profile" --allow-cwd --workdir . \
     "${sandbox_policy_args[@]+"${sandbox_policy_args[@]}"}" \
     --read-file /usr/bin/env "${chrome_run_args[@]+"${chrome_run_args[@]}"}" \
     "${playwright_run_args[@]+"${playwright_run_args[@]}"}" \
