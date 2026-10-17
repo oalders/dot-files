@@ -66,6 +66,18 @@ s.bind(name)
     [ "$(readlink "$FAKE_HOME/.ssh/ssh_auth_sock")" = "$new_sock" ]
 }
 
+@test "ssh/rc: leaves link alone when SSH_AUTH_SOCK is the link itself" {
+    sock="$SOCK_DIR/agent.sock"
+    make_socket "$sock"
+    ln -s "$sock" "$FAKE_HOME/.ssh/ssh_auth_sock"
+
+    run env HOME="$FAKE_HOME" SSH_CLIENT="1.2.3.4 22 22" \
+        SSH_AUTH_SOCK="$FAKE_HOME/.ssh/ssh_auth_sock" sh "$SSH_RC"
+    [ "$status" -eq 0 ]
+
+    [ "$(readlink "$FAKE_HOME/.ssh/ssh_auth_sock")" = "$sock" ]
+}
+
 @test "ssh/rc: no-op when SSH_CLIENT unset" {
     sock="$SOCK_DIR/agent.sock"
     make_socket "$sock"

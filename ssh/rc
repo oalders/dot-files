@@ -4,6 +4,8 @@
 set -eu
 
 # https://werat.github.io/2017/02/04/tmux-ssh-agent-forwarding.html
-if [ -n "${SSH_CLIENT-}" ] && [ -n "${SSH_AUTH_SOCK-}" ] && [ -S "${SSH_AUTH_SOCK}" ]; then
+# Skip when SSH_AUTH_SOCK is already the stable link, or ln makes it point at itself.
+if [ -n "${SSH_CLIENT-}" ] && [ -n "${SSH_AUTH_SOCK-}" ] && [ -S "${SSH_AUTH_SOCK}" ] &&
+    [ "$SSH_AUTH_SOCK" != "$HOME/.ssh/ssh_auth_sock" ]; then
     ln -snf "$SSH_AUTH_SOCK" "$HOME/.ssh/ssh_auth_sock"
 fi
