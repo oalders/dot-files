@@ -1,13 +1,13 @@
-Match exec "[ -f ~/.colima/ssh_config ]"
-  Include ~/.colima/ssh_config
-
-HashKnownHosts=yes
-VisualHostKey=yes
+# Includes come first so their host blocks win over the defaults below; ssh
+# keeps the first value it sees. Missing include files are skipped silently.
+Include ~/.ssh/config.d/*
+Include ~/.colima/ssh_config
 
 Host *
+HashKnownHosts=yes
+VisualHostKey=yes
 ControlMaster auto
 ControlPath  ~/.ssh/sockets/%C
 ControlPersist 600
 PreferredAuthentications=publickey,password
-
-Include ~/.ssh/config.d/*
+ServerAliveInterval 60
