@@ -21,6 +21,12 @@ if is os name eq linux && is there apt && (! is there node || is cli version nod
     sudo apt-get install -y nodejs
 fi
 
+# Shells that don't put ~/dot-files/node_modules/.bin on PATH (e.g. agent
+# sandboxes) get the npm bundled with the nodesource package, which lags.
+if is os name eq linux && is there apt && is user sudoer; then
+    debounce 1 d sudo npm install -g npm@latest
+fi
+
 debounce --local 1 d npm install npm@latest
 debounce --local 1 d npm install
 
