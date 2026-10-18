@@ -440,7 +440,23 @@ if [[ -z $no_pr ]]; then
                 # baseline removal event comes from before the merge.
                 # A re-run on an already queued/auto-merge PR resumes waiting
                 # instead of calling `gh pr merge` a second time.
-                pre_status=$(pr_queue_status 2>/dev/null) || pre_status=""
+                # Without a baseline any old removal event reads as a new
+                # ejection, so don't merge until it is known.
+                pre_status=""
+                for attempt in 1 2 3 4 5; do
+                    if pre_status=$(pr_queue_status 2>/dev/null) &&
+                        [[ $(classify_status "$pre_status" "") != invalid ]]; then
+                        break
+                    fi
+                    pre_status=""
+                    if [[ $attempt -lt 5 ]]; then
+                        sleep "${MERGE_PR_POLL_INTERVAL:-60}"
+                    fi
+                done
+                if [[ -z $pre_status ]]; then
+                    echo "merge-pr: could not read PR status from GitHub 5 times in a row — nothing torn down" >&2
+                    exit 1
+                fi
                 IFS='|' read -r _ _ _ _ _ baseline_removed _ _ <<<"$pre_status"
                 case "$(classify_status "$pre_status" "$baseline_removed")" in
                 queued) echo "merge-pr: PR already in the merge queue — waiting" ;;

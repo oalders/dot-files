@@ -1565,3 +1565,21 @@ _queue_setup() {
     [[ "$output" == *"gh pr merge --disable-auto"* ]]
     [ -d "$WORKTREE_DIR" ]
 }
+
+@test "queue: failed baseline read is retried so an old ejection is not new" {
+    _queue_setup FAIL 'OPEN|false||false|PENDING|RFMQ_old|FAILED_CHECKS|u' \
+        'OPEN|false||true|PENDING|RFMQ_old|FAILED_CHECKS|u' 'MERGED|false||false|SUCCESS|RFMQ_old|FAILED_CHECKS|u'
+    run "$MERGE_PR" -s
+    [ "$status" -eq 0 ]
+    [[ "$output" != *"removed from the merge queue"* ]]
+    [ ! -d "$WORKTREE_DIR" ]
+}
+
+@test "queue: unreadable baseline gives up before calling gh pr merge" {
+    _queue_setup FAIL
+    run "$MERGE_PR" -s
+    [ "$status" -eq 1 ]
+    [[ "$output" == *"could not read PR status from GitHub 5 times in a row — nothing torn down"* ]]
+    [ ! -e "$BATS_TEST_TMPDIR/merge-was-called" ]
+    [ -d "$WORKTREE_DIR" ]
+}
