@@ -223,6 +223,7 @@ These don't belong to any single tool or stack, so they live in `oalders-core` (
 - `read` on `/etc/apt`. Ubuntu's apport excepthook imports `apt` on every uncaught Python exception; without the grant each traceback is prefixed with `Warning: W:Unable to read /etc/apt/apt.conf.d/ - opendir (13: Permission denied)`.
 - `read_file` on `~/dot-files/claude/CLAUDE.md` (the global Claude Code instructions). `~/.claude/CLAUDE.md` is a symlink to this path; without the grant the harness can't follow the symlink and none of the global instructions load in sandboxed sessions. Single-file grant rather than a `read` on `~/dot-files/claude/` — `statusline-command.sh` is the only other file under there the sandbox needs, and it's already granted below.
 - `read_file` on `~/dot-files/claude/statusline-command.sh` (the Claude Code statusline script, run sandboxed as a child of claude; `bin/nn` injects the matching `statusLine` block into the session settings since the sandbox can't read `~/.claude/settings.json`).
+- `read_file` on `~/.editorconfig` and its symlink target `~/dot-files/editorconfig`, so shfmt (via `precious lint`) can read it instead of failing with `operation not permitted`.
 - `bypass_protection` on `~/.bashrc` → `~/dot-files/bashrc` (so `nono shell` and rc-loading don't trip the `deny_shell_configs` overlap; safe since this repo is public and scanned for secrets).
 
 See `claude-nono/Makefile` in this repo for the maximalist reference set.
