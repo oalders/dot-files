@@ -27,7 +27,6 @@
     "diff-lockfiles": "^1.3.0",
     "eslint": "^10.11.0",
     "fixjson": "^1.1.2",
-    "lua-fmt": "^2.6.0",
     "markdownlint": "^0.41.0",
     "markdownlint-cli": "^0.49.0",
     "mcp-hub": "^4.2.1",
