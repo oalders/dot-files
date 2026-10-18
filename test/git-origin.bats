@@ -90,3 +90,34 @@ setup_fake_github() {
     [ "$status" -ne 0 ]
     [ "$(git config --get remote.origin.url)" = "git@github.com:.git" ]
 }
+
+@test "git-origin ssh strips a trailing slash" {
+    setup_fake_github
+    git remote add origin https://github.com/oalders/dot-files/
+    run "$GIT_ORIGIN" ssh
+    [ "$status" -eq 0 ]
+    [ "$(git config --get remote.origin.url)" = "git@github.com:oalders/dot-files.git" ]
+}
+
+@test "git-origin reports a missing origin remote" {
+    run "$GIT_ORIGIN" https
+    [ "$status" -ne 0 ]
+    [[ "$output" == *"No origin remote configured"* ]]
+}
+
+@test "git-origin still syncs the default branch when gh config fails" {
+    setup_fake_github
+    stub_command gh 'exit 1'
+    git remote add origin git@github.com:oalders/dot-files.git
+    run "$GIT_ORIGIN" https
+    [ "$status" -eq 0 ]
+    [[ "$output" == *"warning: could not set gh git_protocol"* ]]
+    [ "$(git symbolic-ref --short refs/remotes/origin/HEAD)" = "origin/main" ]
+}
+
+@test "git-origin rejects extra arguments" {
+    git remote add origin git@github.com:oalders/dot-files.git
+    run "$GIT_ORIGIN" https extra
+    [ "$status" -ne 0 ]
+    [ "$(git config --get remote.origin.url)" = "git@github.com:oalders/dot-files.git" ]
+}
