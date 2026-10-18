@@ -6,4 +6,9 @@
 
 set -eu -o pipefail
 
-GH_BROWSER="echo" exec gh auth login --hostname github.com --git-protocol https --scopes workflow --web "$@"
+GH_BROWSER="echo" exec gh auth login \
+    --hostname github.com \
+    --git-protocol https \
+    --scopes workflow \
+    --web \
+    "$@"
