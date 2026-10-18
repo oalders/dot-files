@@ -85,7 +85,7 @@ classify_status() {
 # torn down.
 wait_for_merge() {
     local baseline=$1 line kind position reason url
-    local failures=0 last_kind="" last_position="" first=1
+    local failures=0 unsettled=0 last_kind="" last_position="" first=1
     while true; do
         if [[ -z $first ]]; then
             sleep "${MERGE_PR_POLL_INTERVAL:-60}"
@@ -104,6 +104,11 @@ wait_for_merge() {
             continue
         fi
         failures=0
+        if [[ $kind == unsettled ]]; then
+            unsettled=$((unsettled + 1))
+        else
+            unsettled=0
+        fi
         IFS='|' read -r _ _ position _ _ _ reason url <<<"$line"
         case "$kind" in
         merged)
@@ -118,6 +123,24 @@ wait_for_merge() {
             echo "merge-pr: PR was removed from the merge queue ($reason) — nothing torn down" >&2
             echo "          fix, push, and re-run merge-pr: $url" >&2
             exit 1
+            ;;
+        checks_failed)
+            echo "merge-pr: required checks failed while waiting for auto-merge — nothing torn down" >&2
+            echo "          fix, push, and re-run merge-pr: $url" >&2
+            exit 1
+            ;;
+        unsettled)
+            # isInMergeQueue can lag just after enqueue; give it a couple of
+            # polls before deciding the PR is simply not going to merge.
+            if [[ $unsettled -ge 3 ]]; then
+                echo "merge-pr: PR is OPEN but neither queued nor set to auto-merge — nothing torn down" >&2
+                exit 1
+            fi
+            ;;
+        automerge)
+            if [[ $last_kind != automerge ]]; then
+                echo "merge-pr: auto-merge enabled — waiting for required checks"
+            fi
             ;;
         queued)
             if [[ $last_kind != queued ]]; then
@@ -398,9 +421,15 @@ if [[ -z $no_pr ]]; then
                 # OPEN (queued, or auto-merge when checks are pending), so wait
                 # for the real outcome before anything is torn down. The
                 # baseline removal event comes from before the merge.
+                # A re-run on an already queued/auto-merge PR resumes waiting
+                # instead of calling `gh pr merge` a second time.
                 pre_status=$(pr_queue_status 2>/dev/null) || pre_status=""
                 IFS='|' read -r _ _ _ _ _ baseline_removed _ _ <<<"$pre_status"
-                gh pr merge "${gh_args[@]}"
+                case "$(classify_status "$pre_status" "$baseline_removed")" in
+                queued) echo "merge-pr: PR already in the merge queue — waiting" ;;
+                automerge) echo "merge-pr: auto-merge already enabled — waiting" ;;
+                *) gh pr merge "${gh_args[@]}" ;;
+                esac
                 wait_for_merge "$baseline_removed"
                 pr_state=MERGED
             fi

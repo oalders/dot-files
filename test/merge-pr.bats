@@ -1447,3 +1447,55 @@ _queue_setup() {
     [[ "$output" == *"could not read PR status from GitHub 5 times in a row — nothing torn down"* ]]
     [ -d "$WORKTREE_DIR" ]
 }
+
+@test "automerge: auto-merge then queued then merged tears down" {
+    _queue_setup 'OPEN|false||false|PENDING|||u' 'OPEN|false||true|PENDING|||u' \
+        'OPEN|true|1|false|SUCCESS|||u' 'MERGED|false||false|SUCCESS|||u'
+    run "$MERGE_PR" -s
+    [ "$status" -eq 0 ]
+    [[ "$output" == *"auto-merge enabled — waiting for required checks"* ]]
+    [ ! -d "$WORKTREE_DIR" ]
+}
+
+@test "automerge: failing head checks tear nothing down" {
+    _queue_setup 'OPEN|false||false|PENDING|||u' 'OPEN|false||true|FAILURE|||https://x/pull/7'
+    run "$MERGE_PR" -s
+    [ "$status" -eq 1 ]
+    [[ "$output" == *"required checks failed while waiting for auto-merge — nothing torn down"* ]]
+    [[ "$output" == *"https://x/pull/7"* ]]
+    [ -d "$WORKTREE_DIR" ]
+}
+
+@test "queue: brief unsettled read then queued keeps waiting" {
+    _queue_setup 'OPEN|false||false|SUCCESS|||u' 'OPEN|false||false|SUCCESS|||u' \
+        'OPEN|true|1|false|SUCCESS|||u' 'MERGED|false||false|SUCCESS|||u'
+    run "$MERGE_PR" -s
+    [ "$status" -eq 0 ]
+    [ ! -d "$WORKTREE_DIR" ]
+}
+
+@test "queue: neither queued nor auto-merge after grace tears nothing down" {
+    _queue_setup 'OPEN|false||false|SUCCESS|||u'
+    run "$MERGE_PR" -s
+    [ "$status" -eq 1 ]
+    [[ "$output" == *"PR is OPEN but neither queued nor set to auto-merge — nothing torn down"* ]]
+    [ -d "$WORKTREE_DIR" ]
+}
+
+@test "resume: re-run while queued waits without calling gh pr merge" {
+    _queue_setup 'OPEN|true|3|false|SUCCESS|||u' 'MERGED|false||false|SUCCESS|||u'
+    run "$MERGE_PR" -s
+    [ "$status" -eq 0 ]
+    [[ "$output" == *"PR already in the merge queue — waiting"* ]]
+    [ ! -e "$BATS_TEST_TMPDIR/merge-was-called" ]
+    [ ! -d "$WORKTREE_DIR" ]
+}
+
+@test "resume: re-run while auto-merge is pending waits without calling gh pr merge" {
+    _queue_setup 'OPEN|false||true|PENDING|||u' 'MERGED|false||false|SUCCESS|||u'
+    run "$MERGE_PR" -s
+    [ "$status" -eq 0 ]
+    [[ "$output" == *"auto-merge already enabled — waiting"* ]]
+    [ ! -e "$BATS_TEST_TMPDIR/merge-was-called" ]
+    [ ! -d "$WORKTREE_DIR" ]
+}
