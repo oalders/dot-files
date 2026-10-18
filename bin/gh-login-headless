@@ -1,8 +1,14 @@
 #!/usr/bin/env bash
 
 # Device-flow login for a VM with no usable browser: prints the URL instead of
-# opening lynx, and doesn't upload this host's SSH key to GitHub.
+# opening lynx. Git uses HTTPS with gh's token, so no SSH key is involved;
+# workflow scope lets pushes change .github/workflows.
 
 set -eu -o pipefail
 
-GH_BROWSER="echo" exec gh auth login --hostname github.com --git-protocol ssh --web --skip-ssh-key "$@"
+GH_BROWSER="echo" exec gh auth login \
+    --hostname github.com \
+    --git-protocol https \
+    --scopes workflow \
+    --web \
+    "$@"

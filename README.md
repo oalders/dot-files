@@ -3,7 +3,7 @@
 <!-- vim-markdown-toc GFM -->
 
 * [Fresh macOS Installs](#fresh-macos-installs)
-  * [Clone Repo and Change Remote](#clone-repo-and-change-remote)
+  * [Clone Repo and Log In to GitHub](#clone-repo-and-log-in-to-github)
   * [Change Default shell](#change-default-shell)
   * [Trackpad and Dock defaults](#trackpad-and-dock-defaults)
   * [Install App Store Apps](#install-app-store-apps)
@@ -47,13 +47,19 @@
 Some of these scripts will need to be run manually on a fresh install. They may
 require manual intervention or be impractical to run regularly.
 
-### Clone Repo and Change Remote
+### Clone Repo and Log In to GitHub
+
+Git authenticates to GitHub over HTTPS with gh's token (see `git/config`), so
+there is no SSH key to set up. `workflow` lets pushes change
+`.github/workflows`.
 
 ```text
 git clone https://github.com/oalders/dot-files.git
 cd dot-files
-./bin/change-dot-files-origin.sh
+gh auth login --git-protocol https --scopes workflow
 ```
+
+On a VM without a browser, use `./bin/gh-login-headless` instead.
 
 ### Change Default shell
 
