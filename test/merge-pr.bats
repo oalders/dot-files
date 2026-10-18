@@ -14,6 +14,7 @@ setup() {
     # Stub docker so the docker-teardown step is hermetic: every query returns
     # empty, so it finds no worktree-owned containers regardless of host state.
     stub_command docker 'exit 0'
+    export MERGE_PR_POLL_INTERVAL=0
 }
 
 @test "merge-pr -h prints usage and exits 0" {
@@ -369,6 +370,7 @@ esac
     stub_command gh '
 case "$2" in
     view) printf "OPEN\tmain\n" ;;
+    graphql) printf "MERGED|false||false|SUCCESS|||u\n" ;;
     merge) : >"$BATS_TEST_TMPDIR/merge-was-called" ;;
 esac
 '
@@ -791,6 +793,7 @@ esac
     stub_command gh '
 case "$2" in
     view) printf "OPEN\tmain\n" ;;
+    graphql) printf "MERGED|false||false|SUCCESS|||u\n" ;;
     merge) : >"$BATS_TEST_TMPDIR/merge-was-called" ;;
 esac
 '
@@ -856,6 +859,7 @@ esac
     stub_command gh '
 case "$2" in
     view) printf "OPEN\tmain\n" ;;
+    graphql) printf "MERGED|false||false|SUCCESS|||u\n" ;;
     merge) git switch -q main && git branch -D feature ;;
 esac
 '
@@ -885,6 +889,7 @@ esac
     stub_command gh '
 case "$2" in
     view) printf "OPEN\tghost\n" ;;
+    graphql) printf "MERGED|false||false|SUCCESS|||u\n" ;;
     merge) : >"$BATS_TEST_TMPDIR/merge-was-called" ;;
 esac
 '
@@ -1197,6 +1202,7 @@ case "$1 $2" in
         [[ -e "$BATS_TEST_TMPDIR/edit-fails" ]] && exit 1
         ;;
     "pr merge") : >"$BATS_TEST_TMPDIR/merge-was-called" ;;
+    "api graphql") echo "MERGED|false||false|SUCCESS|||u" ;;
 esac
 exit 0
 '
@@ -1327,4 +1333,117 @@ ISSUE2=https://github.com/o/r/issues/2
     [[ "$output" == *"merge-pr: warning: could not list issues closed by this PR"* ]]
     [ ! -e "$BATS_TEST_TMPDIR/edit.log" ]
     [ ! -d "$WORKTREE_DIR" ]
+}
+
+# Merge queue / auto-merge wait. The stub answers each `gh api graphql` probe
+# with the next line of $BATS_TEST_TMPDIR/probes (the last line repeats), in
+# merge-pr's `state|in_queue|position|auto_merge|head_checks|removed_id|
+# removed_reason|url` format. A FAIL line makes that probe exit 1, and a
+# non-empty on-probe-<n> file is sourced on the n-th probe for side effects.
+# Usage: _queue_stub <probe-line>...   (one line per successive probe)
+_queue_stub() {
+    printf '%s\n' "$@" >"$BATS_TEST_TMPDIR/probes"
+    stub_command gh '
+echo "$*" >>"$BATS_TEST_TMPDIR/gh.log"
+case "$1 $2" in
+    "pr view") printf "OPEN\tmain\t7\n" ;;
+    "pr merge") : >"$BATS_TEST_TMPDIR/merge-was-called" ;;
+    "api graphql")
+        n=$(( $(cat "$BATS_TEST_TMPDIR/probe-count" 2>/dev/null || echo 0) + 1 ))
+        echo "$n" >"$BATS_TEST_TMPDIR/probe-count"
+        [[ -s "$BATS_TEST_TMPDIR/on-probe-$n" ]] && . "$BATS_TEST_TMPDIR/on-probe-$n"
+        line=$(sed -n "${n}p" "$BATS_TEST_TMPDIR/probes")
+        [[ -z $line ]] && line=$(tail -n 1 "$BATS_TEST_TMPDIR/probes")
+        [[ $line == FAIL ]] && exit 1
+        echo "$line"
+        ;;
+esac
+exit 0
+'
+}
+
+# Linked-worktree fixture plus the queue stub.
+_queue_setup() {
+    _ready_repo
+    setup_feature_worktree
+    unset TMUX
+    stub_command tmux 'exit 0'
+    _queue_stub "$@"
+}
+
+# In each probe list below, the first line answers the pre-merge probe.
+@test "queue: queued then merged tears down" {
+    _queue_setup 'OPEN|false||false|SUCCESS|||u' 'OPEN|true|2|false|SUCCESS|||u' \
+        'OPEN|true|1|false|SUCCESS|||u' 'MERGED|false||false|SUCCESS|||u'
+    run "$MERGE_PR" -s
+    [ "$status" -eq 0 ]
+    [ -e "$BATS_TEST_TMPDIR/merge-was-called" ]
+    [[ "$output" == *"PR queued — waiting for the merge queue (position 2)"* ]]
+    [[ "$output" == *"still queued — position 1"* ]]
+    [[ "$output" == *"PR merged — proceeding to cleanup"* ]]
+    [ ! -d "$WORKTREE_DIR" ]
+}
+
+@test "queue: ejected PR tears nothing down and keeps labels" {
+    _queue_setup 'OPEN|false||false|SUCCESS|||u' 'OPEN|true|1|false|SUCCESS|||u' \
+        'OPEN|false||false|FAILURE|RFMQ_1|FAILED_CHECKS|https://x/pull/7'
+    run "$MERGE_PR" -s
+    [ "$status" -eq 1 ]
+    [[ "$output" == *"PR was removed from the merge queue (FAILED_CHECKS) — nothing torn down"* ]]
+    [[ "$output" == *"https://x/pull/7"* ]]
+    [ -d "$WORKTREE_DIR" ]
+    run git -C "$REPO_DIR" branch --list feature
+    [ -n "$output" ]
+    # No label cleanup ran: no closing-issues lookup, no issue calls.
+    run grep -E "closingIssuesReferences|^issue " "$BATS_TEST_TMPDIR/gh.log"
+    [ "$status" -ne 0 ]
+}
+
+@test "queue: stale removal event is not an ejection" {
+    _queue_setup 'OPEN|false||false|SUCCESS|RFMQ_old|FAILED_CHECKS|u' \
+        'OPEN|true|1|false|SUCCESS|RFMQ_old|FAILED_CHECKS|u' \
+        'MERGED|false||false|SUCCESS|RFMQ_old|FAILED_CHECKS|u'
+    run "$MERGE_PR" -s
+    [ "$status" -eq 0 ]
+    [ ! -d "$WORKTREE_DIR" ]
+}
+
+@test "queue: PR closed during the wait tears nothing down" {
+    _queue_setup 'OPEN|false||false|SUCCESS|||u' 'OPEN|true|1|false|SUCCESS|||u' \
+        'CLOSED|false||false|SUCCESS|||u'
+    run "$MERGE_PR" -s
+    [ "$status" -eq 1 ]
+    [[ "$output" == *"PR was closed while waiting — nothing torn down"* ]]
+    [ -d "$WORKTREE_DIR" ]
+}
+
+@test "queue: main working tree waits before deleting the branch" {
+    _ready_repo
+    cd "$REPO_DIR"
+    git checkout -q -b feature
+    git push -q -u origin feature
+    unset TMUX
+    stub_command tmux 'exit 0'
+    _queue_stub 'OPEN|false||false|SUCCESS|||u' 'OPEN|true|1|false|SUCCESS|||u' \
+        'OPEN|false||false|FAILURE|RFMQ_1|FAILED_CHECKS|u'
+    run "$MERGE_PR" -s
+    [ "$status" -eq 1 ]
+    run git -C "$REPO_DIR" rev-parse --abbrev-ref HEAD
+    [[ "$output" == "feature" ]]
+}
+
+@test "queue: transient probe failures are retried" {
+    _queue_setup 'OPEN|false||false|SUCCESS|||u' 'OPEN|true|1|false|SUCCESS|||u' \
+        FAIL FAIL 'MERGED|false||false|SUCCESS|||u'
+    run "$MERGE_PR" -s
+    [ "$status" -eq 0 ]
+    [ ! -d "$WORKTREE_DIR" ]
+}
+
+@test "queue: five consecutive probe failures give up without teardown" {
+    _queue_setup 'OPEN|false||false|SUCCESS|||u' 'OPEN|true|1|false|SUCCESS|||u' FAIL
+    run "$MERGE_PR" -s
+    [ "$status" -eq 1 ]
+    [[ "$output" == *"could not read PR status from GitHub 5 times in a row — nothing torn down"* ]]
+    [ -d "$WORKTREE_DIR" ]
 }
