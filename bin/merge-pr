@@ -16,6 +16,14 @@ when the branch is no longer on origin — no push required.
 After a merge (or an already-MERGED PR), an "in progress" label
 (case-insensitive) is removed from each issue the PR closes. Best-effort.
 
+On a repo with a merge queue, `gh pr merge` only queues the PR (or turns
+on auto-merge while required checks are pending), so merge-pr waits,
+polling every 60s (MERGE_PR_POLL_INTERVAL), until the PR merges, and only
+then tears down. If the PR is removed from the merge queue, its checks fail,
+or it is closed, nothing is torn down and merge-pr exits 1: fix, push, and
+re-run. A re-run on an already queued PR resumes waiting. Ctrl-C stops
+waiting but does not cancel the merge; `gh pr merge --disable-auto` does.
+
 Options:
   -f, --force   Discard uncommitted changes in the worktree when
                 removing it.
@@ -42,6 +50,126 @@ Refuses:
   dirty worktree         Bails before merging when there are uncommitted
                          changes, unless --force is given.
 EOF
+}
+
+# Print the PR's merge-queue status as one line:
+#   state|in_queue|position|auto_merge|head_checks|removed_id|removed_reason|url
+# Joined with `|`, not @tsv: `IFS=$'\t' read` collapses empty fields.
+pr_queue_status() {
+    # shellcheck disable=SC2016 # $owner etc. are GraphQL variables, not shell
+    gh api graphql -F owner='{owner}' -F name='{repo}' -F number="$pr_number" \
+        -f query='query($owner:String!,$name:String!,$number:Int!){repository(owner:$owner,name:$name){pullRequest(number:$number){state isInMergeQueue mergeQueueEntry{position} autoMergeRequest{enabledAt} url commits(last:1){nodes{commit{statusCheckRollup{state}}}} timelineItems(last:1,itemTypes:[REMOVED_FROM_MERGE_QUEUE_EVENT]){nodes{... on RemovedFromMergeQueueEvent{id reason}}}}}}' \
+        --jq '.data.repository.pullRequest | [.state, (.isInMergeQueue|tostring), ((.mergeQueueEntry.position // "")|tostring), ((.autoMergeRequest != null)|tostring), (.commits.nodes[0].commit.statusCheckRollup.state // ""), (.timelineItems.nodes[0].id // ""), (.timelineItems.nodes[0].reason // ""), .url] | join("|")'
+}
+
+# classify_status <status-line> <baseline_removed_id>
+# A removal event only counts as an ejection when it differs from the one seen
+# before this run's merge, so an earlier attempt's ejection isn't misread.
+classify_status() {
+    local state in_queue position auto_merge checks removed_id reason url
+    IFS='|' read -r state in_queue position auto_merge checks removed_id reason url <<<"$1"
+    case "$state" in
+    MERGED) echo merged ;;
+    CLOSED) echo closed ;;
+    OPEN)
+        if [[ $in_queue == true ]]; then
+            echo queued
+        elif [[ -n $removed_id && $removed_id != "$2" ]]; then
+            echo ejected
+        elif [[ $auto_merge == true && ($checks == FAILURE || $checks == ERROR) ]]; then
+            echo checks_failed
+        elif [[ $auto_merge == true ]]; then
+            echo automerge
+        else
+            echo unsettled
+        fi
+        ;;
+    *) echo invalid ;;
+    esac
+}
+
+wait_interrupted() {
+    echo "" >&2
+    echo "merge-pr: stopped waiting — nothing torn down. GitHub will still merge the PR on its own." >&2
+    echo "          Re-run merge-pr to resume waiting, or cancel with: gh pr merge --disable-auto" >&2
+    exit 130
+}
+
+# wait_for_merge <baseline_removed_id>
+# Returns only once the PR is MERGED; every other outcome exits 1 with nothing
+# torn down.
+wait_for_merge() {
+    local baseline=$1 line kind position reason url
+    local failures=0 unsettled=0 last_kind="" last_position="" first=1
+    trap wait_interrupted INT
+    while true; do
+        if [[ -z $first ]]; then
+            sleep "${MERGE_PR_POLL_INTERVAL:-60}"
+        fi
+        first=""
+        kind=invalid
+        if line=$(pr_queue_status 2>/dev/null); then
+            kind=$(classify_status "$line" "$baseline")
+        fi
+        if [[ $kind == invalid ]]; then
+            failures=$((failures + 1))
+            if [[ $failures -ge 5 ]]; then
+                echo "merge-pr: could not read PR status from GitHub 5 times in a row — nothing torn down; re-run merge-pr to resume waiting" >&2
+                exit 1
+            fi
+            continue
+        fi
+        failures=0
+        if [[ $kind == unsettled ]]; then
+            unsettled=$((unsettled + 1))
+        else
+            unsettled=0
+        fi
+        IFS='|' read -r _ _ position _ _ _ reason url <<<"$line"
+        case "$kind" in
+        merged)
+            trap - INT
+            echo "merge-pr: PR merged — proceeding to cleanup"
+            return 0
+            ;;
+        closed)
+            echo "merge-pr: PR was closed while waiting — nothing torn down" >&2
+            exit 1
+            ;;
+        ejected)
+            echo "merge-pr: PR was removed from the merge queue ($reason) — nothing torn down" >&2
+            echo "          fix, push, and re-run merge-pr: $url" >&2
+            exit 1
+            ;;
+        checks_failed)
+            echo "merge-pr: required checks failed while waiting for auto-merge — nothing torn down" >&2
+            echo "          fix, push, and re-run merge-pr: $url" >&2
+            exit 1
+            ;;
+        unsettled)
+            # isInMergeQueue can lag just after enqueue; give it a couple of
+            # polls before deciding the PR is simply not going to merge.
+            if [[ $unsettled -ge 3 ]]; then
+                echo "merge-pr: PR is OPEN but neither queued nor set to auto-merge — nothing torn down" >&2
+                exit 1
+            fi
+            ;;
+        automerge)
+            if [[ $last_kind != automerge ]]; then
+                echo "merge-pr: auto-merge enabled — waiting for required checks"
+            fi
+            ;;
+        queued)
+            if [[ $last_kind != queued ]]; then
+                echo "merge-pr: PR queued — waiting for the merge queue (position $position)"
+            elif [[ $position != "$last_position" ]]; then
+                echo "merge-pr: still queued — position $position"
+            fi
+            ;;
+        esac
+        last_kind=$kind
+        last_position=$position
+    done
 }
 
 # Parse our own --force/-f, --close, and --punt from anywhere in the argument
@@ -222,7 +350,7 @@ fi
 # close-mode case where there's no PR at all; teardown still runs, but the
 # PR-state dispatch below is skipped.
 no_pr=""
-if ! pr_info=$(gh pr view --json state,baseRefName -q '[.state, .baseRefName] | @tsv' 2>/dev/null); then
+if ! pr_info=$(gh pr view --json state,baseRefName,number -q '[.state, .baseRefName, .number] | @tsv' 2>/dev/null); then
     if [[ -n $close_mode ]]; then
         # --close abandons the branch. With no PR to close (never opened, or
         # already deleted) there's simply nothing to close, so fall through to
@@ -232,6 +360,7 @@ if ! pr_info=$(gh pr view --json state,baseRefName -q '[.state, .baseRefName] | 
         no_pr=1
         pr_state=""
         pr_base=""
+        pr_number=""
     else
         # A deferred push pre-flight failure means we can't even identify the
         # PR; surface that actionable reason instead of the generic "no PR
@@ -246,6 +375,7 @@ if ! pr_info=$(gh pr view --json state,baseRefName -q '[.state, .baseRefName] | 
 else
     pr_state=$(echo "$pr_info" | cut -f1)
     pr_base=$(echo "$pr_info" | cut -f2)
+    pr_number=$(echo "$pr_info" | cut -f3)
 fi
 
 # Resolve a deferred push pre-flight failure. It matters only when we'll run
@@ -304,7 +434,49 @@ if [[ -z $no_pr ]]; then
                 # positional/flag args still pass through after it.
                 gh pr close "$branch" "${gh_args[@]}"
             else
-                gh pr merge "${gh_args[@]}"
+                # On a merge-queue repo `gh pr merge` exits 0 with the PR still
+                # OPEN (queued, or auto-merge when checks are pending), so wait
+                # for the real outcome before anything is torn down. The
+                # baseline removal event comes from before the merge.
+                # A re-run on an already queued/auto-merge PR resumes waiting
+                # instead of calling `gh pr merge` a second time.
+                # Without a baseline any old removal event reads as a new
+                # ejection, so don't merge until it is known.
+                pre_status=""
+                for attempt in 1 2 3 4 5; do
+                    if pre_status=$(pr_queue_status 2>/dev/null) &&
+                        [[ $(classify_status "$pre_status" "") != invalid ]]; then
+                        break
+                    fi
+                    pre_status=""
+                    if [[ $attempt -lt 5 ]]; then
+                        sleep "${MERGE_PR_POLL_INTERVAL:-60}"
+                    fi
+                done
+                if [[ -z $pre_status ]]; then
+                    echo "merge-pr: could not read PR status from GitHub 5 times in a row — nothing torn down" >&2
+                    exit 1
+                fi
+                IFS='|' read -r _ _ _ _ _ baseline_removed _ _ <<<"$pre_status"
+                case "$(classify_status "$pre_status" "$baseline_removed")" in
+                queued) echo "merge-pr: PR already in the merge queue — waiting" ;;
+                automerge) echo "merge-pr: auto-merge already enabled — waiting" ;;
+                *) gh pr merge "${gh_args[@]}" ;;
+                esac
+                pre_wait_head=$(git rev-parse HEAD)
+                wait_for_merge "$baseline_removed"
+                pr_state=MERGED
+                # The wait can be long and other panes stay live, so re-check
+                # what the up-front pre-flights guarded. Compare HEAD rather than
+                # recount unpushed commits: the merge may have deleted @{u}.
+                if [[ "$(git rev-parse HEAD)" != "$pre_wait_head" ]]; then
+                    echo "merge-pr: new commits since the merge started — nothing torn down" >&2
+                    exit 1
+                fi
+                if [[ -z $force && -n "$(git status --porcelain --ignore-submodules=none)" ]]; then
+                    echo "merge-pr: worktree gained uncommitted changes while waiting — nothing torn down" >&2
+                    exit 1
+                fi
             fi
             ;;
         MERGED)

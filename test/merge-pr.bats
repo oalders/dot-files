@@ -14,6 +14,7 @@ setup() {
     # Stub docker so the docker-teardown step is hermetic: every query returns
     # empty, so it finds no worktree-owned containers regardless of host state.
     stub_command docker 'exit 0'
+    export MERGE_PR_POLL_INTERVAL=0
 }
 
 @test "merge-pr -h prints usage and exits 0" {
@@ -369,6 +370,7 @@ esac
     stub_command gh '
 case "$2" in
     view) printf "OPEN\tmain\n" ;;
+    graphql) printf "MERGED|false||false|SUCCESS|||u\n" ;;
     merge) : >"$BATS_TEST_TMPDIR/merge-was-called" ;;
 esac
 '
@@ -791,6 +793,7 @@ esac
     stub_command gh '
 case "$2" in
     view) printf "OPEN\tmain\n" ;;
+    graphql) printf "MERGED|false||false|SUCCESS|||u\n" ;;
     merge) : >"$BATS_TEST_TMPDIR/merge-was-called" ;;
 esac
 '
@@ -856,6 +859,7 @@ esac
     stub_command gh '
 case "$2" in
     view) printf "OPEN\tmain\n" ;;
+    graphql) printf "MERGED|false||false|SUCCESS|||u\n" ;;
     merge) git switch -q main && git branch -D feature ;;
 esac
 '
@@ -885,6 +889,7 @@ esac
     stub_command gh '
 case "$2" in
     view) printf "OPEN\tghost\n" ;;
+    graphql) printf "MERGED|false||false|SUCCESS|||u\n" ;;
     merge) : >"$BATS_TEST_TMPDIR/merge-was-called" ;;
 esac
 '
@@ -1197,6 +1202,7 @@ case "$1 $2" in
         [[ -e "$BATS_TEST_TMPDIR/edit-fails" ]] && exit 1
         ;;
     "pr merge") : >"$BATS_TEST_TMPDIR/merge-was-called" ;;
+    "api graphql") echo "MERGED|false||false|SUCCESS|||u" ;;
 esac
 exit 0
 '
@@ -1327,4 +1333,253 @@ ISSUE2=https://github.com/o/r/issues/2
     [[ "$output" == *"merge-pr: warning: could not list issues closed by this PR"* ]]
     [ ! -e "$BATS_TEST_TMPDIR/edit.log" ]
     [ ! -d "$WORKTREE_DIR" ]
+}
+
+# Merge queue / auto-merge wait. The stub answers each `gh api graphql` probe
+# with the next line of $BATS_TEST_TMPDIR/probes (the last line repeats), in
+# merge-pr's `state|in_queue|position|auto_merge|head_checks|removed_id|
+# removed_reason|url` format. A FAIL line makes that probe exit 1, and a
+# non-empty on-probe-<n> file is sourced on the n-th probe for side effects.
+# Usage: _queue_stub <probe-line>...   (one line per successive probe)
+_queue_stub() {
+    printf '%s\n' "$@" >"$BATS_TEST_TMPDIR/probes"
+    stub_command gh '
+echo "$*" >>"$BATS_TEST_TMPDIR/gh.log"
+case "$1 $2" in
+    "pr view") printf "OPEN\tmain\t7\n" ;;
+    "pr merge") : >"$BATS_TEST_TMPDIR/merge-was-called" ;;
+    "api graphql")
+        n=$(( $(cat "$BATS_TEST_TMPDIR/probe-count" 2>/dev/null || echo 0) + 1 ))
+        echo "$n" >"$BATS_TEST_TMPDIR/probe-count"
+        [[ -s "$BATS_TEST_TMPDIR/on-probe-$n" ]] && . "$BATS_TEST_TMPDIR/on-probe-$n"
+        line=$(sed -n "${n}p" "$BATS_TEST_TMPDIR/probes")
+        [[ -z $line ]] && line=$(tail -n 1 "$BATS_TEST_TMPDIR/probes")
+        [[ $line == FAIL ]] && exit 1
+        echo "$line"
+        ;;
+esac
+exit 0
+'
+}
+
+# Linked-worktree fixture plus the queue stub.
+_queue_setup() {
+    _ready_repo
+    setup_feature_worktree
+    unset TMUX
+    stub_command tmux 'exit 0'
+    _queue_stub "$@"
+}
+
+# In each probe list below, the first line answers the pre-merge probe.
+@test "queue: queued then merged tears down" {
+    _queue_setup 'OPEN|false||false|SUCCESS|||u' 'OPEN|true|2|false|SUCCESS|||u' \
+        'OPEN|true|1|false|SUCCESS|||u' 'MERGED|false||false|SUCCESS|||u'
+    run "$MERGE_PR" -s
+    [ "$status" -eq 0 ]
+    [ -e "$BATS_TEST_TMPDIR/merge-was-called" ]
+    [[ "$output" == *"PR queued — waiting for the merge queue (position 2)"* ]]
+    [[ "$output" == *"still queued — position 1"* ]]
+    [[ "$output" == *"PR merged — proceeding to cleanup"* ]]
+    [ ! -d "$WORKTREE_DIR" ]
+}
+
+@test "queue: ejected PR tears nothing down and keeps labels" {
+    _queue_setup 'OPEN|false||false|SUCCESS|||u' 'OPEN|true|1|false|SUCCESS|||u' \
+        'OPEN|false||false|FAILURE|RFMQ_1|FAILED_CHECKS|https://x/pull/7'
+    run "$MERGE_PR" -s
+    [ "$status" -eq 1 ]
+    [[ "$output" == *"PR was removed from the merge queue (FAILED_CHECKS) — nothing torn down"* ]]
+    [[ "$output" == *"https://x/pull/7"* ]]
+    [ -d "$WORKTREE_DIR" ]
+    run git -C "$REPO_DIR" branch --list feature
+    [ -n "$output" ]
+    # No label cleanup ran: no closing-issues lookup, no issue calls.
+    run grep -E "closingIssuesReferences|^issue " "$BATS_TEST_TMPDIR/gh.log"
+    [ "$status" -ne 0 ]
+}
+
+@test "queue: stale removal event is not an ejection" {
+    _queue_setup 'OPEN|false||false|SUCCESS|RFMQ_old|FAILED_CHECKS|u' \
+        'OPEN|true|1|false|SUCCESS|RFMQ_old|FAILED_CHECKS|u' \
+        'MERGED|false||false|SUCCESS|RFMQ_old|FAILED_CHECKS|u'
+    run "$MERGE_PR" -s
+    [ "$status" -eq 0 ]
+    [ ! -d "$WORKTREE_DIR" ]
+}
+
+@test "queue: PR closed during the wait tears nothing down" {
+    _queue_setup 'OPEN|false||false|SUCCESS|||u' 'OPEN|true|1|false|SUCCESS|||u' \
+        'CLOSED|false||false|SUCCESS|||u'
+    run "$MERGE_PR" -s
+    [ "$status" -eq 1 ]
+    [[ "$output" == *"PR was closed while waiting — nothing torn down"* ]]
+    [ -d "$WORKTREE_DIR" ]
+}
+
+@test "queue: main working tree waits before deleting the branch" {
+    _ready_repo
+    cd "$REPO_DIR"
+    git checkout -q -b feature
+    git push -q -u origin feature
+    unset TMUX
+    stub_command tmux 'exit 0'
+    _queue_stub 'OPEN|false||false|SUCCESS|||u' 'OPEN|true|1|false|SUCCESS|||u' \
+        'OPEN|false||false|FAILURE|RFMQ_1|FAILED_CHECKS|u'
+    run "$MERGE_PR" -s
+    [ "$status" -eq 1 ]
+    run git -C "$REPO_DIR" rev-parse --abbrev-ref HEAD
+    [[ "$output" == "feature" ]]
+}
+
+@test "queue: transient probe failures are retried" {
+    _queue_setup 'OPEN|false||false|SUCCESS|||u' 'OPEN|true|1|false|SUCCESS|||u' \
+        FAIL FAIL 'MERGED|false||false|SUCCESS|||u'
+    run "$MERGE_PR" -s
+    [ "$status" -eq 0 ]
+    [ ! -d "$WORKTREE_DIR" ]
+}
+
+@test "queue: five consecutive probe failures give up without teardown" {
+    _queue_setup 'OPEN|false||false|SUCCESS|||u' 'OPEN|true|1|false|SUCCESS|||u' FAIL
+    run "$MERGE_PR" -s
+    [ "$status" -eq 1 ]
+    [[ "$output" == *"could not read PR status from GitHub 5 times in a row — nothing torn down"* ]]
+    [ -d "$WORKTREE_DIR" ]
+}
+
+@test "automerge: auto-merge then queued then merged tears down" {
+    _queue_setup 'OPEN|false||false|PENDING|||u' 'OPEN|false||true|PENDING|||u' \
+        'OPEN|true|1|false|SUCCESS|||u' 'MERGED|false||false|SUCCESS|||u'
+    run "$MERGE_PR" -s
+    [ "$status" -eq 0 ]
+    [[ "$output" == *"auto-merge enabled — waiting for required checks"* ]]
+    [ ! -d "$WORKTREE_DIR" ]
+}
+
+@test "automerge: failing head checks tear nothing down" {
+    _queue_setup 'OPEN|false||false|PENDING|||u' 'OPEN|false||true|FAILURE|||https://x/pull/7'
+    run "$MERGE_PR" -s
+    [ "$status" -eq 1 ]
+    [[ "$output" == *"required checks failed while waiting for auto-merge — nothing torn down"* ]]
+    [[ "$output" == *"https://x/pull/7"* ]]
+    [ -d "$WORKTREE_DIR" ]
+}
+
+@test "queue: brief unsettled read then queued keeps waiting" {
+    _queue_setup 'OPEN|false||false|SUCCESS|||u' 'OPEN|false||false|SUCCESS|||u' \
+        'OPEN|true|1|false|SUCCESS|||u' 'MERGED|false||false|SUCCESS|||u'
+    run "$MERGE_PR" -s
+    [ "$status" -eq 0 ]
+    [ ! -d "$WORKTREE_DIR" ]
+}
+
+@test "queue: neither queued nor auto-merge after grace tears nothing down" {
+    _queue_setup 'OPEN|false||false|SUCCESS|||u'
+    run "$MERGE_PR" -s
+    [ "$status" -eq 1 ]
+    [[ "$output" == *"PR is OPEN but neither queued nor set to auto-merge — nothing torn down"* ]]
+    [ -d "$WORKTREE_DIR" ]
+}
+
+@test "resume: re-run while queued waits without calling gh pr merge" {
+    _queue_setup 'OPEN|true|3|false|SUCCESS|||u' 'MERGED|false||false|SUCCESS|||u'
+    run "$MERGE_PR" -s
+    [ "$status" -eq 0 ]
+    [[ "$output" == *"PR already in the merge queue — waiting"* ]]
+    [ ! -e "$BATS_TEST_TMPDIR/merge-was-called" ]
+    [ ! -d "$WORKTREE_DIR" ]
+}
+
+@test "resume: re-run while auto-merge is pending waits without calling gh pr merge" {
+    _queue_setup 'OPEN|false||true|PENDING|||u' 'MERGED|false||false|SUCCESS|||u'
+    run "$MERGE_PR" -s
+    [ "$status" -eq 0 ]
+    [[ "$output" == *"auto-merge already enabled — waiting"* ]]
+    [ ! -e "$BATS_TEST_TMPDIR/merge-was-called" ]
+    [ ! -d "$WORKTREE_DIR" ]
+}
+
+# Work done in another pane during the wait must survive teardown: the
+# on-probe-2 hook changes the worktree while the PR sits in the queue.
+@test "safety: uncommitted change during wait tears nothing down" {
+    _queue_setup 'OPEN|false||false|SUCCESS|||u' 'OPEN|true|1|false|SUCCESS|||u' \
+        'MERGED|false||false|SUCCESS|||u'
+    echo "echo dirty >>'$WORKTREE_DIR/file'" >"$BATS_TEST_TMPDIR/on-probe-2"
+    run "$MERGE_PR" -s
+    [ "$status" -eq 1 ]
+    [[ "$output" == *"worktree gained uncommitted changes while waiting — nothing torn down"* ]]
+    [ -d "$WORKTREE_DIR" ]
+}
+
+@test "safety: new commit during wait tears nothing down" {
+    _queue_setup 'OPEN|false||false|SUCCESS|||u' 'OPEN|true|1|false|SUCCESS|||u' \
+        'MERGED|false||false|SUCCESS|||u'
+    echo "git -C '$WORKTREE_DIR' -c commit.gpgsign=false commit -q --allow-empty -m mid" \
+        >"$BATS_TEST_TMPDIR/on-probe-2"
+    run "$MERGE_PR" -s
+    [ "$status" -eq 1 ]
+    [[ "$output" == *"new commits since the merge started — nothing torn down"* ]]
+    [ -d "$WORKTREE_DIR" ]
+    run git -C "$REPO_DIR" branch --list feature
+    [ -n "$output" ]
+}
+
+@test "safety: --force still tears down a worktree dirtied during wait" {
+    _queue_setup 'OPEN|false||false|SUCCESS|||u' 'OPEN|true|1|false|SUCCESS|||u' \
+        'MERGED|false||false|SUCCESS|||u'
+    echo "echo dirty >>'$WORKTREE_DIR/file'" >"$BATS_TEST_TMPDIR/on-probe-2"
+    run "$MERGE_PR" --force -s
+    [ "$status" -eq 0 ]
+    [ ! -d "$WORKTREE_DIR" ]
+}
+
+@test "queue: usage mentions the merge queue" {
+    run "$MERGE_PR" --help
+    [[ "$output" == *"merge queue"* ]]
+    [[ "$output" == *"gh pr merge --disable-auto"* ]]
+}
+
+# Ctrl-C during the wait: stop watching, tear nothing down, explain that the
+# merge still happens on GitHub. `set -m` gives the background job its own
+# process group; otherwise a non-interactive shell starts it with SIGINT
+# ignored and the trap could never fire.
+@test "queue: Ctrl-C while waiting tears nothing down and prints the hint" {
+    _queue_setup 'OPEN|false||false|SUCCESS|||u' 'OPEN|true|1|false|SUCCESS|||u'
+    export MERGE_PR_POLL_INTERVAL=1
+    set -m
+    "$MERGE_PR" -s >"$BATS_TEST_TMPDIR/out" 2>&1 &
+    local pid=$!
+    for _ in $(seq 50); do
+        [[ -s "$BATS_TEST_TMPDIR/probe-count" ]] && break
+        sleep 0.1
+    done
+    sleep 0.5
+    kill -INT "$pid"
+    local rc=0
+    wait "$pid" || rc=$?
+    set +m
+    [ "$rc" -eq 130 ]
+    run cat "$BATS_TEST_TMPDIR/out"
+    [[ "$output" == *"stopped waiting — nothing torn down"* ]]
+    [[ "$output" == *"gh pr merge --disable-auto"* ]]
+    [ -d "$WORKTREE_DIR" ]
+}
+
+@test "queue: failed baseline read is retried so an old ejection is not new" {
+    _queue_setup FAIL 'OPEN|false||false|PENDING|RFMQ_old|FAILED_CHECKS|u' \
+        'OPEN|false||true|PENDING|RFMQ_old|FAILED_CHECKS|u' 'MERGED|false||false|SUCCESS|RFMQ_old|FAILED_CHECKS|u'
+    run "$MERGE_PR" -s
+    [ "$status" -eq 0 ]
+    [[ "$output" != *"removed from the merge queue"* ]]
+    [ ! -d "$WORKTREE_DIR" ]
+}
+
+@test "queue: unreadable baseline gives up before calling gh pr merge" {
+    _queue_setup FAIL
+    run "$MERGE_PR" -s
+    [ "$status" -eq 1 ]
+    [[ "$output" == *"could not read PR status from GitHub 5 times in a row — nothing torn down"* ]]
+    [ ! -e "$BATS_TEST_TMPDIR/merge-was-called" ]
+    [ -d "$WORKTREE_DIR" ]
 }
