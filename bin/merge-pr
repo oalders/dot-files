@@ -16,6 +16,14 @@ when the branch is no longer on origin — no push required.
 After a merge (or an already-MERGED PR), an "in progress" label
 (case-insensitive) is removed from each issue the PR closes. Best-effort.
 
+On a repo with a merge queue, `gh pr merge` only queues the PR (or turns
+on auto-merge while required checks are pending), so merge-pr waits,
+polling every 60s (MERGE_PR_POLL_INTERVAL), until the PR merges, and only
+then tears down. If the PR is removed from the merge queue, its checks fail,
+or it is closed, nothing is torn down and merge-pr exits 1: fix, push, and
+re-run. A re-run on an already queued PR resumes waiting. Ctrl-C stops
+waiting but does not cancel the merge; `gh pr merge --disable-auto` does.
+
 Options:
   -f, --force   Discard uncommitted changes in the worktree when
                 removing it.
@@ -80,12 +88,20 @@ classify_status() {
     esac
 }
 
+wait_interrupted() {
+    echo "" >&2
+    echo "merge-pr: stopped waiting — nothing torn down. GitHub will still merge the PR on its own." >&2
+    echo "          Re-run merge-pr to resume waiting, or cancel with: gh pr merge --disable-auto" >&2
+    exit 130
+}
+
 # wait_for_merge <baseline_removed_id>
 # Returns only once the PR is MERGED; every other outcome exits 1 with nothing
 # torn down.
 wait_for_merge() {
     local baseline=$1 line kind position reason url
     local failures=0 unsettled=0 last_kind="" last_position="" first=1
+    trap wait_interrupted INT
     while true; do
         if [[ -z $first ]]; then
             sleep "${MERGE_PR_POLL_INTERVAL:-60}"
@@ -112,6 +128,7 @@ wait_for_merge() {
         IFS='|' read -r _ _ position _ _ _ reason url <<<"$line"
         case "$kind" in
         merged)
+            trap - INT
             echo "merge-pr: PR merged — proceeding to cleanup"
             return 0
             ;;
@@ -430,8 +447,20 @@ if [[ -z $no_pr ]]; then
                 automerge) echo "merge-pr: auto-merge already enabled — waiting" ;;
                 *) gh pr merge "${gh_args[@]}" ;;
                 esac
+                pre_wait_head=$(git rev-parse HEAD)
                 wait_for_merge "$baseline_removed"
                 pr_state=MERGED
+                # The wait can be long and other panes stay live, so re-check
+                # what the up-front pre-flights guarded. Compare HEAD rather than
+                # recount unpushed commits: the merge may have deleted @{u}.
+                if [[ "$(git rev-parse HEAD)" != "$pre_wait_head" ]]; then
+                    echo "merge-pr: new commits since the merge started — nothing torn down" >&2
+                    exit 1
+                fi
+                if [[ -z $force && -n "$(git status --porcelain --ignore-submodules=none)" ]]; then
+                    echo "merge-pr: worktree gained uncommitted changes while waiting — nothing torn down" >&2
+                    exit 1
+                fi
             fi
             ;;
         MERGED)

@@ -1499,3 +1499,69 @@ _queue_setup() {
     [ ! -e "$BATS_TEST_TMPDIR/merge-was-called" ]
     [ ! -d "$WORKTREE_DIR" ]
 }
+
+# Work done in another pane during the wait must survive teardown: the
+# on-probe-2 hook changes the worktree while the PR sits in the queue.
+@test "safety: uncommitted change during wait tears nothing down" {
+    _queue_setup 'OPEN|false||false|SUCCESS|||u' 'OPEN|true|1|false|SUCCESS|||u' \
+        'MERGED|false||false|SUCCESS|||u'
+    echo "echo dirty >>'$WORKTREE_DIR/file'" >"$BATS_TEST_TMPDIR/on-probe-2"
+    run "$MERGE_PR" -s
+    [ "$status" -eq 1 ]
+    [[ "$output" == *"worktree gained uncommitted changes while waiting — nothing torn down"* ]]
+    [ -d "$WORKTREE_DIR" ]
+}
+
+@test "safety: new commit during wait tears nothing down" {
+    _queue_setup 'OPEN|false||false|SUCCESS|||u' 'OPEN|true|1|false|SUCCESS|||u' \
+        'MERGED|false||false|SUCCESS|||u'
+    echo "git -C '$WORKTREE_DIR' -c commit.gpgsign=false commit -q --allow-empty -m mid" \
+        >"$BATS_TEST_TMPDIR/on-probe-2"
+    run "$MERGE_PR" -s
+    [ "$status" -eq 1 ]
+    [[ "$output" == *"new commits since the merge started — nothing torn down"* ]]
+    [ -d "$WORKTREE_DIR" ]
+    run git -C "$REPO_DIR" branch --list feature
+    [ -n "$output" ]
+}
+
+@test "safety: --force still tears down a worktree dirtied during wait" {
+    _queue_setup 'OPEN|false||false|SUCCESS|||u' 'OPEN|true|1|false|SUCCESS|||u' \
+        'MERGED|false||false|SUCCESS|||u'
+    echo "echo dirty >>'$WORKTREE_DIR/file'" >"$BATS_TEST_TMPDIR/on-probe-2"
+    run "$MERGE_PR" --force -s
+    [ "$status" -eq 0 ]
+    [ ! -d "$WORKTREE_DIR" ]
+}
+
+@test "queue: usage mentions the merge queue" {
+    run "$MERGE_PR" --help
+    [[ "$output" == *"merge queue"* ]]
+    [[ "$output" == *"gh pr merge --disable-auto"* ]]
+}
+
+# Ctrl-C during the wait: stop watching, tear nothing down, explain that the
+# merge still happens on GitHub. `set -m` gives the background job its own
+# process group; otherwise a non-interactive shell starts it with SIGINT
+# ignored and the trap could never fire.
+@test "queue: Ctrl-C while waiting tears nothing down and prints the hint" {
+    _queue_setup 'OPEN|false||false|SUCCESS|||u' 'OPEN|true|1|false|SUCCESS|||u'
+    export MERGE_PR_POLL_INTERVAL=1
+    set -m
+    "$MERGE_PR" -s >"$BATS_TEST_TMPDIR/out" 2>&1 &
+    local pid=$!
+    for _ in $(seq 50); do
+        [[ -s "$BATS_TEST_TMPDIR/probe-count" ]] && break
+        sleep 0.1
+    done
+    sleep 0.5
+    kill -INT "$pid"
+    local rc=0
+    wait "$pid" || rc=$?
+    set +m
+    [ "$rc" -eq 130 ]
+    run cat "$BATS_TEST_TMPDIR/out"
+    [[ "$output" == *"stopped waiting — nothing torn down"* ]]
+    [[ "$output" == *"gh pr merge --disable-auto"* ]]
+    [ -d "$WORKTREE_DIR" ]
+}
