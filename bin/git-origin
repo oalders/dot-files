@@ -9,8 +9,8 @@ Usage: git-origin <command>
 Commands:
   ssh                     Rewrite origin to git@host:owner/repo.git
   https                   Rewrite origin to https://host/owner/repo.git
-                          Both then run default-branch and set gh's
-                          git_protocol to match (github.com only).
+                          Both also set gh's git_protocol to match
+                          (github.com only) and then run default-branch.
   default-branch [name]   Point local and origin/HEAD at the remote's default
                           branch (e.g. main or master). Auto-detected if
                           omitted. Renames local master<->main if needed.
@@ -28,7 +28,9 @@ parse_url() {
         echo "Cannot parse origin URL: $url" >&2
         return 1
     fi
-    path="${path%/}"
+    while [[ $path == */ ]]; do
+        path="${path%/}"
+    done
     path="${path%.git}"
     if [[ $path != */* ]]; then
         echo "Origin URL has no owner/repo: $url" >&2
@@ -100,8 +102,8 @@ ssh | https)
     }
     host='' path=''
     set_origin "$1"
-    default_branch
     set_gh_protocol "$1"
+    default_branch
     ;;
 default-branch)
     [[ $# -le 2 ]] || {

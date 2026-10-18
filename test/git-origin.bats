@@ -91,9 +91,9 @@ setup_fake_github() {
     [ "$(git config --get remote.origin.url)" = "git@github.com:.git" ]
 }
 
-@test "git-origin ssh strips a trailing slash" {
+@test "git-origin ssh strips trailing slashes" {
     setup_fake_github
-    git remote add origin https://github.com/oalders/dot-files/
+    git remote add origin https://github.com/oalders/dot-files//
     run "$GIT_ORIGIN" ssh
     [ "$status" -eq 0 ]
     [ "$(git config --get remote.origin.url)" = "git@github.com:oalders/dot-files.git" ]
