@@ -7,6 +7,11 @@
 	ui = auto
 [commit]
 	verbose = true
+# HTTPS via gh's token instead of SSH, so remote hosts don't need agent
+# forwarding. The empty helper drops any inherited helper for this host.
+[credential "https://github.com"]
+	helper =
+	helper = !gh auth git-credential
 [diff]
 	algorithm = histogram
 	colorMoved = default

@@ -141,20 +141,6 @@ ghrc() {
     fi
 }
 
-change_git_origin() {
-    # https://github.com/metacpan/metacpan-api.git
-    # git@github.com:metacpan/metacpan-api.git
-
-    repo=$(git config --get remote.origin.url)
-
-    to=$(trurl "$repo" --get '{path}' | sed 's/^\///' | sed 's/\.git$//')
-
-    git="git@github.com:${to}.git"
-
-    git remote remove origin
-    git remote add origin "$git"
-}
-
 get_github_display_name() {
     local branch="$1"
     local number=""

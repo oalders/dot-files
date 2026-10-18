@@ -1,0 +1,100 @@
+#!/usr/bin/env bash
+
+set -eu -o pipefail
+
+usage() {
+    cat <<USAGE
+Usage: git-origin <command>
+
+Commands:
+  ssh                     Rewrite origin to git@host:owner/repo.git
+  https                   Rewrite origin to https://host/owner/repo.git
+                          Both also set gh's git_protocol (github.com only)
+                          and then run default-branch.
+  default-branch [name]   Point local and origin/HEAD at the remote's default
+                          branch (e.g. main or master). Auto-detected if
+                          omitted. Renames local master<->main if needed.
+USAGE
+}
+
+# Prints "host owner/repo" for https, ssh:// and scp-style URLs.
+parse_url() {
+    local url="$1"
+    if [[ $url =~ ^(https?|ssh)://([^@/]+@)?([^/:]+)(:[0-9]+)?/(.+)$ ]]; then
+        echo "${BASH_REMATCH[3]} ${BASH_REMATCH[5]%.git}"
+    elif [[ $url =~ ^([^@]+@)?([^:/]+):(.+)$ ]]; then
+        echo "${BASH_REMATCH[2]} ${BASH_REMATCH[3]%.git}"
+    else
+        echo "Cannot parse origin URL: $url" >&2
+        return 1
+    fi | {
+        read -r host path
+        if [[ $path != */* ]]; then
+            echo "Origin URL has no owner/repo: $url" >&2
+            return 1
+        fi
+        echo "$host $path"
+    }
+}
+
+# set-url rather than remove/add: removing the remote drops every branch's
+# upstream config.
+set_origin() {
+    local scheme="$1" parsed host path url
+    parsed=$(parse_url "$(git config --get remote.origin.url)")
+    read -r host path <<<"$parsed"
+    case "$scheme" in
+    ssh) url="git@${host}:${path}.git" ;;
+    https) url="https://${host}/${path}.git" ;;
+    esac
+    git remote set-url origin "$url"
+    echo "origin -> $url"
+    if [[ $host == github.com ]] && is there gh; then
+        gh config set -h github.com git_protocol "$scheme"
+        echo "gh git_protocol -> $scheme"
+    fi
+}
+
+default_branch() {
+    local name="${1:-}" other
+    git fetch --prune origin
+    if [[ -z $name ]]; then
+        git remote set-head origin --auto >/dev/null
+        name=$(git symbolic-ref --short refs/remotes/origin/HEAD)
+        name="${name#origin/}"
+    fi
+    if ! git show-ref --verify --quiet "refs/remotes/origin/$name"; then
+        echo "origin/$name does not exist" >&2
+        return 1
+    fi
+    case "$name" in
+    main) other=master ;;
+    master) other=main ;;
+    *) other= ;;
+    esac
+    if ! git show-ref --verify --quiet "refs/heads/$name" &&
+        [[ -n $other ]] && git show-ref --verify --quiet "refs/heads/$other"; then
+        git branch -m "$other" "$name"
+    fi
+    if git show-ref --verify --quiet "refs/heads/$name"; then
+        git branch -u "origin/$name" "$name"
+    fi
+    git remote set-head origin "$name"
+    echo "default branch -> $name"
+}
+
+case "${1:-}" in
+ssh | https)
+    set_origin "$1"
+    default_branch
+    ;;
+default-branch) default_branch "${2:-}" ;;
+-h | --help)
+    usage
+    exit 0
+    ;;
+*)
+    usage >&2
+    exit 1
+    ;;
+esac

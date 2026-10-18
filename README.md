@@ -52,7 +52,7 @@ require manual intervention or be impractical to run regularly.
 ```text
 git clone https://github.com/oalders/dot-files.git
 cd dot-files
-./bin/change-dot-files-origin.sh
+./bin/git-origin ssh
 ```
 
 ### Change Default shell
