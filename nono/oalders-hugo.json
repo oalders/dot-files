@@ -16,7 +16,6 @@
     "allow_domain": [
       "api.openverse.org",
       "code.claude.com",
-      "commons.wikimedia.org",
       "en.wikipedia.org",
       "flickr.com",
       "fosstodon.org",
@@ -30,6 +29,8 @@
       "registry.npmjs.org",
       "services.nvd.nist.go",
       "*.staticflickr.com",
+      "commons.wikimedia.org",
+      "thumb.wikimedia.org",
       "upload.wikimedia.org",
       "web.archive.org",
       "www.flickr.com",
