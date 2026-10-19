@@ -196,7 +196,7 @@ The full-Chrome `--chrome` path launches with a `~/.cache/superpowers` profile (
 
 When claude or an MCP server can't reach something:
 
-1. Confirm the block: `nono why --path <path> --op read --profile oalders` (or `--host <hostname>` for network).
+1. Confirm the block: `nono why --path <path> --op read --profile oalders` (or `--host <hostname>` for network). Inside a session use `--self` instead of `--profile`; a bare `nono why` checks an empty context and reports `DENIED` (`path_not_granted`) for everything.
 2. Add the minimal grant to the right file:
    - **Stack-specific** (only useful in Perl/Node/Go/etc. projects) → the matching `oalders-<stack>.json` sibling. If the stack doesn't have a sibling yet, see "Language sibling profiles" above for how to add one.
    - **Cross-cutting** (needed across all projects) → `oalders-core.json` (the net-free base). New network domains/ports → `oalders-net.json`.
