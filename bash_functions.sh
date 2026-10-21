@@ -209,6 +209,13 @@ tmux_session_name() {
         branch=$(git rev-parse --abbrev-ref HEAD)
         display_name=$(get_github_display_name "$branch")
         current_dir=${PWD##*/}
+        # Linked worktree dirs are named after the branch, so prefix the main
+        # checkout's name to keep each project's sessions sorted together.
+        git_dir=$(git rev-parse --path-format=absolute --git-dir)
+        common_dir=$(git rev-parse --path-format=absolute --git-common-dir)
+        if [[ $git_dir != "$common_dir" ]]; then
+            current_dir="$(basename "$(dirname "$common_dir")")/$current_dir"
+        fi
         raw_dir=$current_dir
         current_dir=$(printf "%-18s" "$current_dir")
 
@@ -287,7 +294,7 @@ tmux_session_name() {
             fi
         done
         # Worktree dirs are named after their branch; don't say it twice.
-        if [[ $display_name == "$raw_dir" ]]; then
+        if [[ $display_name == "${PWD##*/}" ]]; then
             SESSION_NAME="$prefix  $raw_dir"
         else
             SESSION_NAME="$prefix  $current_dir   $display_name"
