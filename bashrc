@@ -298,9 +298,11 @@ if is there fnm; then
     # bash caches the old node's path, so the switch is invisible without hash -r.
     __fnm_use_if_file_found() {
         # Claude Code's shell snapshot keeps this function but not
-        # FNM_MULTISHELL_PATH, so under nn the host's /run/user path inherited
-        # by claude comes back and `fnm use` can't relink it. Re-init first.
-        if [[ -n $NN_FNM_RUNTIME_DIR && $FNM_MULTISHELL_PATH != "${NN_FNM_RUNTIME_DIR%/}"/* ]]; then
+        # FNM_MULTISHELL_PATH, so `fnm use` errors on every cd; under nn the
+        # host's /run/user path inherited by claude can come back instead, and
+        # `fnm use` can't relink it. Re-init first.
+        if [[ -z ${FNM_MULTISHELL_PATH:-} ]] ||
+            [[ -n ${NN_FNM_RUNTIME_DIR:-} && $FNM_MULTISHELL_PATH != "${NN_FNM_RUNTIME_DIR%/}"/* ]]; then
             __fnm_env
         fi
         fnm use --silent-if-unchanged --log-level=error
