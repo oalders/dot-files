@@ -11,3 +11,4 @@ sketchybar/plugins/.laptop
 src/
 .tidyall.d/
 node_modules/
+/.local/
