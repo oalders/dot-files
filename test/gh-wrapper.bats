@@ -6,13 +6,30 @@ setup() {
     setup_sandbox
     GH="$BIN_DIR/gh"
     OUT="$BATS_TEST_TMPDIR/gh-argv"
-    export CLAUDECODE=1 OUT
+    # `owner/repo visibility` lines the stub answers `gh repo view` from.
+    VIS="$BATS_TEST_TMPDIR/visibility"
+    : >"$VIS"
+    export CLAUDECODE=1 OUT VIS
     export CLAUDE_CODE_SESSION_ID=0f8e2a1c-test-session
     export TMPDIR="$BATS_TEST_TMPDIR/tmp"
-    mkdir -p "$TMPDIR"
-    # Fake real gh: log each arg, and the contents of any body file it points
-    # at (the wrapper deletes its temp files once gh exits).
+    export HOME="$BATS_TEST_TMPDIR/home"
+    export GIT_CEILING_DIRECTORIES="$BATS_TEST_TMPDIR"
+    unset NN_SESSION_DIR GH_REPO
+    mkdir -p "$TMPDIR" "$HOME/.config/gh" "$BATS_TEST_TMPDIR/work"
+    cd "$BATS_TEST_TMPDIR/work"
+    # Fake real gh. Visibility lookups are answered from $VIS and recorded in
+    # $OUT.lookups, never $OUT; anything else logs each arg, and the contents
+    # of any body file it points at (the wrapper deletes its temp files once
+    # gh exits). `gh auth` also records its stdin.
     stub_command gh '
+if [[ $1 == repo && $2 == view && $4 == --json ]]; then
+    echo "$3" >>"$OUT.lookups"
+    while read -r k v; do
+        if [[ $k == "$3" ]]; then echo "${v^^}"; exit 0; fi
+    done <"$VIS"
+    exit 1
+fi
+[[ $1 == auth ]] && cat >"$OUT.stdin"
 for a in "$@"; do
     printf "ARG:%s\n" "$a"
     case $a in
@@ -30,11 +47,24 @@ done >"$OUT"'
     printf '%s\n' "$GEN" >"$BODY_FILE"
 }
 
+# Record a visibility for the stub: vis owner/repo public|private|internal
+vis() { printf '%s %s\n' "$1" "$2" >>"$VIS"; }
+
+# cd into a repo whose only remote is the private me/secret.
+private_repo() {
+    setup_git_repo
+    git remote add origin git@github.com:me/secret.git
+    vis me/secret private
+}
+
+# No visibility lookup reached gh.
+refute_lookups() { [ ! -e "$OUT.lookups" ]; }
+
 # A bare `! cmd` never fails a bats test (set -e ignores negation).
 refute() { ! "$@"; }
 # Clear the previous call's log so a refusal is seen as nothing reaching gh.
 gh_run() {
-    rm -f "$OUT"
+    rm -f "$OUT" "$OUT.lookups"
     run "$GH" "$@"
 }
 assert_passed() {
@@ -415,4 +445,336 @@ assert_refused() {
     assert_refused
     gh_run api graphql -f "query=$q" -f "b=$REV"
     assert_passed
+}
+
+@test "a private session may not post to a named public repo" {
+    private_repo
+    vis org/proj public
+    gh_run issue create -R org/proj --title t --body "$GEN"
+    assert_refused
+    [[ "$output" == *"org/proj is public; ask the user"* ]]
+    [[ "$output" != *"wrapper-allow-public"* ]]
+}
+
+@test "a private session may write to private and internal repos" {
+    private_repo
+    vis me/other private
+    vis corp/tool internal
+    gh_run pr comment 1 -R me/other --body "$GEN"
+    assert_passed
+    gh_run pr comment 1 -R corp/tool --body "$GEN"
+    assert_passed
+}
+
+@test "a failed visibility lookup is refused and says so" {
+    private_repo
+    gh_run issue comment 1 -R ghost/repo --body "$GEN"
+    assert_refused
+    [[ "$output" == *"looking up ghost/repo failed; retry"* ]]
+}
+
+@test "without -R every github remote of cwd is a target" {
+    private_repo
+    git remote add upstream https://github.com/org/proj
+    vis org/proj public
+    gh_run issue comment 1 --body "$GEN"
+    assert_refused
+    [[ "$output" == *"org/proj is public; pass -R owner/repo"* ]]
+    gh_run issue comment 1 -R me/secret --body "$GEN"
+    assert_passed
+}
+
+@test "a gh repo set-default choice is a target" {
+    private_repo
+    vis org/proj public
+    git config remote.origin.gh-resolved org/proj
+    gh_run issue comment 1 --body "$GEN"
+    assert_refused
+    git config remote.origin.gh-resolved base
+    gh_run issue comment 1 --body "$GEN"
+    assert_passed
+}
+
+@test "global -R, URL arguments and GH_REPO are targets" {
+    private_repo
+    vis org/proj public
+    gh_run -R org/proj issue comment 1 --body "$GEN"
+    assert_refused
+    gh_run --repo=org/proj issue comment 1 --body "$GEN"
+    assert_refused
+    gh_run pr comment https://github.com/org/proj/pull/1 --body "$GEN"
+    assert_refused
+    GH_REPO=org/proj gh_run issue comment 1 --body "$GEN"
+    assert_refused
+}
+
+@test "public sessions and non-repos are unrestricted" {
+    vis org/proj public
+    gh_run issue comment 1 -R org/proj --body "$GEN"
+    assert_passed
+    refute_lookups
+    setup_git_repo
+    git remote add origin https://github.com/me/pub.git
+    vis me/pub public
+    gh_run issue comment 1 -R org/proj --body "$GEN"
+    assert_passed
+}
+
+@test "an unknown session remote makes the session private" {
+    setup_git_repo
+    git remote add origin git@github.com:me/mystery.git
+    vis org/proj public
+    gh_run issue comment 1 -R org/proj --body "$GEN"
+    assert_refused
+}
+
+@test "NN_SESSION_DIR keeps the session private after cd" {
+    private_repo
+    export NN_SESSION_DIR="$REPO_DIR"
+    cd "$BATS_TEST_TMPDIR/work"
+    vis org/proj public
+    gh_run issue comment 1 -R org/proj --body "$GEN"
+    assert_refused
+}
+
+@test "allowlisted public repos may be written to" {
+    private_repo
+    vis org/proj public
+    printf '# embargo lifted\nOrg/Proj\n' >"$HOME/.config/gh/wrapper-allow-public"
+    gh_run issue comment 1 -R org/proj --body "$GEN"
+    assert_passed
+}
+
+@test "reads are never checked" {
+    private_repo
+    vis org/proj public
+    gh_run issue view 1 -R org/proj
+    assert_passed
+    refute_lookups
+}
+
+@test "issue transfer checks the destination" {
+    private_repo
+    vis org/proj public
+    gh_run issue transfer 1 org/proj
+    assert_refused
+    vis me/other private
+    gh_run issue transfer 1 me/other
+    assert_passed
+}
+
+@test "release create and upload are checked" {
+    private_repo
+    vis org/proj public
+    gh_run release create v1 -R org/proj --notes x
+    assert_refused
+    gh_run release upload v1 secret.txt -R org/proj
+    assert_refused
+    gh_run release upload v1 secret.txt
+    assert_passed
+}
+
+@test "a private session may not create or edit gists" {
+    private_repo
+    gh_run gist create notes.md
+    assert_refused
+    [[ "$output" == *"gists are readable by anyone"* ]]
+    gh_run gist edit abc123
+    assert_refused
+    gh_run gist view abc123
+    assert_passed
+}
+
+@test "a public session may create gists" {
+    setup_git_repo
+    git remote add origin https://github.com/me/pub.git
+    vis me/pub public
+    gh_run gist create notes.md
+    assert_passed
+}
+
+@test "lookups print nothing to stderr" {
+    private_repo
+    vis me/other private
+    bats_require_minimum_version 1.5.0
+    run --separate-stderr "$GH" pr comment 1 -R me/other --body "$GEN"
+    [ "$status" -eq 0 ]
+    [ -z "$stderr" ]
+}
+
+@test "unset HOME outside a session prints nothing to stderr" {
+    bats_require_minimum_version 1.5.0
+    run --separate-stderr env -u CLAUDECODE -u HOME "$GH" --version
+    [ -z "$stderr" ]
+}
+
+@test "issue transfer from a public remote hints at -R" {
+    private_repo
+    git remote add upstream https://github.com/org/proj
+    vis org/proj public
+    vis me/other private
+    gh_run issue transfer 1 me/other
+    assert_refused
+    [[ "$output" == *"pass -R owner/repo"* ]]
+}
+
+@test "a private session's api writes are checked by repo path" {
+    private_repo
+    vis org/proj public
+    gh_run api repos/org/proj/issues -f title=t -f body="$GEN"
+    assert_refused
+    [[ "$output" == *"org/proj is public; ask the user"* ]]
+    gh_run api -X DELETE /repos/org/proj/labels/x
+    assert_refused
+    gh_run api https://api.github.com/repos/org/proj/issues/1/comments -f body="$GEN"
+    assert_refused
+    gh_run api repos/me/secret/issues -f title=t -f body="$GEN"
+    assert_passed
+}
+
+@test "api {owner}/{repo} placeholders resolve to cwd's remotes" {
+    private_repo
+    gh_run api 'repos/{owner}/{repo}/issues/1/comments' -f body="$GEN"
+    assert_passed
+    git remote add upstream git@github.com:org/proj.git
+    vis org/proj public
+    gh_run api 'repos/{owner}/{repo}/issues/1/comments' -f body="$GEN"
+    assert_refused
+    [[ "$output" == *"instead of {owner}/{repo}"* ]]
+}
+
+@test "api writes outside repos/ are refused unless exempt" {
+    private_repo
+    gh_run api gists -f description=x
+    assert_refused
+    [[ "$output" == *"can't be determined"* ]]
+    [[ "$output" != *"-R"* ]]
+    gh_run api markdown -f text=hi
+    assert_passed
+    gh_run api -X PATCH notifications/threads/1
+    assert_passed
+    gh_run api -X PUT user/starred/org/proj
+    assert_passed
+}
+
+@test "api reads are never checked" {
+    private_repo
+    vis org/proj public
+    gh_run api repos/org/proj/issues
+    assert_passed
+    gh_run api -X GET repos/org/proj/issues -f state=open
+    assert_passed
+    refute_lookups
+}
+
+@test "a private session's graphql mutations are judged by cwd's repo" {
+    private_repo
+    q='mutation { resolveReviewThread(input: {threadId: "PRRT_x"}) { clientMutationId } }'
+    gh_run api graphql -f "query=$q"
+    assert_passed
+    git remote add upstream https://github.com/org/proj
+    vis org/proj public
+    gh_run api graphql -f "query=$q"
+    assert_refused
+    [[ "$output" == *"set GH_REPO=owner/repo to the repository it writes to"* ]]
+    gh_run api graphql -f 'query={ viewer { login } }'
+    assert_passed
+}
+
+@test "public sessions' graphql mutations need no lookup of a target" {
+    q='mutation { resolveReviewThread(input: {threadId: "PRRT_x"}) { clientMutationId } }'
+    gh_run api graphql -f "query=$q"
+    assert_passed
+    refute_lookups
+}
+
+cred() {
+    run env "$@" bash -c "printf '%b' \"\$REQ\" | '$GH' auth git-credential \"\$VERB\""
+}
+
+@test "a private session's git pushes to public repos get no credentials" {
+    private_repo
+    vis org/proj public
+    REQ='protocol=https\nhost=github.com\npath=org/proj.git\n\n' VERB=get cred
+    [ "$status" -eq 1 ]
+    [[ "$output" == *"org/proj is public"* ]]
+    [ ! -e "$OUT" ]
+    rm -f "$OUT.stdin"
+    export REQ='protocol=https\nhost=github.com\npath=me/secret.git\n\n'
+    VERB=get cred
+    [ "$status" -eq 0 ]
+    printf '%b' "$REQ" >"$BATS_TEST_TMPDIR/expected"
+    cmp "$OUT.stdin" "$BATS_TEST_TMPDIR/expected"
+}
+
+@test "the push guard reads the session repo despite git's GIT_DIR" {
+    private_repo
+    export NN_SESSION_DIR="$PWD"
+    mkdir "$BATS_TEST_TMPDIR/pub"
+    cd "$BATS_TEST_TMPDIR/pub"
+    git init -q
+    git remote add origin https://github.com/org/proj.git
+    vis org/proj public
+    REQ='protocol=https\nhost=github.com\npath=org/proj.git\n\n' VERB=get \
+        cred GIT_DIR="$BATS_TEST_TMPDIR/pub/.git"
+    [ "$status" -eq 1 ]
+    [[ "$output" == *"org/proj is public"* ]]
+}
+
+@test "a credential request without a path is refused in an nn private session" {
+    private_repo
+    export NN_SESSION_DIR="$PWD"
+    REQ='protocol=https\nhost=github.com\n\n' VERB=get cred
+    [ "$status" -eq 1 ]
+    [[ "$output" == *"useHttpPath"* ]]
+    [ ! -e "$OUT.stdin" ]
+}
+
+@test "credential store and erase pass through in a private session" {
+    private_repo
+    for verb in store erase; do
+        rm -f "$OUT.stdin"
+        REQ='protocol=https\nhost=github.com\nusername=x\npassword=y\n\n' VERB=$verb cred
+        [ "$status" -eq 0 ]
+        grep -qx 'password=y' "$OUT.stdin"
+    done
+}
+
+@test "a credential request without a path passes outside nn" {
+    private_repo
+    unset NN_SESSION_DIR
+    export REQ='protocol=https\nhost=github.com\n\n'
+    VERB=get cred
+    [ "$status" -eq 0 ]
+    printf '%b' "$REQ" >"$BATS_TEST_TMPDIR/expected"
+    cmp "$OUT.stdin" "$BATS_TEST_TMPDIR/expected"
+}
+
+@test "credential requests for other hosts do no lookups" {
+    private_repo
+    export REQ='protocol=https\nhost=example.com\npath=org/proj.git\n\n'
+    VERB=get cred
+    [ "$status" -eq 0 ]
+    refute_lookups
+    printf '%b' "$REQ" >"$BATS_TEST_TMPDIR/expected"
+    cmp "$OUT.stdin" "$BATS_TEST_TMPDIR/expected"
+}
+
+@test "a public session's push credentials pass through" {
+    setup_git_repo
+    git remote add origin https://github.com/org/proj.git
+    vis org/proj public
+    export REQ='protocol=https\nhost=github.com\npath=org/proj.git\n\n'
+    VERB=get cred
+    [ "$status" -eq 0 ]
+    printf '%b' "$REQ" >"$BATS_TEST_TMPDIR/expected"
+    cmp "$OUT.stdin" "$BATS_TEST_TMPDIR/expected"
+}
+
+# nn sets GH_PATH to the wrapper; finding the real gh must not follow it.
+@test "GH_PATH naming the wrapper still reaches real gh, which keeps GH_PATH" {
+    stub_command gh 'printf "%s\n" "$GH_PATH" >"$OUT"'
+    GH_PATH="$GH" gh_run auth git-credential get </dev/null
+    [ "$status" -eq 0 ]
+    [ "$(cat "$OUT")" = "$GH" ]
 }

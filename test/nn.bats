@@ -856,3 +856,28 @@ esac'
     [ "$status" -eq 0 ]
     ! grep -Fxq -- "--sandbox-policy" "$BATS_TEST_TMPDIR/nono-argv"
 }
+
+@test "nn wires the gh wrapper's private-to-public guard" {
+    run "$NN"
+    [ "$status" -eq 0 ]
+    grep -Fxq -- "GIT_CONFIG_COUNT=5" "$BATS_TEST_TMPDIR/nono-argv"
+    grep -Fxq -- "GIT_CONFIG_KEY_4=credential.https://github.com.useHttpPath" "$BATS_TEST_TMPDIR/nono-argv"
+    grep -Fxq -- "GIT_CONFIG_VALUE_4=true" "$BATS_TEST_TMPDIR/nono-argv"
+    grep -Fxq -- "GIT_TERMINAL_PROMPT=0" "$BATS_TEST_TMPDIR/nono-argv"
+    grep -Fxq -- "NN_SESSION_DIR=$PWD" "$BATS_TEST_TMPDIR/nono-argv"
+}
+
+@test "nn points GH_PATH at the gh wrapper so gh's own git pushes use it" {
+    mkdir -p "$HOME/dot-files/bin"
+    printf '#!/bin/sh\n' >"$HOME/dot-files/bin/gh"
+    chmod +x "$HOME/dot-files/bin/gh"
+    run "$NN"
+    [ "$status" -eq 0 ]
+    grep -Fxq -- "GH_PATH=$HOME/dot-files/bin/gh" "$BATS_TEST_TMPDIR/nono-argv"
+}
+
+@test "nn sets no GH_PATH when the gh wrapper is missing" {
+    run "$NN"
+    [ "$status" -eq 0 ]
+    ! grep -q -- "^GH_PATH=" "$BATS_TEST_TMPDIR/nono-argv"
+}
