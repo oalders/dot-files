@@ -50,8 +50,12 @@ if [[ ! -f $pw_cli ]]; then
     exit 1
 fi
 
-# Downloads to ~/.cache/ms-playwright/chromium-*. Idempotent — skips when the
-# bundled playwright version already has the browser cached.
+# Pin the bundle to the path bin/nn sets and oalders-playwright grants; macOS
+# would otherwise default to ~/Library/Caches/ms-playwright, which nn never sees.
+export PLAYWRIGHT_BROWSERS_PATH="$HOME/.cache/ms-playwright"
+
+# Idempotent — skips when the bundled playwright version already has the
+# browser cached.
 node "$pw_cli" install chromium
 
 npx_bin="$HOME/dot-files/bin/npx"
@@ -75,7 +79,9 @@ cat >"$npx_bin" <<EOF
 # superpowers-chrome MCP — see nono/CLAUDE.md). Playwright's own bundled Chrome
 # for Testing only logs a *non-fatal* permission error for its crash-reports dir
 # and keeps running, so point the MCP at the bundled build instead. It lives in
-# the shared ~/.cache/ms-playwright bundle this installer seeds.
+# the shared ~/.cache/ms-playwright bundle this installer seeds; the default
+# keeps an unsandboxed (host) MCP launch pointed there too, not at macOS's
+# ~/Library/Caches.
 #
 # --headless: the sandbox has no display, so a headed launch can't come up.
 #
@@ -97,6 +103,7 @@ if [[ "\$*" == *"@playwright/mcp"* ]]; then
         args+=("\$arg")
     done
     mkdir -p "$browser_tmp" 2>/dev/null && export TMPDIR="$browser_tmp"
+    export PLAYWRIGHT_BROWSERS_PATH="\${PLAYWRIGHT_BROWSERS_PATH:-\$HOME/.cache/ms-playwright}"
     exec "$pw_mcp_bin" --browser chromium --headless "\${args[@]}"
 fi
 exec /usr/bin/npx "\$@"

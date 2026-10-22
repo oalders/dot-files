@@ -20,6 +20,8 @@ download), do **not** try to work around it — not with `nono run --allow`, not
 by editing the nono profile to make the path writable. The error means the host
 bundle is missing the browser build this run needs (usually a Playwright
 version bump). The fix runs on the host, **outside** the sandbox: tell the user
-to run `installer/playwright-mcp.sh` (it runs `npx playwright install`) to
-refresh the bundle, then re-run. Normal test runs against an already-seeded
+to run `installer/playwright-mcp.sh` (it runs `playwright install` with
+`PLAYWRIGHT_BROWSERS_PATH=~/.cache/ms-playwright`, on macOS too) to refresh the
+bundle, then re-run. An `Executable doesn't exist at ~/.cache/ms-playwright/...`
+error means the same thing. Normal test runs against an already-seeded
 browser work read-only and need no change.

@@ -547,8 +547,9 @@ set -x
 # nothing an in-sandbox session can tamper with — not for a later host/un-
 # sandboxed `playwright` run (the original #975 concern) and not for another
 # sandboxed session sharing the same bundle. The bundle is seeded and kept
-# current on the host by installer/playwright-mcp.sh (`playwright install`);
-# keep the host Playwright in step with the versions projects pin. An in-sandbox
+# current on the host by installer/playwright-mcp.sh, which exports this same
+# path so macOS doesn't install to ~/Library/Caches/ms-playwright instead; keep
+# the host Playwright in step with the versions projects pin. An in-sandbox
 # `playwright install` for a not-yet-seeded build will fail loudly against the
 # read-only path — that's the cue to refresh the bundle on the host.
 #
