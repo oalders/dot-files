@@ -9,7 +9,7 @@ if [[ "${1:-}" == "-f" ]]; then
 fi
 
 if [ $# -lt 1 ]; then
-    echo "Usage: add-worktree [-f] branch-name..."
+    echo "Usage: [WORKTREE_ROOT=dir] add-worktree [-f] branch-name..."
     exit
 fi
 
@@ -78,7 +78,7 @@ setup_branch() {
 
     date_stamp="$(date +%Y-%m-%d)"
 
-    all_worktrees="$HOME/.worktree/$repo_name/$date_stamp"
+    all_worktrees="${WORKTREE_ROOT:-$HOME/.worktree}/$repo_name/$date_stamp"
     mkdir -p "$all_worktrees"
 
     worktree_dir="$all_worktrees/$branch_name"
