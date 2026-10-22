@@ -9,7 +9,8 @@ if [[ "${1:-}" == "-f" ]]; then
 fi
 
 if [ $# -lt 1 ]; then
-    echo "Usage: [WORKTREE_ROOT=dir] add-worktree [-f] branch-name..."
+    echo "Usage: add-worktree [-f] branch-name..."
+    echo "Worktrees go under \$WORKTREE_ROOT, or ~/.worktree if that is unset."
     exit
 fi
 
@@ -42,6 +43,11 @@ else
 
     repo_root="$(cd "$git_dir/.." && pwd)"
 fi
+
+# Resolve before the cd below so a relative root means relative to the caller.
+worktree_root="${WORKTREE_ROOT:-$HOME/.worktree}"
+mkdir -p "$worktree_root"
+worktree_root="$(cd "$worktree_root" && pwd)"
 
 cd "$repo_root" || exit 1
 
@@ -78,7 +84,7 @@ setup_branch() {
 
     date_stamp="$(date +%Y-%m-%d)"
 
-    all_worktrees="${WORKTREE_ROOT:-$HOME/.worktree}/$repo_name/$date_stamp"
+    all_worktrees="$worktree_root/$repo_name/$date_stamp"
     mkdir -p "$all_worktrees"
 
     worktree_dir="$all_worktrees/$branch_name"

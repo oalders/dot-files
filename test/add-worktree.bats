@@ -15,7 +15,7 @@ setup() {
     # Unset TMUX_PANE so running the suite from inside tmux doesn't leak into
     # the tmux-block tests, which set it explicitly.
     export MY_INSIDE_TMUX=false
-    unset TMUX_PANE
+    unset TMUX_PANE WORKTREE_ROOT
     stub_command pgrep 'exit 1'
     # Tests use generic branch names so the fix-/gh- branches that call
     # `gh issue edit` / `gh pr checkout` aren't exercised; stub anyway.
@@ -170,6 +170,23 @@ EOF
     worktree="$HOME/.worktree/$repo_name/$date_stamp/feature-branch"
 
     [ -d "$worktree" ]
+}
+
+@test "add-worktree creates the worktree under WORKTREE_ROOT" {
+    setup_git_repo
+    # Relative to the caller's cwd (a subdir), not the repo root the script
+    # cd's into.
+    mkdir -p sub
+    cd sub
+    WORKTREE_ROOT=wt run "$ADD_WORKTREE" feature-branch
+    [ "$status" -eq 0 ]
+
+    local date_stamp repo_name
+    date_stamp="$(date +%Y-%m-%d)"
+    repo_name="$(basename "$REPO_DIR")"
+
+    [ -d "$REPO_DIR/sub/wt/$repo_name/$date_stamp/feature-branch" ]
+    [ ! -e "$HOME/.worktree" ]
 }
 
 @test "add-worktree queues fix-gh-issue for fix-<n> branches" {
