@@ -2,13 +2,14 @@
 
 # Device-flow login for a VM with no usable browser: prints the URL instead of
 # opening lynx. Git uses HTTPS with gh's token, so no SSH key is involved;
-# workflow scope lets pushes change .github/workflows.
+# workflow scope lets pushes change .github/workflows; read:packages lets it
+# pull from GitHub Packages.
 
 set -eu -o pipefail
 
 GH_BROWSER="echo" exec gh auth login \
     --hostname github.com \
     --git-protocol https \
-    --scopes workflow \
+    --scopes workflow,read:packages \
     --web \
     "$@"
