@@ -51,15 +51,17 @@ is there $script || {
     exit 1
 }
 
-# diff-lockfiles >= 1.3.0 prints nothing when no package-lock.json changed.
+echo "Using $script $($script --version)"
+
+# diff-lockfiles >= 1.3.0 prints nothing when no lockfile changed.
 changed=$(git diff --name-only "$remote/$base_branch" "$remote/$branch")
-if grep -q 'package-lock.json$' <<<"$changed"; then
+if grep -qE '(package-lock\.json|pnpm-lock\.yaml)$' <<<"$changed"; then
     $script \
         --format table \
         --color \
         "$remote"/"$base_branch" "$remote/$branch"
 else
-    echo "No package-lock.json changes between $remote/$base_branch and $remote/$branch."
+    echo "No package-lock.json or pnpm-lock.yaml changes between $remote/$base_branch and $remote/$branch."
 fi
 
 if ! read -n 1 -t 30 -s -r -p "Approve PR? Press y to continue, r to rebase, n to exit." input; then
