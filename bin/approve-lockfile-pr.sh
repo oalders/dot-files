@@ -54,12 +54,19 @@ is there $script || {
 echo "Using $script $($script --version)"
 
 # diff-lockfiles >= 1.3.0 prints nothing when no lockfile changed.
-changed=$(git diff --name-only "$remote/$base_branch" "$remote/$branch")
+# Diff from the merge base so an unrebased PR doesn't pick up base-branch changes.
+from=$(git merge-base "$remote/$base_branch" "$remote/$branch")
+changed=$(git diff --name-only "$from" "$remote/$branch")
+has_lockfile=false
 if grep -qE '(package-lock\.json|pnpm-lock\.yaml)$' <<<"$changed"; then
+    has_lockfile=true
+fi
+
+if $has_lockfile; then
     $script \
         --format table \
         --color \
-        "$remote"/"$base_branch" "$remote/$branch"
+        "$from" "$remote/$branch"
 else
     echo "No package-lock.json or pnpm-lock.yaml changes between $remote/$base_branch and $remote/$branch."
 fi
@@ -71,12 +78,16 @@ if ! read -n 1 -t 30 -s -r -p "Approve PR? Press y to continue, r to rebase, n t
 fi
 
 if [[ $input == "y" ]]; then
-    file=$(mktemp)
-    $script \
-        --format markdown \
-        "$remote"/"$base_branch" "$remote/$branch" >"$file"
-
-    gh pr review --approve "$branch" -F "$file"
+    # e.g. github_actions PRs have no lockfile to summarize.
+    if $has_lockfile; then
+        file=$(mktemp)
+        $script \
+            --format markdown \
+            "$from" "$remote/$branch" >"$file"
+        gh pr review --approve "$branch" -F "$file"
+    else
+        gh pr review --approve "$branch"
+    fi
     gh pr merge --merge --delete-branch "$branch" || gh pr merge "$branch" --auto
 elif [[ $input == "r" ]]; then
     dependabot-rebase.sh "$branch"
