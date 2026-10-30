@@ -28,6 +28,8 @@ if ! is there apt; then
         expat-devel \
         fd-find \
         glibc-langpack-en \
+        hunspell \
+        hunspell-en-US \
         jq \
         npm \
         pandoc \
@@ -46,6 +48,8 @@ else
         chafa
         cpanminus
         curl
+        hunspell
+        hunspell-en-us
         jq
         libexpat1-dev
         libnet-ssleay-perl
