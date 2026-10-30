@@ -442,3 +442,58 @@ EOF
     [ -f "$worktree/init-ran" ]
     [ ! -e "$NPM_LOG" ]
 }
+
+@test "add-worktree branches from main even when the main checkout is on another branch" {
+    setup_git_repo
+    git checkout -q -b side
+    echo side >side-file
+    git add side-file
+    git -c commit.gpgsign=false commit -q -m "side"
+
+    run "$ADD_WORKTREE" feature-branch
+    [ "$status" -eq 0 ]
+
+    local worktree
+    worktree="$HOME/.worktree/$(basename "$REPO_DIR")/$(date +%Y-%m-%d)/feature-branch"
+    [ "$(git -C "$worktree" rev-parse HEAD)" = "$(git rev-parse main)" ]
+    [ ! -f "$worktree/side-file" ]
+}
+
+@test "add-worktree branches from main when run from a linked worktree" {
+    setup_git_repo
+    git worktree add -q "$BATS_TEST_TMPDIR/other-wt" -b other
+    cd "$BATS_TEST_TMPDIR/other-wt"
+    echo other >other-file
+    git add other-file
+    git -c commit.gpgsign=false commit -q -m "other"
+
+    run "$ADD_WORKTREE" feature-branch
+    [ "$status" -eq 0 ]
+
+    local worktree
+    worktree="$HOME/.worktree/$(basename "$REPO_DIR")/$(date +%Y-%m-%d)/feature-branch"
+    [ "$(git -C "$worktree" rev-parse HEAD)" = "$(git -C "$REPO_DIR" rev-parse main)" ]
+}
+
+@test "add-worktree fetches and branches from origin's default branch without tracking it" {
+    setup_git_repo
+    setup_upstream
+    # Advance origin/main past the local main via a second clone.
+    local clone="$BATS_TEST_TMPDIR/clone"
+    git clone -q -b main "$UPSTREAM_DIR" "$clone"
+    echo new >"$clone/new-file"
+    git -C "$clone" add new-file
+    git -C "$clone" -c user.email=t@example.com -c user.name=T \
+        -c commit.gpgsign=false commit -q -m "upstream"
+    git -C "$clone" push -q origin main
+
+    run "$ADD_WORKTREE" feature-branch
+    [ "$status" -eq 0 ]
+    [[ "$output" == *"Branching from origin/main"* ]]
+
+    local worktree
+    worktree="$HOME/.worktree/$(basename "$REPO_DIR")/$(date +%Y-%m-%d)/feature-branch"
+    [ -f "$worktree/new-file" ]
+    run git -C "$worktree" rev-parse --abbrev-ref '@{u}'
+    [ "$status" -ne 0 ]
+}

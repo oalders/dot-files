@@ -68,6 +68,32 @@ if [[ -f "$repo_root/.claude/settings.local.json" ]]; then
     rm -f "$repo_root/.claude/settings.local.json"
 fi
 
+# Branch from the default branch, not the main checkout's HEAD: that checkout
+# may sit on a feature branch, and its unmerged commits would leak in.
+default_branch=$(git symbolic-ref --short refs/remotes/origin/HEAD 2>/dev/null) || true
+default_branch=${default_branch#origin/}
+if [[ -z $default_branch ]]; then
+    for b in main master; do
+        if git show-ref --quiet "refs/heads/$b" "refs/remotes/origin/$b"; then
+            default_branch=$b
+            break
+        fi
+    done
+fi
+base=HEAD
+if [[ -n $default_branch ]]; then
+    base=$default_branch
+    if git remote get-url origin >/dev/null 2>&1; then
+        if ! git fetch --quiet origin "$default_branch"; then
+            echo "Warning: could not fetch origin/$default_branch" >&2
+        fi
+        if git rev-parse --verify --quiet "origin/$default_branch" >/dev/null; then
+            base=origin/$default_branch
+        fi
+    fi
+fi
+echo "Branching from $base" >&2
+
 setup_branch() {
     branch_name="$1"
     number=""
@@ -93,7 +119,8 @@ setup_branch() {
         # For PR checkouts, create worktree without -b flag (gh pr checkout will create the branch)
         git worktree add "${force[@]+"${force[@]}"}" "$worktree_dir"
     else
-        git worktree add "${force[@]+"${force[@]}"}" "$worktree_dir" -b "$branch_name"
+        # --no-track: an origin/main upstream would make `git push` target main.
+        git worktree add "${force[@]+"${force[@]}"}" --no-track "$worktree_dir" -b "$branch_name" "$base"
     fi
 
     cd "$worktree_dir" || exit 1
