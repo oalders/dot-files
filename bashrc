@@ -146,6 +146,9 @@ if [[ ! -d ~/.plenv && -d $localperlbin ]]; then
     [ "$SHLVL" -eq 1 ] && eval "$(perl -I "$HOME/perl5/lib/perl5" -Mlocal::lib)"
 
     add_path $localperlbin
+elif [[ -d ~/.plenv ]]; then
+    # Inherited vars (e.g. tmux global env) would redirect installs to ~/perl5.
+    unset_perl5_local_lib
 fi
 
 whosonport() {
