@@ -21,6 +21,7 @@ set -x
 
 if ! is there apt; then
     sudo dnf install -y -q \
+        age \
         bubblewrap \
         chafa \
         cpanminus \
@@ -43,6 +44,7 @@ else
     debounce 12 h sudo apt-get update -q
 
     packages=(
+        age
         bubblewrap
         build-essential
         chafa
