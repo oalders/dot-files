@@ -17,28 +17,28 @@
   },
   "homepage": "https://github.com/oalders/dot-files#readme",
   "dependencies": {
-    "@johnnymorganz/stylua-bin": "^2.5.2",
+    "@johnnymorganz/stylua-bin": "^2.6.0",
     "@playwright/mcp": "0.0.83",
     "@xmldom/xmldom": ">=0.9.12",
-    "acorn": "^8.18.0",
-    "ansi-regex": ">=6.4.0",
+    "acorn": "^8.19.0",
+    "ansi-regex": ">=6.5.0",
     "bash-language-server": "^5.8.1",
     "bats": "^1.13.0",
     "diff-lockfiles": "^1.5.0",
-    "eslint": "^10.11.0",
+    "eslint": "^10.13.0",
     "fixjson": "^1.1.2",
-    "markdownlint": "^0.41.0",
-    "markdownlint-cli": "^0.49.0",
+    "markdownlint": "^0.42.0",
+    "markdownlint-cli": "^0.50.0",
     "mcp-hub": "^4.2.1",
-    "normalize-url": "^9.0.1",
+    "normalize-url": "^10.0.0",
     "npm": "^12.2.1",
-    "prettier": "^3.9.9",
-    "tree-sitter-cli": "^0.27.0",
+    "prettier": "^3.9.10",
+    "tree-sitter-cli": "^0.27.1",
     "typescript": "^7.0.2",
     "underscore": "^1.13.8",
     "urijs": ">=1.19.11",
     "ws": "^8.22.0",
-    "zod": "^4.6.6"
+    "zod": "^4.6.7"
   },
   "overrides": {
     "editorconfig": {
@@ -46,7 +46,7 @@
     }
   },
   "devDependencies": {
-    "opencode-ai": "^1.18.33"
+    "opencode-ai": "^1.19.5"
   },
   "allowScripts": {
     "tree-sitter-cli": true
