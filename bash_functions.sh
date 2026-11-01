@@ -175,8 +175,8 @@ get_github_display_name() {
     title=$(echo "$json_data" | jq -r '.title')
     labels=$(echo "$json_data" | jq -r '.labels[].name' 2>/dev/null)
 
-    # Remove special characters that tmux doesn't like
-    title=${title//[.:]/}
+    # Remove characters tmux parses specially; an argument ending in ; is a command separator
+    title=${title//[.:;]/}
 
     # blocked → 🚫 prefix. Other labels are noise in the tmux window title
     # (and "priority: medium"-style names contain colons that tmux parses as
