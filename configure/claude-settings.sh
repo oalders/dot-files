@@ -120,6 +120,10 @@ set_key effortLevel '"medium"'
 # stays. attribution.* is the current key -- includeCoAuthoredBy is deprecated.
 set_nested_key attribution sessionUrl false
 
+# The symlink from installer/symlinks.sh only lists the theme in /theme. This
+# selects it; nono/claude-settings.json mirrors it for sandboxed sessions.
+set_key theme '"custom:tokyo-night"'
+
 # No local auto-memory files; nono/claude-settings.json mirrors this for
 # sandboxed sessions, which can't read this file.
 set_key autoMemoryEnabled false

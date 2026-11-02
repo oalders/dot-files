@@ -33,3 +33,9 @@ setup() {
     [ "$(jq -r '.attribution.sessionUrl' "$SETTINGS")" = "false" ]
     [ "$(jq -r '.attribution.commit' "$SETTINGS")" = "custom co-author" ]
 }
+
+@test "selects the tokyo-night custom theme" {
+    run "$CLAUDE_SETTINGS"
+    [ "$status" -eq 0 ]
+    [ "$(jq -r '.theme' "$SETTINGS")" = "custom:tokyo-night" ]
+}
