@@ -70,29 +70,46 @@ fi
 
 # Branch from the default branch, not the main checkout's HEAD: that checkout
 # may sit on a feature branch, and its unmerged commits would leak in.
+has_branch() {
+    git show-ref --quiet --verify "refs/remotes/origin/$1" ||
+        git show-ref --quiet --verify "refs/heads/$1"
+}
 default_branch=$(git symbolic-ref --short refs/remotes/origin/HEAD 2>/dev/null) || true
 default_branch=${default_branch#origin/}
+# origin/HEAD goes stale when the remote renames its default branch.
+if [[ -n $default_branch ]] && ! has_branch "$default_branch"; then
+    default_branch=""
+fi
 if [[ -z $default_branch ]]; then
     for b in main master; do
-        if git show-ref --quiet "refs/heads/$b" "refs/remotes/origin/$b"; then
+        if has_branch "$b"; then
             default_branch=$b
             break
         fi
     done
 fi
-base=HEAD
+# Full refnames so a branch name can't be parsed as an option or hit a tag.
+start=()
 if [[ -n $default_branch ]]; then
-    base=$default_branch
     if git remote get-url origin >/dev/null 2>&1; then
-        if ! git fetch --quiet origin "$default_branch"; then
+        # No prompting: a credential prompt would stall worktree setup.
+        if ! GIT_TERMINAL_PROMPT=0 git fetch --quiet origin \
+            "+refs/heads/$default_branch:refs/remotes/origin/$default_branch"; then
             echo "Warning: could not fetch origin/$default_branch" >&2
         fi
-        if git rev-parse --verify --quiet "origin/$default_branch" >/dev/null; then
-            base=origin/$default_branch
-        fi
     fi
+    if git show-ref --quiet --verify "refs/remotes/origin/$default_branch"; then
+        start=("refs/remotes/origin/$default_branch")
+    else
+        start=("refs/heads/$default_branch")
+    fi
+elif git rev-parse --verify --quiet HEAD >/dev/null; then
+    start=(HEAD)
 fi
-echo "Branching from $base" >&2
+# No start point in an empty repo lets git worktree add create an orphan.
+label=${start[0]-an orphan branch}
+label=${label#refs/heads/}
+echo "Branching from ${label#refs/remotes/}" >&2
 
 setup_branch() {
     branch_name="$1"
@@ -120,7 +137,9 @@ setup_branch() {
         git worktree add "${force[@]+"${force[@]}"}" "$worktree_dir"
     else
         # --no-track: an origin/main upstream would make `git push` target main.
-        git worktree add "${force[@]+"${force[@]}"}" --no-track "$worktree_dir" -b "$branch_name" "$base"
+        # It conflicts with the --orphan git infers when there's no start point.
+        git worktree add "${force[@]+"${force[@]}"}" ${start[0]+--no-track} \
+            "$worktree_dir" -b "$branch_name" "${start[@]+"${start[@]}"}"
     fi
 
     cd "$worktree_dir" || exit 1

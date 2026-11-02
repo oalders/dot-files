@@ -497,3 +497,52 @@ EOF
     run git -C "$worktree" rev-parse --abbrev-ref '@{u}'
     [ "$status" -ne 0 ]
 }
+
+@test "add-worktree creates an orphan worktree in a repo with no commits" {
+    REPO_DIR="$BATS_TEST_TMPDIR/repo"
+    git init -q -b main "$REPO_DIR"
+    cd "$REPO_DIR"
+
+    run "$ADD_WORKTREE" feature-branch
+    [ "$status" -eq 0 ]
+    [ -d "$HOME/.worktree/repo/$(date +%Y-%m-%d)/feature-branch" ]
+}
+
+@test "add-worktree falls back to main when origin/HEAD is stale" {
+    setup_git_repo
+    setup_upstream
+    git symbolic-ref refs/remotes/origin/HEAD refs/remotes/origin/gone
+
+    run "$ADD_WORKTREE" feature-branch
+    [ "$status" -eq 0 ]
+    [[ "$output" == *"Branching from origin/main"* ]]
+}
+
+@test "add-worktree falls back to master" {
+    REPO_DIR="$BATS_TEST_TMPDIR/repo"
+    git init -q -b master "$REPO_DIR"
+    cd "$REPO_DIR"
+    git config user.email t@example.com
+    git config user.name T
+    echo x >file
+    git add file
+    git -c commit.gpgsign=false commit -q -m init
+    git checkout -q -b side
+    git -c commit.gpgsign=false commit -q --allow-empty -m side
+
+    run "$ADD_WORKTREE" feature-branch
+    [ "$status" -eq 0 ]
+    local worktree="$HOME/.worktree/repo/$(date +%Y-%m-%d)/feature-branch"
+    [ "$(git -C "$worktree" rev-parse HEAD)" = "$(git rev-parse master)" ]
+}
+
+@test "add-worktree branches from the main branch, not a tag named main" {
+    setup_git_repo
+    git tag main
+    git -c commit.gpgsign=false commit -q --allow-empty -m second
+
+    run "$ADD_WORKTREE" feature-branch
+    [ "$status" -eq 0 ]
+    local worktree="$HOME/.worktree/repo/$(date +%Y-%m-%d)/feature-branch"
+    [ "$(git -C "$worktree" rev-parse HEAD)" = "$(git rev-parse refs/heads/main)" ]
+}
