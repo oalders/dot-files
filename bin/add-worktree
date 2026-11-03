@@ -52,6 +52,7 @@ worktree_root="$(cd "$worktree_root" && pwd)"
 cd "$repo_root" || exit 1
 
 repo_name="$(basename "$repo_root")"
+unfinished_dir="$(git rev-parse --path-format=absolute --git-common-dir)/add-worktree-unfinished"
 
 # Claude Code sessions started from a worktree walk over to the main checkout
 # and try to read its .claude/settings.local.json, which the sandbox can't
@@ -125,21 +126,34 @@ setup_branch() {
         type="pr"
     fi
 
-    date_stamp="$(date +%Y-%m-%d)"
+    # Marker reuse skips git worktree add's name check, so a:b would adopt a/b's marker.
+    git check-ref-format --branch "$branch_name" >/dev/null
 
-    all_worktrees="$worktree_root/$repo_name/$date_stamp"
-    mkdir -p "$all_worktrees"
-
-    worktree_dir="$all_worktrees/$branch_name"
-
-    if [[ "$type" == "pr" ]]; then
-        # For PR checkouts, create worktree without -b flag (gh pr checkout will create the branch)
-        git worktree add "${force[@]+"${force[@]}"}" "$worktree_dir"
+    # Flat, so feature/x can't block a later branch named feature; `:` is illegal in branch names.
+    marker="$unfinished_dir/${branch_name//\//:}"
+    if [[ -f $marker && -d $(<"$marker") ]]; then
+        worktree_dir="$(<"$marker")"
+        echo "Reusing unfinished worktree $worktree_dir" >&2
     else
-        # --no-track: an origin/main upstream would make `git push` target main.
-        # It conflicts with the --orphan git infers when there's no start point.
-        git worktree add "${force[@]+"${force[@]}"}" ${start[0]+--no-track} \
-            "$worktree_dir" -b "$branch_name" "${start[@]+"${start[@]}"}"
+        date_stamp="$(date +%Y-%m-%d)"
+
+        all_worktrees="$worktree_root/$repo_name/$date_stamp"
+        mkdir -p "$all_worktrees"
+
+        worktree_dir="$all_worktrees/$branch_name"
+
+        if [[ "$type" == "pr" ]]; then
+            # For PR checkouts, create worktree without -b flag (gh pr checkout will create the branch)
+            git worktree add "${force[@]+"${force[@]}"}" "$worktree_dir"
+        else
+            # --no-track: an origin/main upstream would make `git push` target main.
+            # It conflicts with the --orphan git infers when there's no start point.
+            git worktree add "${force[@]+"${force[@]}"}" ${start[0]+--no-track} \
+                "$worktree_dir" -b "$branch_name" "${start[@]+"${start[@]}"}"
+        fi
+
+        mkdir -p "$unfinished_dir"
+        printf '%s\n' "$worktree_dir" >"$marker"
     fi
 
     cd "$worktree_dir" || exit 1
@@ -184,7 +198,7 @@ setup_branch() {
             # submodule-name validation. Skip traversal names so a crafted
             # section can't point --reference outside .git/modules (#1030).
             case $name in
-                */* | *..*)
+                *..*)
                     echo "Skipping submodule with suspicious name: $name" >&2
                     continue
                     ;;
@@ -222,6 +236,8 @@ setup_branch() {
         # commands live in reviewed code instead.
         tmux rename-window -t "$SESSION_NAME" claude
         tmux send-keys -t "$SESSION_NAME" nn Enter
+        # Before the attach, which blocks until detach.
+        rm -f "$marker"
         # Attaching from inside tmux would nest sessions, so leave the new session
         # detached (running nn) and just print its name to switch to on your own
         # schedule. The source above re-derives MY_INSIDE_TMUX from $TMUX_PANE, so
@@ -232,6 +248,8 @@ setup_branch() {
         else
             tmux attach -t "$SESSION_NAME"
         fi
+    else
+        rm -f "$marker"
     fi
 }
 
