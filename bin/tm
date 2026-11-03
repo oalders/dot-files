@@ -11,9 +11,9 @@ if ! tmux has-session 2>/dev/null; then
     exit 0
 fi
 
-# Not gum filter: session names embed issue titles, and its fuzzy scoring lets
-# scattered word-boundary hits outrank a direct match.
-session=$(tmux list-sessions -F \#S | fzf --reverse --no-multi --prompt="Pick any session! ")
+# --exact: session names embed issue titles, and fuzzy scoring (fzf's and gum's)
+# can rank scattered hits in a title above a direct match.
+session=$(tmux list-sessions -F \#S | fzf --exact --reverse --no-multi --prompt="Pick any session! ")
 subcommand=attach
 
 if [ -z "$session" ]; then
