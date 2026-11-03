@@ -113,7 +113,8 @@ EOF
     local worktree alternates
     worktree="$HOME/.worktree/$(basename "$REPO_DIR")/$(date +%Y-%m-%d)/feature-branch"
     alternates="$(git -C "$worktree/inc/foo" rev-parse --path-format=absolute --git-path objects/info/alternates)"
-    grep -q '\.git/modules/inc/foo' "$alternates"
+    # pwd -P: git records the reference path physically.
+    grep -Fxq "$(cd "$REPO_DIR" && pwd -P)/.git/modules/inc/foo/objects" "$alternates"
 }
 
 @test "add-worktree refuses to run outside a git repository" {
@@ -379,6 +380,21 @@ EOF
     [ "$status" -eq 0 ]
 
     grep -q "attach -t" "$TMUX_LOG"
+}
+
+@test "add-worktree clears the marker before attach, which blocks until detach" {
+    setup_git_repo
+    _stub_tmux_env
+    export ATTACH_SEEN="$BATS_TEST_TMPDIR/attach-seen"
+    export UNFINISHED_DIR="$REPO_DIR/.git/add-worktree-unfinished"
+    stub_command tmux 'if [[ $1 == attach ]]; then ls -A "$UNFINISHED_DIR" >"$ATTACH_SEEN"; fi'
+
+    run "$ADD_WORKTREE" feature-branch
+    [ "$status" -eq 0 ]
+
+    # Exists: attach ran. Empty: no marker was left at that moment.
+    [ -f "$ATTACH_SEEN" ]
+    [ ! -s "$ATTACH_SEEN" ]
 }
 
 @test "add-worktree sets up a worktree and detached session per branch inside tmux" {
@@ -649,4 +665,18 @@ _commit_flaky_init() {
     [ "$status" -eq 0 ]
     [[ "$output" != *"Reusing"* ]]
     [ -d "$worktree" ]
+}
+
+@test "add-worktree rejects an invalid name that maps onto an unfinished marker" {
+    setup_git_repo
+    _commit_flaky_init
+
+    run "$ADD_WORKTREE" a/b
+    [ "$status" -ne 0 ]
+    touch "$INIT_OK"
+
+    run "$ADD_WORKTREE" a:b
+    [ "$status" -ne 0 ]
+    [[ "$output" == *"not a valid branch name"* ]]
+    [[ "$output" != *"Reusing"* ]]
 }
