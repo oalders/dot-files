@@ -395,6 +395,7 @@ EOF
     # Exists: attach ran. Empty: no marker was left at that moment.
     [ -f "$ATTACH_SEEN" ]
     [ ! -s "$ATTACH_SEEN" ]
+    [ -d "$UNFINISHED_DIR" ]
 }
 
 @test "add-worktree sets up a worktree and detached session per branch inside tmux" {

@@ -129,7 +129,7 @@ setup_branch() {
     # Marker reuse skips git worktree add's name check, so a:b would adopt a/b's marker.
     git check-ref-format --branch "$branch_name" >/dev/null
 
-    # Flat: a marker dir left by feature/x would break a later branch named feature; `:` can't collide as it's illegal in branch names, unlike `%`.
+    # Flat, so feature/x can't block a later branch named feature; `:` is illegal in branch names.
     marker="$unfinished_dir/${branch_name//\//:}"
     if [[ -f $marker && -d $(<"$marker") ]]; then
         worktree_dir="$(<"$marker")"
