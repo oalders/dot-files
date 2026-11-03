@@ -160,7 +160,8 @@ Install `plenv` as well as the latest Perl version.
 
 ### Shortcuts
 
-`ctrl-a a`: toggle mouse
+`ctrl-a a`: session picker
+`ctrl-a m`: toggle mouse
 `ctrl-a + L`: toggle session
 `ctrl-a + <space>`: tmux which-key
 
@@ -223,7 +224,7 @@ When mouse is enabled, clicking in the terminal automatically sets it to
 
 * `:set mouse=a` to enable mouse
 * `:set mouse=` to disable mouse
-* `ctrl-a ctrl-m` to toggle mouse in `tmux`
+* `ctrl-a m` to toggle mouse in `tmux`
 
 ### Buffers
 
