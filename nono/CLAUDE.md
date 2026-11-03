@@ -9,7 +9,7 @@ Wraps Claude Code in the [nono](https://nono.sh/) sandbox. Invoke via `nn` (from
 - `oalders-net.json` — all outbound network rules for the default chain (curated `allow_domain`, `open_port`, `network_profile: null`), symlinked to `~/.config/nono/profiles/oalders-net.json`
 - `oalders-playwright-net.json` — Playwright browser-download CDN hosts for the default chain (paired with the net-free `oalders-playwright`), symlinked to `~/.config/nono/profiles/oalders-playwright-net.json`
 - `oalders-open.json` — permissive opt-in profile (`extends: [oalders-core]`, no `oalders-net`): full outbound network with the same filesystem lockdown as `oalders`, symlinked to `~/.config/nono/profiles/oalders-open.json`
-- `claude-settings.json` — `{"sandbox": {"enabled": false}}` passed to claude via `--settings`, symlinked to `~/.config/nono/claude-settings.json` (so claude's built-in sandbox stays off while nono does the real work)
+- `claude-settings.json` — passed to claude via `--settings`, symlinked to `~/.config/nono/claude-settings.json`: keeps claude's built-in sandbox off while nono does the real work, and adds an auto-mode rule (a classifier hint, not a permission) allowing `rm` of literal paths inside the working tree, excluding its root and `.git`
 
 ## Per-project profiles
 
