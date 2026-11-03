@@ -86,6 +86,36 @@ EOF
     [ -d "$worktree" ]
 }
 
+@test "add-worktree shares objects for a nested submodule name" {
+    git config --global protocol.file.allow always
+    git config --global init.defaultBranch main
+    git config --global user.email t@example.com
+    git config --global user.name T
+
+    SUB_SRC="$BATS_TEST_TMPDIR/sub-src"
+    mkdir -p "$SUB_SRC"
+    (
+        cd "$SUB_SRC"
+        git init -q
+        echo sub >sub-file
+        git add sub-file
+        git -c commit.gpgsign=false commit -q -m init
+    )
+
+    setup_git_repo
+    git submodule add -q "$SUB_SRC" inc/foo
+    git -c commit.gpgsign=false commit -q -m "add submodule"
+
+    run "$ADD_WORKTREE" feature-branch
+    [ "$status" -eq 0 ]
+    [[ "$output" != *"suspicious"* ]]
+
+    local worktree alternates
+    worktree="$HOME/.worktree/$(basename "$REPO_DIR")/$(date +%Y-%m-%d)/feature-branch"
+    alternates="$(git -C "$worktree/inc/foo" rev-parse --path-format=absolute --git-path objects/info/alternates)"
+    grep -q '\.git/modules/inc/foo' "$alternates"
+}
+
 @test "add-worktree refuses to run outside a git repository" {
     # BATS_TEST_TMPDIR is not a git repo and GIT_CEILING_DIRECTORIES (set in
     # setup) stops git from finding a parent one, so this exercises the
@@ -545,4 +575,78 @@ EOF
     [ "$status" -eq 0 ]
     local worktree="$HOME/.worktree/repo/$(date +%Y-%m-%d)/feature-branch"
     [ "$(git -C "$worktree" rev-parse HEAD)" = "$(git rev-parse refs/heads/main)" ]
+}
+
+# Commit a scripts/init.sh that logs each run and fails until $INIT_OK exists.
+_commit_flaky_init() {
+    export INIT_OK="$BATS_TEST_TMPDIR/init-ok"
+    export INIT_LOG="$BATS_TEST_TMPDIR/init.log"
+    mkdir -p scripts
+    printf '%s\n' '#!/usr/bin/env bash' 'echo ran >>"$INIT_LOG"' '[[ -f $INIT_OK ]]' >scripts/init.sh
+    chmod +x scripts/init.sh
+    git add scripts/init.sh
+    git -c commit.gpgsign=false commit -q -m "add init"
+}
+
+@test "add-worktree resumes a branch whose setup did not finish" {
+    setup_git_repo
+    _stub_tmux_env
+    export TMUX_PANE="%0"
+    _commit_flaky_init
+
+    run "$ADD_WORKTREE" b1 b2
+    [ "$status" -ne 0 ]
+    [[ "$output" == *"Resume:  add-worktree b1 b2"* ]]
+
+    local all
+    all="$HOME/.worktree/$(basename "$REPO_DIR")/$(date +%Y-%m-%d)"
+    touch "$all/b1/left-by-first-run"
+    touch "$INIT_OK"
+
+    run "$ADD_WORKTREE" b1 b2
+    [ "$status" -eq 0 ]
+    [[ "$output" == *"Reusing unfinished worktree $all/b1"* ]]
+    [ -f "$all/b1/left-by-first-run" ]
+    [ -d "$all/b2" ]
+    [ "$(grep -c "new -s" "$TMUX_LOG")" -eq 2 ]
+
+    # Finishing inside the tmux block clears the marker too.
+    run "$ADD_WORKTREE" b1
+    [ "$status" -ne 0 ]
+    [[ "$output" == *"already exists"* ]]
+    [ "$(grep -c "new -s" "$TMUX_LOG")" -eq 2 ]
+}
+
+@test "add-worktree does not reuse a finished worktree" {
+    setup_git_repo
+    _commit_flaky_init
+    touch "$INIT_OK"
+
+    run "$ADD_WORKTREE" x
+    [ "$status" -eq 0 ]
+
+    run "$ADD_WORKTREE" x
+    [ "$status" -ne 0 ]
+    [[ "$output" == *"already exists"* ]]
+    [ "$(wc -l <"$INIT_LOG")" -eq 1 ]
+}
+
+@test "add-worktree creates a fresh worktree when the unfinished one is gone" {
+    setup_git_repo
+    _commit_flaky_init
+
+    # The slash also proves the marker stays flat.
+    run "$ADD_WORKTREE" feature/x
+    [ "$status" -ne 0 ]
+
+    local worktree
+    worktree="$HOME/.worktree/$(basename "$REPO_DIR")/$(date +%Y-%m-%d)/feature/x"
+    git worktree remove --force "$worktree"
+    git branch -D feature/x
+    touch "$INIT_OK"
+
+    run "$ADD_WORKTREE" feature/x
+    [ "$status" -eq 0 ]
+    [[ "$output" != *"Reusing"* ]]
+    [ -d "$worktree" ]
 }
