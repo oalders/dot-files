@@ -3,5 +3,11 @@
     "enabled": false
   },
   "autoMemoryEnabled": false,
-  "theme": "custom:tokyo-night"
+  "theme": "custom:tokyo-night",
+  "autoMode": {
+    "allow": [
+      "$defaults",
+      "Sandboxed Deletion: This session runs under nono, so Landlock confines writes to granted paths. Deleting specific files or directories inside the session's working tree with `rm`, `rm -r` or `rm -rf` is allowed, including files that existed before this session, and overrides Irreversible Local Destruction for those targets. The targets must be literal paths or variables whose values are visible in the transcript. Does NOT cover the working tree root itself, `.git` contents, anything outside the working tree (such as `~/.claude`), or sweeps of shared temp directories."
+    ]
+  }
 }
