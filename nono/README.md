@@ -26,3 +26,35 @@
   the daemon from a session without this mixin.
 - **Net-free:** image pulls run in the daemon outside the sandbox, so nothing
   traverses the session proxy.
+
+## oalders-playwright-net
+
+- **Hosts:** `cdn.playwright.dev` is the entry point;
+  `playwright.download.prss.microsoft.com` and `playwright.azureedge.net` are
+  its blob hosts.
+- **`storage.googleapis.com`:** `cdn.playwright.dev` 307-redirects the
+  `chromium` (Chrome for Testing) build to the `chrome-for-testing-public` GCS
+  bucket.
+- **GCS scoped to GET/HEAD:** the GCS host is the only download traffic and is
+  a signed GET, so the scope drops it as an upload vector.
+- **Split from `oalders-playwright`:** so the Chromium-bundle filesystem grant
+  can stay net-free.
+- **Wider picture, including the host's breadth:**
+  [nono/CLAUDE.md](CLAUDE.md#net-free-base-vs-network-siblings)
+
+## oalders-playwright
+
+- **`unix_socket_subtree_bind` on `/tmp/claude-1000/pw-mcp`:** nono blocks
+  `bind()` by default, so a bundled-chromium launch dies without this grant for
+  Chromium's ProcessSingleton AF_UNIX socket. The path is the MCP's short
+  `TMPDIR` base, set by the `installer/playwright-mcp.sh` npx wrapper.
+- **Details:**
+  [nono/CLAUDE.md](CLAUDE.md#chromiums-processsingleton-socket-bind)
+
+## oalders-codex
+
+- **Accepted security tradeoff:** the grant includes write to `config.toml`,
+  which Codex on the host trusts. Details:
+  [nono/CLAUDE.md](CLAUDE.md#codex-under-the-sandbox)
+- **Contents:** config, ChatGPT login, SQLite state, sessions, tmp.
+- **Net-free:** OpenAI hosts live in `oalders-net`.
