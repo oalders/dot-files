@@ -20,7 +20,7 @@ if ! is there apt; then
 fi
 
 if [[ $IS_SUDOER == false ]]; then
-    echo "Skip earlyoom.sh (Not a sudoer)"
+    skip_not_sudoer
     exit 0
 fi
 

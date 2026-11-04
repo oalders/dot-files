@@ -13,7 +13,7 @@ if is os name ne linux; then
 fi
 
 if [[ $IS_SUDOER == false ]]; then
-    echo "Skip linux.sh (Not a sudoer)"
+    skip_not_sudoer
     exit 0
 fi
 

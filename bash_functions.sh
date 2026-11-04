@@ -84,6 +84,10 @@ if [[ ! ${IS_SUDOER-} ]]; then
     fi
 fi
 
+skip_not_sudoer() {
+    echo "Skip $(basename "$0") (no passwordless sudo; try: sudo -v && IS_SUDOER=true $0)"
+}
+
 rename_tab() {
     if test "${TMUX_PANE+x}"; then
         echo -en "\033Ptmux;\033\033]0;$1\a\033\\"
