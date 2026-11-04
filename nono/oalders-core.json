@@ -45,6 +45,7 @@
     "read_file": [
       "/etc/bash.bashrc",
       "/etc/gitconfig",
+      "/etc/magic",
       "~/.bashrc",
       "~/.docker/config.json",
       "~/.editorconfig",
