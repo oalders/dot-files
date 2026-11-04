@@ -28,7 +28,7 @@ esac'
     run "$BIN_DIR/tm"
 
     [ "$status" -eq 0 ]
-    [ "$(cat "$TMUX_LOG")" = "attach -t muevelo/fix-1862     Load-sensitive fast tests still fail make" ]
+    [ "$(cat "$TMUX_LOG")" = "attach-session -t muevelo/fix-1862     Load-sensitive fast tests still fail make" ]
 }
 
 @test "switches rather than attaches when already inside tmux" {
@@ -38,7 +38,7 @@ esac'
     run "$BIN_DIR/tm"
 
     [ "$status" -eq 0 ]
-    [ "$(cat "$TMUX_LOG")" = "switch -t muevelo/fix-1862     Load-sensitive fast tests still fail make" ]
+    [ "$(cat "$TMUX_LOG")" = "switch-client -t muevelo/fix-1862     Load-sensitive fast tests still fail make" ]
 }
 
 @test "cancelling the picker leaves tmux alone" {
