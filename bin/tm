@@ -13,7 +13,7 @@ fi
 
 # --exact: session names embed issue titles, and fuzzy scoring (fzf's and gum's)
 # can rank scattered hits in a title above a direct match.
-session=$(tmux list-sessions -F \#S | fzf --exact --reverse --no-multi --prompt="Pick any session! ")
+session=$(tmux list-sessions -F \#S | fzf --exact --reverse --no-multi --color="bg+:#292c42,gutter:-1" --prompt="Pick any session! ")
 subcommand=attach-session
 
 if [ -z "$session" ]; then
