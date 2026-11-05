@@ -24,3 +24,18 @@ on the host, **outside** the sandbox: tell the user to run
 `~/dot-files/installer/playwright-mcp.sh` to refresh the bundle, then re-run.
 Normal test runs against an already-seeded browser work read-only and need no
 change.
+
+## Attribution trailer on GitHub writes
+
+`gh` is wrapped (`~/dot-files/bin/gh`) and refuses issue, PR, review and
+comment bodies, including a `gh api` top-level `body`, that don't end with
+this line. It only validates and never appends it, so write it yourself, naming
+the model you are running as:
+
+```text
+🤖 Generated with [Claude Code](https://claude.com/claude-code) · <Model>
+```
+
+This replaces any trailer the harness suggests; one without the `· <Model>`
+suffix is refused. Reviews and review replies use `🤖 Review by …` instead.
+Scope and exemptions are in the `bin/gh` header.
