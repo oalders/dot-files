@@ -71,7 +71,8 @@ if is os name eq darwin && [ -d '/Applications/Meld.app' ]; then
 fi
 
 # Versioned hooks; core.hooksPath replaces .git/hooks entirely.
-if [[ "$(git -C ~/dot-files config --local --get core.hooksPath || true)" != .githooks ]]; then
+if git -C ~/dot-files rev-parse --git-dir >/dev/null 2>&1 &&
+    [[ "$(git -C ~/dot-files config --local --get core.hooksPath || true)" != .githooks ]]; then
     git -C ~/dot-files config core.hooksPath .githooks
 fi
 
