@@ -4,6 +4,7 @@ load 'helpers.bash'
 
 setup() {
     setup_sandbox
+    # All `is` checks false, so the script never reaches sudo apt-get or git lfs install.
     stub_command is 'exit 1'
     FAKE_HOME="$BATS_TEST_TMPDIR/home"
     mkdir -p "$FAKE_HOME/dot-files"
