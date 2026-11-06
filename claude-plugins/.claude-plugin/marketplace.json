@@ -1,0 +1,37 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "dot-files",
+  "description": "Local Claude Code plugins for Olaf's dot-files",
+  "owner": {
+    "name": "Olaf Alders"
+  },
+  "plugins": [
+    {
+      "name": "bash-perl-lsp",
+      "description": "Bash and Perl language servers for code intelligence",
+      "version": "1.0.0",
+      "source": "./plugins/bash-perl-lsp",
+      "category": "development",
+      "strict": false,
+      "lspServers": {
+        "bash": {
+          "command": "bash-language-server",
+          "args": ["start"],
+          "extensionToLanguage": {
+            ".sh": "shellscript",
+            ".bash": "shellscript"
+          }
+        },
+        "perl": {
+          "command": "perlnavigator",
+          "args": ["--stdio"],
+          "extensionToLanguage": {
+            ".pl": "perl",
+            ".pm": "perl",
+            ".t": "perl"
+          }
+        }
+      }
+    }
+  ]
+}

@@ -56,7 +56,7 @@ at an endpoint it chose and mark it current, and a later **un-sandboxed**
 `docker buildx build` on the host would ship that build context (source, `.env`
 files) to the endpoint. So `bin/nn` exports `BUILDX_CONFIG="$PWD/.tmp/buildx"`
 whenever the resolved profile lists `oalders-docker` — the same redirect it does
-for `SERENA_HOME` and `ANSIBLE_LOCAL_TEMP` — and the profile grants no
+for `ANSIBLE_LOCAL_TEMP` — and the profile grants no
 `~/.docker` write at all. `.tmp` is covered by `--allow-cwd`; the only trade-off
 is that builders no longer persist across worktrees. `~/.docker/contexts` is
 kept read-only for the same reason.

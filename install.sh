@@ -72,7 +72,7 @@ run_general_installers() {
         ./configure/bat.sh
         ./installer/claude.sh
         ./configure/claude-settings.sh
-        ./configure/serena.sh
+        ./configure/claude-lsp.sh
         ./installer/oh-my-posh.sh
     )
 

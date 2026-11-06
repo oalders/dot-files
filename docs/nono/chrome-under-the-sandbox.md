@@ -25,8 +25,7 @@ The fix is narrow:
   `Default/` (cookies, passwords, sessions) denied — the whole point of
   `deny_browser_data_linux`.
 - A grant can't *create* the dir (its parent stays denied), so `bin/nn`
-  pre-creates it outside the sandbox before launch (same pattern as
-  `.tmp`/`.serena-home`).
+  pre-creates it outside the sandbox before launch (same pattern as `.tmp`).
 
 The crashpad-disabling flags the issue floated (`--disable-crashpad`,
 `--no-crashpad`, `--disable-crash-reporter`, `--disable-features=Crashpad`) do

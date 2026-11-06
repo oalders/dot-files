@@ -30,10 +30,11 @@ claude plugin install kitchen-sink@kitchen-sink
 claude plugin install paad@paad
 claude plugin install playwright@claude-plugins-official
 claude plugin install pr-review-toolkit@claude-plugins-official
-claude plugin install serena@claude-plugins-official
 claude plugin install superpowers@superpowers-marketplace
 claude plugin install superpowers-chrome@superpowers-marketplace
 claude plugin install superpowers-developing-for-claude-code@superpowers-marketplace
 claude plugin install superpowers-lab@superpowers-marketplace
 claude plugin install talk-about-us@talk-about-us
 claude plugin install typescript-lsp@claude-plugins-official
+# install.sh runs this directly; minimal-install-claude.sh and Dockerfile.dev rely on this call.
+~/dot-files/configure/claude-lsp.sh

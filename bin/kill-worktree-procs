@@ -8,7 +8,7 @@
 #
 # Why this exists: removing a git worktree (via merge-pr, remove-worktree
 # or prune-merged-worktrees) does NOT stop the Claude Code agent sessions
-# running inside it. The session tree is `nono -> claude -> serena-mcp-server`.
+# running inside it. The session tree is `nono -> claude -> MCP servers`.
 # Left behind, those trees accumulate over days, exhaust RAM and cause
 # load-average spikes. The worktree-removal scripts call this helper just
 # before `git worktree remove` so the processes go away with the worktree.

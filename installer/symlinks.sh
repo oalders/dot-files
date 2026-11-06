@@ -102,6 +102,8 @@ ln -sf $prefix/nix/nix.conf ~/.config/nix/nix.conf
 # Read-only so nono's save-profile prompt can't replace a symlink with a
 # serialized copy that a later nono version may fail to parse.
 chmod u+w ~/.config/nono/profiles
+# Serena was removed in #1099; drop its now-dangling links.
+rm -f ~/.config/nono/profiles/oalders-serena.json ~/.config/nono/serena_config.yml
 ln -sf $prefix/nono/oalders-ansible.json ~/.config/nono/profiles/oalders-ansible.json
 ln -sf $prefix/nono/oalders-chrome.json ~/.config/nono/profiles/oalders-chrome.json
 ln -sf $prefix/nono/oalders-codex.json ~/.config/nono/profiles/oalders-codex.json
@@ -117,14 +119,12 @@ ln -sf $prefix/nono/oalders-perl-net.json ~/.config/nono/profiles/oalders-perl-n
 ln -sf $prefix/nono/oalders-perl-test.json ~/.config/nono/profiles/oalders-perl-test.json
 ln -sf $prefix/nono/oalders-playwright.json ~/.config/nono/profiles/oalders-playwright.json
 ln -sf $prefix/nono/oalders-playwright-net.json ~/.config/nono/profiles/oalders-playwright-net.json
-ln -sf $prefix/nono/oalders-serena.json ~/.config/nono/profiles/oalders-serena.json
 ln -sf $prefix/nono/oalders-snap.json ~/.config/nono/profiles/oalders-snap.json
 ln -sf $prefix/nono/oalders-terraform.json ~/.config/nono/profiles/oalders-terraform.json
 ln -sf $prefix/nono/oalders-uv.json ~/.config/nono/profiles/oalders-uv.json
 ln -sf $prefix/nono/oalders.json ~/.config/nono/profiles/oalders.json
 chmod a-w ~/.config/nono/profiles
 ln -sf $prefix/nono/claude-settings.json ~/.config/nono/claude-settings.json
-ln -sf $prefix/nono/serena_config.yml ~/.config/nono/serena_config.yml
 ln -sf $prefix/perlimports/perlimports.toml ~/.config/perlimports/perlimports.toml
 ln -sf $prefix/config/sqlfluff ~/.config/sqlfluff/.sqlfluff
 ln -sf $prefix/re.pl/repl.rc ~/.re.pl/repl.rc

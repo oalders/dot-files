@@ -6,7 +6,6 @@
   "extends": [
     "claude-code",
     "oalders-uv",
-    "oalders-serena",
     "oalders-playwright",
     "oalders-chrome",
     "oalders-codex"
@@ -20,6 +19,7 @@
     "read": [
       "~/.config/gh",
       "~/dot-files/bin",
+      "~/dot-files/claude-plugins",
       "~/dot-files/git",
       "~/dot-files/gitignore_global",
       "~/dot-files/node_modules",

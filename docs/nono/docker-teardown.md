@@ -8,7 +8,7 @@ behind the script; the script keeps only orienting one-liners and points here.
 ## Why it exists
 
 Containers are children of the docker daemon, not of the tmux pane or the
-nono/claude/serena process tree. So neither `kill-worktree-procs` (which walks
+nono/claude process tree. So neither `kill-worktree-procs` (which walks
 `/proc` cwd + nono/claude ancestry) nor `tmux kill-session` touches them. Left
 behind, they keep running with the worktree deleted.
 
