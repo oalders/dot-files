@@ -883,5 +883,6 @@ esac'
     run "$NN"
     [ "$status" -eq 0 ]
     [ ! -e .serena-home ]
+    [ -f "$BATS_TEST_TMPDIR/nono-argv" ]
     ! grep -q '^SERENA_HOME=' "$BATS_TEST_TMPDIR/nono-argv"
 }

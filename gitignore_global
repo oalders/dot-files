@@ -52,6 +52,8 @@ node_modules/
 
 # Per-worktree state created by bin/nn #
 ########################################
+# .serena-home/ predates #1099 but lingers in older worktrees.
+.serena-home/
 .tmp/
 
 **/.claude/settings.local.json

@@ -9,11 +9,11 @@ setup() {
     ln -s "$SCRIPT_DIR" "$HOME/dot-files"
     CALLS="$BATS_TEST_TMPDIR/claude-calls"
     export CALLS
-    # Nothing installed: empty plugin list, `mcp get` fails.
+    # Defaults to nothing installed: empty plugin list, `mcp get` fails.
     stub_command claude 'echo "$*" >>"$CALLS"
 case "$*" in
-"plugin list --json") echo "[]" ;;
-"mcp get serena") exit 1 ;;
+"plugin list --json") echo "${PLUGIN_LIST:-[]}" ;;
+"mcp get serena") [[ -n ${MCP_GET:-} ]] || exit 1; echo "$MCP_GET" ;;
 esac'
     UVX="$HOME/.local/bin/uvx"
 }
@@ -23,6 +23,36 @@ esac'
     [ "$status" -eq 0 ]
     grep -Fxq "plugin install bash-perl-lsp@dot-files" "$CALLS"
     ! grep -Eq "uninstall|mcp remove" "$CALLS"
+}
+
+@test "user-scope serena plugin is uninstalled" {
+    export PLUGIN_LIST='[{"id":"serena@claude-plugins-official","scope":"user"}]'
+    run "$SCRIPT_DIR/configure/claude-lsp.sh"
+    [ "$status" -eq 0 ]
+    grep -Fxq "plugin uninstall serena@claude-plugins-official" "$CALLS"
+}
+
+@test "project-scope serena plugin is left alone" {
+    export PLUGIN_LIST='[{"id":"serena@claude-plugins-official","scope":"project"}]'
+    run "$SCRIPT_DIR/configure/claude-lsp.sh"
+    [ "$status" -eq 0 ]
+    run grep -q uninstall "$CALLS"
+    [ "$status" -eq 1 ]
+}
+
+@test "user-scope serena MCP server is removed" {
+    export MCP_GET='  Scope: User config (available in all your projects)'
+    run "$SCRIPT_DIR/configure/claude-lsp.sh"
+    [ "$status" -eq 0 ]
+    grep -Fxq "mcp remove -s user serena" "$CALLS"
+}
+
+@test "non-user-scope serena MCP server is left alone" {
+    export MCP_GET='  Scope: Local config (private to you in this project)'
+    run "$SCRIPT_DIR/configure/claude-lsp.sh"
+    [ "$status" -eq 0 ]
+    run grep -q "mcp remove" "$CALLS"
+    [ "$status" -eq 1 ]
 }
 
 @test "serena shim present: real uvx is restored" {

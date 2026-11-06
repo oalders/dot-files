@@ -404,7 +404,7 @@ fi
 # there — a compromise that outlives the worktree (#1004). Redirect the state
 # into the worktree-local .tmp (covered by --allow-cwd, so no home write grant)
 # instead; the only trade-off is that builders no longer persist across
-# worktrees, matching the per-worktree .tmp scoping. Gated on the
+# worktrees, an accepted cost of keeping the state out of $HOME. Gated on the
 # resolved profile structurally listing oalders-docker in its extends, same
 # shape as the ansible redirect above.
 docker_env=()
@@ -532,9 +532,9 @@ set -x
 # `playwright install` for a not-yet-seeded build will fail loudly against the
 # read-only path — that's the cue to refresh the bundle on the host.
 #
-# GIT_CEILING_DIRECTORIES stops git from walking up out of .tmp into the
-# worktree's repo: uv once fetched a git dependency from an empty cache dir under
-# .tmp/cache and wrote the result into this repo's origin/HEAD.
+# GIT_CEILING_DIRECTORIES stops git run by tools under .tmp (e.g. uv fetching a
+# git dependency into an empty .tmp/cache dir) from walking up into the
+# worktree's repo; such a fetch once overwrote this repo's origin/HEAD.
 #
 # GIT_CONFIG_* rewrites GitHub SSH remotes to HTTPS with gh as the credential
 # helper: SSH bypasses nono's proxy and fails name resolution at session start,

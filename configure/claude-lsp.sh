@@ -14,7 +14,8 @@ if claude plugin list --json | jq -e 'any(.[]; .id == "serena@claude-plugins-off
     claude plugin uninstall serena@claude-plugins-official
 fi
 
-if claude mcp get serena >/dev/null 2>&1; then
+# `mcp get` also resolves local/project scopes, which `remove -s user` rejects.
+if [[ $(claude mcp get serena 2>/dev/null) == *"Scope: User config"* ]]; then
     claude mcp remove -s user serena
 fi
 

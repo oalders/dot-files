@@ -36,4 +36,5 @@ claude plugin install superpowers-developing-for-claude-code@superpowers-marketp
 claude plugin install superpowers-lab@superpowers-marketplace
 claude plugin install talk-about-us@talk-about-us
 claude plugin install typescript-lsp@claude-plugins-official
+# install.sh runs this directly; minimal-install-claude.sh and Dockerfile.dev rely on this call.
 ~/dot-files/configure/claude-lsp.sh
