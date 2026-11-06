@@ -21,6 +21,7 @@ esac'
 @test "nothing to clean up: exits 0 without uninstalling or removing" {
     run "$SCRIPT_DIR/configure/claude-lsp.sh"
     [ "$status" -eq 0 ]
+    grep -Fxq "plugin marketplace add $HOME/dot-files/claude-plugins" "$CALLS"
     grep -Fxq "plugin install bash-perl-lsp@dot-files" "$CALLS"
     ! grep -Eq "uninstall|mcp remove" "$CALLS"
 }
@@ -57,6 +58,14 @@ esac'
 
 @test "serena shim present: real uvx is restored" {
     echo 'exec serena-mcp-server # oraios/serena' >"$UVX"
+    echo real >"$UVX.real"
+    run "$SCRIPT_DIR/configure/claude-lsp.sh"
+    [ "$status" -eq 0 ]
+    [ "$(cat "$UVX")" = real ]
+    [ ! -e "$UVX.real" ]
+}
+
+@test "only uvx.real present: real uvx is restored" {
     echo real >"$UVX.real"
     run "$SCRIPT_DIR/configure/claude-lsp.sh"
     [ "$status" -eq 0 ]
