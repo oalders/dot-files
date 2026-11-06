@@ -48,7 +48,7 @@ if [ -x "$teardown_docker" ]; then
     "$teardown_docker" "$worktree_path" "$branch_name" || true
 fi
 
-# Kill any agent process trees (nono/claude/serena) still running inside
+# Kill any agent process trees (nono/claude/MCP servers) still running inside
 # the worktree before we remove it. tmux kill-session above only SIGHUPs
 # the pane shell; sandboxed claude trees often survive that.
 killer="$(dirname "${BASH_SOURCE[0]}")/kill-worktree-procs"

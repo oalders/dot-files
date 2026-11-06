@@ -14,9 +14,6 @@ setup() {
     mkdir -p "$HOME/.config/nono"
     # bin/nn reads this with jq; needs to be valid JSON.
     echo '{"sandbox":{"enabled":false}}' > "$HOME/.config/nono/claude-settings.json"
-    # bin/nn cp's this seed into the worktree-local serena home; only
-    # existence matters for the test.
-    echo '{}' > "$HOME/.config/nono/serena_config.yml"
     # Stub nono to dump its argv to a file we can grep.
     stub_command nono 'printf "%s\n" "$@" > "$BATS_TEST_TMPDIR/nono-argv"'
     # Default to "no tailscale IP" so Hugo detection doesn't probe the real
@@ -880,4 +877,11 @@ esac'
     run "$NN"
     [ "$status" -eq 0 ]
     ! grep -q -- "^GH_PATH=" "$BATS_TEST_TMPDIR/nono-argv"
+}
+
+@test "bin/nn no longer seeds a serena home (#1099)" {
+    run "$NN"
+    [ "$status" -eq 0 ]
+    [ ! -e .serena-home ]
+    ! grep -q '^SERENA_HOME=' "$BATS_TEST_TMPDIR/nono-argv"
 }

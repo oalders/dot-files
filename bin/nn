@@ -172,7 +172,7 @@ done
 # nn run picks it up via the same walk-up. Add new stacks by appending a
 # detection block + mixin name. Delete .nono/profile.json to force a
 # re-detect (e.g. after adding a new cpanfile to a previously bare repo).
-# Tool-level always-on siblings (oalders-uv, oalders-serena, oalders-playwright,
+# Tool-level always-on siblings (oalders-uv, oalders-playwright,
 # oalders-chrome) are pulled in via oalders.json's own extends list, so they
 # don't need to live here.
 if [[ -z "$profile" ]]; then
@@ -239,27 +239,6 @@ fi
 # shared /tmp namespace.
 mkdir -p .tmp/cache
 
-# Worktree-local serena home. Two problems we're working around:
-#   1. Without SERENA_HOME, serena reads ~/.serena's host-wide
-#      registered_projects on startup and crashes on any path outside the
-#      sandbox (Permission denied on project.yml).
-#   2. Serena's default config sets web_dashboard: true, which tries to bind
-#      a port from 24282 upward — Landlock blocks listen(), so serena exits
-#      with "No free ports found". The dashboard's also pointless headless.
-# Always overwrite with the seed: keeps the per-worktree registry empty and
-# the dashboard disabled, single source of truth in nono/serena_config.yml.
-mkdir -p .serena-home
-seed="$HOME/.config/nono/serena_config.yml"
-if [[ ! -e $seed ]]; then
-    # installer/symlinks.sh creates this, but self-heal here so a fresh
-    # `git pull` doesn't require re-running the installer before the next
-    # nn launch. bin/nn runs outside the sandbox, so writing under
-    # ~/.config/nono is allowed.
-    mkdir -p "$(dirname "$seed")"
-    ln -sf "$HOME/dot-files/nono/serena_config.yml" "$seed"
-fi
-cp "$seed" .serena-home/serena_config.yml
-
 # Decide which browser MCPs to enable for this session:
 #   - superpowers-chrome: only when --chrome was passed (general-purpose web,
 #     opt-in per-session so idle sandboxes don't spawn Chromium MCPs).
@@ -323,7 +302,7 @@ echo "🗯️nn: using settings $settings_label" >&2
 #      oalders-chrome.json grants + bypass-protects exactly that subdir (the
 #      sensitive cookies/sessions under Default/ stay denied), but a grant
 #      can't create the dir (its parent stays denied), so pre-create it here,
-#      outside the sandbox, the same way .tmp/.serena-home are seeded above.
+#      outside the sandbox, the same way .tmp is seeded above.
 #
 #   2. DevTools port: the MCP serves DevTools over a localhost TCP port
 #      (default range 9222-12111), but the default chain only opens
@@ -425,7 +404,7 @@ fi
 # there — a compromise that outlives the worktree (#1004). Redirect the state
 # into the worktree-local .tmp (covered by --allow-cwd, so no home write grant)
 # instead; the only trade-off is that builders no longer persist across
-# worktrees, matching the accepted trade-off for serena's memories. Gated on the
+# worktrees, matching the per-worktree .tmp scoping. Gated on the
 # resolved profile structurally listing oalders-docker in its extends, same
 # shape as the ansible redirect above.
 docker_env=()
@@ -554,7 +533,7 @@ set -x
 # read-only path — that's the cue to refresh the bundle on the host.
 #
 # GIT_CEILING_DIRECTORIES stops git from walking up out of .tmp into the
-# worktree's repo: uv once fetched serena from an empty cache dir under
+# worktree's repo: uv once fetched a git dependency from an empty cache dir under
 # .tmp/cache and wrote the result into this repo's origin/HEAD.
 #
 # GIT_CONFIG_* rewrites GitHub SSH remotes to HTTPS with gh as the credential
@@ -598,7 +577,6 @@ NONO_NO_SAVE_PROMPT=1 exec nono run --profile "$profile" --allow-cwd --workdir .
     NN_FNM_RUNTIME_DIR="$PWD/.tmp/run" \
     PLAYWRIGHT_BROWSERS_PATH="$HOME/.cache/ms-playwright" \
     NPM_CONFIG_CACHE="$PWD/.tmp/cache/npm" \
-    SERENA_HOME="$PWD/.serena-home" \
     DISABLE_AUTOUPDATER=1 \
     FORCE_AUTOUPDATE_PLUGINS=1 \
     DISABLE_TELEMETRY=1 \
