@@ -72,6 +72,10 @@ set_env_key FORCE_AUTOUPDATE_PLUGINS 1
 set_env_key DISABLE_TELEMETRY 1
 set_env_key DISABLE_ERROR_REPORTING 1
 
+# Don't load the claude.ai account's connectors (Gmail, Drive, Docs, ...) into
+# every repo; add any MCP server a project needs at project or local scope.
+set_env_key ENABLE_CLAUDEAI_MCP_SERVERS false
+
 # Compact automatically instead of needing a manual /compact. Compaction fires
 # at window-33k (20k reserved for output, 13k buffer), and the window itself is
 # clamped to the model max -- so on a 200k model anything above 200000 is a
