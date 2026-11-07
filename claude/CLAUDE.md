@@ -28,14 +28,13 @@ change.
 ## Attribution trailer on GitHub writes
 
 `gh` is wrapped (`~/dot-files/bin/gh`) and refuses issue, PR, review and
-comment bodies, including a `gh api` top-level `body`, that don't end with
-this line. It only validates and never appends it, so write it yourself, naming
-the model you are running as:
+comment bodies that don't end with this line. It only validates and never
+appends it, so write it yourself, naming the model you are running as:
 
 ```text
 🤖 Generated with [Claude Code](https://claude.com/claude-code) · <Model>
 ```
 
 This replaces any trailer the harness suggests; one without the `· <Model>`
-suffix is refused. Reviews and review replies use `🤖 Review by …` instead.
-Scope and exemptions are in the `bin/gh` header.
+suffix is refused. Reviews, their inline comments and review replies use
+`🤖 Review by …` instead. Scope and exemptions are in the `bin/gh` header.
