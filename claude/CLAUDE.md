@@ -28,9 +28,8 @@ change.
 ## Attribution trailer on GitHub writes
 
 `gh` is wrapped (`~/dot-files/bin/gh`) and refuses issue, PR, review and
-comment bodies, including inline review comments, that don't end with this
-line. It only validates and never appends it, so write it yourself, naming
-the model you are running as:
+comment bodies that don't end with this line. It only validates and never
+appends it, so write it yourself, naming the model you are running as:
 
 ```text
 🤖 Generated with [Claude Code](https://claude.com/claude-code) · <Model>

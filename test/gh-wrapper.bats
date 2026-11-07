@@ -314,7 +314,8 @@ assert_refused() {
     gh_run api repos/o/r/pulls/1/reviews --input "$json"
     assert_passed
     gh_run api repos/o/r/pulls/1/reviews -f "body=$REV" \
-        -f 'comments[][path]=f' -f 'comments[][body]=nit'
+        -f 'comments[][path]=f' -f 'comments[][body]=nit' \
+        -f 'comments[][path]=g' -f "comments[][body]=$REV"
     assert_refused
     gh_run api repos/o/r/pulls/1/reviews -f "body=$REV" \
         -f 'comments[][path]=f' -f "comments[][body]=$REV"
@@ -436,6 +437,8 @@ assert_refused() {
     q='mutation($b: String!, $t: DraftPullRequestReviewThread!) { addPullRequestReview(input: {pullRequestId: "x", body: $b, threads: [$t]}) { clientMutationId } }'
     gh_run api graphql -f "query=$q" -f "b=$REV" -f 't[path]=f' -f 't[body]=nit'
     assert_refused
+    gh_run api graphql -f "query=$q" -f "b=$REV" -f 't[path]=f' -f "t[body]=$REV"
+    assert_passed
     gh_run api graphql -f 'query={ viewer { login } }'
     assert_passed
 }
