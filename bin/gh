@@ -588,13 +588,14 @@ for my $f (@$found) {
         $input = eval { JSON::PP->new->utf8->decode($raw) };
         if ( ref $input ) {
             my @todo = ($input);
-            while ( defined( my $v = shift @todo ) ) {
+            while (@todo) {
+                my $v = shift @todo;
                 if ( ref $v eq 'HASH' ) {
                     push @todo,   values %$v;
                     push @bodies, grep {defined} json_str( $v->{body} );
                 }
                 elsif ( ref $v eq 'ARRAY' ) { push @todo, @$v }
-                elsif ( !ref $v ) {
+                elsif ( defined $v && !ref $v ) {
                     utf8::encode( my $s = $v );
                     check_leak($s);
                 }

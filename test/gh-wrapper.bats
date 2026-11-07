@@ -316,6 +316,19 @@ assert_refused() {
     gh_run api repos/o/r/pulls/1/reviews -f "body=$REV" \
         -f 'comments[][path]=f' -f 'comments[][body]=nit'
     assert_refused
+    gh_run api repos/o/r/pulls/1/reviews -f "body=$REV" \
+        -f 'comments[][path]=f' -f "comments[][body]=$REV"
+    assert_passed
+}
+
+@test "api --input JSON nulls don't stop the walk" {
+    # The escaped `\/` slips past the raw-text check; only the walk sees it.
+    json="$BATS_TEST_TMPDIR/in.json"
+    jq -cn --arg r "$REV" \
+        '{body: $r, comments: [{path: "f", line: null, body: $r}, {path: "LEAK", body: $r}]}' |
+        sed 's|LEAK|claude.ai\\/code\\/session_x|' >"$json"
+    gh_run api repos/o/r/pulls/1/reviews --input "$json"
+    assert_refused
 }
 
 @test "api -F body=@file reads the file; -f body=@file is a literal" {
