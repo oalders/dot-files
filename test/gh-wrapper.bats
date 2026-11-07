@@ -297,6 +297,39 @@ assert_refused() {
     assert_refused
     gh_run api -X POST repos/o/r/pulls/1/comments/5/replies -f "body=$REV"
     assert_passed
+    gh_run api -X POST repos/o/r/pulls/1/comments -f "body=$GEN"
+    assert_refused
+    gh_run api -X PATCH repos/o/r/pulls/comments/5 -f "body=$GEN"
+    assert_refused
+    gh_run api -X PATCH repos/o/r/pulls/comments/5 -f "body=$REV"
+    assert_passed
+}
+
+@test "api inline review comments need the Review by trailer" {
+    json="$BATS_TEST_TMPDIR/in.json"
+    jq -cn --arg b "$REV" '{body: $b, comments: [{path: "f", body: "nit"}]}' >"$json"
+    gh_run api repos/o/r/pulls/1/reviews --input "$json"
+    assert_refused
+    jq -cn --arg b "$REV" '{body: $b, comments: [{path: "f", body: $b}]}' >"$json"
+    gh_run api repos/o/r/pulls/1/reviews --input "$json"
+    assert_passed
+    gh_run api repos/o/r/pulls/1/reviews -f "body=$REV" \
+        -f 'comments[][path]=f' -f 'comments[][body]=nit' \
+        -f 'comments[][path]=g' -f "comments[][body]=$REV"
+    assert_refused
+    gh_run api repos/o/r/pulls/1/reviews -f "body=$REV" \
+        -f 'comments[][path]=f' -f "comments[][body]=$REV"
+    assert_passed
+}
+
+@test "api --input JSON nulls don't stop the walk" {
+    # The escaped `\/` slips past the raw-text check; only the walk sees it.
+    json="$BATS_TEST_TMPDIR/in.json"
+    jq -cn --arg r "$REV" \
+        '{body: $r, comments: [{path: "f", line: null, body: $r}, {path: "LEAK", body: $r}]}' |
+        sed 's|LEAK|claude.ai\\/code\\/session_x|' >"$json"
+    gh_run api repos/o/r/pulls/1/reviews --input "$json"
+    assert_refused
 }
 
 @test "api -F body=@file reads the file; -f body=@file is a literal" {
@@ -395,9 +428,16 @@ assert_refused() {
     assert_passed
 }
 
-@test "graphql bodies inside lists and plain queries need no trailer" {
+@test "graphql bodies inside lists need the trailer; plain queries don't" {
     q='mutation($b: String!, $t: String!) { addPullRequestReview(input: {pullRequestId: "x", body: $b, threads: [{path: "f", body: $t}]}) { clientMutationId } }'
     gh_run api graphql -f "query=$q" -f "b=$REV" -f t=nit
+    assert_refused
+    gh_run api graphql -f "query=$q" -f "b=$REV" -f "t=$REV"
+    assert_passed
+    q='mutation($b: String!, $t: DraftPullRequestReviewThread!) { addPullRequestReview(input: {pullRequestId: "x", body: $b, threads: [$t]}) { clientMutationId } }'
+    gh_run api graphql -f "query=$q" -f "b=$REV" -f 't[path]=f' -f 't[body]=nit'
+    assert_refused
+    gh_run api graphql -f "query=$q" -f "b=$REV" -f 't[path]=f' -f "t[body]=$REV"
     assert_passed
     gh_run api graphql -f 'query={ viewer { login } }'
     assert_passed
