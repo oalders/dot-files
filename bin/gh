@@ -19,10 +19,10 @@
 # <Model> is whichever model writes the body (e.g. Opus 5.5, Sonnet 5); any
 # Opus/Sonnet/Haiku/Fable name passes.
 #
-# "Review by" is required for reviews and review replies, "Generated with"
-# elsewhere. Merge commit bodies, release notes and titles need no trailer,
-# but like every body they are refused if they hold a Claude Code session
-# link or id.
+# "Review by" is required for reviews, their inline comments, and review
+# replies, "Generated with" elsewhere. Merge commit bodies, release notes and
+# titles need no trailer, but like every body they are refused if they hold a
+# Claude Code session link or id.
 #
 # Trailer scope: `issue`/`pr` create|new|edit|comment|close, `pr review`,
 # `pr merge`, `release` create|edit, and `gh api` POST/PATCH/PUT to comment/
@@ -574,8 +574,10 @@ run_real(@argv)
     || !grep { index( $endpoint, $_ ) >= 0 } @API_ENDPOINT_NEEDLES );
 
 # Resolve every field to its content; `-F key=@file` reads a file. All of it is
-# scanned for session links, and %field keeps the content by key.
+# scanned for session links, and %field keeps the content by key. @bodies
+# keeps every nested or repeated `body`, which %field would collapse.
 my %field;
+my @bodies;
 my $input;
 for my $f (@$found) {
     my $val = value_of( \@argv, $f );
@@ -587,7 +589,10 @@ for my $f (@$found) {
         if ( ref $input ) {
             my @todo = ($input);
             while ( defined( my $v = shift @todo ) ) {
-                if    ( ref $v eq 'HASH' )  { push @todo, values %$v }
+                if ( ref $v eq 'HASH' ) {
+                    push @todo,   values %$v;
+                    push @bodies, grep {defined} json_str( $v->{body} );
+                }
                 elsif ( ref $v eq 'ARRAY' ) { push @todo, @$v }
                 elsif ( !ref $v ) {
                     utf8::encode( my $s = $v );
@@ -605,6 +610,7 @@ for my $f (@$found) {
     }
     check_leak($content);
     $field{$key} = $content;
+    push @bodies, $content if $key =~ /(?:^body|\[body\])\z/;
 }
 
 # A JSON string value as bytes, or undef.
@@ -617,21 +623,16 @@ sub json_str {
 
 if ( !$graphql ) {
     my $verb
-        = $endpoint =~ m{/(?:reviews|replies)\b}
+        = $endpoint =~ m{/(?:reviews|replies)\b|/pulls/(?:\d+/)?comments\b}
         ? 'Review by'
         : 'Generated with';
-
-    # Only a top-level body needs the trailer; inline review comments[] don't.
-    check( $field{body}, $verb ) if defined $field{body};
-    my $body = ref $input eq 'HASH' ? json_str( $input->{body} ) : undef;
-    check( $body, $verb ) if defined $body;
+    check( $_, $verb ) for @bodies;
     run_real(@argv);
 }
 
 # GraphQL: a mutation's body must come from a variable (`body: $x`), so it can
 # be checked; inline string bodies are refused. Variables come from fields or
-# --input's "variables"; `input: $in` with `in[body]=...` is followed too. As
-# on REST, bodies inside lists (review threads[]) need no trailer.
+# --input's "variables"; any other `body` field or key is checked too.
 my $vars
     = ref $input eq 'HASH' && ref $input->{variables} eq 'HASH'
     ? $input->{variables}
@@ -650,27 +651,17 @@ guard_targets(
 $q =~ tr/,/ /;
 block('pass GraphQL mutation bodies as a variable (body: $body, -f body=...)')
     if $q =~ /\bbody\s*:\s*"/;
-$q =~ s/"(?:[^"\\]|\\.)*"/""/gs;    # strings can't unbalance the [ ] count
+$q =~ s/"(?:[^"\\]|\\.)*"/""/gs;    # so strings can't fake a verb or body
 
 my $verb
     = $q =~ /\b\w*(?:PullRequestReview|ReviewThreadReply)\w*\s*\(/
     ? 'Review by'
     : 'Generated with';
 while ( $q =~ /\bbody\s*:\s*\$(\w+)/g ) {
-    my $var    = $1;
-    my $before = substr $q, 0, $-[0];
-    next if ( () = $before =~ /\[/g ) > ( () = $before =~ /\]/g );
-    my @bodies = grep { defined } $field{$var}, json_str( $vars->{$var} );
-    block("supply the GraphQL variable \$$var holding the body") if !@bodies;
-    check( $_, $verb ) for @bodies;
+    my $var = $1;
+    my @vals = grep { defined } $field{$var}, json_str( $vars->{$var} );
+    block("supply the GraphQL variable \$$var holding the body") if !@vals;
+    check( $_, $verb ) for @vals;
 }
-for my $var ( $q =~ /\binput\s*:\s*\$(\w+)/g ) {
-    my $in = $vars->{$var};
-    for my $body (
-        $field{"${var}[body]"},
-        ref $in eq 'HASH' ? json_str( $in->{body} ) : undef
-    ) {
-        check( $body, $verb ) if defined $body;
-    }
-}
+check( $_, $verb ) for @bodies;
 run_real(@argv);
