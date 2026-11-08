@@ -14,27 +14,35 @@
   },
   "network": {
     "allow_domain": [
+      "api.flickr.com",
       "api.openverse.org",
+      "api.pexels.com",
+      "api.unsplash.com",
       "code.claude.com",
       "en.wikipedia.org",
       "flickr.com",
       "fosstodon.org",
       "*.fosstodon.org",
+      "images.pexels.com",
+      "images.unsplash.com",
       "media.licdn.com",
       "metacpan.org",
       "*.metacpan.org",
       "mymindisracing.com",
       "neilb.org",
       "openverse.org",
+      "pexels.com",
       "registry.npmjs.org",
       "services.nvd.nist.go",
       "*.staticflickr.com",
       "commons.wikimedia.org",
       "thumb.wikimedia.org",
+      "unsplash.com",
       "upload.wikimedia.org",
       "web.archive.org",
       "www.flickr.com",
-      "www.olafalders.com"
+      "www.olafalders.com",
+      "www.pexels.com"
     ]
   }
 }
