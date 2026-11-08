@@ -17,8 +17,7 @@ setup() {
     export MY_INSIDE_TMUX=false
     unset TMUX_PANE WORKTREE_ROOT
     stub_command pgrep 'exit 1'
-    # Tests use generic branch names so the fix-/gh- branches that call
-    # `gh issue edit` / `gh pr checkout` aren't exercised; stub anyway.
+    # Never hit the real gh; fix-/gh- tests install their own stub.
     stub_command gh 'exit 0'
     export GIT_CEILING_DIRECTORIES
     GIT_CEILING_DIRECTORIES="$(dirname "$BATS_TEST_TMPDIR")"
@@ -229,6 +228,7 @@ EOF
     # silently coexist with a stray checkout.
     stub_command gh 'case "$*" in
         "pr checkout"*) echo "gh pr checkout must not be called for issue branches" >&2; exit 1 ;;
+        "issue view"*) echo "OPEN https://github.com/o/r/issues/952" ;;
         *) exit 0 ;;
     esac'
     run "$ADD_WORKTREE" fix-952
@@ -247,7 +247,7 @@ EOF
     setup_git_repo
     export GH_LOG="$BATS_TEST_TMPDIR/gh.log"
     stub_command gh 'printf "%s\n" "$*" >>"$GH_LOG"
-exit 0'
+case "$*" in "issue view"*) echo "OPEN https://github.com/o/r/issues/952" ;; esac'
     run "$ADD_WORKTREE" fix-952
     [ "$status" -eq 0 ]
     # Created with a traffic-light green color.
@@ -260,6 +260,7 @@ exit 0'
     # script must warn and carry on, not abort worktree setup.
     stub_command gh 'case "$*" in
         "issue edit"*) echo "could not add label: not found" >&2; exit 1 ;;
+        "issue view"*) echo "OPEN https://github.com/o/r/issues/952" ;;
         *) exit 0 ;;
     esac'
     run "$ADD_WORKTREE" fix-952
@@ -279,6 +280,7 @@ exit 0'
     # and carry on to label the issue and finish setup.
     stub_command gh 'case "$*" in
         "label create"*) echo "HTTP 403: Resource not accessible by integration" >&2; exit 1 ;;
+        "issue view"*) echo "OPEN https://github.com/o/r/issues/952" ;;
         *) exit 0 ;;
     esac'
     run "$ADD_WORKTREE" fix-952
@@ -290,6 +292,80 @@ exit 0'
     worktree="$HOME/.worktree/$repo_name/$date_stamp/fix-952"
 
     [ -f "$worktree/.tmp/fix-gh-issue.pending" ]
+}
+
+@test "add-worktree refuses fix-<n> when gh cannot find or check the issue" {
+    setup_git_repo
+    stub_command gh 'case "$*" in
+        "issue view"*) echo "GraphQL: Could not resolve to an issue or pull request with the number of 999." >&2; exit 1 ;;
+        *) exit 0 ;;
+    esac'
+    run "$ADD_WORKTREE" fix-999
+    [ "$status" -ne 0 ]
+    [[ "$output" == *"Could not resolve"* ]]
+    [[ "$output" == *"add-worktree: could not check issue #999"* ]]
+    [ ! -d "$HOME/.worktree" ]
+}
+
+@test "add-worktree refuses fix-<n> for a closed issue" {
+    setup_git_repo
+    stub_command gh 'case "$*" in
+        "issue view"*) echo "CLOSED https://github.com/o/r/issues/952" ;;
+        *) exit 0 ;;
+    esac'
+    run "$ADD_WORKTREE" fix-952
+    [ "$status" -ne 0 ]
+    [[ "$output" == *"add-worktree: issue #952 is CLOSED, not open"* ]]
+    [ ! -d "$HOME/.worktree" ]
+}
+
+@test "add-worktree refuses fix-<n> when the number is a pull request" {
+    setup_git_repo
+    stub_command gh 'case "$*" in
+        "issue view"*) echo "MERGED https://github.com/o/r/pull/952" ;;
+        *) exit 0 ;;
+    esac'
+    run "$ADD_WORKTREE" fix-952
+    [ "$status" -ne 0 ]
+    [[ "$output" == *"add-worktree: #952 is a pull request, not an issue"* ]]
+    [ ! -d "$HOME/.worktree" ]
+}
+
+@test "add-worktree refuses gh-<n> for a missing PR" {
+    setup_git_repo
+    stub_command gh 'case "$*" in
+        "pr view"*) echo "no pull requests found" >&2; exit 1 ;;
+        *) exit 0 ;;
+    esac'
+    run "$ADD_WORKTREE" gh-999
+    [ "$status" -ne 0 ]
+    [[ "$output" == *"add-worktree: could not check PR #999"* ]]
+    [ ! -d "$HOME/.worktree" ]
+}
+
+@test "add-worktree accepts gh-<n> for a closed PR" {
+    setup_git_repo
+    stub_command gh 'case "$*" in
+        "pr view"*) echo "{\"number\":42,\"state\":\"CLOSED\"}" ;;
+        *) exit 0 ;;
+    esac'
+    run "$ADD_WORKTREE" gh-42
+    [ "$status" -eq 0 ]
+    [ -d "$HOME/.worktree/$(basename "$REPO_DIR")/$(date +%Y-%m-%d)/gh-42" ]
+}
+
+@test "add-worktree creates no worktree when any branch names a bad issue" {
+    setup_git_repo
+    _stub_tmux_env
+    export TMUX_PANE="%0"
+    stub_command gh 'case "$*" in
+        "issue view"*) echo "Could not resolve to an issue" >&2; exit 1 ;;
+        *) exit 0 ;;
+    esac'
+    run "$ADD_WORKTREE" feature-a fix-999
+    [ "$status" -ne 0 ]
+    [[ "$output" == *"add-worktree: could not check issue #999"* ]]
+    [ ! -d "$HOME/.worktree" ]
 }
 
 @test "add-worktree removes the main checkout's .claude/settings.local.json" {

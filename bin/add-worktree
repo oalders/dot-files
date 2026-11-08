@@ -44,6 +44,31 @@ else
     repo_root="$(cd "$git_dir/.." && pwd)"
 fi
 
+# Check every number up front so a typo can't leave a worktree behind (#1104).
+for arg in "$@"; do
+    if [[ $arg =~ ^fix-([0-9]+)$ ]]; then
+        n="${BASH_REMATCH[1]}"
+        if ! state=$(gh issue view "$n" --json state,url --jq '.state + " " + .url'); then
+            echo "add-worktree: could not check issue #$n" >&2
+            exit 1
+        fi
+        if [[ $state == */pull/* ]]; then
+            echo "add-worktree: #$n is a pull request, not an issue" >&2
+            exit 1
+        fi
+        if [[ ${state%% *} != OPEN ]]; then
+            echo "add-worktree: issue #$n is ${state%% *}, not open" >&2
+            exit 1
+        fi
+    elif [[ $arg =~ ^gh-([0-9]+)$ ]]; then
+        n="${BASH_REMATCH[1]}"
+        if ! gh pr view "$n" --json number >/dev/null; then
+            echo "add-worktree: could not check PR #$n" >&2
+            exit 1
+        fi
+    fi
+done
+
 # Resolve before the cd below so a relative root means relative to the caller.
 worktree_root="${WORKTREE_ROOT:-$HOME/.worktree}"
 mkdir -p "$worktree_root"
@@ -164,8 +189,8 @@ setup_branch() {
     elif [[ "$type" == "issue" ]]; then
         # The "in progress" label may not exist in the repo yet. Try to create
         # it first, then label the issue. Neither step should abort worktree
-        # setup: if we lack permission (or the label already exists, or the
-        # issue can't be found), warn and carry on.
+        # setup: if we lack permission (or the label already exists), warn and
+        # carry on.
         # 2ECC40 is a traffic-light green.
         if ! label_out=$(gh label create "in progress" --color 2ECC40 2>&1); then
             case $label_out in
