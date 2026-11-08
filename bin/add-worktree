@@ -63,7 +63,7 @@ for arg in "$@"; do
     elif [[ $arg =~ ^gh-([0-9]+)$ ]]; then
         n="${BASH_REMATCH[1]}"
         if ! gh pr view "$n" --json number >/dev/null; then
-            echo "add-worktree: could not find PR #$n" >&2
+            echo "add-worktree: could not check PR #$n" >&2
             exit 1
         fi
     fi

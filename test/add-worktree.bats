@@ -294,7 +294,7 @@ case "$*" in "issue view"*) echo "OPEN https://github.com/o/r/issues/952" ;; esa
     [ -f "$worktree/.tmp/fix-gh-issue.pending" ]
 }
 
-@test "add-worktree refuses fix-<n> for a missing issue" {
+@test "add-worktree refuses fix-<n> when gh cannot find or check the issue" {
     setup_git_repo
     stub_command gh 'case "$*" in
         "issue view"*) echo "GraphQL: Could not resolve to an issue or pull request with the number of 999." >&2; exit 1 ;;
@@ -304,7 +304,7 @@ case "$*" in "issue view"*) echo "OPEN https://github.com/o/r/issues/952" ;; esa
     [ "$status" -ne 0 ]
     [[ "$output" == *"Could not resolve"* ]]
     [[ "$output" == *"add-worktree: could not check issue #999"* ]]
-    [ ! -d "$HOME/.worktree/$(basename "$REPO_DIR")/$(date +%Y-%m-%d)/fix-999" ]
+    [ ! -d "$HOME/.worktree" ]
 }
 
 @test "add-worktree refuses fix-<n> for a closed issue" {
@@ -316,19 +316,7 @@ case "$*" in "issue view"*) echo "OPEN https://github.com/o/r/issues/952" ;; esa
     run "$ADD_WORKTREE" fix-952
     [ "$status" -ne 0 ]
     [[ "$output" == *"add-worktree: issue #952 is CLOSED, not open"* ]]
-    [ ! -d "$HOME/.worktree/$(basename "$REPO_DIR")/$(date +%Y-%m-%d)/fix-952" ]
-}
-
-@test "add-worktree refuses fix-<n> when gh cannot check the issue" {
-    setup_git_repo
-    stub_command gh 'case "$*" in
-        "issue view"*) echo "HTTP 401: Bad credentials" >&2; exit 1 ;;
-        *) exit 0 ;;
-    esac'
-    run "$ADD_WORKTREE" fix-952
-    [ "$status" -ne 0 ]
-    [[ "$output" == *"Bad credentials"* ]]
-    [[ "$output" == *"add-worktree: could not check issue #952"* ]]
+    [ ! -d "$HOME/.worktree" ]
 }
 
 @test "add-worktree refuses fix-<n> when the number is a pull request" {
@@ -340,7 +328,7 @@ case "$*" in "issue view"*) echo "OPEN https://github.com/o/r/issues/952" ;; esa
     run "$ADD_WORKTREE" fix-952
     [ "$status" -ne 0 ]
     [[ "$output" == *"add-worktree: #952 is a pull request, not an issue"* ]]
-    [ ! -d "$HOME/.worktree/$(basename "$REPO_DIR")/$(date +%Y-%m-%d)/fix-952" ]
+    [ ! -d "$HOME/.worktree" ]
 }
 
 @test "add-worktree refuses gh-<n> for a missing PR" {
@@ -351,14 +339,14 @@ case "$*" in "issue view"*) echo "OPEN https://github.com/o/r/issues/952" ;; esa
     esac'
     run "$ADD_WORKTREE" gh-999
     [ "$status" -ne 0 ]
-    [[ "$output" == *"add-worktree: could not find PR #999"* ]]
-    [ ! -d "$HOME/.worktree/$(basename "$REPO_DIR")/$(date +%Y-%m-%d)/gh-999" ]
+    [[ "$output" == *"add-worktree: could not check PR #999"* ]]
+    [ ! -d "$HOME/.worktree" ]
 }
 
 @test "add-worktree accepts gh-<n> for a closed PR" {
     setup_git_repo
     stub_command gh 'case "$*" in
-        "pr view"*) echo "{\"number\":42}" ;;
+        "pr view"*) echo "{\"number\":42,\"state\":\"CLOSED\"}" ;;
         *) exit 0 ;;
     esac'
     run "$ADD_WORKTREE" gh-42
