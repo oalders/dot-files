@@ -91,14 +91,14 @@ assert_refused() {
 }
 
 @test "any model family and version is accepted" {
-    for m in 'Sonnet 5' 'Haiku 4.5' 'Fable 5.1' 'Opus 4'; do
+    for m in 'Sonnet 5' 'Haiku 4.5' 'Fable 5.1' 'Opus 4' 'Claude Opus 5.5'; do
         gh_run pr comment 1 --body $'hi\n\n🤖 Generated with '"$ANCHOR · $m"
         assert_passed
     done
 }
 
 @test "a trailer without a recognised model is refused" {
-    for m in '' ' · Opus' ' · GPT 5' ' · opus 5.5'; do
+    for m in '' ' · Opus' ' · GPT 5' ' · opus 5.5' ' · Claude' ' · Claude GPT 5'; do
         gh_run pr comment 1 --body $'hi\n\n🤖 Generated with '"$ANCHOR$m"
         assert_refused
     done

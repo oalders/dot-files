@@ -17,7 +17,7 @@
 #   🤖 Review by [Claude Code](https://claude.com/claude-code) · <Model>
 #
 # <Model> is whichever model writes the body (e.g. Opus 5.5, Sonnet 5); any
-# Opus/Sonnet/Haiku/Fable name passes.
+# Opus/Sonnet/Haiku/Fable name passes, with or without a leading "Claude".
 #
 # "Review by" is required for reviews, their inline comments, and review
 # replies, "Generated with" elsewhere. Merge commit bodies, release notes and
@@ -48,7 +48,7 @@ use POSIX      ();
 my $ANCHOR = '[Claude Code](https://claude.com/claude-code)';
 my $ROBOT  = "\xF0\x9F\xA4\x96";
 my $DOT    = "\xC2\xB7";
-my $MODEL  = qr/(?:Opus|Sonnet|Haiku|Fable) \d+(?:\.\d+)?/;
+my $MODEL  = qr/(?:Claude )?(?:Opus|Sonnet|Haiku|Fable) \d+(?:\.\d+)?/;
 
 # Endpoints whose `gh api` write bodies are user-visible GitHub content.
 my @API_ENDPOINT_NEEDLES = qw( /comments /issues /pulls /reviews /replies );
