@@ -4,7 +4,7 @@
     "description": "Net-free shared base: always-on MCP/runtime siblings, security policy, and cross-cutting filesystem grants. Holds no network rules so permissive profiles can compose it without inheriting an allowlist."
   },
   "extends": [
-    "claude-code",
+    "nolabs-ai/claude",
     "oalders-uv",
     "oalders-playwright",
     "oalders-chrome",
