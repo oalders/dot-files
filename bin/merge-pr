@@ -461,7 +461,20 @@ if [[ -z $no_pr ]]; then
                 case "$(classify_status "$pre_status" "$baseline_removed")" in
                 queued) echo "merge-pr: PR already in the merge queue — waiting" ;;
                 automerge) echo "merge-pr: auto-merge already enabled — waiting" ;;
-                *) gh pr merge "${gh_args[@]}" ;;
+                *)
+                    merge_status=0
+                    gh pr merge "${gh_args[@]}" || merge_status=$?
+                    if [[ $merge_status -ne 0 ]]; then
+                        # Checked only after a failure: GitHub computes
+                        # mergeable lazily, so a pre-check could block a merge
+                        # that would succeed.
+                        if [[ $(gh pr view "$pr_number" --json mergeable -q .mergeable 2>/dev/null) == CONFLICTING ]]; then
+                            echo "merge-pr: PR #$pr_number has merge conflicts with $pr_base — nothing torn down" >&2
+                            echo "          merge or rebase origin/$pr_base, push, and re-run merge-pr" >&2
+                        fi
+                        exit "$merge_status"
+                    fi
+                    ;;
                 esac
                 pre_wait_head=$(git rev-parse HEAD)
                 wait_for_merge "$baseline_removed"

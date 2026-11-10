@@ -1340,14 +1340,29 @@ ISSUE2=https://github.com/o/r/issues/2
 # merge-pr's `state|in_queue|position|auto_merge|head_checks|removed_id|
 # removed_reason|url` format. A FAIL line makes that probe exit 1, and a
 # non-empty on-probe-<n> file is sourced on the n-th probe for side effects.
+# A merge-fails file makes `gh pr merge` exit 3. `gh pr view --json mergeable`
+# prints the mergeable file, or exits 1 if a mergeable-fails file exists.
 # Usage: _queue_stub <probe-line>...   (one line per successive probe)
 _queue_stub() {
     printf '%s\n' "$@" >"$BATS_TEST_TMPDIR/probes"
     stub_command gh '
 echo "$*" >>"$BATS_TEST_TMPDIR/gh.log"
 case "$1 $2" in
-    "pr view") printf "OPEN\tmain\t7\n" ;;
-    "pr merge") : >"$BATS_TEST_TMPDIR/merge-was-called" ;;
+    "pr view")
+        if [[ "$*" == *"--json mergeable"* ]]; then
+            [[ -e "$BATS_TEST_TMPDIR/mergeable-fails" ]] && exit 1
+            cat "$BATS_TEST_TMPDIR/mergeable"
+        else
+            printf "OPEN\tmain\t7\n"
+        fi
+        ;;
+    "pr merge")
+        if [[ -e "$BATS_TEST_TMPDIR/merge-fails" ]]; then
+            echo "GraphQL: Pull Request is not mergeable (mergePullRequest)" >&2
+            exit 3
+        fi
+        : >"$BATS_TEST_TMPDIR/merge-was-called"
+        ;;
     "api graphql")
         n=$(( $(cat "$BATS_TEST_TMPDIR/probe-count" 2>/dev/null || echo 0) + 1 ))
         echo "$n" >"$BATS_TEST_TMPDIR/probe-count"
@@ -1445,6 +1460,43 @@ _queue_setup() {
     run "$MERGE_PR" -s
     [ "$status" -eq 1 ]
     [[ "$output" == *"could not read PR status from GitHub 5 times in a row — nothing torn down"* ]]
+    [ -d "$WORKTREE_DIR" ]
+}
+
+@test "merge failure: a conflict says so plainly and tears nothing down" {
+    _queue_setup 'OPEN|false||false|SUCCESS|||u'
+    : >"$BATS_TEST_TMPDIR/merge-fails"
+    echo CONFLICTING >"$BATS_TEST_TMPDIR/mergeable"
+    run "$MERGE_PR" -s
+    [ "$status" -eq 3 ]
+    grep -q "pr view 7 --json mergeable" "$BATS_TEST_TMPDIR/gh.log"
+    [[ "$output" == *"Pull Request is not mergeable"* ]]
+    [[ "$output" == *"merge-pr: PR #7 has merge conflicts with main — nothing torn down"* ]]
+    [[ "$output" == *"merge or rebase origin/main, push, and re-run merge-pr"* ]]
+    [ -d "$WORKTREE_DIR" ]
+}
+
+@test "merge failure: a non-conflict failure does not mention conflicts" {
+    _queue_setup 'OPEN|false||false|SUCCESS|||u'
+    : >"$BATS_TEST_TMPDIR/merge-fails"
+    echo MERGEABLE >"$BATS_TEST_TMPDIR/mergeable"
+    run "$MERGE_PR" -s
+    [ "$status" -eq 3 ]
+    grep -q "pr view 7 --json mergeable" "$BATS_TEST_TMPDIR/gh.log"
+    [[ "$output" == *"Pull Request is not mergeable"* ]]
+    [[ "$output" != *"merge conflicts"* ]]
+    [ -d "$WORKTREE_DIR" ]
+}
+
+@test "merge failure: a failed mergeable lookup keeps gh's status" {
+    _queue_setup 'OPEN|false||false|SUCCESS|||u'
+    : >"$BATS_TEST_TMPDIR/merge-fails"
+    : >"$BATS_TEST_TMPDIR/mergeable-fails"
+    run "$MERGE_PR" -s
+    [ "$status" -eq 3 ]
+    grep -q "pr view 7 --json mergeable" "$BATS_TEST_TMPDIR/gh.log"
+    [[ "$output" == *"Pull Request is not mergeable"* ]]
+    [[ "$output" != *"merge conflicts"* ]]
     [ -d "$WORKTREE_DIR" ]
 }
 
