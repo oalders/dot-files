@@ -265,10 +265,12 @@ _ready_repo() {
     unset TMUX
     stub_command tmux 'exit 0'
     stub_command gh 'printf "MERGED\tmain\n"'
+    # Resolve before the run removes it (macOS /var -> /private/var).
+    expected="$(cd "$WORKTREE_DIR" && pwd -P)"
 
     run "$MERGE_PR"
     [ "$status" -eq 0 ]
-    [ "$(cat "$BATS_TEST_TMPDIR/kill-worktree-procs.args")" = "$WORKTREE_DIR" ]
+    [ "$(cat "$BATS_TEST_TMPDIR/kill-worktree-procs.args")" = "$expected" ]
 }
 
 @test "cleanup: removes a clean worktree without submodules" {

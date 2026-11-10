@@ -91,8 +91,7 @@ session_root() {
     echo "$root"
 }
 
-# Processes we must never kill: this script and its launcher. Our own
-# session tree is spared by skipping self_root below.
+# Never kill this script or its launcher; our own session is skipped via self_root below.
 protected=" $$ ${PPID} "
 self_root="$(session_root "$$")"
 
@@ -116,9 +115,8 @@ if [ -z "$roots" ]; then
     exit 0
 fi
 
-# Expand each session root to its full tree, dropping protected PIDs.
-# Skipping self_root (not snapshotting its descendants) means children it
-# spawns mid-run can't be killed; session trees are disjoint (#1109).
+# Expand each session root to its full tree, dropping protected PIDs. Skip our
+# own root rather than snapshot its tree, which misses later children (#1109).
 victims=""
 for r in $roots; do
     [ "$r" = "$self_root" ] && continue

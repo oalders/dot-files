@@ -8,7 +8,8 @@ setup() {
     # could signal the agent session running these tests.
     ln -s "$BIN_DIR/remove-worktree" "$BIN_DIR/docker-teardown" "$STUB_DIR/"
     REMOVE_WORKTREE="$STUB_DIR/remove-worktree"
-    stub_command kill-worktree-procs 'exit 0'
+    stub_command kill-worktree-procs \
+        'printf "%s\n" "$*" >>"$BATS_TEST_TMPDIR/kill-worktree-procs.args"'
     # No tmux: stub pgrep so the tmux-session-kill block is skipped (an empty
     # `$(pgrep tmux)` short-circuits it). Mirrors add-worktree.bats.
     stub_command pgrep 'exit 1'
@@ -37,6 +38,19 @@ setup() {
     [ ! -d "$WORKTREE_DIR" ]
     run git -C "$REPO_DIR" branch --list feature
     [ -z "$output" ]
+}
+
+@test "remove-worktree passes the worktree path to kill-worktree-procs" {
+    setup_git_repo
+    setup_upstream
+    setup_feature_worktree
+    # git reports the symlink-resolved path (macOS /var -> /private/var).
+    expected="$(pwd -P)"
+    cd "$REPO_DIR"
+
+    run "$REMOVE_WORKTREE" feature
+    [ "$status" -eq 0 ]
+    [ "$(cat "$BATS_TEST_TMPDIR/kill-worktree-procs.args")" = "$expected" ]
 }
 
 # #977: a worktree containing an initialized submodule must be removed
