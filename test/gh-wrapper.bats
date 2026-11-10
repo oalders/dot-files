@@ -111,6 +111,40 @@ assert_refused() {
     assert_passed
 }
 
+@test "git-style trailers naming a Claude model are accepted" {
+    for t in \
+        'Assisted-By: Codex (GPT-5.6 Sol), Claude Opus 5.5' \
+        'Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>' \
+        'co-authored-by: Claude Sonnet 5 <noreply@anthropic.com>' \
+        'Assisted-by: claude-opus-5-5'; do
+        gh_run pr comment 1 --body $'hi\n\n'"$t"
+        assert_passed
+        gh_run pr review 1 --comment --body $'lgtm\n\n'"$t"
+        assert_passed
+    done
+}
+
+@test "git-style trailers that name no Claude model are refused" {
+    for t in \
+        'Co-Authored-By: Pat <pat@example.com>' \
+        'Assisted-By: Codex (GPT-5.6 Sol)' \
+        'Assisted-By: Claude' \
+        'Reviewed-By: Claude Opus 5.5'; do
+        gh_run pr comment 1 --body $'hi\n\n'"$t"
+        assert_refused
+    done
+}
+
+@test "a git-style trailer may sit anywhere in the closing trailer block" {
+    gh_run pr comment 1 --body $'hi\n\nAssisted-By: Claude Opus 5.5\nSigned-off-by: Pat <pat@example.com>\n'
+    assert_passed
+}
+
+@test "a git-style trailer followed by prose is refused" {
+    gh_run pr comment 1 --body $'hi\n\nAssisted-By: Claude Opus 5.5\nPS more'
+    assert_refused
+}
+
 @test "the trailer verb must match the command" {
     gh_run pr comment 1 --body "$REV"
     assert_refused

@@ -17,7 +17,9 @@
 #   🤖 Review by [Claude Code](https://claude.com/claude-code) · <Model>
 #
 # <Model> is whichever model writes the body (e.g. Opus 5.5, Sonnet 5); any
-# Opus/Sonnet/Haiku/Fable name passes, with or without a leading "Claude".
+# Opus/Sonnet/Haiku/Fable name passes, with or without a leading "Claude". A
+# closing git-style Assisted-By: or Co-Authored-By: trailer naming such a model
+# passes in place of either line.
 #
 # "Review by" is required for reviews, their inline comments, and review
 # replies, "Generated with" elsewhere. Merge commit bodies, release notes and
@@ -49,6 +51,9 @@ my $ANCHOR = '[Claude Code](https://claude.com/claude-code)';
 my $ROBOT  = "\xF0\x9F\xA4\x96";
 my $DOT    = "\xC2\xB7";
 my $MODEL  = qr/(?:Claude )?(?:Opus|Sonnet|Haiku|Fable) \d+(?:\.\d+)?/;
+
+# Looser than $MODEL: these lines are hand-written and may list other tools.
+my $GIT_TRAILER_MODEL = qr/\b(?:Opus|Sonnet|Haiku|Fable)[ -]\d+(?:[.-]\d+)?/i;
 
 # Endpoints whose `gh api` write bodies are user-visible GitHub content.
 my @API_ENDPOINT_NEEDLES = qw( /comments /issues /pulls /reviews /replies );
@@ -116,17 +121,30 @@ sub check_leak {
         || ( $sid && $text =~ /\Q$sid\E/i );
 }
 
+# True if $body's closing trailer block credits a Claude model.
+sub has_git_trailer {
+    my ($body) = @_;
+    for my $line ( reverse split /\r?\n/, $body =~ s/\s+\z//r ) {
+        return 0 if $line !~ /^[A-Za-z0-9-]+:\s/;
+        return 1
+            if $line =~ /^(?:Assisted|Co-Authored)-By:.*$GIT_TRAILER_MODEL/i;
+    }
+    return 0;
+}
+
 # Refuse unless $body leaks no session and, when $verb is given, ends with the
-# trailer for $verb.
+# trailer for $verb or a git-style equivalent.
 sub check {
     my ( $body, $verb ) = @_;
     check_leak($body);
     return if !defined $verb;
     return if $body =~ /^\Q$ROBOT $verb $ANCHOR $DOT \E$MODEL[ \t]*\s*\z/m;
+    return if has_git_trailer($body);
     block(    "the body must end with the attribution trailer:\n"
             . "  $ROBOT $verb $ANCHOR $DOT <Model>\n"
             . "where <Model> is the model you are running as (e.g. Opus 5.5,\n"
-            . "Sonnet 5); name yourself, not another model" );
+            . "Sonnet 5); name yourself, not another model. An Assisted-By: or\n"
+            . "Co-Authored-By: trailer naming that model also passes" );
 }
 
 # A session in a private repo may only write to private/internal repos or
