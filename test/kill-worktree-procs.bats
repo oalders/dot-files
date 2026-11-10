@@ -6,10 +6,10 @@ load 'helpers.bash'
 # subshells spawned after startup. Dry-run only: a real run could signal the
 # agent session running these tests.
 @test "spares its own session, including children spawned mid-run" {
-    [[ $(uname) == Linux ]] || skip "kill-worktree-procs reads /proc (Linux only)"
+    [[ $(uname) == Linux ]] || skip "needs /proc (Linux only)"
     wt="$BATS_TEST_TMPDIR/wt"
     mkdir -p "$wt" "$BATS_TEST_TMPDIR/fake"
-    # A bash named `claude` makes this test its own session root (/proc comm).
+    # A bash named "claude" (/proc comm) gives a session root even outside one.
     fake_claude="$BATS_TEST_TMPDIR/fake/claude"
     ln -s "$(command -v bash)" "$fake_claude"
     export BIN_DIR wt
