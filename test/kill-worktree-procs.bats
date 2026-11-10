@@ -6,6 +6,7 @@ load 'helpers.bash'
 # subshells spawned after startup. Dry-run only: a real run could signal the
 # agent session running these tests.
 @test "spares its own session, including children spawned mid-run" {
+    [[ $(uname) == Linux ]] || skip "kill-worktree-procs reads /proc (Linux only)"
     wt="$BATS_TEST_TMPDIR/wt"
     mkdir -p "$wt" "$BATS_TEST_TMPDIR/fake"
     # A bash named `claude` makes this test its own session root (/proc comm).
@@ -14,7 +15,8 @@ load 'helpers.bash'
     export BIN_DIR wt
     cd "$wt"
 
-    run "$fake_claude" -c '"$BIN_DIR"/kill-worktree-procs --dry-run "$wt"'
+    # "; exit" stops bash exec-ing the helper, which would drop the fake claude.
+    run "$fake_claude" -c '"$BIN_DIR"/kill-worktree-procs --dry-run "$wt"; exit $?'
     [ "$status" -eq 0 ]
     [[ "$output" == *"all protected; nothing to kill"* ]]
 }

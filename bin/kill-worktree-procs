@@ -91,7 +91,7 @@ session_root() {
     echo "$root"
 }
 
-# Never kill this script or its launcher; our own session is skipped via self_root below.
+# Never kill ourselves or our launcher; self_root below skips our session.
 protected=" $$ ${PPID} "
 self_root="$(session_root "$$")"
 
