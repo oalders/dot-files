@@ -1,0 +1,21 @@
+{
+  "meta": {
+    "name": "oalders-nix",
+    "description": "Nix CLI mixin: daemon socket and read-only /etc/nix"
+  },
+  "filesystem": {
+    "read": [
+      "/etc/nix"
+    ],
+    "read_file": [
+      "~/.config/nix/nix.conf",
+      "~/dot-files/nix/nix.conf"
+    ],
+    "allow_file": [
+      "/nix/var/nix/daemon-socket/socket"
+    ],
+    "unix_socket": [
+      "/nix/var/nix/daemon-socket/socket"
+    ]
+  }
+}
