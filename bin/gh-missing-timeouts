@@ -1,0 +1,134 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+usage() {
+    cat <<'EOF'
+Usage: gh-missing-timeouts [--skip N] [--limit N] [owner | owner/repo]
+
+List GitHub Actions jobs that don't set timeout-minutes, so they fall back
+to the 360-minute default. Prints one line per job: repo/path: job
+
+Arguments:
+  owner       User or org whose repos to scan (default: you)
+  owner/repo  Scan just this one repo
+
+Options:
+  --skip N    Skip the first N repos (default: 0)
+  --limit N   Maximum number of repos to scan (default: 1000)
+  -h, --help  Show this help
+
+When scanning an owner, repos are sorted by name, so --skip and --limit
+page through them in a stable order. Forks and archived repos are left
+out before paging. Jobs that call a reusable workflow (job-level `uses:`)
+are always skipped, since those can't set timeout-minutes.
+
+Requires gh (logged in) and yq.
+
+Examples:
+  gh-missing-timeouts
+  gh-missing-timeouts --limit 50 my-org
+  gh-missing-timeouts --skip 50 --limit 50    # repos 51-100
+  gh-missing-timeouts oalders/my-mind-is-racing
+EOF
+}
+
+die() {
+    echo "gh-missing-timeouts: $1" >&2
+    echo "Try 'gh-missing-timeouts --help'." >&2
+    exit 2
+}
+
+owner=
+limit=1000
+skip=0
+
+while (($#)); do
+    case $1 in
+        -h | --help)
+            usage
+            exit 0
+            ;;
+        --skip)
+            (($# >= 2)) || die "--skip needs a number"
+            skip=$2
+            shift 2
+            ;;
+        --skip=*)
+            skip=${1#--skip=}
+            shift
+            ;;
+        --limit)
+            (($# >= 2)) || die "--limit needs a number"
+            limit=$2
+            shift 2
+            ;;
+        --limit=*)
+            limit=${1#--limit=}
+            shift
+            ;;
+        -*)
+            die "unknown option: $1"
+            ;;
+        *)
+            [[ -z $owner ]] || die "only one owner or owner/repo allowed"
+            owner=$1
+            shift
+            ;;
+    esac
+done
+
+[[ $limit =~ ^[1-9][0-9]*$ ]] || die "--limit must be a positive integer, got '$limit'"
+[[ $skip =~ ^[0-9]+$ ]] || die "--skip must be a non-negative integer, got '$skip'"
+
+# Jobs that call a reusable workflow (job-level `uses:`) can't set
+# timeout-minutes, so they're skipped.
+filter='.jobs // {} | to_entries[]
+  | select(.value.uses == null and .value["timeout-minutes"] == null)
+  | .key'
+
+list_repos() {
+    if [[ $owner == */* ]]; then
+        # Fails loudly if the repo doesn't exist or isn't visible.
+        gh repo view "$owner" --json nameWithOwner --jq .nameWithOwner
+    else
+        # gh repo list has no offset, and its order can shift between runs,
+        # so fetch every repo, sort by name, then slice out the page.
+        local repos
+        repos=$(gh repo list ${owner:+"$owner"} --source --no-archived \
+            --limit 100000 --json nameWithOwner --jq '.[].nameWithOwner')
+        LC_ALL=C sort <<<"$repos" |
+            awk -v skip="$skip" -v limit="$limit" \
+                'NF && NR > skip && NR <= skip + limit'
+    fi
+}
+
+repos=$(list_repos)
+status=0
+err=$(mktemp "${TMPDIR:-/tmp}/gh-missing-timeouts.XXXXXX")
+trap 'rm -f "$err"' EXIT
+
+while read -r repo; do
+    [[ -n $repo ]] || continue
+    if ! paths=$(gh api "repos/$repo/contents/.github/workflows" \
+        --jq '.[] | select(.name | test("\\.ya?ml$")) | .path' 2>"$err"); then
+        # 404 means the repo has no .github/workflows directory.
+        grep -q 'HTTP 404' "$err" && continue
+        echo "$repo: $(<"$err")" >&2
+        status=1
+        continue
+    fi
+    while read -r path; do
+        [[ -n $path ]] || continue
+        if ! jobs=$(gh api "repos/$repo/contents/$path" --jq .content |
+            base64 -d | yq -r "$filter"); then
+            echo "$repo/$path: could not fetch or parse" >&2
+            status=1
+            continue
+        fi
+        while read -r job; do
+            [[ -n $job ]] && echo "$repo/$path: $job"
+        done <<<"$jobs"
+    done <<<"$paths"
+done <<<"$repos"
+
+exit "$status"
