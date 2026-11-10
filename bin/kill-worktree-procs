@@ -91,14 +91,10 @@ session_root() {
     echo "$root"
 }
 
-# Processes we must never kill: this script, its launcher, and — if this
-# script is itself running inside a nono/claude session — that whole
-# session tree.
+# Processes we must never kill: this script and its launcher. Our own
+# session tree is spared by skipping self_root below.
 protected=" $$ ${PPID} "
 self_root="$(session_root "$$")"
-if [ -n "$self_root" ]; then
-    protected+=" $self_root $(descendants "$self_root" | tr '\n' ' ') "
-fi
 
 # Collect the session root of every process whose cwd is at or under $wt.
 roots=""
@@ -121,8 +117,11 @@ if [ -z "$roots" ]; then
 fi
 
 # Expand each session root to its full tree, dropping protected PIDs.
+# Skipping self_root (not snapshotting its descendants) means children it
+# spawns mid-run can't be killed; session trees are disjoint (#1109).
 victims=""
 for r in $roots; do
+    [ "$r" = "$self_root" ] && continue
     for pid in "$r" $(descendants "$r"); do
         case "$protected" in
         *" $pid "*) continue ;;

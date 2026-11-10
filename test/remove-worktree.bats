@@ -4,7 +4,11 @@ load 'helpers.bash'
 
 setup() {
     setup_sandbox
-    REMOVE_WORKTREE="$BIN_DIR/remove-worktree"
+    # #1109: run from STUB_DIR so the stub killer shadows the real one, which
+    # could signal the agent session running these tests.
+    ln -s "$BIN_DIR/remove-worktree" "$BIN_DIR/docker-teardown" "$STUB_DIR/"
+    REMOVE_WORKTREE="$STUB_DIR/remove-worktree"
+    stub_command kill-worktree-procs 'exit 0'
     # No tmux: stub pgrep so the tmux-session-kill block is skipped (an empty
     # `$(pgrep tmux)` short-circuits it). Mirrors add-worktree.bats.
     stub_command pgrep 'exit 1'
