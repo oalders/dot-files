@@ -1397,6 +1397,8 @@ _queue_setup() {
     [[ "$output" == *"still queued — position 1"* ]]
     [[ "$output" == *"PR merged — proceeding to cleanup"* ]]
     [ ! -d "$WORKTREE_DIR" ]
+    run grep -c "json mergeable" "$BATS_TEST_TMPDIR/gh.log"
+    [ "$output" = "0" ]
 }
 
 @test "queue: ejected PR tears nothing down and keeps labels" {
@@ -1479,7 +1481,7 @@ _queue_setup() {
 @test "merge failure: a non-conflict failure does not mention conflicts" {
     _queue_setup 'OPEN|false||false|SUCCESS|||u'
     : >"$BATS_TEST_TMPDIR/merge-fails"
-    echo MERGEABLE >"$BATS_TEST_TMPDIR/mergeable"
+    echo UNKNOWN >"$BATS_TEST_TMPDIR/mergeable"
     run "$MERGE_PR" -s
     [ "$status" -eq 3 ]
     grep -q "pr view 7 --json mergeable" "$BATS_TEST_TMPDIR/gh.log"
