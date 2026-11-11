@@ -13,8 +13,8 @@ Arguments:
   owner/repo  Scan just this one repo
 
 Options:
-  --skip N    Skip the first N repos (default: 0)
-  --limit N   Maximum number of repos to scan (default: 1000)
+  --skip N    Owner scans only: skip the first N repos (default: 0)
+  --limit N   Owner scans only: maximum repos to scan (default: 1000)
   -h, --help  Show this help
 
 When scanning an owner, repos are sorted by name, so --skip and --limit
@@ -22,7 +22,8 @@ page through them in a stable order. Forks and archived repos are left
 out before paging. Jobs that call a reusable workflow (job-level `uses:`)
 are always skipped, since those can't set timeout-minutes.
 
-Requires gh (logged in) and yq.
+Requires gh (logged in), yq (tested with the Python yq, kislyuk/yq)
+and is (https://github.com/oalders/is).
 
 Examples:
   gh-missing-timeouts
@@ -80,6 +81,16 @@ done
 [[ $limit =~ ^[1-9][0-9]*$ ]] || die "--limit must be a positive integer, got '$limit'"
 [[ $skip =~ ^[0-9]+$ ]] || die "--skip must be a non-negative integer, got '$skip'"
 
+command -v is >/dev/null || die "is is required but not installed"
+for cmd in gh yq; do
+    is there "$cmd" || die "$cmd is required but not installed"
+done
+
+# Job and file names come from the scanned repos and can hold terminal escapes.
+print_safe() {
+    printf '%s\n' "${1//[[:cntrl:]]/?}"
+}
+
 # Jobs that call a reusable workflow (job-level `uses:`) can't set
 # timeout-minutes, so they're skipped.
 filter='.jobs // {} | to_entries[]
@@ -95,7 +106,7 @@ list_repos() {
         # so fetch every repo, sort by name, then slice out the page.
         local repos
         repos=$(gh repo list ${owner:+"$owner"} --source --no-archived \
-            --limit 100000 --json nameWithOwner --jq '.[].nameWithOwner')
+            --limit 100000 --json nameWithOwner --jq '.[].nameWithOwner') || return
         LC_ALL=C sort <<<"$repos" |
             awk -v skip="$skip" -v limit="$limit" \
                 'NF && NR > skip && NR <= skip + limit'
@@ -119,14 +130,16 @@ while read -r repo; do
     fi
     while read -r path; do
         [[ -n $path ]] || continue
-        if ! jobs=$(gh api "repos/$repo/contents/$path" --jq .content |
-            base64 -d | yq -r "$filter"); then
-            echo "$repo/$path: could not fetch or parse" >&2
+        # The raw media type also covers files over the JSON API's 1MB limit.
+        if ! jobs=$(gh api -H 'Accept: application/vnd.github.raw+json' \
+            "repos/$repo/contents/$path" | yq -r "$filter"); then
+            print_safe "$repo/$path: could not fetch or parse" >&2
             status=1
             continue
         fi
         while read -r job; do
-            [[ -n $job ]] && echo "$repo/$path: $job"
+            [[ -n $job ]] || continue
+            print_safe "$repo/$path: $job"
         done <<<"$jobs"
     done <<<"$paths"
 done <<<"$repos"
