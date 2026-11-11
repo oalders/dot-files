@@ -44,6 +44,21 @@ exit 0
     grep -A1 -x -- --label "$BATS_TEST_TMPDIR/gh.log" | grep -qx 'in progress'
 }
 
+@test "-v reports zero results for the default owner" {
+    run "$SWEEP" -v
+    [ "$status" -eq 0 ]
+    [ "$output" = "gh-sweep-in-progress: found 0 closed issue(s) labelled 'in progress' for oalders" ]
+}
+
+@test "--verbose counts found issues and still removes labels" {
+    printf 'https://x/1\tin progress\nhttps://x/2\tIn Progress\n' >"$BATS_TEST_TMPDIR/found"
+    run "$SWEEP" --verbose --owner a --owner b
+    [ "$status" -eq 0 ]
+    [ "${lines[0]}" = "gh-sweep-in-progress: found 2 closed issue(s) labelled 'in progress' for a, b" ]
+    [[ "$output" == *"removed 'in progress' label from https://x/1"* ]]
+    [[ "$output" == *"removed 'In Progress' label from https://x/2"* ]]
+}
+
 @test "each --owner is passed as its own flag" {
     run "$SWEEP" --owner a --owner=b
     [ "$status" -eq 0 ]

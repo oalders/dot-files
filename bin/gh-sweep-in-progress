@@ -3,13 +3,14 @@ set -euo pipefail
 
 usage() {
     cat <<'EOF'
-Usage: gh-sweep-in-progress [--owner OWNER]...
+Usage: gh-sweep-in-progress [-v] [--owner OWNER]...
 
 Remove the "in progress" label (case-insensitive) from closed issues that
 still carry it. Prints one line per label removed.
 
 Options:
   --owner OWNER  User or org to search; repeat for several (default: oalders)
+  -v, --verbose  Also report how many issues the search found
   -h, --help     Show this help
 
 Archived repos are skipped. Exits 1 if any label could not be removed.
@@ -23,12 +24,17 @@ die() {
 }
 
 owners=()
+verbose=0
 
 while (($#)); do
     case $1 in
     -h | --help)
         usage
         exit 0
+        ;;
+    -v | --verbose)
+        verbose=1
+        shift
         ;;
     --owner)
         (($# >= 2)) || die "--owner needs a value"
@@ -68,6 +74,13 @@ found=$(gh search issues "${owner_args[@]}" --label 'in progress' \
     echo "gh-sweep-in-progress: issue search failed" >&2
     exit 1
 }
+
+if ((verbose)); then
+    # One line per issue: label names are unique per repo case-insensitively.
+    n=$(grep -c . <<<"$found" || true)
+    printf -v joined '%s, ' "${owners[@]}"
+    print_safe "gh-sweep-in-progress: found $n closed issue(s) labelled 'in progress' for ${joined%, }"
+fi
 
 status=0
 while IFS=$'\t' read -r url label; do
