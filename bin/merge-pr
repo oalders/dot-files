@@ -540,7 +540,8 @@ fi
 if [[ -z $no_pr && -z $close_mode && -z $punt_mode ]] &&
     [[ $pr_state == "OPEN" || $pr_state == "MERGED" ]]; then
     # gh stderr goes to a file so a notice on success can't pollute the data.
-    err=$(mktemp "${TMPDIR:-/tmp}/merge-pr.XXXXXX")
+    # A mktemp failure only loses gh's error text, never the teardown.
+    err=$(mktemp "${TMPDIR:-/tmp}/merge-pr.XXXXXX") || err=/dev/null
     if closing_issues=$(gh pr view "$branch" --json closingIssuesReferences \
         -q '.closingIssuesReferences[].url' 2>"$err"); then
         while IFS= read -r issue_url; do
@@ -572,7 +573,7 @@ if [[ -z $no_pr && -z $close_mode && -z $punt_mode ]] &&
     else
         warn "gh-sweep-in-progress not found; skipping sweep of closed issues"
     fi
-    rm -f "$err"
+    [[ $err == /dev/null ]] || rm -f "$err"
 fi
 
 # Close mode only: delete the remote branch explicitly. GitHub's

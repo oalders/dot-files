@@ -1279,6 +1279,7 @@ ISSUE2=https://github.com/o/r/issues/2
     [[ "$output" == *"PR already MERGED"* ]]
     [[ "$output" == *"removed 'in progress' label from $ISSUE1"* ]]
     [ ! -e "$BATS_TEST_TMPDIR/merge-was-called" ]
+    [ -e "$BATS_TEST_TMPDIR/sweep-ran" ]
     [ ! -d "$WORKTREE_DIR" ]
 }
 
@@ -1406,7 +1407,20 @@ ISSUE2=https://github.com/o/r/issues/2
 
     run "$MERGE_PR"
     [ "$status" -eq 0 ]
+    [[ "$output" == *"merge-pr: warning: gh-sweep-in-progress: warning: could not remove x"* ]]
     grep -q "gh-sweep-in-progress: warning: could not remove x" "$XDG_STATE_HOME/merge-pr.log"
+}
+
+@test "labels: an unusable TMPDIR still removes the label and tears down" {
+    _label_setup OPEN
+    echo "$ISSUE1" >"$BATS_TEST_TMPDIR/closing"
+    echo "in progress" >"$BATS_TEST_TMPDIR/labels-1"
+
+    TMPDIR="$BATS_TEST_TMPDIR/nonexistent" run "$MERGE_PR"
+    [ "$status" -eq 0 ]
+    [[ "$output" == *"removed 'in progress' label from $ISSUE1"* ]]
+    [ -e "$BATS_TEST_TMPDIR/sweep-ran" ]
+    [ ! -d "$WORKTREE_DIR" ]
 }
 
 @test "labels: a missing sweeper warns, is logged, and teardown continues" {

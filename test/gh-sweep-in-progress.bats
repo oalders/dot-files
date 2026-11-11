@@ -2,8 +2,9 @@
 
 load 'helpers.bash'
 
-# The gh stub logs each call's args (one per line, blank-line separated) and
-# answers `gh search` with $BATS_TEST_TMPDIR/found, i.e. post---jq output.
+# The gh stub logs each call's args (one per line, blank-line separated), each
+# `issue edit` call on one line to edit.log, and answers `gh search` with
+# $BATS_TEST_TMPDIR/found, i.e. post---jq output.
 setup() {
     setup_sandbox
     SWEEP="$BIN_DIR/gh-sweep-in-progress"
@@ -14,7 +15,10 @@ case "$1" in
         [[ -e "$BATS_TEST_TMPDIR/search-fails" ]] && exit 1
         cat "$BATS_TEST_TMPDIR/found" 2>/dev/null
         ;;
-    issue) [[ "$3" == *fail* ]] && exit 1 ;;
+    issue)
+        echo "$*" >>"$BATS_TEST_TMPDIR/edit.log"
+        [[ "$3" == *fail* ]] && exit 1
+        ;;
 esac
 exit 0
 '
@@ -26,7 +30,8 @@ exit 0
     [ "$status" -eq 0 ]
     [[ "$output" == *"removed 'in progress' label from https://x/1"* ]]
     [[ "$output" == *"removed 'In Progress' label from https://x/2"* ]]
-    grep -qx -- "In Progress" "$BATS_TEST_TMPDIR/gh.log"
+    run cat "$BATS_TEST_TMPDIR/edit.log"
+    [ "$output" = "$(printf '%s\n' 'issue edit https://x/1 --remove-label in progress' 'issue edit https://x/2 --remove-label In Progress')" ]
 }
 
 @test "searches closed, unarchived issues for the default owner" {
