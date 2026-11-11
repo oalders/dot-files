@@ -4,7 +4,12 @@ load 'helpers.bash'
 
 setup() {
     setup_sandbox
-    MERGE_PR="$BIN_DIR/merge-pr"
+    # #1109: run merge-pr from STUB_DIR so it finds the stub killer, not the
+    # real one, which could signal the agent session running these tests.
+    ln -s "$BIN_DIR/merge-pr" "$BIN_DIR/docker-teardown" "$STUB_DIR/"
+    MERGE_PR="$STUB_DIR/merge-pr"
+    stub_command kill-worktree-procs \
+        'printf "%s\n" "$*" >>"$BATS_TEST_TMPDIR/kill-worktree-procs.args"'
     # Stop git from walking past BATS_TEST_TMPDIR's parent. Without
     # this, when the developer's TMPDIR sits inside a git repo, tests
     # that expect "no surrounding repo" silently inherit the outer
@@ -252,6 +257,20 @@ _ready_repo() {
     [ ! -d "$WORKTREE_DIR" ]
     run git -C "$SUBMODULE_MAIN" branch --list feature
     [ -z "$output" ]
+}
+
+@test "cleanup: passes the worktree path to kill-worktree-procs" {
+    _ready_repo
+    setup_feature_worktree
+    unset TMUX
+    stub_command tmux 'exit 0'
+    stub_command gh 'printf "MERGED\tmain\n"'
+    # Resolve before the run removes it (macOS /var -> /private/var).
+    expected="$(cd "$WORKTREE_DIR" && pwd -P)"
+
+    run "$MERGE_PR"
+    [ "$status" -eq 0 ]
+    [ "$(cat "$BATS_TEST_TMPDIR/kill-worktree-procs.args")" = "$expected" ]
 }
 
 @test "cleanup: removes a clean worktree without submodules" {
