@@ -10,6 +10,9 @@ setup() {
     MERGE_PR="$STUB_DIR/merge-pr"
     stub_command kill-worktree-procs \
         'printf "%s\n" "$*" >>"$BATS_TEST_TMPDIR/kill-worktree-procs.args"'
+    stub_command gh-sweep-in-progress \
+        ': >"$BATS_TEST_TMPDIR/sweep-ran"; [[ ! -e "$BATS_TEST_TMPDIR/sweep-fails" ]] || exit 3'
+    export XDG_STATE_HOME="$BATS_TEST_TMPDIR/state"
     # Stop git from walking past BATS_TEST_TMPDIR's parent. Without
     # this, when the developer's TMPDIR sits inside a git repo, tests
     # that expect "no surrounding repo" silently inherit the outer
@@ -1249,6 +1252,7 @@ ISSUE2=https://github.com/o/r/issues/2
     [[ "$output" == *"merge-pr: removed 'in progress' label from $ISSUE1"* ]]
     run cat "$BATS_TEST_TMPDIR/edit.log"
     [ "$output" == "$(printf 'issue\nedit\n%s\n--remove-label\nin progress\n' "$ISSUE1")" ]
+    [ -e "$BATS_TEST_TMPDIR/sweep-ran" ]
     [ ! -d "$WORKTREE_DIR" ]
 }
 
@@ -1313,6 +1317,7 @@ ISSUE2=https://github.com/o/r/issues/2
     run grep -c closingIssuesReferences "$BATS_TEST_TMPDIR/gh.log"
     [ "$output" = "0" ]
     [ ! -e "$BATS_TEST_TMPDIR/edit.log" ]
+    [ ! -e "$BATS_TEST_TMPDIR/sweep-ran" ]
     [ ! -d "$WORKTREE_DIR" ]
 }
 
@@ -1326,6 +1331,7 @@ ISSUE2=https://github.com/o/r/issues/2
     run grep -c closingIssuesReferences "$BATS_TEST_TMPDIR/gh.log"
     [ "$output" = "0" ]
     [ ! -e "$BATS_TEST_TMPDIR/edit.log" ]
+    [ ! -e "$BATS_TEST_TMPDIR/sweep-ran" ]
     [ ! -d "$WORKTREE_DIR" ]
 }
 
@@ -1338,6 +1344,7 @@ ISSUE2=https://github.com/o/r/issues/2
     run "$MERGE_PR"
     [ "$status" -eq 0 ]
     [[ "$output" == *"merge-pr: warning: could not remove 'in progress' label from $ISSUE1"* ]]
+    grep -q "could not remove 'in progress' label from $ISSUE1" "$XDG_STATE_HOME/merge-pr.log"
     [ ! -d "$WORKTREE_DIR" ]
     run git -C "$REPO_DIR" branch --list feature
     [ -z "$output" ]
@@ -1351,6 +1358,17 @@ ISSUE2=https://github.com/o/r/issues/2
     [ "$status" -eq 0 ]
     [[ "$output" == *"merge-pr: warning: could not list issues closed by this PR"* ]]
     [ ! -e "$BATS_TEST_TMPDIR/edit.log" ]
+    [ ! -d "$WORKTREE_DIR" ]
+}
+
+@test "labels: a failing sweep warns, is logged, and teardown continues" {
+    _label_setup OPEN
+    : >"$BATS_TEST_TMPDIR/sweep-fails"
+
+    run "$MERGE_PR"
+    [ "$status" -eq 0 ]
+    [[ "$output" == *"merge-pr: warning: gh-sweep-in-progress failed (exit 3)"* ]]
+    grep -q "gh-sweep-in-progress failed (exit 3)" "$XDG_STATE_HOME/merge-pr.log"
     [ ! -d "$WORKTREE_DIR" ]
 }
 

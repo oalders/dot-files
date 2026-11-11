@@ -14,7 +14,10 @@ If the PR is already MERGED, the merge is skipped and teardown runs even
 when the branch is no longer on origin — no push required.
 
 After a merge (or an already-MERGED PR), an "in progress" label
-(case-insensitive) is removed from each issue the PR closes. Best-effort.
+(case-insensitive) is removed from each issue the PR closes, then
+gh-sweep-in-progress clears it from any other closed issue still carrying
+it. Best-effort; label warnings are also appended to
+${XDG_STATE_HOME:-~/.local/state}/merge-pr.log.
 
 On a repo with a merge queue, `gh pr merge` only queues the PR (or turns
 on auto-merge while required checks are pending), so merge-pr waits,
@@ -50,6 +53,13 @@ Refuses:
   dirty worktree         Bails before merging when there are uncommitted
                          changes, unless --force is given.
 EOF
+}
+
+# Warnings printed to the tmux session are lost when merge-pr kills it.
+warn() {
+    echo "merge-pr: warning: $*" >&2
+    local dir="${XDG_STATE_HOME:-$HOME/.local/state}"
+    { mkdir -p "$dir" && echo "$(date -u +%Y-%m-%dT%H:%M:%SZ) $*" >>"$dir/merge-pr.log"; } 2>/dev/null || true
 }
 
 # Print the PR's merge-queue status as one line:
@@ -528,21 +538,30 @@ fi
 if [[ -z $no_pr && -z $close_mode && -z $punt_mode ]] &&
     [[ $pr_state == "OPEN" || $pr_state == "MERGED" ]]; then
     if closing_issues=$(gh pr view "$branch" --json closingIssuesReferences \
-        -q '.closingIssuesReferences[].url' 2>/dev/null); then
+        -q '.closingIssuesReferences[].url' 2>&1); then
         while IFS= read -r issue_url; do
             [[ -z $issue_url ]] && continue
-            label=$(gh issue view "$issue_url" --json labels \
-                -q '.labels[].name | select(ascii_downcase == "in progress")' 2>/dev/null) || label=""
+            if ! label=$(gh issue view "$issue_url" --json labels \
+                -q '.labels[].name | select(ascii_downcase == "in progress")' 2>&1); then
+                warn "could not read labels of $issue_url: $label"
+                continue
+            fi
             if [[ -n $label ]]; then
                 if gh issue edit "$issue_url" --remove-label "$label" >/dev/null; then
                     echo "merge-pr: removed '$label' label from $issue_url"
                 else
-                    echo "merge-pr: warning: could not remove '$label' label from $issue_url" >&2
+                    warn "could not remove '$label' label from $issue_url"
                 fi
             fi
         done <<<"$closing_issues"
     else
-        echo "merge-pr: warning: could not list issues closed by this PR; skipping label cleanup" >&2
+        warn "could not list issues closed by this PR; skipping label cleanup: $closing_issues"
+    fi
+    sweeper="$(dirname "${BASH_SOURCE[0]}")/gh-sweep-in-progress"
+    if [[ -x $sweeper ]]; then
+        "$sweeper" || warn "gh-sweep-in-progress failed (exit $?); re-run it to retry"
+    else
+        warn "gh-sweep-in-progress not found; skipping sweep of closed issues"
     fi
 fi
 

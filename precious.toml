@@ -32,6 +32,7 @@ include = [
     "bin/gh-delete-branch-on-merge",
     "bin/gh-enable-private-vulnerability-reporting",
     "bin/gh-notifications-participating",
+    "bin/gh-sweep-in-progress",
     "bin/gh-triage",
     "bin/git-origin",
     "bin/kill-worktree-procs",

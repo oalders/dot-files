@@ -1,0 +1,83 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+usage() {
+    cat <<'EOF'
+Usage: gh-sweep-in-progress [--owner OWNER]...
+
+Remove the "in progress" label (case-insensitive) from closed issues that
+still carry it. Prints one line per label removed.
+
+Options:
+  --owner OWNER  User or org to search; repeat for several (default: oalders)
+  -h, --help     Show this help
+
+Archived repos are skipped. Exits 1 if any label could not be removed.
+EOF
+}
+
+die() {
+    echo "gh-sweep-in-progress: $1" >&2
+    echo "Try 'gh-sweep-in-progress --help'." >&2
+    exit 2
+}
+
+owners=()
+
+while (($#)); do
+    case $1 in
+    -h | --help)
+        usage
+        exit 0
+        ;;
+    --owner)
+        (($# >= 2)) || die "--owner needs a value"
+        owners+=("$2")
+        shift 2
+        ;;
+    --owner=*)
+        owners+=("${1#--owner=}")
+        shift
+        ;;
+    *)
+        die "unknown argument: $1"
+        ;;
+    esac
+done
+
+((${#owners[@]})) || owners=(oalders)
+
+owner_args=()
+for o in "${owners[@]}"; do
+    owner_args+=(--owner "$o")
+done
+
+# The label: qualifier is case-insensitive, but removal needs the exact name.
+# shellcheck disable=SC2016 # $u is a jq variable
+filter='.[] | .url as $u | .labels[].name
+  | select(ascii_downcase == "in progress") | "\($u)\t\(.)"'
+
+# Labels come from GitHub and can hold terminal escapes.
+print_safe() {
+    printf '%s\n' "${1//[[:cntrl:]]/?}"
+}
+
+found=$(gh search issues "${owner_args[@]}" --label 'in progress' \
+    --state closed --archived=false --limit 1000 --json url,labels \
+    --jq "$filter") || {
+    echo "gh-sweep-in-progress: issue search failed" >&2
+    exit 1
+}
+
+status=0
+while IFS=$'\t' read -r url label; do
+    [[ -n $url ]] || continue
+    if gh issue edit "$url" --remove-label "$label" >/dev/null; then
+        print_safe "gh-sweep-in-progress: removed '$label' label from $url"
+    else
+        print_safe "gh-sweep-in-progress: warning: could not remove '$label' label from $url" >&2
+        status=1
+    fi
+done <<<"$found"
+
+exit "$status"
