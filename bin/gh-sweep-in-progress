@@ -72,7 +72,7 @@ found=$(gh search issues "${owner_args[@]}" --label 'in progress' \
 status=0
 while IFS=$'\t' read -r url label; do
     [[ -n $url ]] || continue
-    if gh issue edit "$url" --remove-label "$label" >/dev/null; then
+    if gh issue edit "$url" --remove-label "$label" >/dev/null </dev/null; then
         print_safe "gh-sweep-in-progress: removed '$label' label from $url"
     else
         print_safe "gh-sweep-in-progress: warning: could not remove '$label' label from $url" >&2

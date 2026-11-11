@@ -53,10 +53,10 @@ exit 0
     [[ "$output" == *"removed 'in progress' label from https://x/2"* ]]
 }
 
-@test "a failed search exits non-zero" {
+@test "a failed search exits 1" {
     : >"$BATS_TEST_TMPDIR/search-fails"
     run "$SWEEP"
-    [ "$status" -ne 0 ]
+    [ "$status" -eq 1 ]
     [[ "$output" == *"issue search failed"* ]]
 }
 

@@ -16,8 +16,8 @@ when the branch is no longer on origin — no push required.
 After a merge (or an already-MERGED PR), an "in progress" label
 (case-insensitive) is removed from each issue the PR closes, then
 gh-sweep-in-progress clears it from any other closed issue still carrying
-it. Best-effort; label warnings are also appended to
-${XDG_STATE_HOME:-~/.local/state}/merge-pr.log.
+it. Best-effort; warnings from label cleanup and the sweep (including its
+stderr) are also appended to ${XDG_STATE_HOME:-~/.local/state}/merge-pr.log.
 
 On a repo with a merge queue, `gh pr merge` only queues the PR (or turns
 on auto-merge while required checks are pending), so merge-pr waits,
@@ -56,10 +56,12 @@ EOF
 }
 
 # Warnings printed to the tmux session are lost when merge-pr kills it.
+# Messages can carry gh output, so keep each to one line free of escapes.
 warn() {
-    echo "merge-pr: warning: $*" >&2
-    local dir="${XDG_STATE_HOME:-$HOME/.local/state}"
-    { mkdir -p "$dir" && echo "$(date -u +%Y-%m-%dT%H:%M:%SZ) $*" >>"$dir/merge-pr.log"; } 2>/dev/null || true
+    local msg="${*//$'\n'/ }" dir="${XDG_STATE_HOME:-$HOME/.local/state}"
+    msg="${msg//[[:cntrl:]]/?}"
+    echo "merge-pr: warning: $msg" >&2
+    { mkdir -p "$dir" && echo "$(date -u +%Y-%m-%dT%H:%M:%SZ) $msg" >>"$dir/merge-pr.log"; } 2>/dev/null || true
 }
 
 # Print the PR's merge-queue status as one line:
@@ -537,32 +539,40 @@ fi
 # main-working-tree block, which can exit.
 if [[ -z $no_pr && -z $close_mode && -z $punt_mode ]] &&
     [[ $pr_state == "OPEN" || $pr_state == "MERGED" ]]; then
+    # gh stderr goes to a file so a notice on success can't pollute the data.
+    err=$(mktemp "${TMPDIR:-/tmp}/merge-pr.XXXXXX")
     if closing_issues=$(gh pr view "$branch" --json closingIssuesReferences \
-        -q '.closingIssuesReferences[].url' 2>&1); then
+        -q '.closingIssuesReferences[].url' 2>"$err"); then
         while IFS= read -r issue_url; do
             [[ -z $issue_url ]] && continue
             if ! label=$(gh issue view "$issue_url" --json labels \
-                -q '.labels[].name | select(ascii_downcase == "in progress")' 2>&1); then
-                warn "could not read labels of $issue_url: $label"
+                -q '.labels[].name | select(ascii_downcase == "in progress")' 2>"$err" </dev/null); then
+                warn "could not read labels of $issue_url: $(<"$err")"
                 continue
             fi
             if [[ -n $label ]]; then
-                if gh issue edit "$issue_url" --remove-label "$label" >/dev/null; then
+                if gh issue edit "$issue_url" --remove-label "$label" >/dev/null 2>"$err" </dev/null; then
                     echo "merge-pr: removed '$label' label from $issue_url"
                 else
-                    warn "could not remove '$label' label from $issue_url"
+                    warn "could not remove '$label' label from $issue_url: $(<"$err")"
                 fi
             fi
         done <<<"$closing_issues"
     else
-        warn "could not list issues closed by this PR; skipping label cleanup: $closing_issues"
+        warn "could not list issues closed by this PR; skipping label cleanup: $(<"$err")"
     fi
     sweeper="$(dirname "${BASH_SOURCE[0]}")/gh-sweep-in-progress"
     if [[ -x $sweeper ]]; then
-        "$sweeper" || warn "gh-sweep-in-progress failed (exit $?); re-run it to retry"
+        rc=0
+        "$sweeper" 2>"$err" || rc=$?
+        while IFS= read -r line; do
+            [[ -n $line ]] && warn "$line"
+        done <"$err"
+        ((rc == 0)) || warn "gh-sweep-in-progress failed (exit $rc); re-run it to retry"
     else
         warn "gh-sweep-in-progress not found; skipping sweep of closed issues"
     fi
+    rm -f "$err"
 fi
 
 # Close mode only: delete the remote branch explicitly. GitHub's

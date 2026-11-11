@@ -11,7 +11,7 @@ setup() {
     stub_command kill-worktree-procs \
         'printf "%s\n" "$*" >>"$BATS_TEST_TMPDIR/kill-worktree-procs.args"'
     stub_command gh-sweep-in-progress \
-        ': >"$BATS_TEST_TMPDIR/sweep-ran"; [[ ! -e "$BATS_TEST_TMPDIR/sweep-fails" ]] || exit 3'
+        ': >"$BATS_TEST_TMPDIR/sweep-ran"; cat "$BATS_TEST_TMPDIR/sweep-stderr" >&2 2>/dev/null; [[ ! -e "$BATS_TEST_TMPDIR/sweep-fails" ]] || exit 3'
     export XDG_STATE_HOME="$BATS_TEST_TMPDIR/state"
     # Stop git from walking past BATS_TEST_TMPDIR's parent. Without
     # this, when the developer's TMPDIR sits inside a git repo, tests
@@ -1205,6 +1205,7 @@ _label_gh_stub() {
     stub_command gh '
 log="$BATS_TEST_TMPDIR/gh.log"
 echo "$*" >>"$log"
+[[ -e "$BATS_TEST_TMPDIR/gh-notice" ]] && echo "A new release of gh is available" >&2
 case "$1 $2" in
     "pr view")
         if [[ "$*" == *closingIssuesReferences* ]]; then
@@ -1216,6 +1217,7 @@ case "$1 $2" in
         ;;
     "issue view")
         n="${3##*/}"
+        [[ -e "$BATS_TEST_TMPDIR/labels-$n-fails" ]] && { printf "HTTP 502\n\033[31mbad gateway\n" >&2; exit 1; }
         cat "$BATS_TEST_TMPDIR/labels-$n" 2>/dev/null
         ;;
     "issue edit")
@@ -1369,6 +1371,52 @@ ISSUE2=https://github.com/o/r/issues/2
     [ "$status" -eq 0 ]
     [[ "$output" == *"merge-pr: warning: gh-sweep-in-progress failed (exit 3)"* ]]
     grep -q "gh-sweep-in-progress failed (exit 3)" "$XDG_STATE_HOME/merge-pr.log"
+    [ ! -d "$WORKTREE_DIR" ]
+}
+
+@test "labels: gh stderr on success does not leak into the url or label" {
+    _label_setup OPEN
+    echo "$ISSUE1" >"$BATS_TEST_TMPDIR/closing"
+    echo "in progress" >"$BATS_TEST_TMPDIR/labels-1"
+    : >"$BATS_TEST_TMPDIR/gh-notice"
+
+    run "$MERGE_PR"
+    [ "$status" -eq 0 ]
+    run cat "$BATS_TEST_TMPDIR/edit.log"
+    [ "$output" == "$(printf 'issue\nedit\n%s\n--remove-label\nin progress\n' "$ISSUE1")" ]
+}
+
+@test "labels: a failed label read logs gh's error on one line and continues" {
+    _label_setup OPEN
+    printf '%s\n%s\n' "$ISSUE1" "$ISSUE2" >"$BATS_TEST_TMPDIR/closing"
+    : >"$BATS_TEST_TMPDIR/labels-1-fails"
+    echo "in progress" >"$BATS_TEST_TMPDIR/labels-2"
+
+    run "$MERGE_PR"
+    [ "$status" -eq 0 ]
+    grep -qx -- "$ISSUE2" "$BATS_TEST_TMPDIR/edit.log"
+    run grep "could not read labels of $ISSUE1" "$XDG_STATE_HOME/merge-pr.log"
+    [ "${#lines[@]}" -eq 1 ]
+    [[ "$output" == *"HTTP 502 ?[31mbad gateway" ]]
+}
+
+@test "labels: sweeper stderr is logged" {
+    _label_setup OPEN
+    echo "gh-sweep-in-progress: warning: could not remove x" >"$BATS_TEST_TMPDIR/sweep-stderr"
+
+    run "$MERGE_PR"
+    [ "$status" -eq 0 ]
+    grep -q "gh-sweep-in-progress: warning: could not remove x" "$XDG_STATE_HOME/merge-pr.log"
+}
+
+@test "labels: a missing sweeper warns, is logged, and teardown continues" {
+    _label_setup OPEN
+    rm "$STUB_DIR/gh-sweep-in-progress"
+
+    run "$MERGE_PR"
+    [ "$status" -eq 0 ]
+    [[ "$output" == *"merge-pr: warning: gh-sweep-in-progress not found"* ]]
+    grep -q "gh-sweep-in-progress not found" "$XDG_STATE_HOME/merge-pr.log"
     [ ! -d "$WORKTREE_DIR" ]
 }
 
