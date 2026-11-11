@@ -41,6 +41,7 @@ exit 0
     [ "$output" = "$(printf -- '--owner\noalders')" ]
     grep -qx -- --archived=false "$BATS_TEST_TMPDIR/gh.log"
     grep -A1 -x -- --state "$BATS_TEST_TMPDIR/gh.log" | grep -qx closed
+    grep -A1 -x -- --label "$BATS_TEST_TMPDIR/gh.log" | grep -qx 'in progress'
 }
 
 @test "each --owner is passed as its own flag" {
