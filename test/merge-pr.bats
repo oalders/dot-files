@@ -1444,7 +1444,7 @@ case "$1 $2" in
             [[ -e "$BATS_TEST_TMPDIR/mergeable-fails" ]] && exit 1
             cat "$BATS_TEST_TMPDIR/mergeable"
         else
-            if [[ -e "$BATS_TEST_TMPDIR/draft" && "$*" == *isDraft* ]]; then
+            if [[ -e "$BATS_TEST_TMPDIR/draft" && "$*" == *"--json "*isDraft*" -q "* ]]; then
                 printf "OPEN\tmain\t7\ttrue\n"
             else
                 printf "OPEN\tmain\t7\n"
