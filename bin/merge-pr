@@ -15,9 +15,10 @@ when the branch is no longer on origin — no push required.
 
 After a merge (or an already-MERGED PR), an "in progress" label
 (case-insensitive) is removed from each issue the PR closes, then
-gh-sweep-in-progress clears it from any other closed issue still carrying
-it. Best-effort; warnings from label cleanup and the sweep (including its
-stderr) are also appended to ${XDG_STATE_HOME:-~/.local/state}/merge-pr.log.
+gh-sweep-in-progress clears it from up to 50 other closed issues still
+carrying it. Best-effort; warnings from label cleanup and the sweep
+(including its stderr) are also appended to
+${XDG_STATE_HOME:-~/.local/state}/merge-pr.log.
 
 On a repo with a merge queue, `gh pr merge` only queues the PR (or turns
 on auto-merge while required checks are pending), so merge-pr waits,
@@ -565,7 +566,7 @@ if [[ -z $no_pr && -z $close_mode && -z $punt_mode ]] &&
     sweeper="$(dirname "${BASH_SOURCE[0]}")/gh-sweep-in-progress"
     if [[ -x $sweeper ]]; then
         rc=0
-        "$sweeper" 2>"$err" || rc=$?
+        "$sweeper" --max 50 2>"$err" || rc=$?
         while IFS= read -r line; do
             [[ -n $line ]] && warn "$line"
         done <"$err"

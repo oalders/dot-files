@@ -11,7 +11,7 @@ setup() {
     stub_command kill-worktree-procs \
         'printf "%s\n" "$*" >>"$BATS_TEST_TMPDIR/kill-worktree-procs.args"'
     stub_command gh-sweep-in-progress \
-        ': >"$BATS_TEST_TMPDIR/sweep-ran"; cat "$BATS_TEST_TMPDIR/sweep-stderr" >&2 2>/dev/null; [[ ! -e "$BATS_TEST_TMPDIR/sweep-fails" ]] || exit 3'
+        'printf "%s\n" "$*" >"$BATS_TEST_TMPDIR/sweep-ran"; cat "$BATS_TEST_TMPDIR/sweep-stderr" >&2 2>/dev/null; [[ ! -e "$BATS_TEST_TMPDIR/sweep-fails" ]] || exit 3'
     export XDG_STATE_HOME="$BATS_TEST_TMPDIR/state"
     # Stop git from walking past BATS_TEST_TMPDIR's parent. Without
     # this, when the developer's TMPDIR sits inside a git repo, tests
@@ -1254,7 +1254,7 @@ ISSUE2=https://github.com/o/r/issues/2
     [[ "$output" == *"merge-pr: removed 'in progress' label from $ISSUE1"* ]]
     run cat "$BATS_TEST_TMPDIR/edit.log"
     [ "$output" == "$(printf 'issue\nedit\n%s\n--remove-label\nin progress\n' "$ISSUE1")" ]
-    [ -e "$BATS_TEST_TMPDIR/sweep-ran" ]
+    [ "$(<"$BATS_TEST_TMPDIR/sweep-ran")" = "--max 50" ]
     [ ! -d "$WORKTREE_DIR" ]
 }
 

@@ -3,13 +3,14 @@ set -euo pipefail
 
 usage() {
     cat <<'EOF'
-Usage: gh-sweep-in-progress [-v] [--owner OWNER]...
+Usage: gh-sweep-in-progress [-v] [--max N] [--owner OWNER]...
 
 Remove the "in progress" label (case-insensitive) from closed issues that
 still carry it. Prints one line per label removed.
 
 Options:
   --owner OWNER  User or org to search; repeat for several (default: oalders)
+  --max N        Remove at most N labels this run (default and cap: 1000)
   -v, --verbose  Also report the search as it starts and what it found
   -h, --help     Show this help
 
@@ -25,6 +26,7 @@ die() {
 
 owners=()
 verbose=0
+max=1000
 
 while (($#)); do
     case $1 in
@@ -45,11 +47,23 @@ while (($#)); do
         owners+=("${1#--owner=}")
         shift
         ;;
+    --max)
+        (($# >= 2)) || die "--max needs a value"
+        max=$2
+        shift 2
+        ;;
+    --max=*)
+        max=${1#--max=}
+        shift
+        ;;
     *)
         die "unknown argument: $1"
         ;;
     esac
 done
+
+[[ $max =~ ^[1-9][0-9]*$ ]] || die "--max needs a positive integer"
+((${#max} <= 4 && max <= 1000)) || max=1000
 
 ((${#owners[@]})) || owners=(oalders)
 
@@ -59,9 +73,10 @@ for o in "${owners[@]}"; do
 done
 
 # The label: qualifier is case-insensitive, but removal needs the exact name.
-# shellcheck disable=SC2016 # $u is a jq variable
-filter='.[] | .url as $u | .labels[].name
-  | select(ascii_downcase == "in progress") | "\($u)\t\(.)"'
+# shellcheck disable=SC2016 # $i and $u are jq variables
+filter='.[] | .id as $i | .url as $u | .labels[]
+  | select(.name | ascii_downcase == "in progress")
+  | "\($i)\t\($u)\t\(.id)\t\(.name)"'
 
 # Labels come from GitHub and can hold terminal escapes.
 print_safe() {
@@ -72,7 +87,7 @@ printf -v joined '%s, ' "${owners[@]}"
 ((verbose)) && print_safe "gh-sweep-in-progress: searching closed issues labelled 'in progress' for ${joined%, }..."
 
 found=$(gh search issues "${owner_args[@]}" --label 'in progress' \
-    --state closed --archived=false --limit 1000 --json url,labels \
+    --state closed --archived=false --limit "$max" --json id,url,labels \
     --jq "$filter") || {
     echo "gh-sweep-in-progress: issue search failed" >&2
     exit 1
@@ -84,15 +99,55 @@ if ((verbose)); then
     print_safe "gh-sweep-in-progress: found $n closed issue(s) labelled 'in progress' for ${joined%, }"
 fi
 
+warn_item() {
+    print_safe "gh-sweep-in-progress: warning: could not remove '$2' label from $1" >&2
+}
+
 status=0
-while IFS=$'\t' read -r url label; do
-    [[ -n $url ]] || continue
-    if gh issue edit "$url" --remove-label "$label" >/dev/null </dev/null; then
-        print_safe "gh-sweep-in-progress: removed '$label' label from $url"
+ids=() urls=() label_ids=() labels=()
+while IFS=$'\t' read -r id url label_id label; do
+    [[ -n $id ]] || continue
+    # IDs are interpolated into the GraphQL query, so refuse anything odd.
+    if [[ $id =~ ^[A-Za-z0-9_=-]+$ && $label_id =~ ^[A-Za-z0-9_=-]+$ ]]; then
+        ids+=("$id") urls+=("$url") label_ids+=("$label_id") labels+=("$label")
     else
-        print_safe "gh-sweep-in-progress: warning: could not remove '$label' label from $url" >&2
+        warn_item "$url" "$label"
         status=1
     fi
 done <<<"$found"
+
+batch=50
+for ((start = 0; start < ${#ids[@]}; start += batch)); do
+    # Pause between batches to stay under GitHub's secondary rate limits.
+    ((start == 0)) || sleep 2
+    end=$((start + batch < ${#ids[@]} ? start + batch : ${#ids[@]}))
+    query='mutation {'
+    for ((i = start; i < end; i++)); do
+        query+=" m$i: removeLabelsFromLabelable(input: {labelableId: \"${ids[i]}\", labelIds: [\"${label_ids[i]}\"]}) { clientMutationId }"
+    done
+    query+=' }'
+
+    # gh exits non-zero if any mutation errored, but still prints the data.
+    resp=$(gh api graphql -f query="$query" </dev/null) || true
+    data_type=$(jq -r '.data | type' <<<"$resp" 2>/dev/null) || data_type=
+    if [[ $data_type != object ]]; then
+        for ((i = start; i < end; i++)); do
+            warn_item "${urls[i]}" "${labels[i]}"
+        done
+        if ((end < ${#ids[@]})); then
+            echo "gh-sweep-in-progress: warning: request failed; skipped the remaining $((${#ids[@]} - end)) issue(s)" >&2
+        fi
+        exit 1
+    fi
+    done_keys=$'\n'$(jq -r '.data | to_entries[] | select(.value != null) | .key' <<<"$resp")$'\n'
+    for ((i = start; i < end; i++)); do
+        if [[ $done_keys == *$'\n'"m$i"$'\n'* ]]; then
+            print_safe "gh-sweep-in-progress: removed '${labels[i]}' label from ${urls[i]}"
+        else
+            warn_item "${urls[i]}" "${labels[i]}"
+            status=1
+        fi
+    done
+done
 
 exit "$status"
