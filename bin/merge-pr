@@ -28,6 +28,9 @@ or it is closed, nothing is torn down and merge-pr exits 1: fix, push, and
 re-run. A re-run on an already queued PR resumes waiting. Ctrl-C stops
 waiting but does not cancel the merge; `gh pr merge --disable-auto` does.
 
+A draft PR prompts to mark it ready (`gh pr ready`) before merging; without
+a terminal on stdin merge-pr refuses instead.
+
 Options:
   -f, --force   Discard uncommitted changes in the worktree when
                 removing it.
@@ -359,11 +362,11 @@ else
     main_repo=$(cd "$git_common_dir" && cd .. && pwd -P)
 fi
 
-# PR lookup: state + baseRefName in a single call. `no_pr` records the
+# PR lookup: state, base, number and draft flag in a single call. `no_pr` records the
 # close-mode case where there's no PR at all; teardown still runs, but the
 # PR-state dispatch below is skipped.
 no_pr=""
-if ! pr_info=$(gh pr view --json state,baseRefName,number -q '[.state, .baseRefName, .number] | @tsv' 2>/dev/null); then
+if ! pr_info=$(gh pr view --json state,baseRefName,number,isDraft -q '[.state, .baseRefName, .number, .isDraft] | @tsv' 2>/dev/null); then
     if [[ -n $close_mode ]]; then
         # --close abandons the branch. With no PR to close (never opened, or
         # already deleted) there's simply nothing to close, so fall through to
@@ -374,6 +377,7 @@ if ! pr_info=$(gh pr view --json state,baseRefName,number -q '[.state, .baseRefN
         pr_state=""
         pr_base=""
         pr_number=""
+        pr_draft=""
     else
         # A deferred push pre-flight failure means we can't even identify the
         # PR; surface that actionable reason instead of the generic "no PR
@@ -389,6 +393,7 @@ else
     pr_state=$(echo "$pr_info" | cut -f1)
     pr_base=$(echo "$pr_info" | cut -f2)
     pr_number=$(echo "$pr_info" | cut -f3)
+    pr_draft=$(echo "$pr_info" | cut -f4)
 fi
 
 # Resolve a deferred push pre-flight failure. It matters only when we'll run
@@ -447,6 +452,22 @@ if [[ -z $no_pr ]]; then
                 # positional/flag args still pass through after it.
                 gh pr close "$branch" "${gh_args[@]}"
             else
+                if [[ $pr_draft == true ]]; then
+                    if [[ -t 0 ]]; then
+                        printf "PR #%s is a draft. Mark it ready for review and merge? [y/N] " "$pr_number" >&2
+                        read -r reply || reply=""
+                        case "$reply" in
+                        [Yy]*) gh pr ready "$pr_number" ;;
+                        *)
+                            echo "merge-pr: PR #$pr_number left as draft — nothing torn down" >&2
+                            exit 1
+                            ;;
+                        esac
+                    else
+                        echo "merge-pr: PR #$pr_number is a draft — run gh pr ready, then re-run merge-pr" >&2
+                        exit 1
+                    fi
+                fi
                 # On a merge-queue repo `gh pr merge` exits 0 with the PR still
                 # OPEN (queued, or auto-merge when checks are pending), so wait
                 # for the real outcome before anything is torn down. The

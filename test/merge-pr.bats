@@ -216,16 +216,6 @@ _ready_repo() {
     [[ "$output" == *"refusing to act on PR in state 'CLOSED'"* ]]
 }
 
-@test "pr state: refuses DRAFT state" {
-    _ready_repo
-    git checkout -q -b feature
-    git push -q -u origin feature
-    stub_command gh 'printf "DRAFT\tmain\n"'
-    run "$MERGE_PR"
-    [ "$status" -eq 1 ]
-    [[ "$output" == *"refusing to act on PR in state 'DRAFT'"* ]]
-}
-
 # Cleanup path. A MERGED PR skips the actual merge and goes straight to
 # worktree removal. tmux is stubbed inert so session resolution (which
 # runs under `set -e`) doesn't abort the script.
@@ -1439,7 +1429,8 @@ ISSUE2=https://github.com/o/r/issues/2
 # merge-pr's `state|in_queue|position|auto_merge|head_checks|removed_id|
 # removed_reason|url` format. A FAIL line makes that probe exit 1, and a
 # non-empty on-probe-<n> file is sourced on the n-th probe for side effects.
-# A merge-fails file makes `gh pr merge` exit 3. `gh pr view --json mergeable`
+# A view file replaces the default `gh pr view` line (OPEN, main, #7, not
+# draft). A merge-fails file makes `gh pr merge` exit 3. `gh pr view --json mergeable`
 # prints the mergeable file, or exits 1 if a mergeable-fails file exists.
 # Usage: _queue_stub <probe-line>...   (one line per successive probe)
 _queue_stub() {
@@ -1452,7 +1443,7 @@ case "$1 $2" in
             [[ -e "$BATS_TEST_TMPDIR/mergeable-fails" ]] && exit 1
             cat "$BATS_TEST_TMPDIR/mergeable"
         else
-            printf "OPEN\tmain\t7\n"
+            cat "$BATS_TEST_TMPDIR/view" 2>/dev/null || printf "OPEN\tmain\t7\n"
         fi
         ;;
     "pr merge")
@@ -1734,5 +1725,46 @@ _queue_setup() {
     [ "$status" -eq 1 ]
     [[ "$output" == *"could not read PR status from GitHub 5 times in a row — nothing torn down"* ]]
     [ ! -e "$BATS_TEST_TMPDIR/merge-was-called" ]
+    [ -d "$WORKTREE_DIR" ]
+}
+
+_draft_setup() {
+    _queue_setup 'OPEN|false||false|SUCCESS|||u' 'MERGED|false||false|SUCCESS|||u'
+    printf 'OPEN\tmain\t7\ttrue\n' >"$BATS_TEST_TMPDIR/view"
+}
+
+# util-linux script gives merge-pr a TTY on stdin and feeds it the reply.
+# The nono sandbox denies /dev/ptmx, so these only run in CI.
+_run_draft_in_pty() {
+    script -qec true /dev/null >/dev/null 2>&1 || skip "no pty"
+    _draft_setup
+    run script -qec "$(printf %q "$MERGE_PR") -s" /dev/null <<<"$1"
+}
+
+@test "draft: refuses without a TTY and touches nothing" {
+    _draft_setup
+    run "$MERGE_PR" -s </dev/null
+    [ "$status" -eq 1 ]
+    [[ "$output" == *"PR #7 is a draft — run gh pr ready, then re-run merge-pr"* ]]
+    run grep -E "^pr (ready|merge)" "$BATS_TEST_TMPDIR/gh.log"
+    [ "$status" -ne 0 ]
+    [ -d "$WORKTREE_DIR" ]
+}
+
+@test "draft: TTY yes marks the PR ready, then merges and tears down" {
+    _run_draft_in_pty y
+    [ "$status" -eq 0 ]
+    [[ "$output" == *"PR #7 is a draft. Mark it ready for review and merge?"* ]]
+    run grep -E "^pr (ready|merge)" "$BATS_TEST_TMPDIR/gh.log"
+    [[ "$output" == "pr ready 7"$'\n'"pr merge"* ]]
+    [ ! -d "$WORKTREE_DIR" ]
+}
+
+@test "draft: TTY no leaves the draft and tears nothing down" {
+    _run_draft_in_pty n
+    [ "$status" -eq 1 ]
+    [[ "$output" == *"PR #7 left as draft — nothing torn down"* ]]
+    run grep -E "^pr (ready|merge)" "$BATS_TEST_TMPDIR/gh.log"
+    [ "$status" -ne 0 ]
     [ -d "$WORKTREE_DIR" ]
 }
