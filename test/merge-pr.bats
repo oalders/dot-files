@@ -1739,8 +1739,7 @@ _draft_setup() {
 }
 
 # util-linux script gives merge-pr a TTY on stdin and feeds it the reply.
-# The nono sandbox denies /dev/ptmx, so these only run in CI, where a missing
-# pty must fail rather than silently skip.
+# Skipped where no pty is available (e.g. the nono sandbox); CI must have one.
 _run_draft_in_pty() {
     if ! script -qec true /dev/null >/dev/null 2>&1; then
         [[ -n ${CI:-} ]] && echo "no pty in CI" >&2 && return 1
