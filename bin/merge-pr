@@ -362,9 +362,9 @@ else
     main_repo=$(cd "$git_common_dir" && cd .. && pwd -P)
 fi
 
-# PR lookup: state, base, number and draft flag in a single call. `no_pr` records the
-# close-mode case where there's no PR at all; teardown still runs, but the
-# PR-state dispatch below is skipped.
+# PR lookup: state, base, number and draft flag in a single call. `no_pr`
+# records the close-mode case where there's no PR at all; teardown still runs,
+# but the PR-state dispatch below is skipped.
 no_pr=""
 if ! pr_info=$(gh pr view --json state,baseRefName,number,isDraft -q '[.state, .baseRefName, .number, .isDraft] | @tsv' 2>/dev/null); then
     if [[ -n $close_mode ]]; then

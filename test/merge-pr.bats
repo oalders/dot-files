@@ -1429,9 +1429,10 @@ ISSUE2=https://github.com/o/r/issues/2
 # merge-pr's `state|in_queue|position|auto_merge|head_checks|removed_id|
 # removed_reason|url` format. A FAIL line makes that probe exit 1, and a
 # non-empty on-probe-<n> file is sourced on the n-th probe for side effects.
-# A view file replaces the default `gh pr view` line (OPEN, main, #7, not
-# draft). A merge-fails file makes `gh pr merge` exit 3. `gh pr view --json mergeable`
-# prints the mergeable file, or exits 1 if a mergeable-fails file exists.
+# `gh pr view` prints OPEN, main, #7, plus isDraft=true when a draft file
+# exists and the call asks for isDraft. A merge-fails file makes `gh pr merge`
+# exit 3. `gh pr view --json mergeable` prints the mergeable file, or exits 1
+# if a mergeable-fails file exists.
 # Usage: _queue_stub <probe-line>...   (one line per successive probe)
 _queue_stub() {
     printf '%s\n' "$@" >"$BATS_TEST_TMPDIR/probes"
@@ -1443,7 +1444,11 @@ case "$1 $2" in
             [[ -e "$BATS_TEST_TMPDIR/mergeable-fails" ]] && exit 1
             cat "$BATS_TEST_TMPDIR/mergeable"
         else
-            cat "$BATS_TEST_TMPDIR/view" 2>/dev/null || printf "OPEN\tmain\t7\n"
+            if [[ -e "$BATS_TEST_TMPDIR/draft" && "$*" == *isDraft* ]]; then
+                printf "OPEN\tmain\t7\ttrue\n"
+            else
+                printf "OPEN\tmain\t7\n"
+            fi
         fi
         ;;
     "pr merge")
@@ -1730,13 +1735,17 @@ _queue_setup() {
 
 _draft_setup() {
     _queue_setup 'OPEN|false||false|SUCCESS|||u' 'MERGED|false||false|SUCCESS|||u'
-    printf 'OPEN\tmain\t7\ttrue\n' >"$BATS_TEST_TMPDIR/view"
+    : >"$BATS_TEST_TMPDIR/draft"
 }
 
 # util-linux script gives merge-pr a TTY on stdin and feeds it the reply.
-# The nono sandbox denies /dev/ptmx, so these only run in CI.
+# The nono sandbox denies /dev/ptmx, so these only run in CI, where a missing
+# pty must fail rather than silently skip.
 _run_draft_in_pty() {
-    script -qec true /dev/null >/dev/null 2>&1 || skip "no pty"
+    if ! script -qec true /dev/null >/dev/null 2>&1; then
+        [[ -n ${CI:-} ]] && echo "no pty in CI" >&2 && return 1
+        skip "no pty"
+    fi
     _draft_setup
     run script -qec "$(printf %q "$MERGE_PR") -s" /dev/null <<<"$1"
 }
