@@ -69,17 +69,17 @@ found_issues() {
     [ ! -e "$BATS_TEST_TMPDIR/sleep.log" ]
 }
 
-@test "more than 50 issues are sent in two requests with one pause" {
+@test "more than 10 issues are sent in two requests with one pause" {
     command -v jq >/dev/null || skip "jq not installed"
-    found_issues 51
+    found_issues 11
     run "$SWEEP"
     [ "$status" -eq 0 ]
-    [ "$(grep -c removed <<<"$output")" -eq 51 ]
-    [[ "$output" == *"removed 'in progress' label from https://x/51"* ]]
+    [ "$(grep -c removed <<<"$output")" -eq 11 ]
+    [[ "$output" == *"removed 'in progress' label from https://x/11"* ]]
     run cat "$BATS_TEST_TMPDIR/graphql.log"
     [ "${#lines[@]}" -eq 2 ]
-    [ "$(grep -o removeLabelsFromLabelable <<<"${lines[0]}" | wc -l)" -eq 50 ]
-    [[ "${lines[1]}" == *'labelableId: "I_51"'* ]]
+    [ "$(grep -o removeLabelsFromLabelable <<<"${lines[0]}" | wc -l)" -eq 10 ]
+    [[ "${lines[1]}" == *'labelableId: "I_11"'* ]]
     [[ "${lines[1]}" != *'"I_1"'* ]]
     run cat "$BATS_TEST_TMPDIR/sleep.log"
     [ "$output" = 2 ]
@@ -97,15 +97,17 @@ found_issues() {
     [[ "$output" != *"removed 'in progress' label from https://x/2"* ]]
 }
 
-@test "a request with no data warns for its batch and skips the rest" {
+@test "a request with no data says the batch may be unfinished and skips the rest" {
     command -v jq >/dev/null || skip "jq not installed"
-    found_issues 51
-    echo '{"message":"You have exceeded a secondary rate limit"}' >"$BATS_TEST_TMPDIR/response"
+    found_issues 11
+    echo '{"message":"Server Error"}' >"$BATS_TEST_TMPDIR/response"
     run "$SWEEP"
     [ "$status" -eq 1 ]
-    [ "$(grep -c 'warning: could not remove' <<<"$output")" -eq 50 ]
+    [[ "$output" == *"request failed; up to 10 issue(s) in this batch may still carry the label"* ]]
     [[ "$output" == *"skipped the remaining 1 issue(s)"* ]]
+    [[ "$output" == *"re-run to retry"* ]]
     [[ "$output" != *removed* ]]
+    [[ "$output" != *"could not remove"* ]]
     run cat "$BATS_TEST_TMPDIR/graphql.log"
     [ "${#lines[@]}" -eq 1 ]
     [ ! -e "$BATS_TEST_TMPDIR/sleep.log" ]
@@ -113,14 +115,14 @@ found_issues() {
 
 @test "a later batch with every alias null stops after the earlier success" {
     command -v jq >/dev/null || skip "jq not installed"
-    found_issues 101
-    seq 50 99 | sed 's/^/m/' >"$BATS_TEST_TMPDIR/null-aliases"
+    found_issues 21
+    seq 10 19 | sed 's/^/m/' >"$BATS_TEST_TMPDIR/null-aliases"
     run "$SWEEP"
     [ "$status" -eq 1 ]
-    [ "$(grep -c removed <<<"$output")" -eq 50 ]
-    [[ "$output" == *"removed 'in progress' label from https://x/50"* ]]
-    [ "$(grep -c 'warning: could not remove' <<<"$output")" -eq 50 ]
-    [[ "$output" == *"warning: could not remove 'in progress' label from https://x/100"* ]]
+    [ "$(grep -c removed <<<"$output")" -eq 10 ]
+    [[ "$output" == *"removed 'in progress' label from https://x/10"* ]]
+    [[ "$output" != *"removed 'in progress' label from https://x/11"* ]]
+    [[ "$output" == *"up to 10 issue(s) in this batch may still carry the label"* ]]
     [[ "$output" == *"skipped the remaining 1 issue(s)"* ]]
     run cat "$BATS_TEST_TMPDIR/graphql.log"
     [ "${#lines[@]}" -eq 2 ]
