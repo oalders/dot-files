@@ -100,13 +100,14 @@ found_issues() {
 @test "a request with no data says the batch may be unfinished and skips the rest" {
     command -v jq >/dev/null || skip "jq not installed"
     found_issues 11
-    echo '{"message":"Server Error"}' >"$BATS_TEST_TMPDIR/response"
+    echo '<html>502 Bad Gateway</html>' >"$BATS_TEST_TMPDIR/response"
     run "$SWEEP"
     [ "$status" -eq 1 ]
-    [[ "$output" == *"request failed; up to 10 issue(s) in this batch may still carry the label"* ]]
+    [[ "$output" == *"warning: request failed; this batch of 10 may be partly applied"* ]]
+    [ "$(grep -c 'may be partly applied' <<<"$output")" -eq 1 ]
     [[ "$output" == *"skipped the remaining 1 issue(s)"* ]]
-    [[ "$output" == *"re-run to retry"* ]]
-    [[ "$output" != *removed* ]]
+    [[ "$output" == *"warning: re-run to retry whatever still carries the label"* ]]
+    [[ "$output" != *"removed 'in progress' label from"* ]]
     [[ "$output" != *"could not remove"* ]]
     run cat "$BATS_TEST_TMPDIR/graphql.log"
     [ "${#lines[@]}" -eq 1 ]
@@ -122,7 +123,7 @@ found_issues() {
     [ "$(grep -c removed <<<"$output")" -eq 10 ]
     [[ "$output" == *"removed 'in progress' label from https://x/10"* ]]
     [[ "$output" != *"removed 'in progress' label from https://x/11"* ]]
-    [[ "$output" == *"up to 10 issue(s) in this batch may still carry the label"* ]]
+    [[ "$output" == *"this batch of 10 may be partly applied"* ]]
     [[ "$output" == *"skipped the remaining 1 issue(s)"* ]]
     run cat "$BATS_TEST_TMPDIR/graphql.log"
     [ "${#lines[@]}" -eq 2 ]

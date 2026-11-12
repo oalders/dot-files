@@ -117,7 +117,7 @@ while IFS=$'\t' read -r id url label_id label; do
     fi
 done <<<"$found"
 
-# 50 mutations per request timed out (HTTP 502) part-way through.
+# 50 per request returned HTTP 502 after some had already applied.
 batch=10
 for ((start = 0; start < ${#ids[@]}; start += batch)); do
     # Pause between batches to stay under GitHub's secondary rate limits.
@@ -135,11 +135,11 @@ for ((start = 0; start < ${#ids[@]}; start += batch)); do
     done_keys=$(jq -r '.data | objects | to_entries[] | select(.value != null) | .key' <<<"$resp" 2>/dev/null) || done_keys=
     # A failed request (e.g. HTTP 502) may still have applied some removals.
     if [[ -z $done_keys ]]; then
-        echo "gh-sweep-in-progress: warning: request failed; up to $((end - start)) issue(s) in this batch may still carry the label" >&2
+        echo "gh-sweep-in-progress: warning: request failed; this batch of $((end - start)) may be partly applied" >&2
         if ((end < ${#ids[@]})); then
             echo "gh-sweep-in-progress: warning: skipped the remaining $((${#ids[@]} - end)) issue(s)" >&2
         fi
-        echo "gh-sweep-in-progress: re-run to retry" >&2
+        echo "gh-sweep-in-progress: warning: re-run to retry whatever still carries the label" >&2
         exit 1
     fi
     done_keys=$'\n'$done_keys$'\n'
