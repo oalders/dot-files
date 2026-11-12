@@ -10,7 +10,7 @@ still carry it. Prints one line per label removed.
 
 Options:
   --owner OWNER  User or org to search; repeat for several (default: oalders)
-  --max N        Remove at most N labels this run (default and cap: 1000)
+  --max N        Search at most N issues this run (default and cap: 1000)
   -v, --verbose  Also report the search as it starts and what it found
   -h, --help     Show this help
 
@@ -97,6 +97,7 @@ if ((verbose)); then
     # One line per issue: label names are unique per repo case-insensitively.
     n=$(grep -c . <<<"$found" || true)
     print_safe "gh-sweep-in-progress: found $n closed issue(s) labelled 'in progress' for ${joined%, }"
+    ((n < max)) || echo "gh-sweep-in-progress: reached --max $max; more may remain, re-run to continue"
 fi
 
 warn_item() {
@@ -129,8 +130,9 @@ for ((start = 0; start < ${#ids[@]}; start += batch)); do
 
     # gh exits non-zero if any mutation errored, but still prints the data.
     resp=$(gh api graphql -f query="$query" </dev/null) || true
-    data_type=$(jq -r '.data | type' <<<"$resp" 2>/dev/null) || data_type=
-    if [[ $data_type != object ]]; then
+    # No alias succeeding (e.g. every one RATE_LIMITED) means stop, like no data.
+    done_keys=$(jq -r '.data | objects | to_entries[] | select(.value != null) | .key' <<<"$resp" 2>/dev/null) || done_keys=
+    if [[ -z $done_keys ]]; then
         for ((i = start; i < end; i++)); do
             warn_item "${urls[i]}" "${labels[i]}"
         done
@@ -139,7 +141,7 @@ for ((start = 0; start < ${#ids[@]}; start += batch)); do
         fi
         exit 1
     fi
-    done_keys=$'\n'$(jq -r '.data | to_entries[] | select(.value != null) | .key' <<<"$resp")$'\n'
+    done_keys=$'\n'$done_keys$'\n'
     for ((i = start; i < end; i++)); do
         if [[ $done_keys == *$'\n'"m$i"$'\n'* ]]; then
             print_safe "gh-sweep-in-progress: removed '${labels[i]}' label from ${urls[i]}"
