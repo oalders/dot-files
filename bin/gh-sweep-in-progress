@@ -1,0 +1,156 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+usage() {
+    cat <<'EOF'
+Usage: gh-sweep-in-progress [-v] [--max N] [--owner OWNER]...
+
+Remove the "in progress" label (case-insensitive) from closed issues that
+still carry it. Prints one line per label removed.
+
+Options:
+  --owner OWNER  User or org to search; repeat for several (default: oalders)
+  --max N        Search at most N issues this run (default and cap: 1000)
+  -v, --verbose  Also report the search as it starts and what it found
+  -h, --help     Show this help
+
+Archived repos are skipped. Exits 1 if any label could not be removed.
+EOF
+}
+
+die() {
+    echo "gh-sweep-in-progress: $1" >&2
+    echo "Try 'gh-sweep-in-progress --help'." >&2
+    exit 2
+}
+
+owners=()
+verbose=0
+max=1000
+
+while (($#)); do
+    case $1 in
+    -h | --help)
+        usage
+        exit 0
+        ;;
+    -v | --verbose)
+        verbose=1
+        shift
+        ;;
+    --owner)
+        (($# >= 2)) || die "--owner needs a value"
+        owners+=("$2")
+        shift 2
+        ;;
+    --owner=*)
+        owners+=("${1#--owner=}")
+        shift
+        ;;
+    --max)
+        (($# >= 2)) || die "--max needs a value"
+        max=$2
+        shift 2
+        ;;
+    --max=*)
+        max=${1#--max=}
+        shift
+        ;;
+    *)
+        die "unknown argument: $1"
+        ;;
+    esac
+done
+
+[[ $max =~ ^[1-9][0-9]*$ ]] || die "--max needs a positive integer"
+((${#max} <= 4 && max <= 1000)) || max=1000
+
+((${#owners[@]})) || owners=(oalders)
+
+owner_args=()
+for o in "${owners[@]}"; do
+    owner_args+=(--owner "$o")
+done
+
+# The label: qualifier is case-insensitive, but removal needs the exact name.
+# shellcheck disable=SC2016 # $i and $u are jq variables
+filter='.[] | .id as $i | .url as $u | .labels[]
+  | select(.name | ascii_downcase == "in progress")
+  | "\($i)\t\($u)\t\(.id)\t\(.name)"'
+
+# Labels come from GitHub and can hold terminal escapes.
+print_safe() {
+    printf '%s\n' "${1//[[:cntrl:]]/?}"
+}
+
+printf -v joined '%s, ' "${owners[@]}"
+((verbose)) && print_safe "gh-sweep-in-progress: searching closed issues labelled 'in progress' for ${joined%, }..."
+
+found=$(gh search issues "${owner_args[@]}" --label 'in progress' \
+    --state closed --archived=false --limit "$max" --json id,url,labels \
+    --jq "$filter") || {
+    echo "gh-sweep-in-progress: issue search failed" >&2
+    exit 1
+}
+
+if ((verbose)); then
+    # One line per issue: label names are unique per repo case-insensitively.
+    n=$(grep -c . <<<"$found" || true)
+    print_safe "gh-sweep-in-progress: found $n closed issue(s) labelled 'in progress' for ${joined%, }"
+    ((n < max)) || echo "gh-sweep-in-progress: reached --max $max; more may remain, re-run to continue"
+fi
+
+warn_item() {
+    print_safe "gh-sweep-in-progress: warning: could not remove '$2' label from $1" >&2
+}
+
+status=0
+ids=() urls=() label_ids=() labels=()
+while IFS=$'\t' read -r id url label_id label; do
+    [[ -n $id ]] || continue
+    # IDs are interpolated into the GraphQL query, so refuse anything odd.
+    if [[ $id =~ ^[A-Za-z0-9_=-]+$ && $label_id =~ ^[A-Za-z0-9_=-]+$ ]]; then
+        ids+=("$id") urls+=("$url") label_ids+=("$label_id") labels+=("$label")
+    else
+        warn_item "$url" "$label"
+        status=1
+    fi
+done <<<"$found"
+
+# 50 per request returned HTTP 502 after some had already applied.
+batch=10
+for ((start = 0; start < ${#ids[@]}; start += batch)); do
+    # Pause between batches to stay under GitHub's secondary rate limits.
+    ((start == 0)) || sleep 2
+    end=$((start + batch < ${#ids[@]} ? start + batch : ${#ids[@]}))
+    query='mutation {'
+    for ((i = start; i < end; i++)); do
+        query+=" m$i: removeLabelsFromLabelable(input: {labelableId: \"${ids[i]}\", labelIds: [\"${label_ids[i]}\"]}) { clientMutationId }"
+    done
+    query+=' }'
+
+    # gh exits non-zero if any mutation errored, but still prints the data.
+    resp=$(gh api graphql -f query="$query" </dev/null) || true
+    # No alias succeeding (e.g. every one RATE_LIMITED) means stop, like no data.
+    done_keys=$(jq -r '.data | objects | to_entries[] | select(.value != null) | .key' <<<"$resp" 2>/dev/null) || done_keys=
+    # A failed request (e.g. HTTP 502) may still have applied some removals.
+    if [[ -z $done_keys ]]; then
+        echo "gh-sweep-in-progress: warning: request failed; this batch of $((end - start)) may be partly applied" >&2
+        if ((end < ${#ids[@]})); then
+            echo "gh-sweep-in-progress: warning: skipped the remaining $((${#ids[@]} - end)) issue(s)" >&2
+        fi
+        echo "gh-sweep-in-progress: warning: re-run to retry whatever still carries the label" >&2
+        exit 1
+    fi
+    done_keys=$'\n'$done_keys$'\n'
+    for ((i = start; i < end; i++)); do
+        if [[ $done_keys == *$'\n'"m$i"$'\n'* ]]; then
+            print_safe "gh-sweep-in-progress: removed '${labels[i]}' label from ${urls[i]}"
+        else
+            warn_item "${urls[i]}" "${labels[i]}"
+            status=1
+        fi
+    done
+done
+
+exit "$status"
