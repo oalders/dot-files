@@ -10,7 +10,7 @@ still carry it. Prints one line per label removed.
 
 Options:
   --owner OWNER  User or org to search; repeat for several (default: oalders)
-  -v, --verbose  Also report how many issues the search found
+  -v, --verbose  Also report the search as it starts and what it found
   -h, --help     Show this help
 
 Archived repos are skipped. Exits 1 if any label could not be removed.
@@ -68,6 +68,9 @@ print_safe() {
     printf '%s\n' "${1//[[:cntrl:]]/?}"
 }
 
+printf -v joined '%s, ' "${owners[@]}"
+((verbose)) && print_safe "gh-sweep-in-progress: searching closed issues labelled 'in progress' for ${joined%, }..."
+
 found=$(gh search issues "${owner_args[@]}" --label 'in progress' \
     --state closed --archived=false --limit 1000 --json url,labels \
     --jq "$filter") || {
@@ -78,7 +81,6 @@ found=$(gh search issues "${owner_args[@]}" --label 'in progress' \
 if ((verbose)); then
     # One line per issue: label names are unique per repo case-insensitively.
     n=$(grep -c . <<<"$found" || true)
-    printf -v joined '%s, ' "${owners[@]}"
     print_safe "gh-sweep-in-progress: found $n closed issue(s) labelled 'in progress' for ${joined%, }"
 fi
 
