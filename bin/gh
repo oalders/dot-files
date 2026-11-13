@@ -647,10 +647,10 @@ sub json_str {
 
 if ( !$graphql ) {
     my $verb
-        = $endpoint =~ m{/issues/(?:\d+/)?comments\b}
-        ? [ 'Generated with', 'Review by' ]
-        : $endpoint =~ m{/(?:reviews|replies)\b|/pulls/(?:\d+/)?comments\b}
+        = $endpoint =~ m{/(?:reviews|replies)\b|/pulls/(?:\d+/)?comments\b}
         ? 'Review by'
+        : $endpoint =~ m{/issues/(?:\d+/)?comments\b}
+        ? [ 'Generated with', 'Review by' ]
         : 'Generated with';
     check( $_, $verb ) for @bodies;
     run_real(@argv);

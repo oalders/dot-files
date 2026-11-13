@@ -167,6 +167,10 @@ assert_refused() {
     assert_refused
     gh_run api -X POST repos/o/r/commits/abc/comments -f "body=$REV"
     assert_refused
+    gh_run issue close 1 --comment "$REV"
+    assert_refused
+    gh_run api -X POST 'repos/o/r/pulls/1/comments?x=/issues/comments' -f "body=$GEN"
+    assert_refused
 }
 
 @test "body flag spellings are all checked" {
