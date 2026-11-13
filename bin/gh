@@ -482,11 +482,16 @@ sub cmd_targets {
     return ( $NAME_IT, default_targets() );
 }
 
+# An endpoint without its scheme, host and leading slashes.
+sub endpoint_path {
+    ( my $e = $_[0] // q{} ) =~ s{^(?:https?://[^/]+)?/*}{};
+    return $e;
+}
+
 # gh api fills {owner}/{repo} from cwd. Rendering markdown, marking
 # notifications read and starring post nothing, so they are exempt.
 sub api_targets {
-    my ($endpoint) = @_;
-    ( my $e = $endpoint // q{} ) =~ s{^(?:https?://[^/]+)?/*}{};
+    my $e = endpoint_path(@_);
     return if $e =~ m{^(?:markdown|notifications|user/starred)(?:[/?#]|\z)};
     return ( $ASK, undef ) if $e !~ m{^repos/([^/]+)/([^/?#]+)};
     my ( $owner, $repo ) = ( $1, $2 );
@@ -646,11 +651,11 @@ sub json_str {
 }
 
 if ( !$graphql ) {
-    ( my $path = $endpoint ) =~ s{^(?:https?://[^/]+)?/*|[?#].*}{}gs;
+    ( my $path = endpoint_path($endpoint) ) =~ s/[?#].*//s;
     my $verb
         = $endpoint =~ m{/(?:reviews|replies)\b|/pulls/(?:\d+/)?comments\b}
         ? 'Review by'
-        : $path =~ m{^repos/[^/]+/[^/]+/issues/(?:\d+/)?comments\b}
+        : $path =~ m{^repos/[^/]+/[^/]+/issues/(?:\d+/comments|comments/\d+)/?\z}
         ? [ 'Generated with', 'Review by' ]
         : 'Generated with';
     check( $_, $verb ) for @bodies;
