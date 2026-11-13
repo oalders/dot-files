@@ -22,9 +22,10 @@
 # passes in place of either line.
 #
 # "Review by" is required for reviews, their inline comments, and review
-# replies, "Generated with" elsewhere. Merge commit bodies, release notes and
-# titles need no trailer, but like every body they are refused if they hold a
-# Claude Code session link or id.
+# replies; `issue`/`pr comment` and REST issue-comment endpoints accept either
+# (not `close`/`reopen --comment` or GraphQL); "Generated with" elsewhere.
+# Merge commit bodies, release notes and titles need no trailer, but like every
+# body they are refused if they hold a Claude Code session link or id.
 #
 # Trailer scope: `issue`/`pr` create|new|edit|comment|close, `pr review`,
 # `pr merge`, `release` create|edit, and `gh api` POST/PATCH/PUT to comment/
@@ -133,15 +134,18 @@ sub has_git_trailer {
 }
 
 # Refuse unless $body leaks no session and, when $verb is given, ends with the
-# trailer for $verb or a git-style equivalent.
+# trailer for $verb (a verb or arrayref of verbs) or a git-style equivalent.
 sub check {
     my ( $body, $verb ) = @_;
     check_leak($body);
     return if !defined $verb;
-    return if $body =~ /^\Q$ROBOT $verb $ANCHOR $DOT \E$MODEL[ \t]*\s*\z/m;
+    my @verbs = ref $verb ? @$verb : $verb;
+    return
+        if grep { $body =~ /^\Q$ROBOT $_ $ANCHOR $DOT \E$MODEL[ \t]*\s*\z/m }
+        @verbs;
     return if has_git_trailer($body);
-    block(    "the body must end with the attribution trailer:\n"
-            . "  $ROBOT $verb $ANCHOR $DOT <Model>\n"
+    block(    "the body must end with an attribution trailer:\n"
+            . join( q{}, map {"  $ROBOT $_ $ANCHOR $DOT <Model>\n"} @verbs )
             . "where <Model> is the model you are running as (e.g. Opus 5.5,\n"
             . "Sonnet 5); name yourself, not another model. An Assisted-By: or\n"
             . "Co-Authored-By: trailer naming that model also passes" );
@@ -407,8 +411,9 @@ my %ISSUE_PR_WRITE = (
 my %ISSUE_PR = (
     (
         map { $_ => [ \%ISSUE_PR_WRITE, 'Generated with' ] }
-            qw( create new edit comment )
+            qw( create new edit )
     ),
+    comment => [ \%ISSUE_PR_WRITE, [ 'Generated with', 'Review by' ] ],
     (
         map {
             $_ => [
@@ -642,7 +647,9 @@ sub json_str {
 
 if ( !$graphql ) {
     my $verb
-        = $endpoint =~ m{/(?:reviews|replies)\b|/pulls/(?:\d+/)?comments\b}
+        = $endpoint =~ m{/issues/(?:\d+/)?comments\b}
+        ? [ 'Generated with', 'Review by' ]
+        : $endpoint =~ m{/(?:reviews|replies)\b|/pulls/(?:\d+/)?comments\b}
         ? 'Review by'
         : 'Generated with';
     check( $_, $verb ) for @bodies;

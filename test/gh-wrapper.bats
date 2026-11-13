@@ -146,12 +146,27 @@ assert_refused() {
 }
 
 @test "the trailer verb must match the command" {
-    gh_run pr comment 1 --body "$REV"
+    gh_run pr create --title t --body "$REV"
     assert_refused
     gh_run pr review 1 --comment --body "$GEN"
     assert_refused
     gh_run pr review 1 --approve --body "$REV"
     assert_passed
+}
+
+@test "conversation comments accept either trailer" {
+    gh_run pr comment 1 --body "$REV"
+    assert_passed
+    gh_run issue comment 1 --body "$REV"
+    assert_passed
+    gh_run api -X POST repos/o/r/issues/1/comments -f "body=$REV"
+    assert_passed
+    gh_run api -X PATCH repos/o/r/issues/comments/9 -f "body=$REV"
+    assert_passed
+    gh_run api -X POST repos/o/r/issues -f "body=$REV"
+    assert_refused
+    gh_run api -X POST repos/o/r/commits/abc/comments -f "body=$REV"
+    assert_refused
 }
 
 @test "body flag spellings are all checked" {
