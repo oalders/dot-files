@@ -646,10 +646,11 @@ sub json_str {
 }
 
 if ( !$graphql ) {
+    ( my $path = $endpoint ) =~ s{^(?:https?://[^/]+)?/*|[?#].*}{}gs;
     my $verb
         = $endpoint =~ m{/(?:reviews|replies)\b|/pulls/(?:\d+/)?comments\b}
         ? 'Review by'
-        : $endpoint =~ m{/issues/(?:\d+/)?comments\b}
+        : $path =~ m{^repos/[^/]+/[^/]+/issues/(?:\d+/)?comments\b}
         ? [ 'Generated with', 'Review by' ]
         : 'Generated with';
     check( $_, $verb ) for @bodies;
