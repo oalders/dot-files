@@ -267,9 +267,18 @@ fi
 # filesystem.read_file.
 base_settings="$HOME/.config/nono/claude-settings.json"
 session_settings="$PWD/.tmp/claude-settings.json"
+# Auto memory is off in the base settings; opt a repo in with
+# `git config --local nn.autoMemory true` (--local for the same reason as
+# nn.sandboxPolicy). ~/.claude is already writable via nolabs-ai/claude.
+auto_memory_json=false
+if [[ $(git config --local --type=bool --get nn.autoMemory 2>/dev/null) == true ]]; then
+    auto_memory_json=true
+    echo "🗯️nn: auto memory enabled (git config nn.autoMemory)" >&2
+fi
 chrome_json=$( ((chrome_enabled)) && echo true || echo false)
 playwright_json=$( ((playwright_enabled)) && echo true || echo false)
 jq --argjson chrome "$chrome_json" --argjson pw "$playwright_json" \
+    --argjson automemory "$auto_memory_json" \
     --arg statusline "bash $HOME/dot-files/claude/statusline-command.sh" \
     '. + {
         enabledPlugins: ((.enabledPlugins // {}) + {
@@ -277,7 +286,7 @@ jq --argjson chrome "$chrome_json" --argjson pw "$playwright_json" \
             "superpowers-chrome@superpowers-marketplace": $chrome
         }),
         statusLine: { type: "command", command: $statusline }
-    }' "$base_settings" >"$session_settings"
+    } + (if $automemory then { autoMemoryEnabled: true } else {} end)' "$base_settings" >"$session_settings"
 
 enabled_mcps=()
 ((chrome_enabled)) && enabled_mcps+=("chrome")

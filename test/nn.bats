@@ -854,6 +854,31 @@ esac'
     ! grep -Fxq -- "--sandbox-policy" "$BATS_TEST_TMPDIR/nono-argv"
 }
 
+# --- per-repo auto memory via git config -----------------------------------
+
+@test "bin/nn enables auto memory when the repo's local nn.autoMemory is true" {
+    git init -q .
+    git config --local nn.autoMemory true
+    run "$NN"
+    [ "$status" -eq 0 ]
+    [ "$(jq -r '.autoMemoryEnabled' .tmp/claude-settings.json)" = "true" ]
+}
+
+@test "bin/nn leaves auto memory to the base settings by default" {
+    git init -q .
+    run "$NN"
+    [ "$status" -eq 0 ]
+    [ "$(jq -r '.autoMemoryEnabled' .tmp/claude-settings.json)" = "null" ]
+}
+
+@test "bin/nn ignores nn.autoMemory set in global git config" {
+    git init -q .
+    git config --global nn.autoMemory true
+    run "$NN"
+    [ "$status" -eq 0 ]
+    [ "$(jq -r '.autoMemoryEnabled' .tmp/claude-settings.json)" = "null" ]
+}
+
 @test "nn wires the gh wrapper's private-to-public guard" {
     run "$NN"
     [ "$status" -eq 0 ]
