@@ -270,6 +270,7 @@ session_settings="$PWD/.tmp/claude-settings.json"
 # Auto memory is off in the base settings; opt a repo in with
 # `git config --local nn.autoMemory true` (--local for the same reason as
 # nn.sandboxPolicy). ~/.claude is already writable via nolabs-ai/claude.
+# Like nn.sandboxPolicy, the sandboxed agent can write this key itself.
 auto_memory_json=false
 if [[ $(git config --local --type=bool --get nn.autoMemory 2>/dev/null) == true ]]; then
     auto_memory_json=true

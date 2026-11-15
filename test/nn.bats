@@ -856,27 +856,36 @@ esac'
 
 # --- per-repo auto memory via git config -----------------------------------
 
+# Mirror the real base settings, which disable auto memory.
+seed_auto_memory_off() {
+    echo '{"sandbox":{"enabled":false},"autoMemoryEnabled":false}' \
+        >"$HOME/.config/nono/claude-settings.json"
+}
+
 @test "bin/nn enables auto memory when the repo's local nn.autoMemory is true" {
+    seed_auto_memory_off
     git init -q .
     git config --local nn.autoMemory true
     run "$NN"
     [ "$status" -eq 0 ]
-    [ "$(jq -r '.autoMemoryEnabled' .tmp/claude-settings.json)" = "true" ]
+    jq -e '.autoMemoryEnabled == true' .tmp/claude-settings.json
 }
 
-@test "bin/nn leaves auto memory to the base settings by default" {
+@test "bin/nn keeps the base auto memory setting by default" {
+    seed_auto_memory_off
     git init -q .
     run "$NN"
     [ "$status" -eq 0 ]
-    [ "$(jq -r '.autoMemoryEnabled' .tmp/claude-settings.json)" = "null" ]
+    jq -e '.autoMemoryEnabled == false' .tmp/claude-settings.json
 }
 
 @test "bin/nn ignores nn.autoMemory set in global git config" {
+    seed_auto_memory_off
     git init -q .
     git config --global nn.autoMemory true
     run "$NN"
     [ "$status" -eq 0 ]
-    [ "$(jq -r '.autoMemoryEnabled' .tmp/claude-settings.json)" = "null" ]
+    jq -e '.autoMemoryEnabled == false' .tmp/claude-settings.json
 }
 
 @test "nn wires the gh wrapper's private-to-public guard" {
