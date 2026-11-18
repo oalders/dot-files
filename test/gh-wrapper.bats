@@ -417,6 +417,10 @@ assert_refused() {
     assert_refused
     gh_run api -X POST repos/o/r/issues -f title=t -f "body=$GEN"
     assert_passed
+    gh_run api -X POST repos/o/r/releases -f body='session_01AbCdEfGhIjKlMnOpQrSt'
+    assert_refused
+    gh_run api -X POST repos/o/r/releases -f body=x
+    assert_passed
 }
 
 @test "api --input JSON body is checked" {
@@ -539,6 +543,23 @@ assert_refused() {
     gh_run api graphql -f 'query=mutation { addComment(input: {subjectId: "x",body: "hi"}) { clientMutationId } }'
     assert_refused
     gh_run api graphql -f $'query=mutation { addComment(input: {subjectId: "x" # ]\n body: "hi"}) { clientMutationId } }'
+    assert_refused
+}
+
+@test "graphql strings and comments are tokenized in one pass" {
+    m='mutation($b: String!) { addComment(input: {subjectId: '
+    gh_run api graphql -f "query=$m\"#1\", body: \$b}) { clientMutationId } }" -f b=hi
+    assert_refused
+    gh_run api graphql -f "query=$m\"#1\", body: \$b}) { clientMutationId } }" -f "b=$GEN"
+    assert_passed
+    gh_run api graphql -f 'query=mutation { addComment(input: {subjectId: "#1", body: "hi"}) { clientMutationId } }'
+    assert_refused
+    gh_run api graphql -f "query=$m\"x\" # \"
+ body: \$b, t: \"y\"}) { clientMutationId } }" -f b=hi
+    assert_refused
+    gh_run api graphql -f $'query=mutation { addComment(input: {subjectId: "x" # c\r body: "hi"}) { clientMutationId } }'
+    assert_refused
+    gh_run api graphql -f 'query=mutation { addComment(input: {subjectId: """\""" #""" body: "hi"}) { clientMutationId } }'
     assert_refused
 }
 

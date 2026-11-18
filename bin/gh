@@ -596,10 +596,6 @@ if ( !$graphql
     guard_targets(@targets) if @targets;
 }
 run_real(@argv) if !defined $method || uc($method) !~ /^(?:POST|PATCH|PUT)$/;
-run_real(@argv)
-    if !$graphql
-    && ( !defined $endpoint
-    || !grep { index( $endpoint, $_ ) >= 0 } @API_ENDPOINT_NEEDLES );
 
 # Resolve every field to its content; `-F key=@file` reads a file. All of it is
 # scanned for session links, and %field keeps the content by key. @bodies
@@ -650,6 +646,11 @@ sub json_str {
     return $s;
 }
 
+run_real(@argv)
+    if !$graphql
+    && ( !defined $endpoint
+    || !grep { index( $endpoint, $_ ) >= 0 } @API_ENDPOINT_NEEDLES );
+
 if ( !$graphql ) {
     ( my $path = endpoint_path($endpoint) ) =~ s/[?#].*//s;
     my $verb
@@ -678,12 +679,12 @@ guard_targets(
     "set GH_REPO=owner/repo to the repository it writes to, or $ASK",
     default_targets() );
 
-# GraphQL ignores commas and `#` comments; drop them so they can't hide a body.
-( my $q = $query ) =~ s/#[^\n]*//g;
-$q =~ tr/,/ /;
+# One pass: a `#` in a string or a `"` in a comment must not hide a body.
+( my $q = $query ) =~ s/("""(?:\\"""|(?!""").)*"""|"(?:[^"\\\n\r]|\\.)*")|#[^\r\n]*/
+    defined $1 ? '""' : ''/gse;
+$q =~ tr/,/ /;    # GraphQL ignores commas
 block('pass GraphQL mutation bodies as a variable (body: $body, -f body=...)')
     if $q =~ /\bbody\s*:\s*"/;
-$q =~ s/"(?:[^"\\]|\\.)*"/""/gs;    # so strings can't fake a verb or body
 
 my $verb
     = $q =~ /\b\w*(?:PullRequestReview|ReviewThreadReply)\w*\s*\(/
