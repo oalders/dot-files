@@ -717,6 +717,16 @@ assert_refused() {
     [[ "$output" == *"works in a private repository and org/proj is public"* ]]
 }
 
+@test "an empty target list never takes the single-remote shortcut" {
+    private_repo
+    export NN_SESSION_DIR="$REPO_DIR"
+    cd "$BATS_TEST_TMPDIR/work"
+    q='mutation { resolveReviewThread(input: {threadId: "PRRT_x"}) { clientMutationId } }'
+    gh_run api graphql -f "query=$q"
+    assert_refused
+    [[ "$output" == *"can't be determined"* ]]
+}
+
 @test "allowlisted public repos may be written to" {
     private_repo
     vis org/proj public
