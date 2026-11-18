@@ -25,7 +25,8 @@
 # replies; `issue`/`pr comment` and REST issue-comment endpoints accept either
 # (not `close`/`reopen --comment` or GraphQL); "Generated with" elsewhere.
 # Merge commit bodies, release notes and titles need no trailer, but like every
-# body they are refused if they hold a Claude Code session link or id.
+# body and every `gh api` write field they are refused if they hold a Claude
+# Code session link or id.
 #
 # Trailer scope: `issue`/`pr` create|new|edit|comment|close, `pr review`,
 # `pr merge`, `release` create|edit, and `gh api` POST/PATCH/PUT to comment/
@@ -646,6 +647,7 @@ sub json_str {
     return $s;
 }
 
+# Leak checks above ran for every write; this gates only the trailer check.
 run_real(@argv)
     if !$graphql
     && ( !defined $endpoint
@@ -680,9 +682,9 @@ guard_targets(
     default_targets() );
 
 # One pass: a `#` in a string or a `"` in a comment must not hide a body.
-( my $q = $query ) =~ s/("""(?:\\"""|(?!""").)*"""|"(?:[^"\\\n\r]|\\.)*")|#[^\r\n]*/
+( my $q = $query ) =~ s/("""(?:\\"""|(?!""").)*"""|"(?:[^"\\\n\r]|\\[^\n\r])*")|#[^\r\n]*/
     defined $1 ? '""' : ''/gse;
-$q =~ tr/,/ /;    # GraphQL ignores commas
+$q =~ s/,|\xEF\xBB\xBF/ /g;    # GraphQL ignores commas and BOMs
 block('pass GraphQL mutation bodies as a variable (body: $body, -f body=...)')
     if $q =~ /\bbody\s*:\s*"/;
 

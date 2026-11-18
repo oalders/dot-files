@@ -421,6 +421,16 @@ assert_refused() {
     assert_refused
     gh_run api -X POST repos/o/r/releases -f body=x
     assert_passed
+    printf "session_01AbCdEfGhIjKlMnOpQrSt" >"$BATS_TEST_TMPDIR/leak.md"
+    gh_run api -X POST repos/o/r/releases -F "body=@$BATS_TEST_TMPDIR/leak.md"
+    assert_refused
+    json="$BATS_TEST_TMPDIR/in.json"
+    printf '{"body":"session_01AbCdEfGhIjKlMnOpQrSt"}' >"$json"
+    gh_run api repos/o/r/releases --input "$json"
+    assert_refused
+    printf '{"body":"x"}' >"$json"
+    gh_run api repos/o/r/releases --input "$json"
+    assert_passed
 }
 
 @test "api --input JSON body is checked" {
@@ -546,7 +556,7 @@ assert_refused() {
     assert_refused
 }
 
-@test "graphql strings and comments are tokenized in one pass" {
+@test "graphql: a # in a string doesn't start a comment" {
     m='mutation($b: String!) { addComment(input: {subjectId: '
     gh_run api graphql -f "query=$m\"#1\", body: \$b}) { clientMutationId } }" -f b=hi
     assert_refused
@@ -554,12 +564,29 @@ assert_refused() {
     assert_passed
     gh_run api graphql -f 'query=mutation { addComment(input: {subjectId: "#1", body: "hi"}) { clientMutationId } }'
     assert_refused
-    gh_run api graphql -f "query=$m\"x\" # \"
+}
+
+@test "graphql: a \" in a comment doesn't start a string" {
+    # Guards against stripping strings before comments.
+    gh_run api graphql -f "query=mutation(\$b: String!) { addComment(input: {subjectId: \"x\" # \"
  body: \$b, t: \"y\"}) { clientMutationId } }" -f b=hi
     assert_refused
+}
+
+@test "graphql: comments and strings end at any line terminator" {
     gh_run api graphql -f $'query=mutation { addComment(input: {subjectId: "x" # c\r body: "hi"}) { clientMutationId } }'
     assert_refused
+    gh_run api graphql -f $'query=mutation { addComment(input: {subjectId: "x\\\n body: "hi"}) { clientMutationId } }'
+    assert_refused
+}
+
+@test "graphql: block strings end only at an unescaped \"\"\"" {
     gh_run api graphql -f 'query=mutation { addComment(input: {subjectId: """\""" #""" body: "hi"}) { clientMutationId } }'
+    assert_refused
+}
+
+@test "graphql: a BOM between tokens is ignored like a comma" {
+    gh_run api graphql -f $'query=mutation { addComment(input: {subjectId: "x", body\xEF\xBB\xBF: "hi"}) { clientMutationId } }'
     assert_refused
 }
 
