@@ -7,12 +7,16 @@ not a hostile agent.
 
 ## Rule
 
+- A write whose every target is the session's only GitHub remote is allowed
+  without a lookup.
 - The session is private if any GitHub remote of cwd's repo, or of
-  `$NN_SESSION_DIR`'s repo (exported by `bin/nn`), is not public. A failed
-  lookup counts as private.
+  `$NN_SESSION_DIR`'s repo (exported by `bin/nn`), is not public. A lookup
+  that still fails is guarded as if private; refusals say its visibility
+  couldn't be determined.
 - In a private session, every target of a write must be `private`, `internal`,
   or listed in `~/.config/gh/wrapper-allow-public` (one `owner/repo` per line,
-  `#` comments). Unknown targets and failed lookups are refused.
+  `#` comments). Unknown targets, and those whose lookup still fails after a
+  retry, are refused.
 - Without `-R` or a URL, the targets are `$GH_REPO`, else every GitHub remote
   of cwd plus any `gh repo set-default` choice. gh would pick one, preferring
   `upstream`, so a private repo with a public `upstream` remote is exactly the
@@ -58,4 +62,5 @@ a fetch, so fetching a public repo from a private `nn` session can be refused.
 - Calling `/usr/bin/gh` directly, `curl` with a token, or `gh auth token`.
 - Hosts other than github.com.
 
-Visibility comes from the real `gh` at write time, a few API calls per write.
+Visibility comes from the real `gh` at write time, a few API calls per write
+(none for a write to the session's only remote).

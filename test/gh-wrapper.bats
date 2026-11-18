@@ -6,9 +6,12 @@ setup() {
     setup_sandbox
     GH="$BIN_DIR/gh"
     OUT="$BATS_TEST_TMPDIR/gh-argv"
-    # `owner/repo visibility` lines the stub answers `gh repo view` from.
+    # `owner/repo visibility` lines the stub answers `gh repo view` from;
+    # `owner/repo N` lines in $VIS.flaky fail that repo's first N lookups of
+    # each gh_run.
     VIS="$BATS_TEST_TMPDIR/visibility"
     : >"$VIS"
+    : >"$VIS.flaky"
     export CLAUDECODE=1 OUT VIS
     export CLAUDE_CODE_SESSION_ID=0f8e2a1c-test-session
     export TMPDIR="$BATS_TEST_TMPDIR/tmp"
@@ -24,6 +27,11 @@ setup() {
     stub_command gh '
 if [[ $1 == repo && $2 == view && $4 == --json ]]; then
     echo "$3" >>"$OUT.lookups"
+    while read -r k n; do
+        if [[ $k == "$3" ]] && (($(grep -cxF "$3" "$OUT.lookups") <= n)); then
+            exit 1
+        fi
+    done <"$VIS.flaky"
     while read -r k v; do
         if [[ $k == "$3" ]]; then echo "${v^^}"; exit 0; fi
     done <"$VIS"
@@ -573,7 +581,64 @@ assert_refused() {
     private_repo
     gh_run issue comment 1 -R ghost/repo --body "$GEN"
     assert_refused
-    [[ "$output" == *"looking up ghost/repo failed; retry"* ]]
+    [[ "$output" == *"can't determine whether ghost/repo is public; retry"* ]]
+    [ "$(grep -cxF ghost/repo "$OUT.lookups")" -eq 2 ]
+}
+
+@test "a lookup that fails once is retried" {
+    private_repo
+    vis me/other private
+    echo 'me/other 1' >"$VIS.flaky"
+    gh_run pr comment 1 -R me/other --body "$GEN"
+    assert_passed
+}
+
+@test "a failed lookup isn't cached" {
+    setup_git_repo
+    git remote add origin git@github.com:me/a.git
+    git remote add upstream https://github.com/org/proj
+    vis org/proj public
+    vis me/a private
+    # Both of private_context's attempts fail; guard_targets must look again.
+    echo 'me/a 2' >"$VIS.flaky"
+    gh_run issue comment 1 -R me/a --body "$GEN"
+    assert_passed
+    [ "$(grep -cxF me/a "$OUT.lookups")" -eq 3 ]
+}
+
+@test "a known-private remote beats an unknown one" {
+    setup_git_repo
+    git remote add origin git@github.com:me/unknown.git
+    git remote add upstream git@github.com:me/secret.git
+    vis me/secret private
+    vis org/proj public
+    gh_run issue comment 1 -R org/proj --body "$GEN"
+    assert_refused
+    [[ "$output" == *"works in a private repository"* ]]
+    [[ "$output" != *"can't tell"* ]]
+}
+
+@test "writing to the session's only remote needs no lookup" {
+    setup_git_repo
+    git remote add origin git@github.com:me/unknown.git
+    gh_run issue comment 1 --body "$GEN"
+    assert_passed
+    refute_lookups
+    gh_run issue comment 1 -R me/unknown --body "$GEN"
+    assert_passed
+    refute_lookups
+}
+
+@test "a failed session lookup isn't reported as a private session" {
+    setup_git_repo
+    git remote add origin git@github.com:me/unknown.git
+    git remote add upstream https://github.com/org/proj
+    vis org/proj public
+    gh_run issue comment 1 -R me/unknown --body "$GEN"
+    assert_refused
+    [[ "$output" == *"can't tell whether this session's repository is private"* ]]
+    [[ "$output" == *"can't determine whether me/unknown is public"* ]]
+    [[ "$output" != *"works in a private repository"* ]]
 }
 
 @test "without -R every github remote of cwd is a target" {
@@ -638,6 +703,28 @@ assert_refused() {
     vis org/proj public
     gh_run issue comment 1 -R org/proj --body "$GEN"
     assert_refused
+}
+
+@test "NN_SESSION_DIR's private repo stops cwd's lone remote taking the shortcut" {
+    private_repo
+    export NN_SESSION_DIR="$REPO_DIR"
+    cd "$BATS_TEST_TMPDIR/work"
+    git init -q
+    git remote add origin https://github.com/org/proj
+    vis org/proj public
+    gh_run issue comment 1 --body "$GEN"
+    assert_refused
+    [[ "$output" == *"works in a private repository and org/proj is public"* ]]
+}
+
+@test "an empty target list never takes the single-remote shortcut" {
+    private_repo
+    export NN_SESSION_DIR="$REPO_DIR"
+    cd "$BATS_TEST_TMPDIR/work"
+    q='mutation { resolveReviewThread(input: {threadId: "PRRT_x"}) { clientMutationId } }'
+    gh_run api graphql -f "query=$q"
+    assert_refused
+    [[ "$output" == *"can't be determined"* ]]
 }
 
 @test "allowlisted public repos may be written to" {

@@ -154,9 +154,10 @@ sub check {
 # A session in a private repo may only write to private/internal repos or
 # allowlisted ones. Why, and what it does not cover: docs/gh-wrapper-visibility.md.
 my $PRIVATE      = 'this session works in a private repository';
+my $UNKNOWN      = "can't tell whether this session's repository is private";
 my $ASK          = 'ask the user before writing there';
 my $NAME_IT      = 'pass -R owner/repo naming the repository you mean';
-my %visibility;    # owner/repo => lowercase visibility, '' if lookup failed
+my %visibility;    # owner/repo => lowercase visibility; failures aren't cached
 my $private_context;
 
 # Output of @cmd, or '' if it fails. stdin/stderr are /dev/null so a lookup
@@ -198,12 +199,14 @@ sub repo_name {
 
 sub repo_visibility {
     my ($repo) = @_;
-    return $visibility{$repo} //= do {
+    return $visibility{$repo} if defined $visibility{$repo};
+    for ( 1 .. 2 ) {
         my $v = lc gh_output( 'repo', 'view', $repo, '--json', 'visibility',
             '--jq', '.visibility' );
         $v =~ s/\s+\z//;
-        $v;
-    };
+        return $visibility{$repo} = $v if length $v;
+    }
+    return q{};
 }
 
 # Git exports GIT_DIR to credential helpers, which would override -C.
@@ -236,16 +239,23 @@ sub default_targets {
     );
 }
 
+# Deduped by name; an undef (non-github.com) remote stays an entry.
+sub session_remotes {
+    my %seen;
+    return grep { !$seen{ $_ // q{} }++ }
+        map { github_remotes($_) }
+        grep { defined && length } q{.}, $ENV{NN_SESSION_DIR};
+}
+
+# 0 if nothing blocks (every session remote is public, or there are none),
+# else the refusal prefix; a known-private remote beats an unknown one.
 sub private_context {
-    return $private_context //= do {
-        my %seen;
-        my @remotes = grep { !$seen{ $_ // q{} }++ }
-            map { github_remotes($_) }
-            grep { defined && length } q{.}, $ENV{NN_SESSION_DIR};
-        ( grep { !defined || repo_visibility($_) ne 'public' } @remotes )
-            ? 1
-            : 0;
-    };
+    return $private_context if defined $private_context;
+    my @vis = map { defined ? repo_visibility($_) : undef } session_remotes();
+    return $private_context = $PRIVATE
+        if grep { !defined || ( length && $_ ne 'public' ) } @vis;
+    return $private_context = $UNKNOWN if grep { $_ eq q{} } @vis;
+    return $private_context = 0;
 }
 
 sub allowed_public {
@@ -265,17 +275,25 @@ sub allowed_public {
 # to do instead.
 sub guard_targets {
     my ( $hint, @targets ) = @_;
-    return if !private_context();
-    block("$PRIVATE and the repository this writes to can't be determined;"
+    # Writing back to the session's only repo can't leak; no lookup needed.
+    my @remotes = session_remotes();
+    return
+        if @remotes == 1
+        && defined $remotes[0]
+        && @targets
+        && !grep { !defined || $_ ne $remotes[0] } @targets;
+    my $context = private_context() or return;
+    block("$context and the repository this writes to can't be determined;"
             . " $hint" )
         if !@targets || grep { !defined } @targets;
     for my $repo (@targets) {
         next if allowed_public($repo);
         my $vis = repo_visibility($repo);
         next if $vis eq 'private' || $vis eq 'internal';
-        block("$PRIVATE and looking up $repo failed; retry, or $ASK")
+        block( "$context and can't determine whether $repo is public;"
+                . " retry, or $ASK" )
             if $vis eq q{};
-        block("$PRIVATE and $repo is $vis; $hint");
+        block("$context and $repo is $vis; $hint");
     }
 }
 
@@ -534,9 +552,10 @@ if ( $sub eq 'auth' && $action eq 'git-credential' && $argv[-1] eq 'get' ) {
 
         # nn always sets useHttpPath, so a missing path there means a bypass.
         if ( !defined $kv{path} ) {
-            block(    "$PRIVATE and git did not say which repository it wants"
+            my $context = $ENV{NN_SESSION_DIR} && private_context();
+            block(    "$context and git did not say which repository it wants"
                     . ' credentials for; set credential.useHttpPath=true' )
-                if $ENV{NN_SESSION_DIR} && private_context();
+                if $context;
         }
         else {
             guard_targets( $ASK, repo_name( $kv{path} ) );
@@ -562,8 +581,9 @@ if ( $sub eq 'release' && $action eq 'upload' ) {
     run_real(@argv);
 }
 if ( $sub eq 'gist' && $action =~ /^(?:create|new|edit)\z/ ) {
-    block("$PRIVATE and gists are readable by anyone with the link")
-        if private_context();
+    my $context = private_context();
+    block("$context and gists are readable by anyone with the link")
+        if $context;
     run_real(@argv);
 }
 
