@@ -254,6 +254,16 @@ case "$*" in "issue view"*) echo "OPEN https://github.com/o/r/issues/952" ;; esa
     grep -q "label create in progress --color 2ECC40" "$GH_LOG"
 }
 
+@test "add-worktree assigns the issue to me for fix-<n> branches" {
+    setup_git_repo
+    export GH_LOG="$BATS_TEST_TMPDIR/gh.log"
+    stub_command gh 'printf "%s\n" "$*" >>"$GH_LOG"
+case "$*" in "issue view"*) echo "OPEN https://github.com/o/r/issues/952" ;; esac'
+    run "$ADD_WORKTREE" fix-952
+    [ "$status" -eq 0 ]
+    grep -qE '^issue edit 952 .*--add-assignee @me( |$)' "$GH_LOG"
+}
+
 @test "add-worktree continues when gh issue edit fails to add the label" {
     setup_git_repo
     # Simulate the label add failing (e.g. label missing, or no perms). The
