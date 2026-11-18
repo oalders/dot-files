@@ -188,7 +188,7 @@ setup_branch() {
         gh pr checkout "$number"
     elif [[ "$type" == "issue" ]]; then
         # The "in progress" label may not exist in the repo yet. Try to create
-        # it first, then label and self-assign the issue. Neither step should
+        # it first, then label and self-assign the issue. None of this should
         # abort worktree setup: if we lack permission (or the label already
         # exists), warn and carry on.
         # 2ECC40 is a traffic-light green.

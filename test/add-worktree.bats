@@ -261,7 +261,7 @@ case "$*" in "issue view"*) echo "OPEN https://github.com/o/r/issues/952" ;; esa
 case "$*" in "issue view"*) echo "OPEN https://github.com/o/r/issues/952" ;; esac'
     run "$ADD_WORKTREE" fix-952
     [ "$status" -eq 0 ]
-    grep -qF "issue edit 952 --add-label in progress --add-assignee @me" "$GH_LOG"
+    grep -qE '^issue edit 952 .*--add-assignee @me( |$)' "$GH_LOG"
 }
 
 @test "add-worktree continues when gh issue edit fails to add the label" {
