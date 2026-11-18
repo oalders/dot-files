@@ -6,7 +6,8 @@ setup() {
     setup_sandbox
     GH="$BIN_DIR/gh"
     OUT="$BATS_TEST_TMPDIR/gh-argv"
-    # `owner/repo visibility` lines the stub answers `gh repo view` from.
+    # `owner/repo visibility` lines the stub answers `gh repo view` from;
+    # repos listed in $VIS.flaky fail their first lookup.
     VIS="$BATS_TEST_TMPDIR/visibility"
     : >"$VIS"
     export CLAUDECODE=1 OUT VIS
@@ -24,6 +25,11 @@ setup() {
     stub_command gh '
 if [[ $1 == repo && $2 == view && $4 == --json ]]; then
     echo "$3" >>"$OUT.lookups"
+    if grep -qxF "$3" "$VIS.flaky" 2>/dev/null &&
+        ! grep -qxF "$3" "$VIS.failed" 2>/dev/null; then
+        echo "$3" >>"$VIS.failed"
+        exit 1
+    fi
     while read -r k v; do
         if [[ $k == "$3" ]]; then echo "${v^^}"; exit 0; fi
     done <"$VIS"
@@ -573,7 +579,36 @@ assert_refused() {
     private_repo
     gh_run issue comment 1 -R ghost/repo --body "$GEN"
     assert_refused
-    [[ "$output" == *"looking up ghost/repo failed; retry"* ]]
+    [[ "$output" == *"can't determine whether ghost/repo is public; retry"* ]]
+}
+
+@test "a lookup that fails once is retried" {
+    private_repo
+    vis me/other private
+    echo me/other >"$VIS.flaky"
+    gh_run pr comment 1 -R me/other --body "$GEN"
+    assert_passed
+}
+
+@test "writing to the session's only remote needs no lookup" {
+    setup_git_repo
+    git remote add origin git@github.com:me/unknown.git
+    gh_run issue comment 1 --body "$GEN"
+    assert_passed
+    refute_lookups
+    gh_run issue comment 1 -R me/unknown --body "$GEN"
+    assert_passed
+    refute_lookups
+}
+
+@test "a failed session lookup isn't reported as a private session" {
+    setup_git_repo
+    git remote add origin git@github.com:me/unknown.git
+    git remote add upstream https://github.com/org/proj
+    vis org/proj public
+    gh_run issue comment 1 -R me/unknown --body "$GEN"
+    assert_refused
+    [[ "$output" == *"can't tell whether this session's repository is private and can't determine whether me/unknown is public"* ]]
 }
 
 @test "without -R every github remote of cwd is a target" {
