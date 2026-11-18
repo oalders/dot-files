@@ -10,8 +10,9 @@ not a hostile agent.
 - A write whose every target is the session's only GitHub remote is allowed
   without a lookup.
 - The session is private if any GitHub remote of cwd's repo, or of
-  `$NN_SESSION_DIR`'s repo (exported by `bin/nn`), is not public. A failed
-  lookup is retried once, then counts as private.
+  `$NN_SESSION_DIR`'s repo (exported by `bin/nn`), is not public. A lookup
+  that still fails is guarded as if private; refusals say its visibility
+  couldn't be determined.
 - In a private session, every target of a write must be `private`, `internal`,
   or listed in `~/.config/gh/wrapper-allow-public` (one `owner/repo` per line,
   `#` comments). Unknown targets, and those whose lookup still fails after a

@@ -7,9 +7,11 @@ setup() {
     GH="$BIN_DIR/gh"
     OUT="$BATS_TEST_TMPDIR/gh-argv"
     # `owner/repo visibility` lines the stub answers `gh repo view` from;
-    # `owner/repo N` lines in $VIS.flaky fail that repo's first N lookups.
+    # `owner/repo N` lines in $VIS.flaky fail that repo's first N lookups of
+    # each gh_run.
     VIS="$BATS_TEST_TMPDIR/visibility"
     : >"$VIS"
+    : >"$VIS.flaky"
     export CLAUDECODE=1 OUT VIS
     export CLAUDE_CODE_SESSION_ID=0f8e2a1c-test-session
     export TMPDIR="$BATS_TEST_TMPDIR/tmp"
@@ -25,12 +27,11 @@ setup() {
     stub_command gh '
 if [[ $1 == repo && $2 == view && $4 == --json ]]; then
     echo "$3" >>"$OUT.lookups"
-    n=$(awk -v r="$3" '"'"'$1 == r { print $2 }'"'"' "$VIS.flaky" 2>/dev/null)
-    failed=$(grep -cxF "$3" "$VIS.failed" 2>/dev/null)
-    if (( ${failed:-0} < ${n:-0} )); then
-        echo "$3" >>"$VIS.failed"
-        exit 1
-    fi
+    while read -r k n; do
+        if [[ $k == "$3" ]] && (($(grep -cxF "$3" "$OUT.lookups") <= n)); then
+            exit 1
+        fi
+    done <"$VIS.flaky"
     while read -r k v; do
         if [[ $k == "$3" ]]; then echo "${v^^}"; exit 0; fi
     done <"$VIS"
@@ -602,6 +603,7 @@ assert_refused() {
     echo 'me/a 2' >"$VIS.flaky"
     gh_run issue comment 1 -R me/a --body "$GEN"
     assert_passed
+    [ "$(grep -cxF me/a "$OUT.lookups")" -eq 3 ]
 }
 
 @test "a known-private remote beats an unknown one" {
@@ -710,6 +712,7 @@ assert_refused() {
     vis org/proj public
     gh_run issue comment 1 --body "$GEN"
     assert_refused
+    [[ "$output" == *"works in a private repository and org/proj is public"* ]]
 }
 
 @test "allowlisted public repos may be written to" {
