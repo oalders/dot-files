@@ -247,15 +247,15 @@ sub session_remotes {
         grep { defined && length } q{.}, $ENV{NN_SESSION_DIR};
 }
 
-# 0 if every session remote is public, else the refusal message prefix.
+# 0 if nothing blocks (every session remote is public, or there are none),
+# else the refusal prefix; a known-private remote beats an unknown one.
 sub private_context {
-    return $private_context //= do {
-        my @vis
-            = map { defined ? repo_visibility($_) : undef } session_remotes();
-          ( grep { !defined || ( length && $_ ne 'public' ) } @vis ) ? $PRIVATE
-        : ( grep { $_ eq q{} } @vis )                            ? $UNKNOWN
-        :                                                          0;
-    };
+    return $private_context if defined $private_context;
+    my @vis = map { defined ? repo_visibility($_) : undef } session_remotes();
+    return $private_context = $PRIVATE
+        if grep { !defined || ( length && $_ ne 'public' ) } @vis;
+    return $private_context = $UNKNOWN if grep { $_ eq q{} } @vis;
+    return $private_context = 0;
 }
 
 sub allowed_public {

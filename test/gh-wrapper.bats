@@ -7,7 +7,7 @@ setup() {
     GH="$BIN_DIR/gh"
     OUT="$BATS_TEST_TMPDIR/gh-argv"
     # `owner/repo visibility` lines the stub answers `gh repo view` from;
-    # repos listed in $VIS.flaky fail their first lookup.
+    # `owner/repo N` lines in $VIS.flaky fail that repo's first N lookups.
     VIS="$BATS_TEST_TMPDIR/visibility"
     : >"$VIS"
     export CLAUDECODE=1 OUT VIS
@@ -25,8 +25,9 @@ setup() {
     stub_command gh '
 if [[ $1 == repo && $2 == view && $4 == --json ]]; then
     echo "$3" >>"$OUT.lookups"
-    if grep -qxF "$3" "$VIS.flaky" 2>/dev/null &&
-        ! grep -qxF "$3" "$VIS.failed" 2>/dev/null; then
+    n=$(awk -v r="$3" '"'"'$1 == r { print $2 }'"'"' "$VIS.flaky" 2>/dev/null)
+    failed=$(grep -cxF "$3" "$VIS.failed" 2>/dev/null)
+    if (( ${failed:-0} < ${n:-0} )); then
         echo "$3" >>"$VIS.failed"
         exit 1
     fi
@@ -580,14 +581,37 @@ assert_refused() {
     gh_run issue comment 1 -R ghost/repo --body "$GEN"
     assert_refused
     [[ "$output" == *"can't determine whether ghost/repo is public; retry"* ]]
+    [ "$(grep -cxF ghost/repo "$OUT.lookups")" -eq 2 ]
 }
 
 @test "a lookup that fails once is retried" {
     private_repo
     vis me/other private
-    echo me/other >"$VIS.flaky"
+    echo 'me/other 1' >"$VIS.flaky"
     gh_run pr comment 1 -R me/other --body "$GEN"
     assert_passed
+}
+
+@test "a failed lookup isn't cached" {
+    setup_git_repo
+    git remote add origin git@github.com:me/a.git
+    git remote add upstream https://github.com/org/proj
+    vis org/proj public
+    vis me/a private
+    # Both of private_context's attempts fail; guard_targets must look again.
+    echo 'me/a 2' >"$VIS.flaky"
+    gh_run issue comment 1 -R me/a --body "$GEN"
+    assert_passed
+}
+
+@test "a known-private remote beats an unknown one" {
+    private_repo
+    git remote add upstream git@github.com:me/unknown.git
+    vis org/proj public
+    gh_run issue comment 1 -R org/proj --body "$GEN"
+    assert_refused
+    [[ "$output" == *"works in a private repository"* ]]
+    [[ "$output" != *"can't tell"* ]]
 }
 
 @test "writing to the session's only remote needs no lookup" {
@@ -608,7 +632,9 @@ assert_refused() {
     vis org/proj public
     gh_run issue comment 1 -R me/unknown --body "$GEN"
     assert_refused
-    [[ "$output" == *"can't tell whether this session's repository is private and can't determine whether me/unknown is public"* ]]
+    [[ "$output" == *"can't tell whether this session's repository is private"* ]]
+    [[ "$output" == *"can't determine whether me/unknown is public"* ]]
+    [[ "$output" != *"works in a private repository"* ]]
 }
 
 @test "without -R every github remote of cwd is a target" {
@@ -672,6 +698,17 @@ assert_refused() {
     cd "$BATS_TEST_TMPDIR/work"
     vis org/proj public
     gh_run issue comment 1 -R org/proj --body "$GEN"
+    assert_refused
+}
+
+@test "NN_SESSION_DIR's private repo stops cwd's lone remote taking the shortcut" {
+    private_repo
+    export NN_SESSION_DIR="$REPO_DIR"
+    cd "$BATS_TEST_TMPDIR/work"
+    git init -q
+    git remote add origin https://github.com/org/proj
+    vis org/proj public
+    gh_run issue comment 1 --body "$GEN"
     assert_refused
 }
 
