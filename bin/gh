@@ -666,14 +666,20 @@ if ( !$graphql ) {
 }
 
 # GraphQL: a mutation's body must come from a variable (`body: $x`), so it can
-# be checked; inline string bodies are refused. Variables come from fields or
-# --input's "variables"; any other `body` field or key is checked too.
+# be checked; inline string bodies are refused. Variables come from fields or,
+# with --input, only from its "variables": gh then sends fields in the URL.
+# Any other `body` field or key is checked too.
+my $has_input = grep { $_->{role} eq 'input' } @$found;
 my $vars
     = ref $input eq 'HASH' && ref $input->{variables} eq 'HASH'
     ? $input->{variables}
     : {};
-my $query = $field{query}
-    // ( ref $input eq 'HASH' ? json_str( $input->{query} ) : undef );
+my $query
+    = !$has_input        ? $field{query}
+    : ref $input eq 'HASH' ? json_str( $input->{query} )
+    :                        undef;
+block('GraphQL --input must be a JSON object with a string "query"')
+    if $has_input && !defined $query;
 run_real(@argv) if !defined $query || $query !~ /\bmutation\b/;
 
 # Mutations name their target only by node ID; judge them by cwd's repo.
@@ -682,8 +688,9 @@ guard_targets(
     default_targets() );
 
 # One pass: a `#` in a string or a `"` in a comment must not hide a body.
-( my $q = $query ) =~ s/("""(?:\\"""|(?!""").)*"""|"(?:[^"\\\n\r]|\\[^\n\r])*")|#[^\r\n]*/
-    defined $1 ? '""' : ''/gse;
+# Possessive so no backtracking can hit older Perls' regex iteration limit.
+( my $q = $query ) =~ s/("""(?:[^"\\]++|\\"""|\\|"(?!""))*+"""|"(?:[^"\\\n\r]++|\\[^\n\r])*+")|#[^\r\n]*/
+    defined $1 ? '""' : ''/ge;
 $q =~ s/,|\xEF\xBB\xBF/ /g;    # GraphQL ignores commas and BOMs
 block('pass GraphQL mutation bodies as a variable (body: $body, -f body=...)')
     if $q =~ /\bbody\s*:\s*"/;
@@ -694,7 +701,8 @@ my $verb
     : 'Generated with';
 while ( $q =~ /\bbody\s*:\s*\$(\w+)/g ) {
     my $var = $1;
-    my @vals = grep { defined } $field{$var}, json_str( $vars->{$var} );
+    my @vals = grep {defined}
+        $has_input ? json_str( $vars->{$var} ) : $field{$var};
     block("supply the GraphQL variable \$$var holding the body") if !@vals;
     check( $_, $verb ) for @vals;
 }
