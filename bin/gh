@@ -693,13 +693,13 @@ guard_targets(
     defined $1 ? '""' : ''/ge;
 $q =~ s/,|\xEF\xBB\xBF/ /g;    # GraphQL ignores commas and BOMs
 block('pass GraphQL mutation bodies as a variable (body: $body, -f body=...)')
-    if $q =~ /\bbody\s*:\s*"/;
+    if $q =~ /(?<![\$\w])body\s*:(?!\s*\$\s*\w)/;    # $body: is a declaration
 
 my $verb
     = $q =~ /\b\w*(?:PullRequestReview|ReviewThreadReply)\w*\s*\(/
     ? 'Review by'
     : 'Generated with';
-while ( $q =~ /\bbody\s*:\s*\$(\w+)/g ) {
+while ( $q =~ /\bbody\s*:\s*\$\s*(\w+)/g ) {
     my $var = $1;
     my @vals = grep {defined}
         $has_input ? json_str( $vars->{$var} ) : $field{$var};
