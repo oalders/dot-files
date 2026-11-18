@@ -607,8 +607,10 @@ assert_refused() {
 }
 
 @test "a known-private remote beats an unknown one" {
-    private_repo
-    git remote add upstream git@github.com:me/unknown.git
+    setup_git_repo
+    git remote add origin git@github.com:me/unknown.git
+    git remote add upstream git@github.com:me/secret.git
+    vis me/secret private
     vis org/proj public
     gh_run issue comment 1 -R org/proj --body "$GEN"
     assert_refused
