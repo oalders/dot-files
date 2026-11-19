@@ -30,7 +30,11 @@
 #
 # Trailer scope: `issue`/`pr` create|new|edit|comment|close, `pr review`,
 # `pr merge`, `release` create|edit, and `gh api` POST/PATCH/PUT to comment/
-# issue/pull/review/reply endpoints or GraphQL mutations.
+# issue/pull/review/reply endpoints or GraphQL mutations. An `issue`/`pr edit`
+# only needs the leak check when every target's current body is non-empty and
+# has neither a `[Claude Code](…)` link nor a Claude `Co-Authored-By:`/
+# `Assisted-By:` line (a human's); add one if you rewrite it (not for a typo,
+# link or checkbox fix).
 #
 # Also, in a session whose repo is private, writes (including git pushes via
 # `auth git-credential`) to any repo that is not private/internal (or listed in
@@ -53,6 +57,10 @@ my $ANCHOR = '[Claude Code](https://claude.com/claude-code)';
 my $ROBOT  = "\xF0\x9F\xA4\x96";
 my $DOT    = "\xC2\xB7";
 my $MODEL  = qr/(?:Claude )?(?:Opus|Sonnet|Haiku|Fable) \d+(?:\.\d+)?/;
+
+# The Claude Code link, current or legacy; the `)` keeps session links out.
+my $CLAUDE_LINK
+    = qr{\[Claude Code\]\(https://claude\.(?:com/claude-code|ai/code)\)};
 
 # Looser than $MODEL: these lines are hand-written and may list other tools.
 my $GIT_TRAILER_MODEL = qr/\b(?:Opus|Sonnet|Haiku|Fable)[ -]\d+(?:[.-]\d+)?/i;
@@ -134,6 +142,15 @@ sub has_git_trailer {
     return 0;
 }
 
+# True if $body ends with the trailer for any of @verbs, or a git-style one.
+sub has_trailer {
+    my ( $body, @verbs ) = @_;
+    return 1
+        if grep { $body =~ /^\Q$ROBOT $_ $ANCHOR $DOT \E$MODEL[ \t]*\s*\z/m }
+        @verbs;
+    return has_git_trailer($body);
+}
+
 # Refuse unless $body leaks no session and, when $verb is given, ends with the
 # trailer for $verb (a verb or arrayref of verbs) or a git-style equivalent.
 sub check {
@@ -141,10 +158,7 @@ sub check {
     check_leak($body);
     return if !defined $verb;
     my @verbs = ref $verb ? @$verb : $verb;
-    return
-        if grep { $body =~ /^\Q$ROBOT $_ $ANCHOR $DOT \E$MODEL[ \t]*\s*\z/m }
-        @verbs;
-    return if has_git_trailer($body);
+    return if has_trailer( $body, @verbs );
     block(    "the body must end with an attribution trailer:\n"
             . join( q{}, map {"  $ROBOT $_ $ANCHOR $DOT <Model>\n"} @verbs )
             . "where <Model> is the model you are running as (e.g. Opus 5.5,\n"
@@ -382,22 +396,23 @@ sub value_of {
     return substr $argv->[ $f->{pos} ], length $f->{prefix};
 }
 
-# Check the `body`/`file`/`leak` flags of an issue/pr/release command. `body`
-# and `file` values need the $verb trailer (if any); `leak` values are only
-# scanned for session links. Body files are swapped for the path to pass on.
-sub check_flags {
-    my ( $argv, $start, $spec, $verb ) = @_;
+# Leak-check the `leak` flags of an issue/pr/release command and return the
+# `body` and `file` bodies. Body files are swapped for the path to pass on.
+sub flag_bodies {
+    my ( $argv, $start, $spec ) = @_;
     my ($found) = parse_flags( $argv, $start, $spec );
+    my @bodies;
     for my $f (@$found) {
         my $val = value_of( $argv, $f );
-        if    ( $f->{role} eq 'body' ) { check( $val, $verb ) }
+        if    ( $f->{role} eq 'body' ) { push @bodies, $val }
         elsif ( $f->{role} eq 'leak' ) { check_leak($val) }
         elsif ( $f->{role} eq 'file' ) {
             my ( $body, $path ) = read_body($val);
-            check( $body, $verb );
+            push @bodies, $body;
             $argv->[ $f->{pos} ] = $f->{prefix} . $path;
         }
     }
+    return @bodies;
 }
 
 sub values_spec {
@@ -481,24 +496,54 @@ my %RELEASE_SPEC = (
 
 my @argv = @ARGV;
 
+# Raw -R values in argv order, before then after the subcommand.
+sub repo_values {
+    my ( $start, $found ) = @_;
+    my @r;
+    for ( my $j = 0 ; $j < $start - 1 ; $j++ ) {
+        if    ( $argv[$j] =~ /^(?:-R|--repo)\z/ ) { push @r, $argv[ ++$j ] }
+        elsif ( $argv[$j] =~ /^(?:--repo=|-R=?)(.+)/s ) { push @r, $1 }
+    }
+    push @r,
+        map { value_of( \@argv, $_ ) } grep { $_->{name} eq 'repo' } @$found;
+    return @r;
+}
+
 # A subcommand's targets: -R (before or after the subcommand) and URL
 # arguments, else default_targets(). Returns ( $hint, @repos ).
 sub cmd_targets {
     my ( $start, $spec ) = @_;
     my ( $found, $positional ) = parse_flags( \@argv, $start, $spec );
-    my @t = map { repo_name( value_of( \@argv, $_ ) ) }
-        grep { $_->{name} eq 'repo' } @$found;
+    my @t = map { repo_name($_) } repo_values( $start, $found );
     push @t, map { repo_name($_) } grep { m{github\.com/}i } @$positional;
-    for ( my $j = 0 ; $j < $start - 1 ; $j++ ) {
-        if ( $argv[$j] =~ /^(?:-R|--repo)\z/ ) {
-            push @t, repo_name( $argv[ ++$j ] );
-        }
-        elsif ( $argv[$j] =~ /^(?:--repo=|-R=?)(.+)/s ) {
-            push @t, repo_name($1);
-        }
-    }
     return ( $ASK, @t ) if @t;
     return ( $NAME_IT, default_targets() );
+}
+
+# True if every target of an issue/pr edit has a human-written body: non-empty,
+# without a Claude Code link (current or legacy; it also catches older
+# trailers) or a git-style trailer. A pr edit with no selector checks the
+# current branch's PR.
+sub all_human_written {
+    my ( $sub, $start, $spec ) = @_;
+    my ( $found, $positional ) = parse_flags( \@argv, $start, $spec );
+    my ( undef, @sel ) = @$positional;    # drop the action word
+    my ($repo) = reverse repo_values( $start, $found );
+    for my $sel ( @sel ? @sel : undef ) {
+        my $json = gh_output( ( defined $repo ? ( '-R', $repo ) : () ),
+            $sub, 'view', ( defined $sel ? $sel : () ), '--json', 'body' );
+        my $v    = eval { JSON::PP->new->utf8->decode($json) };
+        my $body = ref $v eq 'HASH' ? json_str( $v->{body} ) : undef;
+        block("can't fetch the current body to tell who wrote it")
+            if !defined $body;
+        return 0
+            if $body !~ /\S/
+            || $body =~ $CLAUDE_LINK
+            || has_git_trailer($body)
+            # Older Claude Code co-authored without a model name.
+            || $body =~ /^(?:Assisted|Co-Authored)-By:.*noreply\@anthropic\.com/im;
+    }
+    return 1;
 }
 
 # An endpoint without its scheme, host and leading slashes.
@@ -566,8 +611,21 @@ if ( $sub eq 'auth' && $action eq 'git-credential' && $argv[-1] eq 'get' ) {
     run_real(@argv);
 }
 if ($cmd) {
-    check_flags( \@argv, $i + 1, @$cmd );
-    guard_targets( cmd_targets( $i + 1, $cmd->[0] ) );
+    my ( $spec, $verb ) = @$cmd;
+    my @bodies = flag_bodies( \@argv, $i + 1, $spec );
+    # Guard first so a refused target never gets a current-body fetch.
+    my $maybe_human
+        = $action eq 'edit'
+        && defined $verb
+        && grep { !has_trailer( $_, $verb ) } @bodies;
+    if ($maybe_human) {
+        guard_targets( cmd_targets( $i + 1, $spec ) );
+        # Touching up a human's body isn't Claude's post; only leaks matter.
+        $verb = undef if all_human_written( $sub, $i + 1, $spec );
+    }
+    check( $_, $verb ) for @bodies;
+    # Other paths keep the old order: the local check runs before the guard.
+    guard_targets( cmd_targets( $i + 1, $spec ) ) if !$maybe_human;
     run_real(@argv);
 }
 if ( $sub eq 'issue' && $action eq 'transfer' ) {

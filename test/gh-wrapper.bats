@@ -37,6 +37,14 @@ if [[ $1 == repo && $2 == view && $4 == --json ]]; then
     done <"$VIS"
     exit 1
 fi
+if [[ ${*: -2} == "--json body" ]]; then
+    echo "$*" >>"$OUT.views"
+    sel=${*: -3:1}
+    [[ $sel == view ]] && sel=branch
+    [[ -f $BATS_TEST_TMPDIR/current.$sel ]] || exit 1
+    cat "$BATS_TEST_TMPDIR/current.$sel"
+    exit 0
+fi
 [[ $1 == auth ]] && cat >"$OUT.stdin"
 for a in "$@"; do
     printf "ARG:%s\n" "$a"
@@ -65,6 +73,10 @@ private_repo() {
     vis me/secret private
 }
 
+# Record the body the stub answers `gh issue|pr view SEL --json body` with;
+# SEL `branch` answers a view with no selector.
+current() { jq -cn --arg b "$2" '{body: $b}' >"$BATS_TEST_TMPDIR/current.$1"; }
+
 # No visibility lookup reached gh.
 refute_lookups() { [ ! -e "$OUT.lookups" ]; }
 
@@ -72,7 +84,7 @@ refute_lookups() { [ ! -e "$OUT.lookups" ]; }
 refute() { ! "$@"; }
 # Clear the previous call's log so a refusal is seen as nothing reaching gh.
 gh_run() {
-    rm -f "$OUT" "$OUT.lookups"
+    rm -f "$OUT" "$OUT.lookups" "$OUT.views"
     run "$GH" "$@"
 }
 assert_passed() {
@@ -202,6 +214,116 @@ assert_refused() {
     assert_passed
 }
 
+@test "editing human-written bodies needs no trailer" {
+    current 7 'written by a human'
+    current 8 'also human'
+    gh_run -R a/b issue edit 7 8 -R o/r --body 'small fix'
+    assert_passed
+    grep -qxF -- '-R o/r issue view 7 --json body' "$OUT.views"
+    grep -qxF -- '-R o/r issue view 8 --json body' "$OUT.views"
+}
+
+# Not a fetch failure: the refusal must be for the missing trailer.
+assert_needs_trailer() {
+    assert_refused
+    [[ "$output" == *"attribution trailer"* ]]
+}
+
+@test "editing a body with the Claude Code link needs the trailer" {
+    for b in "$GEN" $'hi\n\n🤖 Generated with '"$ANCHOR" \
+        $'hi\n\n🤖 Generated with [Claude Code](https://claude.ai/code)'; do
+        current 7 "$b"
+        gh_run issue edit 7 --body 'small fix'
+        assert_needs_trailer
+    done
+}
+
+@test "editing a body with a git-style trailer needs the trailer" {
+    for m in 'Claude Opus 5.5' Claude; do
+        current 7 $'hi\n\nCo-Authored-By: '"$m"' <noreply@anthropic.com>'
+        gh_run issue edit 7 --body 'small fix'
+        assert_needs_trailer
+    done
+}
+
+@test "editing an empty body needs the trailer" {
+    for b in '' ' '; do
+        current 9 "$b"
+        gh_run pr edit 9 --body 'small fix'
+        assert_needs_trailer
+    done
+}
+
+@test "an edit of human- and Claude-written bodies needs the trailer" {
+    current 7 'written by a human'
+    current 8 "$REV"
+    gh_run issue edit 7 8 --body 'small fix'
+    assert_needs_trailer
+}
+
+@test "a pr edit with no selector checks the current branch's PR" {
+    current branch 'written by a human'
+    gh_run pr edit --body 'small fix'
+    assert_passed
+    grep -qxF -- 'pr view --json body' "$OUT.views"
+}
+
+@test "a private session's edit of a public repo is refused before any fetch" {
+    private_repo
+    vis o/pub public
+    current 7 'written by a human'
+    gh_run -R o/pub issue edit 7 --body 'small fix'
+    assert_refused
+    [[ "$output" == *"o/pub is public"* ]]
+    [ ! -e "$OUT.views" ]
+}
+
+@test "an edit whose current body can't be fetched is refused" {
+    gh_run pr edit 7 --body 'small fix'
+    assert_refused
+    [[ "$output" == *"can't fetch the current body"* ]]
+    grep -qxF -- 'pr view 7 --json body' "$OUT.views"
+}
+
+@test "an edit with the trailer fetches no current body" {
+    gh_run pr edit 7 --body "$GEN"
+    assert_passed
+    [ ! -e "$OUT.views" ]
+}
+
+@test "editing a human-written body still refuses session links" {
+    current 7 'written by a human'
+    gh_run issue edit 7 --body 'see session_01AbCdEfGhIjKlMnOpQrSt'
+    assert_refused
+    [[ "$output" == *"must not contain a Claude Code session link or id"* ]]
+    [[ "$output" != *"attribution trailer"* ]]
+    [ -e "$OUT.views" ]
+}
+
+@test "editing a human-written body via --body-file needs no trailer" {
+    current 7 'written by a human'
+    printf 'small fix\n' >"$BATS_TEST_TMPDIR/body"
+    gh_run issue edit 7 --body-file "$BATS_TEST_TMPDIR/body"
+    assert_passed
+    grep -qxF -- 'issue view 7 --json body' "$OUT.views"
+}
+
+@test "editing a Claude-written body via --body-file needs the trailer" {
+    current 7 "$REV"
+    printf 'small fix\n' >"$BATS_TEST_TMPDIR/body"
+    gh_run issue edit 7 --body-file "$BATS_TEST_TMPDIR/body"
+    assert_needs_trailer
+}
+
+@test "editing a human-written body via --body-file still refuses session ids" {
+    current 7 'written by a human'
+    printf 'see session_01AbCdEfGhIjKlMnOpQrSt\n' >"$BATS_TEST_TMPDIR/body"
+    gh_run issue edit 7 --body-file "$BATS_TEST_TMPDIR/body"
+    assert_refused
+    [[ "$output" == *"must not contain a Claude Code session link or id"* ]]
+    [[ "$output" != *"attribution trailer"* ]]
+}
+
 @test "issue/pr new, close and reopen are checked" {
     gh_run issue new --title t --body hi
     assert_refused
@@ -321,6 +443,9 @@ assert_refused() {
     assert_refused
     gh_run release create v1 --notes 'notes'
     assert_passed
+    gh_run release edit v1 --notes 'notes'
+    assert_passed
+    [ ! -e "$OUT.views" ]
     gh_run release edit v1 -n 'https://claude.ai/code/session_01AbCdEfGhIjKlMnOpQrSt'
     assert_refused
     gh_run pr merge 1 --subject 'session_01AbCdEfGhIjKlMnOpQrSt'
