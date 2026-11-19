@@ -38,8 +38,8 @@ appends it, so write it yourself, naming the model you are running as:
 This replaces any trailer the harness suggests; one without the `· <Model>`
 suffix is refused. Reviews, their inline comments and review replies use
 `🤖 Review by …` instead. `gh issue edit`/`gh pr edit` needs no trailer when
-the body currently on GitHub is non-empty and has no Claude Code link or Claude
-trailer (a human wrote it); for a small fix there (a typo, link or checkbox)
+the body currently on GitHub is non-empty and has no `[Claude Code](…)` link or
+`Co-Authored-By:`/`Assisted-By:` line naming Claude (a human wrote it); for a small fix there (a typo, link or checkbox)
 leave it off, but if you rewrite the text, end it with the trailer. Scope and
 exemptions are in the `bin/gh` header.
 

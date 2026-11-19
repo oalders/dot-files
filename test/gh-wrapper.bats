@@ -84,7 +84,7 @@ refute_lookups() { [ ! -e "$OUT.lookups" ]; }
 refute() { ! "$@"; }
 # Clear the previous call's log so a refusal is seen as nothing reaching gh.
 gh_run() {
-    rm -f "$OUT" "$OUT.lookups"
+    rm -f "$OUT" "$OUT.lookups" "$OUT.views"
     run "$GH" "$@"
 }
 assert_passed() {
@@ -239,9 +239,11 @@ assert_needs_trailer() {
 }
 
 @test "editing a body with a git-style trailer needs the trailer" {
-    current 7 $'hi\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>'
-    gh_run issue edit 7 --body 'small fix'
-    assert_needs_trailer
+    for m in 'Claude Opus 5.5' Claude; do
+        current 7 $'hi\n\nCo-Authored-By: '"$m"' <noreply@anthropic.com>'
+        gh_run issue edit 7 --body 'small fix'
+        assert_needs_trailer
+    done
 }
 
 @test "editing an empty body needs the trailer" {
@@ -280,6 +282,7 @@ assert_needs_trailer() {
     gh_run pr edit 7 --body 'small fix'
     assert_refused
     [[ "$output" == *"can't fetch the current body"* ]]
+    grep -qxF -- 'pr view 7 --json body' "$OUT.views"
 }
 
 @test "an edit with the trailer fetches no current body" {
@@ -292,6 +295,16 @@ assert_needs_trailer() {
     current 7 'written by a human'
     gh_run issue edit 7 --body 'see session_01AbCdEfGhIjKlMnOpQrSt'
     assert_refused
+    [[ "$output" == *"must not contain a Claude Code session link or id"* ]]
+    [[ "$output" != *"attribution trailer"* ]]
+    [ -e "$OUT.views" ]
+}
+
+@test "editing a human-written body via --body-file needs no trailer" {
+    current 7 'written by a human'
+    printf 'small fix\n' >"$BATS_TEST_TMPDIR/body"
+    gh_run issue edit 7 --body-file "$BATS_TEST_TMPDIR/body"
+    assert_passed
 }
 
 @test "issue/pr new, close and reopen are checked" {

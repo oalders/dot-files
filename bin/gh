@@ -31,7 +31,8 @@
 # `pr merge`, `release` create|edit, and `gh api` POST/PATCH/PUT to comment/
 # issue/pull/review/reply endpoints or GraphQL mutations. An `issue`/`pr edit`
 # only needs the leak check when every target's current body is non-empty and
-# has no trailer or Claude Code link (a human's); if you rewrote it, add one.
+# has no trailer or Claude Code link (a human's); add one if you rewrite it
+# (not for a typo, link or checkbox fix).
 #
 # Also, in a session whose repo is private, writes (including git pushes via
 # `auth git-credential`) to any repo that is not private/internal (or listed in
@@ -519,8 +520,8 @@ sub cmd_targets {
 
 # True if every target of an issue/pr edit has a human-written body: non-empty,
 # without a Claude Code link (current or legacy; it also catches older
-# trailers) or a git-style trailer.
-# No selector means the current branch's PR.
+# trailers) or a git-style trailer. A pr edit with no selector checks the
+# current branch's PR.
 sub all_human_written {
     my ( $sub, $start, $spec ) = @_;
     my ( $found, $positional ) = parse_flags( \@argv, $start, $spec );
@@ -536,7 +537,9 @@ sub all_human_written {
         return 0
             if $body !~ /\S/
             || $body =~ $CLAUDE_LINK
-            || has_git_trailer($body);
+            || has_git_trailer($body)
+            # Older Claude Code co-authored without a model name.
+            || $body =~ /^(?:Assisted|Co-Authored)-By:.*noreply\@anthropic\.com/im;
     }
     return 1;
 }
@@ -619,6 +622,7 @@ if ($cmd) {
         $verb = undef if all_human_written( $sub, $i + 1, $spec );
     }
     check( $_, $verb ) for @bodies;
+    # Other paths keep the old order: the local check runs before the guard.
     guard_targets( cmd_targets( $i + 1, $spec ) ) if !$maybe_human;
     run_real(@argv);
 }
