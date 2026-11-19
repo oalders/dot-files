@@ -623,10 +623,17 @@ assert_refused() {
     gh_run api graphql -f $'query=mutation { addComment(input: {subjectId: "x" # c\r body: "hi"}) { clientMutationId } }'
     assert_refused
     [[ $output == *"pass GraphQL mutation bodies as a variable"* ]]
-    # A raw LF in a string (escaped or not) is invalid GraphQL; it fails closed.
+    # A raw LF in a string (escaped or not) is invalid GraphQL; any " left
+    # unclosed is refused, so a # after it can't hide a body.
     gh_run api graphql -f $'query=mutation { addComment(input: {subjectId: "x\\\n body: "hi"}) { clientMutationId } }'
     assert_refused
     [[ $output == *"pass GraphQL mutation bodies as a variable"* ]]
+    gh_run api graphql -f $'query=mutation { addComment(input: {subjectId: "x\n#", body: "no trailer"}) { clientMutationId } }'
+    assert_refused
+    [[ $output == *"GraphQL query has an unterminated or malformed string"* ]]
+    gh_run api graphql -f 'query=mutation($b: String!) { addComment(input: {body: $b, subjectId: """x }) { clientMutationId } }' -f "b=$GEN"
+    assert_refused
+    [[ $output == *"GraphQL query has an unterminated or malformed string"* ]]
 }
 
 @test "graphql: block strings end only at an unescaped \"\"\"" {

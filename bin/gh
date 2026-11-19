@@ -690,10 +690,12 @@ guard_targets(
 # One pass: a `#` in a string or a `"` in a comment must not hide a body.
 # Possessive so no backtracking can hit older Perls' regex iteration limit.
 ( my $q = $query ) =~ s/("""(?:[^"\\]++|\\"""|\\|"(?!""))*+"""|"(?:[^"\\\n\r]++|\\[^\n\r])*+")|#[^\r\n]*/
-    defined $1 ? '""' : ''/ge;
+    defined $1 ? ' ~ ' : ''/ge;    # no \w, so `$"..."` can't read as a variable
 $q =~ s/,|\xEF\xBB\xBF/ /g;    # GraphQL ignores commas and BOMs
 block('pass GraphQL mutation bodies as a variable (body: $body, -f body=...)')
     if $q =~ /(?<![\$\w])body\s*:(?!\s*\$\s*\w)/;    # $body: is a declaration
+# A " left over opens a string we couldn't close; a # inside it hid the rest.
+block('GraphQL query has an unterminated or malformed string') if $q =~ /"/;
 
 my $verb
     = $q =~ /\b\w*(?:PullRequestReview|ReviewThreadReply)\w*\s*\(/
