@@ -305,6 +305,23 @@ assert_needs_trailer() {
     printf 'small fix\n' >"$BATS_TEST_TMPDIR/body"
     gh_run issue edit 7 --body-file "$BATS_TEST_TMPDIR/body"
     assert_passed
+    grep -qxF -- 'issue view 7 --json body' "$OUT.views"
+}
+
+@test "editing a Claude-written body via --body-file needs the trailer" {
+    current 7 "$REV"
+    printf 'small fix\n' >"$BATS_TEST_TMPDIR/body"
+    gh_run issue edit 7 --body-file "$BATS_TEST_TMPDIR/body"
+    assert_needs_trailer
+}
+
+@test "editing a human-written body via --body-file still refuses session ids" {
+    current 7 'written by a human'
+    printf 'see session_01AbCdEfGhIjKlMnOpQrSt\n' >"$BATS_TEST_TMPDIR/body"
+    gh_run issue edit 7 --body-file "$BATS_TEST_TMPDIR/body"
+    assert_refused
+    [[ "$output" == *"must not contain a Claude Code session link or id"* ]]
+    [[ "$output" != *"attribution trailer"* ]]
 }
 
 @test "issue/pr new, close and reopen are checked" {

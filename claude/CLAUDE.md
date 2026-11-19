@@ -39,9 +39,10 @@ This replaces any trailer the harness suggests; one without the `· <Model>`
 suffix is refused. Reviews, their inline comments and review replies use
 `🤖 Review by …` instead. `gh issue edit`/`gh pr edit` needs no trailer when
 the body currently on GitHub is non-empty and has no `[Claude Code](…)` link or
-`Co-Authored-By:`/`Assisted-By:` line naming Claude (a human wrote it); for a small fix there (a typo, link or checkbox)
-leave it off, but if you rewrite the text, end it with the trailer. Scope and
-exemptions are in the `bin/gh` header.
+`Co-Authored-By:`/`Assisted-By:` line naming a Claude model or
+`noreply@anthropic.com` (a human wrote it); for a small fix there (a typo, link
+or checkbox) leave it off, but if you rewrite the text, end it with the
+trailer. Scope and exemptions are in the `bin/gh` header.
 
 ## Remote git operations go through `gh`
 
