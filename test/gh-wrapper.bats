@@ -214,33 +214,49 @@ assert_refused() {
     assert_passed
 }
 
-@test "editing a human-written body needs no trailer" {
+@test "editing human-written bodies needs no trailer" {
     current 7 'written by a human'
-    gh_run -R o/r issue edit 7 --body 'small fix'
+    current 8 'also human'
+    gh_run -R a/b issue edit 7 8 -R o/r --body 'small fix'
     assert_passed
     grep -qxF -- '-R o/r issue view 7 --json body' "$OUT.views"
+    grep -qxF -- '-R o/r issue view 8 --json body' "$OUT.views"
 }
 
-@test "editing a Claude-written body needs the trailer" {
-    for b in "$GEN" "$REV" $'hi\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>' \
-        $'hi\n\n🤖 Generated with '"$ANCHOR"; do
+# Not a fetch failure: the refusal must be for the missing trailer.
+assert_needs_trailer() {
+    assert_refused
+    [[ "$output" == *"attribution trailer"* ]]
+}
+
+@test "editing a body with the Claude Code link needs the trailer" {
+    for b in "$GEN" $'hi\n\n🤖 Generated with '"$ANCHOR" \
+        $'hi\n\n🤖 Generated with [Claude Code](https://claude.ai/code)'; do
         current 7 "$b"
         gh_run issue edit 7 --body 'small fix'
-        assert_refused
+        assert_needs_trailer
     done
 }
 
+@test "editing a body with a git-style trailer needs the trailer" {
+    current 7 $'hi\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>'
+    gh_run issue edit 7 --body 'small fix'
+    assert_needs_trailer
+}
+
 @test "editing an empty body needs the trailer" {
-    current 9 ' '
-    gh_run pr edit 9 --body 'small fix'
-    assert_refused
+    for b in '' ' '; do
+        current 9 "$b"
+        gh_run pr edit 9 --body 'small fix'
+        assert_needs_trailer
+    done
 }
 
 @test "an edit of human- and Claude-written bodies needs the trailer" {
     current 7 'written by a human'
     current 8 "$REV"
     gh_run issue edit 7 8 --body 'small fix'
-    assert_refused
+    assert_needs_trailer
 }
 
 @test "a pr edit with no selector checks the current branch's PR" {
@@ -397,6 +413,9 @@ assert_refused() {
     assert_refused
     gh_run release create v1 --notes 'notes'
     assert_passed
+    gh_run release edit v1 --notes 'notes'
+    assert_passed
+    [ ! -e "$OUT.views" ]
     gh_run release edit v1 -n 'https://claude.ai/code/session_01AbCdEfGhIjKlMnOpQrSt'
     assert_refused
     gh_run pr merge 1 --subject 'session_01AbCdEfGhIjKlMnOpQrSt'

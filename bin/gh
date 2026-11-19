@@ -30,8 +30,8 @@
 # Trailer scope: `issue`/`pr` create|new|edit|comment|close, `pr review`,
 # `pr merge`, `release` create|edit, and `gh api` POST/PATCH/PUT to comment/
 # issue/pull/review/reply endpoints or GraphQL mutations. An `issue`/`pr edit`
-# of a body that is non-empty and has no trailer or $ANCHOR (a human's) only
-# needs the leak check; if you rewrote it, add the trailer yourself.
+# only needs the leak check when every target's current body is non-empty and
+# has no trailer or Claude Code link (a human's); if you rewrote it, add one.
 #
 # Also, in a session whose repo is private, writes (including git pushes via
 # `auth git-credential`) to any repo that is not private/internal (or listed in
@@ -54,6 +54,10 @@ my $ANCHOR = '[Claude Code](https://claude.com/claude-code)';
 my $ROBOT  = "\xF0\x9F\xA4\x96";
 my $DOT    = "\xC2\xB7";
 my $MODEL  = qr/(?:Claude )?(?:Opus|Sonnet|Haiku|Fable) \d+(?:\.\d+)?/;
+
+# The Claude Code link, current or legacy; the `)` keeps session links out.
+my $CLAUDE_LINK
+    = qr{\[Claude Code\]\(https://claude\.(?:com/claude-code|ai/code)\)};
 
 # Looser than $MODEL: these lines are hand-written and may list other tools.
 my $GIT_TRAILER_MODEL = qr/\b(?:Opus|Sonnet|Haiku|Fable)[ -]\d+(?:[.-]\d+)?/i;
@@ -135,6 +139,7 @@ sub has_git_trailer {
     return 0;
 }
 
+# True if $body ends with the trailer for any of @verbs, or a git-style one.
 sub has_trailer {
     my ( $body, @verbs ) = @_;
     return 1
@@ -513,7 +518,8 @@ sub cmd_targets {
 }
 
 # True if every target of an issue/pr edit has a human-written body: non-empty,
-# without $ANCHOR (which also catches older trailers) or a git-style trailer.
+# without a Claude Code link (current or legacy; it also catches older
+# trailers) or a git-style trailer.
 # No selector means the current branch's PR.
 sub all_human_written {
     my ( $sub, $start, $spec ) = @_;
@@ -529,7 +535,7 @@ sub all_human_written {
             if !defined $body;
         return 0
             if $body !~ /\S/
-            || index( $body, $ANCHOR ) >= 0
+            || $body =~ $CLAUDE_LINK
             || has_git_trailer($body);
     }
     return 1;
