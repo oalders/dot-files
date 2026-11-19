@@ -17,6 +17,12 @@ Wraps Claude Code in the [nono](https://nono.sh/) sandbox. Invoke via `nn` (from
 
 Project-local profiles can `"extends": "oalders"` to layer additional grants on top, or stand alone for a tighter sandbox.
 
+`nn --nono-arg <arg>` (repeatable, one token per flag) passes a one-off flag to `nono run` for that session; it widens the sandbox for that session only, so put anything recurring in a profile:
+
+```bash
+nn --nono-arg --allow-domain --nono-arg calendar.google.com
+```
+
 ## Sibling profiles
 
 `oalders.json` is a lean composition root. Tool- and stack-specific grants live in standalone sibling profiles (`oalders-<topic>.json`) that do **not** `extends: "oalders"` — they're meant to be composed via `extends: [...]`, not stacked into a single inheritance chain.
@@ -108,13 +114,6 @@ Opt-in via per-repo `.nono/profile.json`:
 ```
 nn --profile oalders-perl-test
 nn --profile oalders-open
-```
-
-`nn --nono-arg <arg>` (repeatable) passes a one-off flag to `nono run` for
-that session:
-
-```bash
-nn --nono-arg --allow-domain --nono-arg calendar.google.com
 ```
 
 ### Adding a new sibling

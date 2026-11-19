@@ -15,8 +15,7 @@ set -eu -o pipefail
 # --profile <name|path> overrides profile discovery entirely: an existing
 # file is resolved to an absolute path, anything else is passed through as
 # a profile name for nono's ~/.config/nono/profiles lookup.
-# --nono-arg <arg> (repeatable) passes <arg> to `nono run` before `--`, e.g.
-# --nono-arg --allow-domain --nono-arg calendar.google.com.
+# --nono-arg <arg> (repeatable) passes <arg> to nono run before --.
 chrome_enabled=0
 playwright_forced=0
 clodhopper_enabled=0

@@ -2,6 +2,8 @@
 
 load 'helpers.bash'
 
+bats_require_minimum_version 1.5.0
+
 setup() {
     setup_sandbox
     NN="$BIN_DIR/nn"
@@ -385,7 +387,7 @@ esac'
     # Before -- so nono, not claude, receives it.
     [ "$(grep -Fxn -m1 -- 'calendar.google.com' "$argv" | cut -d: -f1)" -lt "$(grep -Fxn -m1 -- '--' "$argv" | cut -d: -f1)" ]
     [ "$(grep -Fxc -- 'calendar.google.com' "$argv")" -eq 1 ]
-    ! grep -Fxq -- "--nono-arg" "$argv"
+    run ! grep -Fxq -- "--nono-arg" "$argv"
     grep -Fxq -- "--resume" "$argv"
 }
 
@@ -395,7 +397,8 @@ esac'
     argv="$BATS_TEST_TMPDIR/nono-argv"
     [ "$(grep -Fx -A1 -m1 -- '--allow-domain' "$argv" | tail -n1)" = "calendar.google.com" ]
     [ "$(grep -Fxn -m1 -- 'calendar.google.com' "$argv" | cut -d: -f1)" -lt "$(grep -Fxn -m1 -- '--' "$argv" | cut -d: -f1)" ]
-    ! grep -Fq -- "--nono-arg=" "$argv"
+    [ "$(grep -Fxc -- 'calendar.google.com' "$argv")" -eq 1 ]
+    run ! grep -Fq -- "--nono-arg=" "$argv"
 }
 
 @test "bin/nn --nono-arg without a value fails with exit 2" {
