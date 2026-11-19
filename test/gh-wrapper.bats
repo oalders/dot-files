@@ -425,6 +425,22 @@ assert_refused() {
     assert_refused
     gh_run api -X POST repos/o/r/issues -f title=t -f "body=$GEN"
     assert_passed
+    gh_run api -X POST repos/o/r/releases -f body='session_01AbCdEfGhIjKlMnOpQrSt'
+    assert_refused
+    gh_run api -X POST repos/o/r/releases -f body=x
+    assert_passed
+    gh_run api -X PATCH repos/o/r/releases/1 -f title='session_01AbCdEfGhIjKlMnOpQrSt'
+    assert_refused
+    printf "session_01AbCdEfGhIjKlMnOpQrSt" >"$BATS_TEST_TMPDIR/leak.md"
+    gh_run api -X POST repos/o/r/releases -F "body=@$BATS_TEST_TMPDIR/leak.md"
+    assert_refused
+    json="$BATS_TEST_TMPDIR/in.json"
+    printf '{"body":"session_01AbCdEfGhIjKlMnOpQrSt"}' >"$json"
+    gh_run api repos/o/r/releases --input "$json"
+    assert_refused
+    printf '{"body":"x"}' >"$json"
+    gh_run api repos/o/r/releases --input "$json"
+    assert_passed
 }
 
 @test "api --input JSON body is checked" {
@@ -489,6 +505,22 @@ assert_refused() {
     assert_refused
     gh_run api graphql -f 'query=mutation($b: String!) { addComment(input: {subjectId: "x", body: $b}) { clientMutationId } }'
     assert_refused
+    gh_run api graphql -f 'query=mutation { addComment(input: {subjectId: "x", body: null}) { clientMutationId } }'
+    assert_refused
+    [[ $output == *"pass GraphQL mutation bodies as a variable"* ]]
+    gh_run api graphql -f 'query=mutation { addComment(input: {subjectId: "x", body: ENUM}) { clientMutationId } }'
+    assert_refused
+    [[ $output == *"pass GraphQL mutation bodies as a variable"* ]]
+}
+
+@test "graphql allows whitespace and comments between \$ and the variable" {
+    m='mutation($body: String!, $b: String!) { addComment(input: {subjectId: "x", body: $'
+    gh_run api graphql -f "query=$m b}) { clientMutationId } }" -f b=hi
+    assert_refused
+    gh_run api graphql -f "query=$m#c"$'\n'"b}) { clientMutationId } }" -f b=hi
+    assert_refused
+    gh_run api graphql -f "query=$m b}) { clientMutationId } }" -f "b=$GEN"
+    assert_passed
 }
 
 @test "graphql input variables have their body checked" {
@@ -543,11 +575,85 @@ assert_refused() {
     assert_passed
 }
 
+@test "graphql --input is judged as gh sends it, ignoring fields" {
+    json="$BATS_TEST_TMPDIR/in.json"
+    q='mutation { addComment(input: {subjectId: "x", body: "hi"}) { clientMutationId } }'
+    jq -cn --arg q "$q" '{query: $q}' >"$json"
+    gh_run api graphql --input "$json" -f 'query={viewer{login}}'
+    assert_refused
+    q='mutation($b: String!) { addComment(input: {subjectId: "x", body: $b}) { clientMutationId } }'
+    jq -cn --arg q "$q" '{query: $q, variables: {}}' >"$json"
+    gh_run api graphql --input "$json" -f "b=$GEN"
+    assert_refused
+    [[ $output == *'supply the GraphQL variable $b'* ]]
+    jq -cn --arg q "$q" --arg b "$GEN" '{query: $q, variables: {b: $b}}' >"$json"
+    gh_run api graphql --input "$json" -f b=hi
+    assert_passed
+    gh_run api graphql --input - <<<'not json'
+    assert_refused
+    [[ $output == *'must be a JSON object with a string "query"'* ]]
+    gh_run api graphql --input - <<<'[{"query":"{viewer{login}}"}]'
+    assert_refused
+    [[ $output == *'must be a JSON object with a string "query"'* ]]
+    gh_run api graphql --input - <<<'{"query":"{viewer{login}}"}'
+    assert_passed
+}
+
 @test "graphql commas and comments cannot hide an inline body" {
     gh_run api graphql -f 'query=mutation { addComment(input: {subjectId: "x",body: "hi"}) { clientMutationId } }'
     assert_refused
     gh_run api graphql -f $'query=mutation { addComment(input: {subjectId: "x" # ]\n body: "hi"}) { clientMutationId } }'
     assert_refused
+}
+
+@test "graphql: a # in a string doesn't start a comment" {
+    m='mutation($b: String!) { addComment(input: {subjectId: '
+    gh_run api graphql -f "query=$m\"#1\", body: \$b}) { clientMutationId } }" -f b=hi
+    assert_refused
+    gh_run api graphql -f "query=$m\"#1\", body: \$b}) { clientMutationId } }" -f "b=$GEN"
+    assert_passed
+    gh_run api graphql -f 'query=mutation { addComment(input: {subjectId: "#1", body: "hi"}) { clientMutationId } }'
+    assert_refused
+    [[ $output == *"pass GraphQL mutation bodies as a variable"* ]]
+}
+
+@test "graphql: a \" in a comment doesn't start a string" {
+    # Guards against stripping strings before comments.
+    gh_run api graphql -f "query=mutation(\$b: String!) { addComment(input: {subjectId: \"x\" # \"
+ body: \$b, t: \"y\"}) { clientMutationId } }" -f b=hi
+    assert_refused
+    gh_run api graphql -f "query=mutation(\$b: String!) { addComment(input: {subjectId: \"x\" # \"
+ body: \$b, t: \"y\"}) { clientMutationId } }" -f "b=$GEN"
+    assert_passed
+}
+
+@test "graphql line terminators end comments and fail closed in strings" {
+    gh_run api graphql -f $'query=mutation { addComment(input: {subjectId: "x" # c\r body: "hi"}) { clientMutationId } }'
+    assert_refused
+    [[ $output == *"pass GraphQL mutation bodies as a variable"* ]]
+    # A raw LF in a string (escaped or not) is invalid GraphQL; any " left
+    # unclosed is refused, so a # after it can't hide a body.
+    gh_run api graphql -f $'query=mutation { addComment(input: {subjectId: "x\\\n body: "hi"}) { clientMutationId } }'
+    assert_refused
+    [[ $output == *"pass GraphQL mutation bodies as a variable"* ]]
+    gh_run api graphql -f $'query=mutation { addComment(input: {subjectId: "x\n#", body: "no trailer"}) { clientMutationId } }'
+    assert_refused
+    [[ $output == *"GraphQL query has an unterminated or malformed string"* ]]
+    gh_run api graphql -f 'query=mutation($b: String!) { addComment(input: {body: $b, subjectId: """x }) { clientMutationId } }' -f "b=$GEN"
+    assert_refused
+    [[ $output == *"GraphQL query has an unterminated or malformed string"* ]]
+}
+
+@test "graphql: block strings end only at an unescaped \"\"\"" {
+    gh_run api graphql -f 'query=mutation { addComment(input: {subjectId: """\""" #""" body: "hi"}) { clientMutationId } }'
+    assert_refused
+    [[ $output == *"pass GraphQL mutation bodies as a variable"* ]]
+}
+
+@test "graphql: a BOM between tokens is ignored like a comma" {
+    gh_run api graphql -f $'query=mutation { addComment(input: {subjectId: "x", body\xEF\xBB\xBF: "hi"}) { clientMutationId } }'
+    assert_refused
+    [[ $output == *"pass GraphQL mutation bodies as a variable"* ]]
 }
 
 @test "graphql review thread replies need the Review by trailer" {

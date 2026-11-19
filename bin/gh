@@ -25,7 +25,8 @@
 # replies; `issue`/`pr comment` and REST issue-comment endpoints accept either
 # (not `close`/`reopen --comment` or GraphQL); "Generated with" elsewhere.
 # Merge commit bodies, release notes and titles need no trailer, but like every
-# body they are refused if they hold a Claude Code session link or id.
+# body and every `gh api` write field they are refused if they hold a Claude
+# Code session link or id.
 #
 # Trailer scope: `issue`/`pr` create|new|edit|comment|close, `pr review`,
 # `pr merge`, `release` create|edit, and `gh api` POST/PATCH/PUT to comment/
@@ -616,10 +617,6 @@ if ( !$graphql
     guard_targets(@targets) if @targets;
 }
 run_real(@argv) if !defined $method || uc($method) !~ /^(?:POST|PATCH|PUT)$/;
-run_real(@argv)
-    if !$graphql
-    && ( !defined $endpoint
-    || !grep { index( $endpoint, $_ ) >= 0 } @API_ENDPOINT_NEEDLES );
 
 # Resolve every field to its content; `-F key=@file` reads a file. All of it is
 # scanned for session links, and %field keeps the content by key. @bodies
@@ -670,6 +667,12 @@ sub json_str {
     return $s;
 }
 
+# Leak checks above ran for every write; this gates only the trailer check.
+run_real(@argv)
+    if !$graphql
+    && ( !defined $endpoint
+    || !grep { index( $endpoint, $_ ) >= 0 } @API_ENDPOINT_NEEDLES );
+
 if ( !$graphql ) {
     ( my $path = endpoint_path($endpoint) ) =~ s/[?#].*//s;
     my $verb
@@ -683,14 +686,20 @@ if ( !$graphql ) {
 }
 
 # GraphQL: a mutation's body must come from a variable (`body: $x`), so it can
-# be checked; inline string bodies are refused. Variables come from fields or
-# --input's "variables"; any other `body` field or key is checked too.
+# be checked; inline string bodies are refused. Variables come from fields or,
+# with --input, only from its "variables": gh then sends fields in the URL.
+# Any other `body` field or key is checked too.
+my $has_input = grep { $_->{role} eq 'input' } @$found;
 my $vars
     = ref $input eq 'HASH' && ref $input->{variables} eq 'HASH'
     ? $input->{variables}
     : {};
-my $query = $field{query}
-    // ( ref $input eq 'HASH' ? json_str( $input->{query} ) : undef );
+my $query
+    = !$has_input        ? $field{query}
+    : ref $input eq 'HASH' ? json_str( $input->{query} )
+    :                        undef;
+block('GraphQL --input must be a JSON object with a string "query"')
+    if $has_input && !defined $query;
 run_real(@argv) if !defined $query || $query !~ /\bmutation\b/;
 
 # Mutations name their target only by node ID; judge them by cwd's repo.
@@ -698,20 +707,24 @@ guard_targets(
     "set GH_REPO=owner/repo to the repository it writes to, or $ASK",
     default_targets() );
 
-# GraphQL ignores commas and `#` comments; drop them so they can't hide a body.
-( my $q = $query ) =~ s/#[^\n]*//g;
-$q =~ tr/,/ /;
+# One pass: a `#` in a string or a `"` in a comment must not hide a body.
+# Possessive so no backtracking can hit older Perls' regex iteration limit.
+( my $q = $query ) =~ s/("""(?:[^"\\]++|\\"""|\\|"(?!""))*+"""|"(?:[^"\\\n\r]++|\\[^\n\r])*+")|#[^\r\n]*/
+    defined $1 ? ' ~ ' : ''/ge;    # no \w, so `$"..."` can't read as a variable
+$q =~ s/,|\xEF\xBB\xBF/ /g;    # GraphQL ignores commas and BOMs
 block('pass GraphQL mutation bodies as a variable (body: $body, -f body=...)')
-    if $q =~ /\bbody\s*:\s*"/;
-$q =~ s/"(?:[^"\\]|\\.)*"/""/gs;    # so strings can't fake a verb or body
+    if $q =~ /(?<![\$\w])body\s*:(?!\s*\$\s*\w)/;    # $body: is a declaration
+# A " left over opens a string we couldn't close; a # inside it hid the rest.
+block('GraphQL query has an unterminated or malformed string') if $q =~ /"/;
 
 my $verb
     = $q =~ /\b\w*(?:PullRequestReview|ReviewThreadReply)\w*\s*\(/
     ? 'Review by'
     : 'Generated with';
-while ( $q =~ /\bbody\s*:\s*\$(\w+)/g ) {
+while ( $q =~ /\bbody\s*:\s*\$\s*(\w+)/g ) {
     my $var = $1;
-    my @vals = grep { defined } $field{$var}, json_str( $vars->{$var} );
+    my @vals = grep {defined}
+        $has_input ? json_str( $vars->{$var} ) : $field{$var};
     block("supply the GraphQL variable \$$var holding the body") if !@vals;
     check( $_, $verb ) for @vals;
 }
