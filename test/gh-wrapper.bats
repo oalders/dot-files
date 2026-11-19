@@ -40,6 +40,7 @@ fi
 if [[ ${*: -2} == "--json body" ]]; then
     echo "$*" >>"$OUT.views"
     sel=${*: -3:1}
+    [[ $sel == view ]] && sel=branch
     [[ -f $BATS_TEST_TMPDIR/current.$sel ]] || exit 1
     cat "$BATS_TEST_TMPDIR/current.$sel"
     exit 0
@@ -72,7 +73,8 @@ private_repo() {
     vis me/secret private
 }
 
-# Record the body the stub answers `gh issue|pr view SEL --json body` with.
+# Record the body the stub answers `gh issue|pr view SEL --json body` with;
+# SEL `branch` answers a view with no selector.
 current() { jq -cn --arg b "$2" '{body: $b}' >"$BATS_TEST_TMPDIR/current.$1"; }
 
 # No visibility lookup reached gh.
@@ -219,14 +221,43 @@ assert_refused() {
     grep -qxF -- '-R o/r issue view 7 --json body' "$OUT.views"
 }
 
-@test "editing a Claude-written or empty body needs the trailer" {
+@test "editing a Claude-written body needs the trailer" {
+    for b in "$GEN" "$REV" $'hi\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>' \
+        $'hi\n\n🤖 Generated with '"$ANCHOR"; do
+        current 7 "$b"
+        gh_run issue edit 7 --body 'small fix'
+        assert_refused
+    done
+}
+
+@test "editing an empty body needs the trailer" {
+    current 9 ' '
+    gh_run pr edit 9 --body 'small fix'
+    assert_refused
+}
+
+@test "an edit of human- and Claude-written bodies needs the trailer" {
     current 7 'written by a human'
     current 8 "$REV"
     gh_run issue edit 7 8 --body 'small fix'
     assert_refused
-    current 9 ' '
-    gh_run pr edit 9 --body 'small fix'
+}
+
+@test "a pr edit with no selector checks the current branch's PR" {
+    current branch 'written by a human'
+    gh_run pr edit --body 'small fix'
+    assert_passed
+    grep -qxF -- 'pr view --json body' "$OUT.views"
+}
+
+@test "a private session's edit of a public repo is refused before any fetch" {
+    private_repo
+    vis o/pub public
+    current 7 'written by a human'
+    gh_run -R o/pub issue edit 7 --body 'small fix'
     assert_refused
+    [[ "$output" == *"o/pub is public"* ]]
+    [ ! -e "$OUT.views" ]
 }
 
 @test "an edit whose current body can't be fetched is refused" {
