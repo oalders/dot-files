@@ -110,6 +110,13 @@ nn --profile oalders-perl-test
 nn --profile oalders-open
 ```
 
+`nn --nono-arg <arg>` (repeatable) passes a one-off flag to `nono run` for
+that session:
+
+```bash
+nn --nono-arg --allow-domain --nono-arg calendar.google.com
+```
+
 ### Adding a new sibling
 
 1. Write `nono/oalders-<topic>.json` standalone (no `extends`).

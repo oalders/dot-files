@@ -15,11 +15,14 @@ set -eu -o pipefail
 # --profile <name|path> overrides profile discovery entirely: an existing
 # file is resolved to an absolute path, anything else is passed through as
 # a profile name for nono's ~/.config/nono/profiles lookup.
+# --nono-arg <arg> (repeatable) passes <arg> to `nono run` before `--`, e.g.
+# --nono-arg --allow-domain --nono-arg calendar.google.com.
 chrome_enabled=0
 playwright_forced=0
 clodhopper_enabled=0
 clodhopper_disabled=0
 profile_override=""
+nono_args=()
 forwarded_args=()
 while [[ $# -gt 0 ]]; do
     case "$1" in
@@ -40,6 +43,19 @@ while [[ $# -gt 0 ]]; do
             exit 2
             ;;
         --profile=*) profile_override="${1#--profile=}" ;;
+        --nono-arg)
+            [[ $# -ge 2 && -n "$2" ]] || {
+                echo "nn: --nono-arg requires a value" >&2
+                exit 2
+            }
+            nono_args+=("$2")
+            shift
+            ;;
+        --nono-arg=)
+            echo "nn: --nono-arg requires a value" >&2
+            exit 2
+            ;;
+        --nono-arg=*) nono_args+=("${1#--nono-arg=}") ;;
         *) forwarded_args+=("$1") ;;
     esac
     shift
@@ -570,7 +586,8 @@ NONO_NO_SAVE_PROMPT=1 exec nono run --profile "$profile" --allow-cwd --workdir .
     "${sandbox_policy_args[@]+"${sandbox_policy_args[@]}"}" \
     --read-file /usr/bin/env "${chrome_run_args[@]+"${chrome_run_args[@]}"}" \
     "${playwright_run_args[@]+"${playwright_run_args[@]}"}" \
-    "${hugo_run_args[@]+"${hugo_run_args[@]}"}" "${extra_allow[@]+"${extra_allow[@]}"}" -- \
+    "${hugo_run_args[@]+"${hugo_run_args[@]}"}" "${extra_allow[@]+"${extra_allow[@]}"}" \
+    "${nono_args[@]+"${nono_args[@]}"}" -- \
     env NO_PROXY="$no_proxy_value" no_proxy="$no_proxy_value" TMPDIR="$PWD/.tmp" \
     XDG_CACHE_HOME="$PWD/.tmp/cache" \
     GIT_CEILING_DIRECTORIES="${GIT_CEILING_DIRECTORIES:+$GIT_CEILING_DIRECTORIES:}$PWD/.tmp" \

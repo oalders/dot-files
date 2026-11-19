@@ -376,6 +376,49 @@ esac'
     grep -Fxq -- "--resume" "$BATS_TEST_TMPDIR/nono-argv"
 }
 
+@test "bin/nn --nono-arg passes values to nono run before --" {
+    run "$NN" --nono-arg --allow-domain --nono-arg calendar.google.com --resume
+    [ "$status" -eq 0 ]
+    argv="$BATS_TEST_TMPDIR/nono-argv"
+    # A value starting with - must be taken as the value, not parsed as a flag.
+    [ "$(grep -Fx -A1 -m1 -- '--allow-domain' "$argv" | tail -n1)" = "calendar.google.com" ]
+    # Before -- so nono, not claude, receives it.
+    [ "$(grep -Fxn -m1 -- 'calendar.google.com' "$argv" | cut -d: -f1)" -lt "$(grep -Fxn -m1 -- '--' "$argv" | cut -d: -f1)" ]
+    [ "$(grep -Fxc -- 'calendar.google.com' "$argv")" -eq 1 ]
+    ! grep -Fxq -- "--nono-arg" "$argv"
+    grep -Fxq -- "--resume" "$argv"
+}
+
+@test "bin/nn supports the --nono-arg=value form" {
+    run "$NN" --nono-arg=--allow-domain --nono-arg=calendar.google.com
+    [ "$status" -eq 0 ]
+    argv="$BATS_TEST_TMPDIR/nono-argv"
+    [ "$(grep -Fx -A1 -m1 -- '--allow-domain' "$argv" | tail -n1)" = "calendar.google.com" ]
+    [ "$(grep -Fxn -m1 -- 'calendar.google.com' "$argv" | cut -d: -f1)" -lt "$(grep -Fxn -m1 -- '--' "$argv" | cut -d: -f1)" ]
+    ! grep -Fq -- "--nono-arg=" "$argv"
+}
+
+@test "bin/nn --nono-arg without a value fails with exit 2" {
+    run "$NN" --nono-arg
+    [ "$status" -eq 2 ]
+    [[ "$output" == *"--nono-arg requires a value"* ]]
+    [ ! -f "$BATS_TEST_TMPDIR/nono-argv" ]
+}
+
+@test "bin/nn --nono-arg= with an empty value fails with exit 2" {
+    run "$NN" --nono-arg=
+    [ "$status" -eq 2 ]
+    [[ "$output" == *"--nono-arg requires a value"* ]]
+    [ ! -f "$BATS_TEST_TMPDIR/nono-argv" ]
+}
+
+@test "bin/nn --nono-arg '' with an empty value fails with exit 2" {
+    run "$NN" --nono-arg ""
+    [ "$status" -eq 2 ]
+    [[ "$output" == *"--nono-arg requires a value"* ]]
+    [ ! -f "$BATS_TEST_TMPDIR/nono-argv" ]
+}
+
 @test "bin/nn --profile overrides a discovered .nono/profile.json" {
     mkdir -p .nono
     echo '{"extends": ["oalders"]}' > .nono/profile.json
