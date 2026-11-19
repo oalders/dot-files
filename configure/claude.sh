@@ -13,6 +13,7 @@ claude plugin marketplace add anthropics/claude-plugins-official
 claude plugin marketplace add oalders/talk-about-us
 claude plugin marketplace add oalders/kitchen-sink
 claude plugin marketplace add Ovid/paad
+claude plugin marketplace add prime-radiant-inc/prime-radiant-marketplace
 
 # Third-party marketplaces default to autoUpdate off, and FORCE_AUTOUPDATE_PLUGINS
 # does not change that.
@@ -35,6 +36,7 @@ claude plugin install superpowers-chrome@superpowers-marketplace
 claude plugin install superpowers-developing-for-claude-code@superpowers-marketplace
 claude plugin install superpowers-lab@superpowers-marketplace
 claude plugin install talk-about-us@talk-about-us
+claude plugin install toolsmith@prime-radiant-marketplace
 claude plugin install typescript-lsp@claude-plugins-official
 # install.sh runs this directly; minimal-install-claude.sh and Dockerfile.dev rely on this call.
 ~/dot-files/configure/claude-lsp.sh
