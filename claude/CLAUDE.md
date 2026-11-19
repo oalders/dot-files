@@ -39,10 +39,7 @@ This replaces any trailer the harness suggests; one without the `· <Model>`
 suffix is refused. Reviews, their inline comments and review replies use
 `🤖 Review by …` instead. Scope and exemptions are in the `bin/gh` header.
 
-## Remote git operations go through `gh`
+## Remote git operations
 
-Never run `git push`, `fetch`, `pull`, `clone` or `ls-remote`: the sandbox has
-no git credentials, so they always fail. Use `gh` instead: `gh repo sync`,
-`gh pr checkout`, `gh repo clone`. `gh` has no push, so publish a branch through
-the git data API (`gh api` blobs → tree → commit, then create or update the
-ref), parented on the remote commit.
+`git push`, `fetch`, `pull` and `clone` work: an HTTPS origin authenticates
+through `gh auth git-credential`, so don't reroute them through `gh api`.
