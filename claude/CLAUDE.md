@@ -41,5 +41,12 @@ suffix is refused. Reviews, their inline comments and review replies use
 
 ## Remote git operations
 
-`git push`, `fetch`, `pull` and `clone` work: an HTTPS origin authenticates
-through `gh auth git-credential`, so don't reroute them through `gh api`.
+`git push`, `fetch`, `pull`, `clone` and `ls-remote` work against GitHub: `nn`
+rewrites GitHub SSH URLs to HTTPS and authenticates them through
+`gh auth git-credential`, so don't reroute them through `gh api`. What fails:
+
+- A push from a private-repo session to a public repo, refused by the `bin/gh`
+  guard (`docs/gh-wrapper-visibility.md`).
+- SSH to any other host: `~/.ssh` is denied, and there is no agent.
+- `clone` or `worktree add` outside the sandbox's writable paths; use the
+  scratchpad.
