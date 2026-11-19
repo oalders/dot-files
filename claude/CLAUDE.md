@@ -37,7 +37,9 @@ appends it, so write it yourself, naming the model you are running as:
 
 This replaces any trailer the harness suggests; one without the `· <Model>`
 suffix is refused. Reviews, their inline comments and review replies use
-`🤖 Review by …` instead. Scope and exemptions are in the `bin/gh` header.
+`🤖 Review by …` instead. Editing a human-written body (non-empty, no
+trailer) needs no trailer unless you rewrote it; then add one. Scope and
+exemptions are in the `bin/gh` header.
 
 ## Remote git operations go through `gh`
 

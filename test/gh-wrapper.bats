@@ -37,6 +37,13 @@ if [[ $1 == repo && $2 == view && $4 == --json ]]; then
     done <"$VIS"
     exit 1
 fi
+if [[ ${*: -2} == "--json body" ]]; then
+    echo "$*" >>"$OUT.views"
+    sel=${*: -3:1}
+    [[ -f $BATS_TEST_TMPDIR/current.$sel ]] || exit 1
+    cat "$BATS_TEST_TMPDIR/current.$sel"
+    exit 0
+fi
 [[ $1 == auth ]] && cat >"$OUT.stdin"
 for a in "$@"; do
     printf "ARG:%s\n" "$a"
@@ -64,6 +71,9 @@ private_repo() {
     git remote add origin git@github.com:me/secret.git
     vis me/secret private
 }
+
+# Record the body the stub answers `gh issue|pr view SEL --json body` with.
+current() { jq -cn --arg b "$2" '{body: $b}' >"$BATS_TEST_TMPDIR/current.$1"; }
 
 # No visibility lookup reached gh.
 refute_lookups() { [ ! -e "$OUT.lookups" ]; }
@@ -200,6 +210,41 @@ assert_refused() {
     assert_passed
     gh_run pr edit 1 -b "$GEN"
     assert_passed
+}
+
+@test "editing a human-written body needs no trailer" {
+    current 7 'written by a human'
+    gh_run -R o/r issue edit 7 --body 'small fix'
+    assert_passed
+    grep -qxF -- '-R o/r issue view 7 --json body' "$OUT.views"
+}
+
+@test "editing a Claude-written or empty body needs the trailer" {
+    current 7 'written by a human'
+    current 8 "$REV"
+    gh_run issue edit 7 8 --body 'small fix'
+    assert_refused
+    current 9 ' '
+    gh_run pr edit 9 --body 'small fix'
+    assert_refused
+}
+
+@test "an edit whose current body can't be fetched is refused" {
+    gh_run pr edit 7 --body 'small fix'
+    assert_refused
+    [[ "$output" == *"can't fetch the current body"* ]]
+}
+
+@test "an edit with the trailer fetches no current body" {
+    gh_run pr edit 7 --body "$GEN"
+    assert_passed
+    [ ! -e "$OUT.views" ]
+}
+
+@test "editing a human-written body still refuses session links" {
+    current 7 'written by a human'
+    gh_run issue edit 7 --body 'see session_01AbCdEfGhIjKlMnOpQrSt'
+    assert_refused
 }
 
 @test "issue/pr new, close and reopen are checked" {
