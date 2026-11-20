@@ -452,7 +452,7 @@ EOF
     grep -q "new -s" "$TMUX_LOG"
     grep -q "rename-window" "$TMUX_LOG"
     grep -q "send-keys" "$TMUX_LOG"
-    ! grep -q "attach" "$TMUX_LOG"
+    ! grep -q "attach" "$TMUX_LOG" || false
     # And it prints the session name so you can switch to it later.
     [[ "$output" == *"test-session"* ]]
 }
@@ -497,7 +497,7 @@ EOF
     [ -d "$all/b1" ]
     [ -d "$all/b2" ]
     [ "$(grep -c "new -s" "$TMUX_LOG")" -eq 2 ]
-    ! grep -q "attach" "$TMUX_LOG"
+    ! grep -q "attach" "$TMUX_LOG" || false
 }
 
 @test "add-worktree refuses several branches outside tmux" {
@@ -665,7 +665,8 @@ EOF
 
     run "$ADD_WORKTREE" feature-branch
     [ "$status" -eq 0 ]
-    local worktree="$HOME/.worktree/repo/$(date +%Y-%m-%d)/feature-branch"
+    local worktree
+    worktree="$HOME/.worktree/repo/$(date +%Y-%m-%d)/feature-branch"
     [ "$(git -C "$worktree" rev-parse HEAD)" = "$(git rev-parse master)" ]
 }
 
@@ -676,7 +677,8 @@ EOF
 
     run "$ADD_WORKTREE" feature-branch
     [ "$status" -eq 0 ]
-    local worktree="$HOME/.worktree/repo/$(date +%Y-%m-%d)/feature-branch"
+    local worktree
+    worktree="$HOME/.worktree/repo/$(date +%Y-%m-%d)/feature-branch"
     [ "$(git -C "$worktree" rev-parse HEAD)" = "$(git rev-parse refs/heads/main)" ]
 }
 

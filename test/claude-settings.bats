@@ -21,7 +21,7 @@ setup() {
     "$CLAUDE_SETTINGS" >/dev/null
     run "$CLAUDE_SETTINGS"
     [ "$status" -eq 0 ]
-    ! echo "$output" | grep -Fq 'set attribution.sessionUrl'
+    ! echo "$output" | grep -Fq 'set attribution.sessionUrl' || false
     [ "$(jq -r '.attribution.sessionUrl' "$SETTINGS")" = "false" ]
 }
 
