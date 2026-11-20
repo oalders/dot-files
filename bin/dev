@@ -31,9 +31,12 @@ GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 NC='\033[0m'
 
-error() { echo -e "${RED}ERROR: $1${NC}" >&2; exit 1; }
-info()  { echo -e "${GREEN}>>> $1${NC}"; }
-warn()  { echo -e "${YELLOW}>>> $1${NC}"; }
+error() {
+    echo -e "${RED}ERROR: $1${NC}" >&2
+    exit 1
+}
+info() { echo -e "${GREEN}>>> $1${NC}"; }
+warn() { echo -e "${YELLOW}>>> $1${NC}"; }
 
 check_requirements() {
     command -v docker >/dev/null 2>&1 || error "docker not found. Install from https://docs.docker.com/get-docker/"
@@ -199,7 +202,7 @@ container_stop() {
     check_requirements
 
     local is_running is_stopped
-    is_running=$(docker ps    --filter "name=^${CONTAINER_NAME}$" --format '{{.Names}}')
+    is_running=$(docker ps --filter "name=^${CONTAINER_NAME}$" --format '{{.Names}}')
     is_stopped=$(docker ps -a --filter "name=^${CONTAINER_NAME}$" --format '{{.Names}}')
 
     if [[ -z "$is_stopped" ]]; then
@@ -294,15 +297,28 @@ container_clean() {
 }
 
 case "${1:-}" in
-    build)   shift; container_build "$@" ;;
-    pull)    container_pull ;;
-    start)   container_start ;;
-    shell)   container_shell ;;
-    claude)  shift; container_claude "$@" ;;
-    reclaude) shift; container_stop; container_claude "$@" ;;
-    stop)    container_stop ;;
-    clean)   shift; container_clean "$@" ;;
-    status)  container_status ;;
+    build)
+        shift
+        container_build "$@"
+        ;;
+    pull) container_pull ;;
+    start) container_start ;;
+    shell) container_shell ;;
+    claude)
+        shift
+        container_claude "$@"
+        ;;
+    reclaude)
+        shift
+        container_stop
+        container_claude "$@"
+        ;;
+    stop) container_stop ;;
+    clean)
+        shift
+        container_clean "$@"
+        ;;
+    status) container_status ;;
     *)
         echo "Usage: dev {build|pull|start|shell|claude|reclaude|stop|clean|status}"
         echo ""

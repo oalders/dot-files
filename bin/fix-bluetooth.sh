@@ -40,8 +40,8 @@ for uart_device in /sys/bus/serial/devices/serial*; do
         # Try to unbind from hci_uart driver
         if [ -L "$uart_device/driver" ]; then
             echo "  Unbinding $device_name"
-            echo "$device_name" | sudo tee /sys/bus/serial/drivers/hci_uart_bcm/unbind 2>/dev/null || \
-            echo "$device_name" | sudo tee /sys/bus/serial/drivers/hci_uart/unbind 2>/dev/null || true
+            echo "$device_name" | sudo tee /sys/bus/serial/drivers/hci_uart_bcm/unbind 2>/dev/null ||
+                echo "$device_name" | sudo tee /sys/bus/serial/drivers/hci_uart/unbind 2>/dev/null || true
         fi
     fi
 done

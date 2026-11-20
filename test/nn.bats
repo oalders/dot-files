@@ -15,7 +15,7 @@ setup() {
     export GIT_CEILING_DIRECTORIES="$BATS_TEST_TMPDIR"
     mkdir -p "$HOME/.config/nono"
     # bin/nn reads this with jq; needs to be valid JSON.
-    echo '{"sandbox":{"enabled":false}}' > "$HOME/.config/nono/claude-settings.json"
+    echo '{"sandbox":{"enabled":false}}' >"$HOME/.config/nono/claude-settings.json"
     # Stub nono to dump its argv to a file we can grep.
     stub_command nono 'printf "%s\n" "$@" > "$BATS_TEST_TMPDIR/nono-argv"'
     # Default to "no tailscale IP" so Hugo detection doesn't probe the real
@@ -127,7 +127,7 @@ esac'
     # file inside it; the hugo.toml here just mirrors a real modular-layout
     # site so the fixture reads true to what it represents.
     mkdir -p config/_default
-    echo 'baseURL = "https://example.com/"' > config/_default/hugo.toml
+    echo 'baseURL = "https://example.com/"' >config/_default/hugo.toml
     run "$NN"
     [ "$status" -eq 0 ]
     [ -f .nono/profile.json ]
@@ -325,7 +325,7 @@ esac'
 }
 
 @test "bin/nn --profile resolves an existing file to an absolute path" {
-    echo '{"extends": ["oalders"]}' > custom-profile.json
+    echo '{"extends": ["oalders"]}' >custom-profile.json
     run "$NN" --profile custom-profile.json
     [ "$status" -eq 0 ]
     grep -Fxq -- "$(realpath custom-profile.json)" "$BATS_TEST_TMPDIR/nono-argv"
@@ -424,7 +424,7 @@ esac'
 
 @test "bin/nn --profile overrides a discovered .nono/profile.json" {
     mkdir -p .nono
-    echo '{"extends": ["oalders"]}' > .nono/profile.json
+    echo '{"extends": ["oalders"]}' >.nono/profile.json
     run "$NN" --profile myprofile
     [ "$status" -eq 0 ]
     grep -Fxq -- "myprofile" "$BATS_TEST_TMPDIR/nono-argv"
@@ -434,7 +434,7 @@ esac'
 @test "bin/nn --profile overrides stack auto-detection" {
     # package.json would normally trigger the oalders-node auto-detect and
     # write a .nono/profile.json wrapper; the override must skip both.
-    echo '{}' > package.json
+    echo '{}' >package.json
     run "$NN" --profile myprofile
     [ "$status" -eq 0 ]
     grep -Fxq -- "myprofile" "$BATS_TEST_TMPDIR/nono-argv"
@@ -506,7 +506,7 @@ esac'
     # A cpanfile marks a Perl repo; detection must compose BOTH the fs mixin
     # (oalders-perl) and the network mixin (oalders-perl-net). Appending only
     # the fs half would silently strip CPAN network from auto-detected sessions.
-    echo "requires 'Moo';" > cpanfile
+    echo "requires 'Moo';" >cpanfile
     run "$NN"
     [ "$status" -eq 0 ]
     [ -f .nono/profile.json ]
@@ -583,7 +583,7 @@ esac'
 @test "bin/nn auto-enables Playwright from a playwright.config.js marker" {
     # Detection keys on an e2e marker at the repo top, so a project that has
     # committed a Playwright config gets the MCP and its ports without --playwright.
-    echo 'export default {};' > playwright.config.js
+    echo 'export default {};' >playwright.config.js
     run "$NN"
     [ "$status" -eq 0 ]
     [ "$(jq -r '.enabledPlugins["playwright@claude-plugins-official"]' .tmp/claude-settings.json)" = "true" ]
@@ -619,7 +619,7 @@ esac'
     # $TAILSCALE_IP, and the IP added to NO_PROXY so in-sandbox inspection
     # (curl / the Playwright MCP) reaches the served site directly instead of
     # through the credential proxy.
-    echo '{"baseURL": "https://example.com/"}' > hugo.json
+    echo '{"baseURL": "https://example.com/"}' >hugo.json
     stub_command tailscale 'if [ "$1" = "ip" ]; then echo "100.72.160.52"; fi'
     run "$NN"
     [ "$status" -eq 0 ]
@@ -639,7 +639,7 @@ esac'
     # (the default setup() stubs make tailscale/ip return nothing). Without
     # one there is nothing to serve to, so the ports stay closed, NO_PROXY
     # keeps only loopback, and $TAILSCALE_IP is never set.
-    echo '{"baseURL": "https://example.com/"}' > hugo.json
+    echo '{"baseURL": "https://example.com/"}' >hugo.json
     run "$NN"
     [ "$status" -eq 0 ]
     [ "$(grep -Fxc -- "--open-port" "$BATS_TEST_TMPDIR/nono-argv")" -eq 0 ]
@@ -738,7 +738,7 @@ esac'
 # session will run `docker compose`, which needs the CLI plugins dir the
 # default chain doesn't grant (#1002).
 @test "bin/nn auto-detect appends oalders-docker for docker-compose.yml" {
-    printf 'services: {}\n' > docker-compose.yml
+    printf 'services: {}\n' >docker-compose.yml
     run "$NN"
     [ "$status" -eq 0 ]
     [ -f .nono/profile.json ]
@@ -746,7 +746,7 @@ esac'
 }
 
 @test "bin/nn auto-detect appends oalders-docker for docker-compose.yaml" {
-    printf 'services: {}\n' > docker-compose.yaml
+    printf 'services: {}\n' >docker-compose.yaml
     run "$NN"
     [ "$status" -eq 0 ]
     [ -f .nono/profile.json ]
@@ -754,7 +754,7 @@ esac'
 }
 
 @test "bin/nn auto-detect appends oalders-docker for compose.yml" {
-    printf 'services: {}\n' > compose.yml
+    printf 'services: {}\n' >compose.yml
     run "$NN"
     [ "$status" -eq 0 ]
     [ -f .nono/profile.json ]
@@ -762,7 +762,7 @@ esac'
 }
 
 @test "bin/nn auto-detect appends oalders-docker for compose.yaml" {
-    printf 'services: {}\n' > compose.yaml
+    printf 'services: {}\n' >compose.yaml
     run "$NN"
     [ "$status" -eq 0 ]
     [ -f .nono/profile.json ]
@@ -835,8 +835,8 @@ esac'
     #
     # Paired with a package.json so a wrapper IS written: asserting merely that
     # no profile.json exists would also pass if detection were deleted outright.
-    printf 'FROM alpine\n' > Dockerfile
-    printf '{}\n' > package.json
+    printf 'FROM alpine\n' >Dockerfile
+    printf '{}\n' >package.json
     run "$NN"
     [ "$status" -eq 0 ]
     [ -f .nono/profile.json ]

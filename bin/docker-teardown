@@ -39,19 +39,19 @@ EOF
 dry=0
 while [ $# -gt 0 ]; do
     case "$1" in
-    -n | --dry-run)
-        dry=1
-        shift
-        ;;
-    -h | --help)
-        usage
-        exit 0
-        ;;
-    -*)
-        echo "docker-teardown: unknown option: $1" >&2
-        exit 2
-        ;;
-    *) break ;;
+        -n | --dry-run)
+            dry=1
+            shift
+            ;;
+        -h | --help)
+            usage
+            exit 0
+            ;;
+        -*)
+            echo "docker-teardown: unknown option: $1" >&2
+            exit 2
+            ;;
+        *) break ;;
     esac
 done
 
@@ -92,10 +92,10 @@ compose_projects=""
 while IFS=$'\t' read -r id wd proj; do
     [ -n "$id" ] || continue
     case "$wd" in
-    "$wt" | "$wt"/*)
-        targets="$targets $id"
-        [ -n "$proj" ] && compose_projects="$compose_projects $proj"
-        ;;
+        "$wt" | "$wt"/*)
+            targets="$targets $id"
+            [ -n "$proj" ] && compose_projects="$compose_projects $proj"
+            ;;
     esac
 done < <(docker ps -a --filter "label=$wd_label" \
     --format "{{.ID}}"$'\t'"{{.Label \"$wd_label\"}}"$'\t'"{{.Label \"$proj_label\"}}" 2>/dev/null)
@@ -149,8 +149,8 @@ proj_fallback="$(basename "$wt" | tr '[:upper:]' '[:lower:]' | tr -cd 'a-z0-9_-'
 # disables globbing so a name can't expand as a pathname pattern.
 set -f
 # shellcheck disable=SC2086
-candidate_projects="$(printf '%s\n' $compose_projects "$proj_fallback" \
-    | grep -v '^$' | sort -u)"
+candidate_projects="$(printf '%s\n' $compose_projects "$proj_fallback" |
+    grep -v '^$' | sort -u)"
 set +f
 
 # Collect removable networks as "<id><TAB><name>" lines: labelled with a

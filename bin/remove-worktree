@@ -26,8 +26,8 @@ if [[ -n $(pgrep tmux) ]]; then
 fi
 
 # We need to be inside the repository in order to remove the worktree.
-git_dir=$(git rev-parse --git-common-dir) || ( echo "cannot find --git-common-dir. are we inside a git repository?" && exit 1)
-cd "$git_dir/.." || ( echo "cannot chdir to $git_dir/.." && exit 1)
+git_dir=$(git rev-parse --git-common-dir) || (echo "cannot find --git-common-dir. are we inside a git repository?" && exit 1)
+cd "$git_dir/.." || (echo "cannot chdir to $git_dir/.." && exit 1)
 
 # `add-worktree gh-N` creates a dir named `gh-N` but `gh pr checkout` then
 # switches it to the PR's branch, so dir name ≠ branch name. Resolve to the

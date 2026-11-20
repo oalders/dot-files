@@ -3,5 +3,5 @@
 use strict;
 use warnings;
 
-use Code::TidyAll::Git::Precommit;
+use Code::TidyAll::Git::Precommit ();
 Code::TidyAll::Git::Precommit->check( no_stash => 1 );

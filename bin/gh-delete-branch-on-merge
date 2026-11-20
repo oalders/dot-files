@@ -13,7 +13,7 @@ else
     args=()
 fi
 
-gh repo list "${args[@]}" --limit 1000 --json nameWithOwner --jq '.[].nameWithOwner' | \
+gh repo list "${args[@]}" --limit 1000 --json nameWithOwner --jq '.[].nameWithOwner' |
     while IFS= read -r repo; do
         echo "Setting delete_branch_on_merge: $repo"
         gh api "repos/$repo" -X PATCH -f delete_branch_on_merge=true --silent

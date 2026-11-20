@@ -34,39 +34,39 @@ DRY_RUN="${TAG_RELEASE_DRY_RUN:-}"
 POSITIONAL=()
 while [ $# -gt 0 ]; do
     case "$1" in
-    -y | --yes)
-        YES=1
-        shift
-        ;;
-    --no-summary)
-        NO_SUMMARY=1
-        shift
-        ;;
-    --dry-run)
-        DRY_RUN=1
-        shift
-        ;;
-    -h | --help)
-        usage
-        exit 0
-        ;;
-    --)
-        shift
-        while [ $# -gt 0 ]; do
+        -y | --yes)
+            YES=1
+            shift
+            ;;
+        --no-summary)
+            NO_SUMMARY=1
+            shift
+            ;;
+        --dry-run)
+            DRY_RUN=1
+            shift
+            ;;
+        -h | --help)
+            usage
+            exit 0
+            ;;
+        --)
+            shift
+            while [ $# -gt 0 ]; do
+                POSITIONAL+=("$1")
+                shift
+            done
+            break
+            ;;
+        -*)
+            echo "Error: unknown option: $1" >&2
+            echo "Run 'tag-release --help' for usage." >&2
+            exit 2
+            ;;
+        *)
             POSITIONAL+=("$1")
             shift
-        done
-        break
-        ;;
-    -*)
-        echo "Error: unknown option: $1" >&2
-        echo "Run 'tag-release --help' for usage." >&2
-        exit 2
-        ;;
-    *)
-        POSITIONAL+=("$1")
-        shift
-        ;;
+            ;;
     esac
 done
 

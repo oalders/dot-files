@@ -254,7 +254,7 @@ hs.hotkey.bind(
     chrome_tab_action(gmail, gmail .. 'mail/u/0/#all')
 )
 hs.hotkey.bind(my_hotkeys, 'i', nil, open_app_action('wezterm'))
-hs.hotkey.bind(my_hotkeys, 'l', nil, chrome_tab_action(slack,slack))
+hs.hotkey.bind(my_hotkeys, 'l', nil, chrome_tab_action(slack, slack))
 hs.hotkey.bind(my_hotkeys, 'n', nil, chrome_tab_action(github, github))
 hs.hotkey.bind(
     my_hotkeys,

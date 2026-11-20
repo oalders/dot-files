@@ -33,11 +33,11 @@ curl --location -O "$url"
 # output. `|| true` keeps `set -e`/`pipefail` from aborting on an empty match so
 # the explicit check below can report a clear error.
 expected="$(
-    curl --location --silent "https://go.dev/dl/?mode=json&include=all" \
-        | grep -A6 "\"filename\": \"$filename\"" \
-        | grep '"sha256"' \
-        | grep -oE '[a-f0-9]{64}' \
-        | head -1 || true
+    curl --location --silent "https://go.dev/dl/?mode=json&include=all" |
+        grep -A6 "\"filename\": \"$filename\"" |
+        grep '"sha256"' |
+        grep -oE '[a-f0-9]{64}' |
+        head -1 || true
 )"
 
 if [[ -z $expected ]]; then

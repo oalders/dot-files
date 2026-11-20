@@ -15,4 +15,4 @@ my @plugins = (
     'CompletionDriver::Methods',     # class method completion
 );
 
-$_REPL->load_plugin( $_ ) for @plugins;
+$_REPL->load_plugin($_) for @plugins;

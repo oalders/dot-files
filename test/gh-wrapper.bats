@@ -777,7 +777,7 @@ assert_needs_trailer() {
     [[ $output == *"GraphQL query has an unterminated or malformed string"* ]]
 }
 
-@test "graphql: block strings end only at an unescaped \"\"\"" {
+@test "graphql: block strings end only at an unescaped triple quote" {
     gh_run api graphql -f 'query=mutation { addComment(input: {subjectId: """\""" #""" body: "hi"}) { clientMutationId } }'
     assert_refused
     [[ $output == *"pass GraphQL mutation bodies as a variable"* ]]

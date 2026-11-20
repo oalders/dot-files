@@ -45,7 +45,7 @@ for domain in \
     if [ -n "$ips" ]; then
         while read -r ip; do
             ipset add allowed-domains "$ip" 2>/dev/null || true
-        done <<< "$ips"
+        done <<<"$ips"
     else
         echo "  WARNING: Could not resolve $domain"
     fi
