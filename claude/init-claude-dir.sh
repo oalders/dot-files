@@ -21,8 +21,8 @@ else
     # Merge required keys into existing settings
     # Add skipDangerousModePermissionPrompt if missing
     if ! jq -e '.skipDangerousModePermissionPrompt' "${SETTINGS}" >/dev/null 2>&1; then
-        jq '.skipDangerousModePermissionPrompt = true' "${SETTINGS}" > "${SETTINGS}.tmp" \
-            && mv "${SETTINGS}.tmp" "${SETTINGS}"
+        jq '.skipDangerousModePermissionPrompt = true' "${SETTINGS}" >"${SETTINGS}.tmp" &&
+            mv "${SETTINGS}.tmp" "${SETTINGS}"
         echo "Added skipDangerousModePermissionPrompt to ${SETTINGS}"
     fi
 fi

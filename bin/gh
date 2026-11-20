@@ -160,7 +160,7 @@ sub check {
     my @verbs = ref $verb ? @$verb : $verb;
     return if has_trailer( $body, @verbs );
     block(    "the body must end with an attribution trailer:\n"
-            . join( q{}, map {"  $ROBOT $_ $ANCHOR $DOT <Model>\n"} @verbs )
+            . join( q{}, map { "  $ROBOT $_ $ANCHOR $DOT <Model>\n" } @verbs )
             . "where <Model> is the model you are running as (e.g. Opus 5.5,\n"
             . "Sonnet 5); name yourself, not another model. An Assisted-By: or\n"
             . "Co-Authored-By: trailer naming that model also passes" );
@@ -168,11 +168,11 @@ sub check {
 
 # A session in a private repo may only write to private/internal repos or
 # allowlisted ones. Why, and what it does not cover: docs/gh-wrapper-visibility.md.
-my $PRIVATE      = 'this session works in a private repository';
-my $UNKNOWN      = "can't tell whether this session's repository is private";
-my $ASK          = 'ask the user before writing there';
-my $NAME_IT      = 'pass -R owner/repo naming the repository you mean';
-my %visibility;    # owner/repo => lowercase visibility; failures aren't cached
+my $PRIVATE = 'this session works in a private repository';
+my $UNKNOWN = "can't tell whether this session's repository is private";
+my $ASK     = 'ask the user before writing there';
+my $NAME_IT = 'pass -R owner/repo naming the repository you mean';
+my %visibility;   # owner/repo => lowercase visibility; failures aren't cached
 my $private_context;
 
 # Output of @cmd, or '' if it fails. stdin/stderr are /dev/null so a lookup
@@ -188,7 +188,8 @@ sub cmd_output {
         # _exit: END would unlink the parent's temp files.
         exec { $cmd[0] } @cmd or POSIX::_exit(127);
     }
-    my $out = do { local $/; <$fh> } // q{};
+    my $out = do { local $/; <$fh> }
+        // q{};
     close $fh;
     return $? ? q{} : $out;
 }
@@ -216,8 +217,10 @@ sub repo_visibility {
     my ($repo) = @_;
     return $visibility{$repo} if defined $visibility{$repo};
     for ( 1 .. 2 ) {
-        my $v = lc gh_output( 'repo', 'view', $repo, '--json', 'visibility',
-            '--jq', '.visibility' );
+        my $v = lc gh_output(
+            'repo', 'view', $repo, '--json', 'visibility',
+            '--jq', '.visibility'
+        );
         $v =~ s/\s+\z//;
         return $visibility{$repo} = $v if length $v;
     }
@@ -230,8 +233,10 @@ sub git_config_values {
     local %ENV = %ENV;
     delete @ENV{
         qw( GIT_DIR GIT_WORK_TREE GIT_COMMON_DIR GIT_INDEX_FILE GIT_PREFIX )};
-    my $out = cmd_output( 'git', '-C', $dir, 'config', '--get-regexp',
-        $regexp );
+    my $out = cmd_output(
+        'git', '-C', $dir, 'config', '--get-regexp',
+        $regexp
+    );
     return map { ( split q{ }, $_, 2 )[1] // q{} } split /\n/, $out;
 }
 
@@ -248,8 +253,8 @@ sub default_targets {
     return repo_name( $ENV{GH_REPO} ) if $ENV{GH_REPO};
     return (
         github_remotes(q{.}),
-        map  { repo_name($_) }
-        grep { $_ ne 'base' }
+        map { repo_name($_) }
+            grep { $_ ne 'base' }
             git_config_values( q{.}, '^remote\..*\.gh-resolved$' )
     );
 }
@@ -290,22 +295,23 @@ sub allowed_public {
 # to do instead.
 sub guard_targets {
     my ( $hint, @targets ) = @_;
+
     # Writing back to the session's only repo can't leak; no lookup needed.
     my @remotes = session_remotes();
     return
-        if @remotes == 1
+           if @remotes == 1
         && defined $remotes[0]
         && @targets
         && !grep { !defined || $_ ne $remotes[0] } @targets;
     my $context = private_context() or return;
-    block("$context and the repository this writes to can't be determined;"
+    block( "$context and the repository this writes to can't be determined;"
             . " $hint" )
         if !@targets || grep { !defined } @targets;
     for my $repo (@targets) {
         next if allowed_public($repo);
         my $vis = repo_visibility($repo);
         next if $vis eq 'private' || $vis eq 'internal';
-        block( "$context and can't determine whether $repo is public;"
+        block(    "$context and can't determine whether $repo is public;"
                 . " retry, or $ASK" )
             if $vis eq q{};
         block("$context and $repo is $vis; $hint");
@@ -512,11 +518,11 @@ sub repo_values {
 # A subcommand's targets: -R (before or after the subcommand) and URL
 # arguments, else default_targets(). Returns ( $hint, @repos ).
 sub cmd_targets {
-    my ( $start, $spec ) = @_;
+    my ( $start, $spec )       = @_;
     my ( $found, $positional ) = parse_flags( \@argv, $start, $spec );
     my @t = map { repo_name($_) } repo_values( $start, $found );
     push @t, map { repo_name($_) } grep { m{github\.com/}i } @$positional;
-    return ( $ASK, @t ) if @t;
+    return ( $ASK,     @t ) if @t;
     return ( $NAME_IT, default_targets() );
 }
 
@@ -530,8 +536,10 @@ sub all_human_written {
     my ( undef, @sel ) = @$positional;    # drop the action word
     my ($repo) = reverse repo_values( $start, $found );
     for my $sel ( @sel ? @sel : undef ) {
-        my $json = gh_output( ( defined $repo ? ( '-R', $repo ) : () ),
-            $sub, 'view', ( defined $sel ? $sel : () ), '--json', 'body' );
+        my $json = gh_output(
+            ( defined $repo ? ( '-R', $repo ) : () ),
+            $sub, 'view', ( defined $sel ? $sel : () ), '--json', 'body'
+        );
         my $v    = eval { JSON::PP->new->utf8->decode($json) };
         my $body = ref $v eq 'HASH' ? json_str( $v->{body} ) : undef;
         block("can't fetch the current body to tell who wrote it")
@@ -540,8 +548,10 @@ sub all_human_written {
             if $body !~ /\S/
             || $body =~ $CLAUDE_LINK
             || has_git_trailer($body)
+
             # Older Claude Code co-authored without a model name.
-            || $body =~ /^(?:Assisted|Co-Authored)-By:.*noreply\@anthropic\.com/im;
+            || $body
+            =~ /^(?:Assisted|Co-Authored)-By:.*noreply\@anthropic\.com/im;
     }
     return 1;
 }
@@ -559,9 +569,10 @@ sub api_targets {
     return if $e =~ m{^(?:markdown|notifications|user/starred)(?:[/?#]|\z)};
     return ( $ASK, undef ) if $e !~ m{^repos/([^/]+)/([^/?#]+)};
     my ( $owner, $repo ) = ( $1, $2 );
-    return ( 'name the repository instead of {owner}/{repo}',
-        default_targets() )
-        if $owner eq '{owner}';
+    return (
+        'name the repository instead of {owner}/{repo}',
+        default_targets()
+    ) if $owner eq '{owner}';
     return ( $ASK, repo_name("$owner/$repo") );
 }
 
@@ -613,6 +624,7 @@ if ( $sub eq 'auth' && $action eq 'git-credential' && $argv[-1] eq 'get' ) {
 if ($cmd) {
     my ( $spec, $verb ) = @$cmd;
     my @bodies = flag_bodies( \@argv, $i + 1, $spec );
+
     # Guard first so a refused target never gets a current-body fetch.
     my $maybe_human
         = $action eq 'edit'
@@ -620,6 +632,7 @@ if ($cmd) {
         && grep { !has_trailer( $_, $verb ) } @bodies;
     if ($maybe_human) {
         guard_targets( cmd_targets( $i + 1, $spec ) );
+
         # Touching up a human's body isn't Claude's post; only leaks matter.
         # Blanking it is not a touch-up, so it still needs the trailer.
         $verb = undef
@@ -627,6 +640,7 @@ if ($cmd) {
             && all_human_written( $sub, $i + 1, $spec );
     }
     check( $_, $verb ) for @bodies;
+
     # Other paths keep the old order: the local check runs before the guard.
     guard_targets( cmd_targets( $i + 1, $spec ) ) if !$maybe_human;
     run_real(@argv);
@@ -671,7 +685,7 @@ my ($method)   = map { value_of( \@argv, $_ ) }
     grep { $_->{role} eq 'method' } reverse @$found;
 $method //= 'POST' if grep { $_->{role} =~ /^(?:field|input)$/ } @$found;
 my $graphql = defined $endpoint && $endpoint =~ m{(?:^|/)graphql(?:[?#]|\z)};
-if ( !$graphql
+if (   !$graphql
     && defined $method
     && uc($method) =~ /^(?:POST|PATCH|PUT|DELETE)$/ ) {
     my @targets = api_targets($endpoint);
@@ -698,7 +712,7 @@ for my $f (@$found) {
                 my $v = shift @todo;
                 if ( ref $v eq 'HASH' ) {
                     push @todo,   values %$v;
-                    push @bodies, grep {defined} json_str( $v->{body} );
+                    push @bodies, grep { defined } json_str( $v->{body} );
                 }
                 elsif ( ref $v eq 'ARRAY' ) { push @todo, @$v }
                 elsif ( defined $v && !ref $v ) {
@@ -739,7 +753,8 @@ if ( !$graphql ) {
     my $verb
         = $endpoint =~ m{/(?:reviews|replies)\b|/pulls/(?:\d+/)?comments\b}
         ? 'Review by'
-        : $path =~ m{^repos/[^/]+/[^/]+/issues/(?:\d+/comments|comments/\d+)/?\z}
+        : $path
+        =~ m{^repos/[^/]+/[^/]+/issues/(?:\d+/comments|comments/\d+)/?\z}
         ? [ 'Generated with', 'Review by' ]
         : 'Generated with';
     check( $_, $verb ) for @bodies;
@@ -756,7 +771,7 @@ my $vars
     ? $input->{variables}
     : {};
 my $query
-    = !$has_input        ? $field{query}
+    = !$has_input          ? $field{query}
     : ref $input eq 'HASH' ? json_str( $input->{query} )
     :                        undef;
 block('GraphQL --input must be a JSON object with a string "query"')
@@ -766,15 +781,18 @@ run_real(@argv) if !defined $query || $query !~ /\bmutation\b/;
 # Mutations name their target only by node ID; judge them by cwd's repo.
 guard_targets(
     "set GH_REPO=owner/repo to the repository it writes to, or $ASK",
-    default_targets() );
+    default_targets()
+);
 
 # One pass: a `#` in a string or a `"` in a comment must not hide a body.
 # Possessive so no backtracking can hit older Perls' regex iteration limit.
-( my $q = $query ) =~ s/("""(?:[^"\\]++|\\"""|\\|"(?!""))*+"""|"(?:[^"\\\n\r]++|\\[^\n\r])*+")|#[^\r\n]*/
-    defined $1 ? ' ~ ' : ''/ge;    # no \w, so `$"..."` can't read as a variable
-$q =~ s/,|\xEF\xBB\xBF/ /g;    # GraphQL ignores commas and BOMs
+( my $q = $query )
+    =~ s/("""(?:[^"\\]++|\\"""|\\|"(?!""))*+"""|"(?:[^"\\\n\r]++|\\[^\n\r])*+")|#[^\r\n]*/
+    defined $1 ? ' ~ ' : ''/ge;  # no \w, so `$"..."` can't read as a variable
+$q =~ s/,|\xEF\xBB\xBF/ /g;      # GraphQL ignores commas and BOMs
 block('pass GraphQL mutation bodies as a variable (body: $body, -f body=...)')
     if $q =~ /(?<![\$\w])body\s*:(?!\s*\$\s*\w)/;    # $body: is a declaration
+
 # A " left over opens a string we couldn't close; a # inside it hid the rest.
 block('GraphQL query has an unterminated or malformed string') if $q =~ /"/;
 
@@ -783,8 +801,8 @@ my $verb
     ? 'Review by'
     : 'Generated with';
 while ( $q =~ /\bbody\s*:\s*\$\s*(\w+)/g ) {
-    my $var = $1;
-    my @vals = grep {defined}
+    my $var  = $1;
+    my @vals = grep { defined }
         $has_input ? json_str( $vars->{$var} ) : $field{$var};
     block("supply the GraphQL variable \$$var holding the body") if !@vals;
     check( $_, $verb ) for @vals;

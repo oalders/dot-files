@@ -40,7 +40,7 @@ setup_fake_github() {
     [ "$status" -eq 0 ]
     [ "$(git config --get remote.origin.url)" = "https://github.com/oalders/dot-files.git" ]
     grep -qx 'config set -h github.com git_protocol https' "$BATS_TEST_TMPDIR/gh.log"
-    [ "$(git rev-parse --abbrev-ref main@{u})" = "origin/main" ]
+    [ "$(git rev-parse --abbrev-ref 'main@{u}')" = "origin/main" ]
     [ "$(git symbolic-ref --short refs/remotes/origin/HEAD)" = "origin/main" ]
 }
 
@@ -73,7 +73,7 @@ setup_fake_github() {
     run "$GIT_ORIGIN" default-branch
     [ "$status" -eq 0 ]
     [ "$(git branch --show-current)" = "main" ]
-    [ "$(git rev-parse --abbrev-ref main@{u})" = "origin/main" ]
+    [ "$(git rev-parse --abbrev-ref 'main@{u}')" = "origin/main" ]
     [ "$(git symbolic-ref --short refs/remotes/origin/HEAD)" = "origin/main" ]
 }
 

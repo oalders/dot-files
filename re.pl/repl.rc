@@ -2,6 +2,8 @@
 
 # swiped from https://gist.github.com/Cside/4065970
 
+# Devel::REPL evals this with $_REPL already set, so strict would reject it.
+## no critic (RequireUseStrict)
 my @plugins = (
     'Colors',
     'ReadLineHistory',    # history saved across sessions
@@ -15,4 +17,4 @@ my @plugins = (
     'CompletionDriver::Methods',     # class method completion
 );
 
-$_REPL->load_plugin( $_ ) for @plugins;
+$_REPL->load_plugin($_) for @plugins;

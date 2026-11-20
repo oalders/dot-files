@@ -30,35 +30,35 @@ max=1000
 
 while (($#)); do
     case $1 in
-    -h | --help)
-        usage
-        exit 0
-        ;;
-    -v | --verbose)
-        verbose=1
-        shift
-        ;;
-    --owner)
-        (($# >= 2)) || die "--owner needs a value"
-        owners+=("$2")
-        shift 2
-        ;;
-    --owner=*)
-        owners+=("${1#--owner=}")
-        shift
-        ;;
-    --max)
-        (($# >= 2)) || die "--max needs a value"
-        max=$2
-        shift 2
-        ;;
-    --max=*)
-        max=${1#--max=}
-        shift
-        ;;
-    *)
-        die "unknown argument: $1"
-        ;;
+        -h | --help)
+            usage
+            exit 0
+            ;;
+        -v | --verbose)
+            verbose=1
+            shift
+            ;;
+        --owner)
+            (($# >= 2)) || die "--owner needs a value"
+            owners+=("$2")
+            shift 2
+            ;;
+        --owner=*)
+            owners+=("${1#--owner=}")
+            shift
+            ;;
+        --max)
+            (($# >= 2)) || die "--max needs a value"
+            max=$2
+            shift 2
+            ;;
+        --max=*)
+            max=${1#--max=}
+            shift
+            ;;
+        *)
+            die "unknown argument: $1"
+            ;;
     esac
 done
 

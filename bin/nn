@@ -95,7 +95,7 @@ project_root=$(git rev-parse --show-toplevel 2>/dev/null || echo "$PWD")
 if [[ -n "${common_dir-}" ]]; then
     main_root=$(realpath "$common_dir/..")
     if [[ "$main_root" != "$(realpath "$project_root")" &&
-        -f "$main_root/.claude/settings.local.json" ]]; then
+    -f "$main_root/.claude/settings.local.json" ]]; then
         echo "Removing $main_root/.claude/settings.local.json (see anthropics/claude-code#77998)" >&2
         rm -f "$main_root/.claude/settings.local.json"
     fi
@@ -220,13 +220,13 @@ if [[ -z "$profile" ]]; then
     if ((hugo_enabled)); then
         mixins+=("oalders-snap" "oalders-hugo")
     fi
-    if (( ${#mixins[@]} > 0 )); then
+    if ((${#mixins[@]} > 0)); then
         mkdir -p "$project_root/.nono"
         extends='"oalders"'
         for m in "${mixins[@]}"; do
             extends="$extends, \"$m\""
         done
-        printf '{"extends": [%s]}\n' "$extends" > "$project_root/.nono/profile.json"
+        printf '{"extends": [%s]}\n' "$extends" >"$project_root/.nono/profile.json"
         profile="$project_root/.nono/profile.json"
         profile_label="$profile (auto: oalders + ${mixins[*]})"
     else
@@ -263,7 +263,7 @@ mkdir -p "$HOME/.local/share/toolsmith"
 #   - playwright: auto-enabled when e2e markers exist at repo top, or forced
 #     via --playwright for repos without markers yet.
 playwright_enabled=$playwright_forced
-if ((!playwright_enabled)); then
+if ((! playwright_enabled)); then
     for marker in \
         "$project_root/e2e" \
         "$project_root/tests/e2e" \
@@ -510,7 +510,7 @@ if [[ -f $fix_marker ]]; then
             break
         }
     done
-    if ((!user_prompt)) && [[ -n $pending_prompt ]]; then
+    if ((! user_prompt)) && [[ -n $pending_prompt ]]; then
         auto_prompt=("$pending_prompt")
         echo "🗯️nn: auto-running initial prompt: $pending_prompt" >&2
     fi

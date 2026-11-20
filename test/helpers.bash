@@ -35,7 +35,7 @@ EOF
 setup_git_repo() {
     REPO_DIR="$BATS_TEST_TMPDIR/repo"
     mkdir -p "$REPO_DIR"
-    cd "$REPO_DIR"
+    cd "$REPO_DIR" || return
     git init -q -b main
     git config user.email "test@example.com"
     git config user.name "Test"
@@ -83,7 +83,7 @@ setup_feature_worktree() {
 
     WORKTREE_DIR="$BATS_TEST_TMPDIR/feature-wt"
     git worktree add -q "$WORKTREE_DIR" -b feature
-    cd "$WORKTREE_DIR"
+    cd "$WORKTREE_DIR" || return
     git config user.email "test@example.com"
     git config user.name "Test"
 
@@ -156,5 +156,5 @@ setup_submodule_feature_worktree() {
     WORKTREE_DIR="$BATS_TEST_TMPDIR/sub-feature-wt"
     git -C "$SUBMODULE_MAIN" worktree add -q "$WORKTREE_DIR" -b feature
     git -C "$WORKTREE_DIR" push -q -u origin feature
-    cd "$WORKTREE_DIR"
+    cd "$WORKTREE_DIR" || return
 }

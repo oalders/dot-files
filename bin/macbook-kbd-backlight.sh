@@ -99,47 +99,47 @@ ACTION="${1:-status}"
 STEP=$(pct_to_value 10)
 
 case "$ACTION" in
-status)
-    pct=$(((CURRENT * 100 + MAX / 2) / MAX))
-    echo "Device:  $LED_NAME"
-    echo "Current: $CURRENT / $MAX (${pct}%)"
-    echo ""
-    echo "Run '$0 on|off|toggle|up|down|<n>|<n>%' to change it."
-    ;;
-on | max | full)
-    set_brightness "$MAX"
-    ;;
-off | 0)
-    set_brightness 0
-    ;;
-toggle)
-    if [ "$CURRENT" -gt 0 ]; then
+    status)
+        pct=$(((CURRENT * 100 + MAX / 2) / MAX))
+        echo "Device:  $LED_NAME"
+        echo "Current: $CURRENT / $MAX (${pct}%)"
+        echo ""
+        echo "Run '$0 on|off|toggle|up|down|<n>|<n>%' to change it."
+        ;;
+    on | max | full)
+        set_brightness "$MAX"
+        ;;
+    off | 0)
         set_brightness 0
-    else
-        set_brightness "$(pct_to_value 50)"
-    fi
-    ;;
-up | +)
-    set_brightness "$((CURRENT + STEP))"
-    ;;
-down | -)
-    set_brightness "$((CURRENT - STEP))"
-    ;;
-*%)
-    pct="${ACTION%\%}"
-    if ! [[ $pct =~ ^[0-9]+$ ]]; then
-        echo "Error: invalid percentage '$ACTION'" >&2
-        exit 1
-    fi
-    set_brightness "$(pct_to_value "$pct")"
-    ;;
-*)
-    if [[ $ACTION =~ ^[0-9]+$ ]]; then
-        set_brightness "$ACTION"
-    else
-        echo "Error: unknown argument '$ACTION'" >&2
-        echo "Usage: $0 [status|on|off|toggle|up|down|<n>|<n>%]" >&2
-        exit 1
-    fi
-    ;;
+        ;;
+    toggle)
+        if [ "$CURRENT" -gt 0 ]; then
+            set_brightness 0
+        else
+            set_brightness "$(pct_to_value 50)"
+        fi
+        ;;
+    up | +)
+        set_brightness "$((CURRENT + STEP))"
+        ;;
+    down | -)
+        set_brightness "$((CURRENT - STEP))"
+        ;;
+    *%)
+        pct="${ACTION%\%}"
+        if ! [[ $pct =~ ^[0-9]+$ ]]; then
+            echo "Error: invalid percentage '$ACTION'" >&2
+            exit 1
+        fi
+        set_brightness "$(pct_to_value "$pct")"
+        ;;
+    *)
+        if [[ $ACTION =~ ^[0-9]+$ ]]; then
+            set_brightness "$ACTION"
+        else
+            echo "Error: unknown argument '$ACTION'" >&2
+            echo "Usage: $0 [status|on|off|toggle|up|down|<n>|<n>%]" >&2
+            exit 1
+        fi
+        ;;
 esac

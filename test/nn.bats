@@ -15,7 +15,7 @@ setup() {
     export GIT_CEILING_DIRECTORIES="$BATS_TEST_TMPDIR"
     mkdir -p "$HOME/.config/nono"
     # bin/nn reads this with jq; needs to be valid JSON.
-    echo '{"sandbox":{"enabled":false}}' > "$HOME/.config/nono/claude-settings.json"
+    echo '{"sandbox":{"enabled":false}}' >"$HOME/.config/nono/claude-settings.json"
     # Stub nono to dump its argv to a file we can grep.
     stub_command nono 'printf "%s\n" "$@" > "$BATS_TEST_TMPDIR/nono-argv"'
     # Default to "no tailscale IP" so Hugo detection doesn't probe the real
@@ -30,7 +30,7 @@ setup() {
     stub_command clodhopper 'true'
     # Clean cwd outside any git work tree.
     mkdir -p "$BATS_TEST_TMPDIR/work"
-    cd "$BATS_TEST_TMPDIR/work"
+    cd "$BATS_TEST_TMPDIR/work" || return
 }
 
 # Install a stub nono-preflight at the absolute path bin/nn invokes it from
@@ -63,7 +63,7 @@ STUB
     run "$NN"
     [ "$status" -eq 0 ]
     grep -Fxq "NN_FNM_RUNTIME_DIR=$BATS_TEST_TMPDIR/work/.tmp/run" "$BATS_TEST_TMPDIR/nono-argv"
-    ! grep -q "^XDG_RUNTIME_DIR=" "$BATS_TEST_TMPDIR/nono-argv"
+    ! grep -q "^XDG_RUNTIME_DIR=" "$BATS_TEST_TMPDIR/nono-argv" || false
 }
 
 @test "bashrc feeds NN_FNM_RUNTIME_DIR to fnm env as XDG_RUNTIME_DIR" {
@@ -127,7 +127,7 @@ esac'
     # file inside it; the hugo.toml here just mirrors a real modular-layout
     # site so the fixture reads true to what it represents.
     mkdir -p config/_default
-    echo 'baseURL = "https://example.com/"' > config/_default/hugo.toml
+    echo 'baseURL = "https://example.com/"' >config/_default/hugo.toml
     run "$NN"
     [ "$status" -eq 0 ]
     [ -f .nono/profile.json ]
@@ -158,7 +158,7 @@ esac'
     run "$NN" --clodhopper
     [ "$status" -eq 0 ]
     # The nn-specific flag must be parsed out of $@, not passed through to claude.
-    ! grep -Fxq -- "--clodhopper" "$BATS_TEST_TMPDIR/nono-argv"
+    ! grep -Fxq -- "--clodhopper" "$BATS_TEST_TMPDIR/nono-argv" || false
 }
 
 @test "bin/nn --clodhopper is parsed out independently of forwarded args" {
@@ -166,7 +166,7 @@ esac'
     run "$NN" --clodhopper --resume
     [ "$status" -eq 0 ]
     # The nn-specific flag is consumed; the unrelated arg still reaches claude.
-    ! grep -Fxq -- "--clodhopper" "$BATS_TEST_TMPDIR/nono-argv"
+    ! grep -Fxq -- "--clodhopper" "$BATS_TEST_TMPDIR/nono-argv" || false
     grep -Fxq -- "--resume" "$BATS_TEST_TMPDIR/nono-argv"
 }
 
@@ -208,7 +208,7 @@ esac'
     stub_command clodhopper 'true'
     run "$NN" --no-clodhopper --resume
     [ "$status" -eq 0 ]
-    ! grep -Fxq -- "--no-clodhopper" "$BATS_TEST_TMPDIR/nono-argv"
+    ! grep -Fxq -- "--no-clodhopper" "$BATS_TEST_TMPDIR/nono-argv" || false
     grep -Fxq -- "--resume" "$BATS_TEST_TMPDIR/nono-argv"
 }
 
@@ -258,7 +258,7 @@ esac'
     : >"$BATS_TEST_TMPDIR/nono-argv"
     run "$NN"
     [ "$status" -eq 0 ]
-    ! grep -Fxq '/kitchen-sink:fix-gh-issue' "$BATS_TEST_TMPDIR/nono-argv"
+    ! grep -Fxq '/kitchen-sink:fix-gh-issue' "$BATS_TEST_TMPDIR/nono-argv" || false
 }
 
 @test "bin/nn injects nothing for an empty marker but still consumes it" {
@@ -301,7 +301,7 @@ esac'
     # values, update the comment in bin/nn and flip this assertion deliberately.
     run "$NN" --model opus
     [ "$status" -eq 0 ]
-    ! grep -Fxq '/kitchen-sink:fix-gh-issue' "$BATS_TEST_TMPDIR/nono-argv"
+    ! grep -Fxq '/kitchen-sink:fix-gh-issue' "$BATS_TEST_TMPDIR/nono-argv" || false
     # The one-shot marker is still consumed regardless of the misread.
     [ ! -f .tmp/fix-gh-issue.pending ]
 }
@@ -309,7 +309,7 @@ esac'
 @test "bin/nn passes no auto-prompt without the marker" {
     run "$NN"
     [ "$status" -eq 0 ]
-    ! grep -Fxq '/kitchen-sink:fix-gh-issue' "$BATS_TEST_TMPDIR/nono-argv"
+    ! grep -Fxq '/kitchen-sink:fix-gh-issue' "$BATS_TEST_TMPDIR/nono-argv" || false
 }
 
 @test "bin/nn --profile passes a non-file value through as a profile name" {
@@ -325,7 +325,7 @@ esac'
 }
 
 @test "bin/nn --profile resolves an existing file to an absolute path" {
-    echo '{"extends": ["oalders"]}' > custom-profile.json
+    echo '{"extends": ["oalders"]}' >custom-profile.json
     run "$NN" --profile custom-profile.json
     [ "$status" -eq 0 ]
     grep -Fxq -- "$(realpath custom-profile.json)" "$BATS_TEST_TMPDIR/nono-argv"
@@ -336,7 +336,7 @@ esac'
     [ "$status" -eq 0 ]
     grep -Fxq -- "myprofile" "$BATS_TEST_TMPDIR/nono-argv"
     # The combined form is consumed, not forwarded to claude.
-    ! grep -Fxq -- "--profile=myprofile" "$BATS_TEST_TMPDIR/nono-argv"
+    ! grep -Fxq -- "--profile=myprofile" "$BATS_TEST_TMPDIR/nono-argv" || false
 }
 
 @test "bin/nn --profile without a value fails with exit 2" {
@@ -424,17 +424,17 @@ esac'
 
 @test "bin/nn --profile overrides a discovered .nono/profile.json" {
     mkdir -p .nono
-    echo '{"extends": ["oalders"]}' > .nono/profile.json
+    echo '{"extends": ["oalders"]}' >.nono/profile.json
     run "$NN" --profile myprofile
     [ "$status" -eq 0 ]
     grep -Fxq -- "myprofile" "$BATS_TEST_TMPDIR/nono-argv"
-    ! grep -Fxq -- "$BATS_TEST_TMPDIR/work/.nono/profile.json" "$BATS_TEST_TMPDIR/nono-argv"
+    ! grep -Fxq -- "$BATS_TEST_TMPDIR/work/.nono/profile.json" "$BATS_TEST_TMPDIR/nono-argv" || false
 }
 
 @test "bin/nn --profile overrides stack auto-detection" {
     # package.json would normally trigger the oalders-node auto-detect and
     # write a .nono/profile.json wrapper; the override must skip both.
-    echo '{}' > package.json
+    echo '{}' >package.json
     run "$NN" --profile myprofile
     [ "$status" -eq 0 ]
     grep -Fxq -- "myprofile" "$BATS_TEST_TMPDIR/nono-argv"
@@ -497,7 +497,7 @@ esac'
     [ "$status" -eq 0 ]
     # The user's prompt reaches claude; the queued one is suppressed.
     grep -Fxq 'do something else' "$BATS_TEST_TMPDIR/nono-argv"
-    ! grep -Fxq '/kitchen-sink:fix-gh-issue' "$BATS_TEST_TMPDIR/nono-argv"
+    ! grep -Fxq '/kitchen-sink:fix-gh-issue' "$BATS_TEST_TMPDIR/nono-argv" || false
     # The one-shot marker is still consumed on the first launch.
     [ ! -f .tmp/fix-gh-issue.pending ]
 }
@@ -506,7 +506,7 @@ esac'
     # A cpanfile marks a Perl repo; detection must compose BOTH the fs mixin
     # (oalders-perl) and the network mixin (oalders-perl-net). Appending only
     # the fs half would silently strip CPAN network from auto-detected sessions.
-    echo "requires 'Moo';" > cpanfile
+    echo "requires 'Moo';" >cpanfile
     run "$NN"
     [ "$status" -eq 0 ]
     [ -f .nono/profile.json ]
@@ -543,8 +543,8 @@ esac'
     # Guard against a vacuous pass: if the stub never wrote the argv dump the
     # negative greps would "succeed" on a missing file and mask a regression.
     [ -f "$BATS_TEST_TMPDIR/nono-argv" ]
-    ! grep -Fxq -- "--open-port" "$BATS_TEST_TMPDIR/nono-argv"
-    ! grep -Fxq -- "CHROME_WS_PORT=9222" "$BATS_TEST_TMPDIR/nono-argv"
+    ! grep -Fxq -- "--open-port" "$BATS_TEST_TMPDIR/nono-argv" || false
+    ! grep -Fxq -- "CHROME_WS_PORT=9222" "$BATS_TEST_TMPDIR/nono-argv" || false
 }
 
 @test "bin/nn --chrome is consumed, not forwarded to claude" {
@@ -553,7 +553,7 @@ esac'
     run "$NN" --chrome
     [ "$status" -eq 0 ]
     [ -f "$BATS_TEST_TMPDIR/nono-argv" ]
-    ! grep -Fxq -- "--chrome" "$BATS_TEST_TMPDIR/nono-argv"
+    ! grep -Fxq -- "--chrome" "$BATS_TEST_TMPDIR/nono-argv" || false
 }
 
 @test "bin/nn --playwright produces a launch that can actually use Playwright" {
@@ -576,14 +576,14 @@ esac'
     grep -Fxq -- "9333" "$BATS_TEST_TMPDIR/nono-argv"
     grep -Fxq -- "9342" "$BATS_TEST_TMPDIR/nono-argv"
     # And nothing just outside it.
-    ! grep -Fxq -- "9322" "$BATS_TEST_TMPDIR/nono-argv"
-    ! grep -Fxq -- "9343" "$BATS_TEST_TMPDIR/nono-argv"
+    ! grep -Fxq -- "9322" "$BATS_TEST_TMPDIR/nono-argv" || false
+    ! grep -Fxq -- "9343" "$BATS_TEST_TMPDIR/nono-argv" || false
 }
 
 @test "bin/nn auto-enables Playwright from a playwright.config.js marker" {
     # Detection keys on an e2e marker at the repo top, so a project that has
     # committed a Playwright config gets the MCP and its ports without --playwright.
-    echo 'export default {};' > playwright.config.js
+    echo 'export default {};' >playwright.config.js
     run "$NN"
     [ "$status" -eq 0 ]
     [ "$(jq -r '.enabledPlugins["playwright@claude-plugins-official"]' .tmp/claude-settings.json)" = "true" ]
@@ -609,7 +609,7 @@ esac'
     run "$NN" --playwright
     [ "$status" -eq 0 ]
     [ -f "$BATS_TEST_TMPDIR/nono-argv" ]
-    ! grep -Fxq -- "--playwright" "$BATS_TEST_TMPDIR/nono-argv"
+    ! grep -Fxq -- "--playwright" "$BATS_TEST_TMPDIR/nono-argv" || false
 }
 
 @test "bin/nn opens Hugo serve ports and wires the tailscale IP when one exists" {
@@ -619,7 +619,7 @@ esac'
     # $TAILSCALE_IP, and the IP added to NO_PROXY so in-sandbox inspection
     # (curl / the Playwright MCP) reaches the served site directly instead of
     # through the credential proxy.
-    echo '{"baseURL": "https://example.com/"}' > hugo.json
+    echo '{"baseURL": "https://example.com/"}' >hugo.json
     stub_command tailscale 'if [ "$1" = "ip" ]; then echo "100.72.160.52"; fi'
     run "$NN"
     [ "$status" -eq 0 ]
@@ -627,8 +627,8 @@ esac'
     [ "$(grep -Fxc -- "--open-port" "$BATS_TEST_TMPDIR/nono-argv")" -eq 4 ]
     grep -Fxq -- "1313" "$BATS_TEST_TMPDIR/nono-argv"
     grep -Fxq -- "1316" "$BATS_TEST_TMPDIR/nono-argv"
-    ! grep -Fxq -- "1312" "$BATS_TEST_TMPDIR/nono-argv"
-    ! grep -Fxq -- "1317" "$BATS_TEST_TMPDIR/nono-argv"
+    ! grep -Fxq -- "1312" "$BATS_TEST_TMPDIR/nono-argv" || false
+    ! grep -Fxq -- "1317" "$BATS_TEST_TMPDIR/nono-argv" || false
     grep -Fxq -- "TAILSCALE_IP=100.72.160.52" "$BATS_TEST_TMPDIR/nono-argv"
     grep -Fxq -- "NO_PROXY=localhost,127.0.0.1,100.72.160.52" "$BATS_TEST_TMPDIR/nono-argv"
     grep -Fxq -- "no_proxy=localhost,127.0.0.1,100.72.160.52" "$BATS_TEST_TMPDIR/nono-argv"
@@ -639,11 +639,11 @@ esac'
     # (the default setup() stubs make tailscale/ip return nothing). Without
     # one there is nothing to serve to, so the ports stay closed, NO_PROXY
     # keeps only loopback, and $TAILSCALE_IP is never set.
-    echo '{"baseURL": "https://example.com/"}' > hugo.json
+    echo '{"baseURL": "https://example.com/"}' >hugo.json
     run "$NN"
     [ "$status" -eq 0 ]
     [ "$(grep -Fxc -- "--open-port" "$BATS_TEST_TMPDIR/nono-argv")" -eq 0 ]
-    ! grep -Fq -- "TAILSCALE_IP=" "$BATS_TEST_TMPDIR/nono-argv"
+    ! grep -Fq -- "TAILSCALE_IP=" "$BATS_TEST_TMPDIR/nono-argv" || false
     grep -Fxq -- "NO_PROXY=localhost,127.0.0.1" "$BATS_TEST_TMPDIR/nono-argv"
 }
 
@@ -654,7 +654,7 @@ esac'
     run "$NN"
     [ "$status" -eq 0 ]
     [ "$(grep -Fxc -- "--open-port" "$BATS_TEST_TMPDIR/nono-argv")" -eq 0 ]
-    ! grep -Fq -- "TAILSCALE_IP=" "$BATS_TEST_TMPDIR/nono-argv"
+    ! grep -Fq -- "TAILSCALE_IP=" "$BATS_TEST_TMPDIR/nono-argv" || false
     grep -Fxq -- "NO_PROXY=localhost,127.0.0.1" "$BATS_TEST_TMPDIR/nono-argv"
 }
 
@@ -680,7 +680,7 @@ esac'
     [ "$status" -eq 0 ]
     # Guard against a vacuous pass on a missing argv dump.
     [ -f "$BATS_TEST_TMPDIR/nono-argv" ]
-    ! grep -Fq -- "ANSIBLE_LOCAL_TEMP=" "$BATS_TEST_TMPDIR/nono-argv"
+    ! grep -Fq -- "ANSIBLE_LOCAL_TEMP=" "$BATS_TEST_TMPDIR/nono-argv" || false
 }
 
 @test "bin/nn does not trip the ansible redirect on a substring-only match" {
@@ -693,7 +693,7 @@ esac'
     run "$NN"
     [ "$status" -eq 0 ]
     [ -f "$BATS_TEST_TMPDIR/nono-argv" ]
-    ! grep -Fq -- "ANSIBLE_LOCAL_TEMP=" "$BATS_TEST_TMPDIR/nono-argv"
+    ! grep -Fq -- "ANSIBLE_LOCAL_TEMP=" "$BATS_TEST_TMPDIR/nono-argv" || false
 }
 
 @test "bin/nn points buildx state at the worktree-local .tmp" {
@@ -718,7 +718,7 @@ esac'
     [ "$status" -eq 0 ]
     # Guard against a vacuous pass on a missing argv dump.
     [ -f "$BATS_TEST_TMPDIR/nono-argv" ]
-    ! grep -Fq -- "BUILDX_CONFIG=" "$BATS_TEST_TMPDIR/nono-argv"
+    ! grep -Fq -- "BUILDX_CONFIG=" "$BATS_TEST_TMPDIR/nono-argv" || false
 }
 
 @test "bin/nn does not trip the buildx redirect on a substring-only match" {
@@ -730,7 +730,7 @@ esac'
     run "$NN"
     [ "$status" -eq 0 ]
     [ -f "$BATS_TEST_TMPDIR/nono-argv" ]
-    ! grep -Fq -- "BUILDX_CONFIG=" "$BATS_TEST_TMPDIR/nono-argv"
+    ! grep -Fq -- "BUILDX_CONFIG=" "$BATS_TEST_TMPDIR/nono-argv" || false
 }
 
 # bin/nn checks four compose filenames; cover each so dropping one from the
@@ -738,7 +738,7 @@ esac'
 # session will run `docker compose`, which needs the CLI plugins dir the
 # default chain doesn't grant (#1002).
 @test "bin/nn auto-detect appends oalders-docker for docker-compose.yml" {
-    printf 'services: {}\n' > docker-compose.yml
+    printf 'services: {}\n' >docker-compose.yml
     run "$NN"
     [ "$status" -eq 0 ]
     [ -f .nono/profile.json ]
@@ -746,7 +746,7 @@ esac'
 }
 
 @test "bin/nn auto-detect appends oalders-docker for docker-compose.yaml" {
-    printf 'services: {}\n' > docker-compose.yaml
+    printf 'services: {}\n' >docker-compose.yaml
     run "$NN"
     [ "$status" -eq 0 ]
     [ -f .nono/profile.json ]
@@ -754,7 +754,7 @@ esac'
 }
 
 @test "bin/nn auto-detect appends oalders-docker for compose.yml" {
-    printf 'services: {}\n' > compose.yml
+    printf 'services: {}\n' >compose.yml
     run "$NN"
     [ "$status" -eq 0 ]
     [ -f .nono/profile.json ]
@@ -762,7 +762,7 @@ esac'
 }
 
 @test "bin/nn auto-detect appends oalders-docker for compose.yaml" {
-    printf 'services: {}\n' > compose.yaml
+    printf 'services: {}\n' >compose.yaml
     run "$NN"
     [ "$status" -eq 0 ]
     [ -f .nono/profile.json ]
@@ -835,13 +835,13 @@ esac'
     #
     # Paired with a package.json so a wrapper IS written: asserting merely that
     # no profile.json exists would also pass if detection were deleted outright.
-    printf 'FROM alpine\n' > Dockerfile
-    printf '{}\n' > package.json
+    printf 'FROM alpine\n' >Dockerfile
+    printf '{}\n' >package.json
     run "$NN"
     [ "$status" -eq 0 ]
     [ -f .nono/profile.json ]
     grep -Fq '"oalders-node"' .nono/profile.json
-    ! grep -Fq '"oalders-docker"' .nono/profile.json
+    ! grep -Fq '"oalders-docker"' .nono/profile.json || false
 }
 
 # --- nono Landlock preflight wiring (#1024) --------------------------------
@@ -891,13 +891,13 @@ esac'
     git config --global nn.sandboxPolicy landlock
     run "$NN"
     [ "$status" -eq 0 ]
-    ! grep -Fxq -- "--sandbox-policy" "$BATS_TEST_TMPDIR/nono-argv"
+    ! grep -Fxq -- "--sandbox-policy" "$BATS_TEST_TMPDIR/nono-argv" || false
 }
 
 @test "bin/nn omits --sandbox-policy outside a git repo" {
     run "$NN"
     [ "$status" -eq 0 ]
-    ! grep -Fxq -- "--sandbox-policy" "$BATS_TEST_TMPDIR/nono-argv"
+    ! grep -Fxq -- "--sandbox-policy" "$BATS_TEST_TMPDIR/nono-argv" || false
 }
 
 # --- per-repo auto memory via git config -----------------------------------
@@ -956,7 +956,7 @@ seed_auto_memory_off() {
 @test "nn sets no GH_PATH when the gh wrapper is missing" {
     run "$NN"
     [ "$status" -eq 0 ]
-    ! grep -q -- "^GH_PATH=" "$BATS_TEST_TMPDIR/nono-argv"
+    ! grep -q -- "^GH_PATH=" "$BATS_TEST_TMPDIR/nono-argv" || false
 }
 
 @test "bin/nn no longer seeds a serena home (#1099)" {
@@ -964,5 +964,5 @@ seed_auto_memory_off() {
     [ "$status" -eq 0 ]
     [ ! -e .serena-home ]
     [ -f "$BATS_TEST_TMPDIR/nono-argv" ]
-    ! grep -q '^SERENA_HOME=' "$BATS_TEST_TMPDIR/nono-argv"
+    ! grep -q '^SERENA_HOME=' "$BATS_TEST_TMPDIR/nono-argv" || false
 }

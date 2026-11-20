@@ -1,56 +1,99 @@
+exclude = [ ".tmp/**" ]
+
+# Shell scripts: anything in bin/ that isn't Perl or AppleScript, plus rc files
+# that have a shell shebang. test/precious-coverage.bats fails on any script
+# this misses.
 [commands.shfmt]
-type     = "both"
-include  = [ "**/*.sh", "bin/git-origin", "bin/merge-pr" ]
-cmd = [ "shfmt" ]
-ok_exit_codes = [0]
-lint_failure_exit_codes = [1]
-lint_flags  = "--diff"
-tidy_flags  = ["-w", "-s", "-i", "4"]
-
-[commands.stylua]
-cmd = [ "stylua" ]
 type = "both"
-include = "**/*.lua"
-ok_exit_codes = [0]
-lint_failure_exit_codes = [1]
-lint_flags = "--check"
-
-[commands.shellcheck]
-type    = "lint"
 include = [
-    ".githooks/pre-commit",
+    "**/*.bash",
+    "**/*.bats",
     "**/*.sh",
+    ".githooks/pre-commit",
     "bash_profile",
     "bashrc-docker",
-    "bin/add-worktree",
-    "bin/claude-hook-toolsmith",
-    "bin/claude-mcp",
-    "bin/dev",
-    "bin/dl",
-    "bin/dl-audio",
-    "bin/docker-teardown",
-    "bin/fix-docker-sudo",
-    "bin/gh-delete-branch-on-merge",
-    "bin/gh-enable-private-vulnerability-reporting",
-    "bin/gh-notifications-participating",
-    "bin/gh-sweep-in-progress",
-    "bin/gh-triage",
-    "bin/git-origin",
-    "bin/kill-worktree-procs",
-    "bin/merge-pr",
-    "bin/new-ssh-key",
-    "bin/nn",
-    "bin/nn-landlock",
-    "bin/nono-preflight",
-    "bin/prune-merged-worktrees",
-    "bin/remove-worktree",
-    "bin/tag-release",
-    "bin/tm",
-    "bin/tmux-bare-claude",
-    "bin/tmux-update-env",
+    "bin/*",
     "sketchybar/sketchybarrc",
     "ssh/rc",
 ]
+exclude = [ "bin/*.pl", "bin/*.scpt", "bin/gh" ]
+cmd = [ "shfmt" ]
+# Style comes from editorconfig; any formatting flag here would override it.
+lint_flags = "-d"
+tidy_flags = "-w"
+ok_exit_codes = [0]
+lint_failure_exit_codes = [1]
+
+[commands.shellcheck]
+type = "lint"
+include = [
+    "**/*.bash",
+    "**/*.bats",
+    "**/*.sh",
+    ".githooks/pre-commit",
+    "bash_profile",
+    "bashrc-docker",
+    "bin/*",
+    "sketchybar/sketchybarrc",
+    "ssh/rc",
+]
+exclude = [ "bin/*.pl", "bin/*.scpt", "bin/gh" ]
 cmd = [ "shellcheck", "-x" ]
 ok_exit_codes = [0]
 lint_failure_exit_codes = [1]
+
+[commands.stylua]
+type = "both"
+include = "**/*.lua"
+cmd = [ "stylua" ]
+lint_flags = "--check"
+ok_exit_codes = [0]
+lint_failure_exit_codes = [1]
+
+[commands.perlimports]
+type = "both"
+include = [
+    "**/*.pl",
+    "**/*.pm",
+    "**/*.t",
+    "bin/gh",
+    "dzil/profiles/default/skel/git/hooks/pre-commit",
+    "re.pl/repl.rc",
+]
+cmd = [ "perlimports" ]
+lint_flags = [ "--lint" ]
+tidy_flags = [ "-i" ]
+ok_exit_codes = [0]
+lint_failure_exit_codes = [1]
+expect_stderr = true
+
+[commands.perltidy]
+type = "both"
+include = [
+    "**/*.pl",
+    "**/*.pm",
+    "**/*.t",
+    "bin/gh",
+    "dzil/profiles/default/skel/git/hooks/pre-commit",
+    "re.pl/repl.rc",
+]
+cmd = [ "perltidy", "--profile=$PRECIOUS_ROOT/perltidyrc" ]
+lint_flags = [ "--assert-tidy", "--no-standard-output", "--outfile=/dev/null" ]
+tidy_flags = [ "--backup-and-modify-in-place", "--backup-file-extension=/" ]
+ok_exit_codes = [0]
+lint_failure_exit_codes = [2]
+expect_stderr = true
+
+[commands.perlcritic]
+type = "lint"
+include = [
+    "**/*.pl",
+    "**/*.pm",
+    "**/*.t",
+    "bin/gh",
+    "dzil/profiles/default/skel/git/hooks/pre-commit",
+    "re.pl/repl.rc",
+]
+cmd = [ "perlcritic", "--profile=$PRECIOUS_ROOT/perlcriticrc" ]
+ok_exit_codes = [0]
+lint_failure_exit_codes = [2]

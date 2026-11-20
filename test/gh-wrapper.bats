@@ -19,7 +19,7 @@ setup() {
     export GIT_CEILING_DIRECTORIES="$BATS_TEST_TMPDIR"
     unset NN_SESSION_DIR GH_REPO
     mkdir -p "$TMPDIR" "$HOME/.config/gh" "$BATS_TEST_TMPDIR/work"
-    cd "$BATS_TEST_TMPDIR/work"
+    cd "$BATS_TEST_TMPDIR/work" || return
     # Fake real gh. Visibility lookups are answered from $VIS and recorded in
     # $OUT.lookups, never $OUT; anything else logs each arg, and the contents
     # of any body file it points at (the wrapper deletes its temp files once
@@ -777,7 +777,7 @@ assert_needs_trailer() {
     [[ $output == *"GraphQL query has an unterminated or malformed string"* ]]
 }
 
-@test "graphql: block strings end only at an unescaped \"\"\"" {
+@test "graphql: block strings end only at an unescaped triple quote" {
     gh_run api graphql -f 'query=mutation { addComment(input: {subjectId: """\""" #""" body: "hi"}) { clientMutationId } }'
     assert_refused
     [[ $output == *"pass GraphQL mutation bodies as a variable"* ]]
@@ -1130,7 +1130,7 @@ cred() {
     [ ! -e "$OUT" ]
     rm -f "$OUT.stdin"
     export REQ='protocol=https\nhost=github.com\npath=me/secret.git\n\n'
-    VERB=get cred
+    VERB="get" cred
     [ "$status" -eq 0 ]
     printf '%b' "$REQ" >"$BATS_TEST_TMPDIR/expected"
     cmp "$OUT.stdin" "$BATS_TEST_TMPDIR/expected"
@@ -1173,7 +1173,7 @@ cred() {
     private_repo
     unset NN_SESSION_DIR
     export REQ='protocol=https\nhost=github.com\n\n'
-    VERB=get cred
+    VERB="get" cred
     [ "$status" -eq 0 ]
     printf '%b' "$REQ" >"$BATS_TEST_TMPDIR/expected"
     cmp "$OUT.stdin" "$BATS_TEST_TMPDIR/expected"
@@ -1182,7 +1182,7 @@ cred() {
 @test "credential requests for other hosts do no lookups" {
     private_repo
     export REQ='protocol=https\nhost=example.com\npath=org/proj.git\n\n'
-    VERB=get cred
+    VERB="get" cred
     [ "$status" -eq 0 ]
     refute_lookups
     printf '%b' "$REQ" >"$BATS_TEST_TMPDIR/expected"
@@ -1194,7 +1194,7 @@ cred() {
     git remote add origin https://github.com/org/proj.git
     vis org/proj public
     export REQ='protocol=https\nhost=github.com\npath=org/proj.git\n\n'
-    VERB=get cred
+    VERB="get" cred
     [ "$status" -eq 0 ]
     printf '%b' "$REQ" >"$BATS_TEST_TMPDIR/expected"
     cmp "$OUT.stdin" "$BATS_TEST_TMPDIR/expected"

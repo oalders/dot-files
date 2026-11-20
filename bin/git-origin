@@ -48,8 +48,8 @@ set_origin() {
     fi
     parse_url "$current"
     case "$scheme" in
-    ssh) url="git@${host}:${path}.git" ;;
-    https) url="https://${host}/${path}.git" ;;
+        ssh) url="git@${host}:${path}.git" ;;
+        https) url="https://${host}/${path}.git" ;;
     esac
     git remote set-url origin "$url"
     echo "origin -> $url"
@@ -79,9 +79,9 @@ default_branch() {
         return 1
     fi
     case "$name" in
-    main) other=master ;;
-    master) other=main ;;
-    *) other= ;;
+        main) other=master ;;
+        master) other=main ;;
+        *) other= ;;
     esac
     if ! git show-ref --verify --quiet "refs/heads/$name" &&
         [[ -n $other ]] && git show-ref --verify --quiet "refs/heads/$other"; then
@@ -95,29 +95,29 @@ default_branch() {
 }
 
 case "${1:-}" in
-ssh | https)
-    [[ $# -eq 1 ]] || {
+    ssh | https)
+        [[ $# -eq 1 ]] || {
+            usage >&2
+            exit 1
+        }
+        host='' path=''
+        set_origin "$1"
+        set_gh_protocol "$1"
+        default_branch
+        ;;
+    default-branch)
+        [[ $# -le 2 ]] || {
+            usage >&2
+            exit 1
+        }
+        default_branch "${2:-}"
+        ;;
+    -h | --help)
+        usage
+        exit 0
+        ;;
+    *)
         usage >&2
         exit 1
-    }
-    host='' path=''
-    set_origin "$1"
-    set_gh_protocol "$1"
-    default_branch
-    ;;
-default-branch)
-    [[ $# -le 2 ]] || {
-        usage >&2
-        exit 1
-    }
-    default_branch "${2:-}"
-    ;;
--h | --help)
-    usage
-    exit 0
-    ;;
-*)
-    usage >&2
-    exit 1
-    ;;
+        ;;
 esac

@@ -70,7 +70,7 @@ if [ -x "$brew_bash" ]; then
 fi
 
 #if is os version gte 14; then
-    #brew install borders
+#brew install borders
 #fi
 
 # if we keep cask "karabiner-elements" in the brewfile we get a dialog asking

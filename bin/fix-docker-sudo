@@ -6,7 +6,7 @@ set -e
 echo "Fixing Docker permissions..."
 
 # Create docker group if it doesn't exist
-if ! getent group docker > /dev/null 2>&1; then
+if ! getent group docker >/dev/null 2>&1; then
     echo "Creating docker group..."
     sudo groupadd docker
 fi

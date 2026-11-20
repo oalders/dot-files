@@ -16,7 +16,7 @@ setup() {
     echo "$output" | grep -Fq 'session:'
     echo "$output" | grep -Fq 'abcd1234'
     # Truncated: the full UUID tail must not appear.
-    ! echo "$output" | grep -Fq 'abcd1234-5678'
+    ! echo "$output" | grep -Fq 'abcd1234-5678' || false
 }
 
 @test "no-context branch renders truncated session id" {
@@ -32,19 +32,19 @@ setup() {
     json='{"model":{"display_name":"Opus"},"workspace":{"current_dir":"/home/u/proj"},"context_window":{"used_percentage":40}}'
     run bash -c "printf '%s' '$json' | '$STATUSLINE' | sed -E 's/\x1b\[[0-9;]*m//g'"
     [ "$status" -eq 0 ]
-    ! echo "$output" | grep -Fq 'session:'
+    ! echo "$output" | grep -Fq 'session:' || false
     # Still renders model and folder cleanly, no dangling trailing separator.
     echo "$output" | grep -Fq 'Opus'
     echo "$output" | grep -Fq 'proj'
-    ! echo "$output" | grep -Eq '\|[[:space:]]*$'
+    ! echo "$output" | grep -Eq '\|[[:space:]]*$' || false
 }
 
 @test "no session segment when session_id absent (no-context branch)" {
     json='{"model":{"display_name":"Opus"},"workspace":{"current_dir":"/home/u/proj"}}'
     run bash -c "printf '%s' '$json' | '$STATUSLINE' | sed -E 's/\x1b\[[0-9;]*m//g'"
     [ "$status" -eq 0 ]
-    ! echo "$output" | grep -Fq 'session:'
+    ! echo "$output" | grep -Fq 'session:' || false
     echo "$output" | grep -Fq 'Opus'
     echo "$output" | grep -Fq 'proj'
-    ! echo "$output" | grep -Eq '\|[[:space:]]*$'
+    ! echo "$output" | grep -Eq '\|[[:space:]]*$' || false
 }

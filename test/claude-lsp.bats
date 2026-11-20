@@ -23,7 +23,7 @@ esac'
     [ "$status" -eq 0 ]
     grep -Fxq "plugin marketplace add $HOME/dot-files/claude-plugins" "$CALLS"
     grep -Fxq "plugin install bash-perl-lsp@dot-files" "$CALLS"
-    ! grep -Eq "uninstall|mcp remove" "$CALLS"
+    ! grep -Eq "uninstall|mcp remove" "$CALLS" || false
 }
 
 @test "user-scope serena plugin is uninstalled" {

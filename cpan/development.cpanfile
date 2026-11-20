@@ -10,5 +10,6 @@ requires 'Devel::Confess';
 requires 'Modern::Perl';
 requires 'Perl::Critic';
 requires 'Perl::Critic::TooMuchCode';
+requires 'Perl::Critic::Policy::Variables::ProhibitUnusedVarsStricter';
 requires 'Perl::Tidy';
 requires 'Test::Perl::Critic';

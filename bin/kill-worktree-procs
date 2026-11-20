@@ -35,19 +35,19 @@ EOF
 dry=0
 while [ $# -gt 0 ]; do
     case "$1" in
-    -n | --dry-run)
-        dry=1
-        shift
-        ;;
-    -h | --help)
-        usage
-        exit 0
-        ;;
-    -*)
-        echo "kill-worktree-procs: unknown option: $1" >&2
-        exit 2
-        ;;
-    *) break ;;
+        -n | --dry-run)
+            dry=1
+            shift
+            ;;
+        -h | --help)
+            usage
+            exit 0
+            ;;
+        -*)
+            echo "kill-worktree-procs: unknown option: $1" >&2
+            exit 2
+            ;;
+        *) break ;;
     esac
 done
 
@@ -81,7 +81,7 @@ session_root() {
     for i in $(seq 1 20); do
         comm="$(ps -o comm= -p "$p" 2>/dev/null)" || break
         case "$comm" in
-        nono | claude) root="$p" ;;
+            nono | claude) root="$p" ;;
         esac
         ppid="$(ps -o ppid= -p "$p" 2>/dev/null | tr -d ' ')"
         [ -z "$ppid" ] && break
@@ -102,10 +102,10 @@ for d in /proc/[0-9]*; do
     cwd="$(readlink "$d/cwd" 2>/dev/null)" || continue
     cwd="${cwd% (deleted)}"
     case "$cwd" in
-    "$wt" | "$wt"/*)
-        r="$(session_root "$pid")"
-        [ -n "$r" ] && roots="$roots $r"
-        ;;
+        "$wt" | "$wt"/*)
+            r="$(session_root "$pid")"
+            [ -n "$r" ] && roots="$roots $r"
+            ;;
     esac
 done
 roots="$(echo "$roots" | tr ' ' '\n' | grep -E '^[0-9]+$' | sort -un)"
@@ -122,7 +122,7 @@ for r in $roots; do
     [ "$r" = "$self_root" ] && continue
     for pid in "$r" $(descendants "$r"); do
         case "$protected" in
-        *" $pid "*) continue ;;
+            *" $pid "*) continue ;;
         esac
         victims="$victims $pid"
     done
