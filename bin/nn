@@ -254,6 +254,9 @@ fi
 # shared /tmp namespace.
 mkdir -p .tmp/cache
 
+# The toolsmith plugin's tools repo; a nono grant can't create its dir.
+mkdir -p "$HOME/.local/share/toolsmith"
+
 # Decide which browser MCPs to enable for this session:
 #   - superpowers-chrome: only when --chrome was passed (general-purpose web,
 #     opt-in per-session so idle sandboxes don't spawn Chromium MCPs).

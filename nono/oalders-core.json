@@ -37,7 +37,8 @@
     ],
     "allow": [
       "/tmp/claude-1000",
-      "~/.agents/skills"
+      "~/.agents/skills",
+      "~/.local/share/toolsmith"
     ],
     "unix_socket_dir": [
       "/tmp/tmux-1000"

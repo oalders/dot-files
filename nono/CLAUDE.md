@@ -219,6 +219,7 @@ When claude or an MCP server can't reach something:
 
 These don't belong to any single tool or stack, so they live in `oalders-core` (the net-free base that `oalders` always extends):
 
+- `allow` on `~/.local/share/toolsmith` (the toolsmith plugin's shared tools repo and `CATALOG.md`; `bin/nn` pre-creates it since a grant can't create the dir).
 - `read` on `~/.local/bin` (user-installed scripts) and `~/.npm-packages` (npm-installed binaries: playwright-mcp consumer + standalone npx use).
 - `read` on `~/dot-files/bin` (npx wrapper that intercepts `@playwright/mcp@latest` so it sits ahead of `~/dot-files/node_modules/.bin/npx` in PATH).
 - `read` on `~/dot-files/claude-plugins` (local `dot-files` plugin marketplace; Claude Code reads the `bash-perl-lsp` plugin from here).
