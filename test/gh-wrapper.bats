@@ -246,6 +246,14 @@ assert_needs_trailer() {
     done
 }
 
+@test "blanking a human-written body needs the trailer" {
+    current 7 'written by a human'
+    for b in '' ' '; do
+        gh_run issue edit 7 --body "$b"
+        assert_needs_trailer
+    done
+}
+
 @test "editing an empty body needs the trailer" {
     for b in '' ' '; do
         current 9 "$b"
