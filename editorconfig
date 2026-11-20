@@ -2,10 +2,8 @@
 trim_trailing_whitespace = true
 indent_style = space
 indent_size = 4
-
-[*.sh]
-indent_style = space
-indent_size = 4
+switch_case_indent = true
+simplify = true
 
 [*.go]
 indent_style = tab
