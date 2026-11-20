@@ -50,36 +50,6 @@ lint_flags = "--check"
 ok_exit_codes = [0]
 lint_failure_exit_codes = [1]
 
-[commands.perltidy]
-type = "both"
-include = [
-    "**/*.pl",
-    "**/*.pm",
-    "**/*.t",
-    "bin/gh",
-    "dzil/profiles/default/skel/git/hooks/pre-commit",
-    "re.pl/repl.rc",
-]
-cmd = [ "perltidy", "--profile=$PRECIOUS_ROOT/perltidyrc" ]
-lint_flags = [ "--assert-tidy", "--no-standard-output", "--outfile=/dev/null" ]
-tidy_flags = [ "--backup-and-modify-in-place", "--backup-file-extension=/" ]
-ok_exit_codes = [0]
-lint_failure_exit_codes = [2]
-
-[commands.perlcritic]
-type = "lint"
-include = [
-    "**/*.pl",
-    "**/*.pm",
-    "**/*.t",
-    "bin/gh",
-    "dzil/profiles/default/skel/git/hooks/pre-commit",
-    "re.pl/repl.rc",
-]
-cmd = [ "perlcritic", "--profile=$PRECIOUS_ROOT/perlcriticrc" ]
-ok_exit_codes = [0]
-lint_failure_exit_codes = [2]
-
 [commands.perlimports]
 type = "both"
 include = [
@@ -96,3 +66,34 @@ tidy_flags = [ "-i" ]
 ok_exit_codes = [0]
 lint_failure_exit_codes = [1]
 expect_stderr = true
+
+[commands.perltidy]
+type = "both"
+include = [
+    "**/*.pl",
+    "**/*.pm",
+    "**/*.t",
+    "bin/gh",
+    "dzil/profiles/default/skel/git/hooks/pre-commit",
+    "re.pl/repl.rc",
+]
+cmd = [ "perltidy", "--profile=$PRECIOUS_ROOT/perltidyrc" ]
+lint_flags = [ "--assert-tidy", "--no-standard-output", "--outfile=/dev/null" ]
+tidy_flags = [ "--backup-and-modify-in-place", "--backup-file-extension=/" ]
+ok_exit_codes = [0]
+lint_failure_exit_codes = [2]
+expect_stderr = true
+
+[commands.perlcritic]
+type = "lint"
+include = [
+    "**/*.pl",
+    "**/*.pm",
+    "**/*.t",
+    "bin/gh",
+    "dzil/profiles/default/skel/git/hooks/pre-commit",
+    "re.pl/repl.rc",
+]
+cmd = [ "perlcritic", "--profile=$PRECIOUS_ROOT/perlcriticrc" ]
+ok_exit_codes = [0]
+lint_failure_exit_codes = [2]
