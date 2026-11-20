@@ -27,7 +27,7 @@
     "diff-lockfiles": "^1.5.0",
     "eslint": "^10.13.0",
     "fixjson": "^1.1.2",
-    "markdownlint": "^0.42.0",
+    "markdownlint": "^0.42.2",
     "markdownlint-cli": "^0.50.0",
     "mcp-hub": "^4.2.1",
     "normalize-url": "^10.0.0",
