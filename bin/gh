@@ -33,8 +33,8 @@
 # issue/pull/review/reply endpoints or GraphQL mutations. An `issue`/`pr edit`
 # only needs the leak check when every target's current body is non-empty and
 # has neither a `[Claude Code](…)` link nor a Claude `Co-Authored-By:`/
-# `Assisted-By:` line (a human's); add one if you rewrite it (not for a typo,
-# link or checkbox fix).
+# `Assisted-By:` line (a human's) and no new body is blank; add one if you
+# rewrite it (not for a typo, link or checkbox fix).
 #
 # Also, in a session whose repo is private, writes (including git pushes via
 # `auth git-credential`) to any repo that is not private/internal (or listed in
@@ -621,7 +621,10 @@ if ($cmd) {
     if ($maybe_human) {
         guard_targets( cmd_targets( $i + 1, $spec ) );
         # Touching up a human's body isn't Claude's post; only leaks matter.
-        $verb = undef if all_human_written( $sub, $i + 1, $spec );
+        # Blanking it is not a touch-up, so it still needs the trailer.
+        $verb = undef
+            if !grep( { !/\S/ } @bodies )
+            && all_human_written( $sub, $i + 1, $spec );
     }
     check( $_, $verb ) for @bodies;
     # Other paths keep the old order: the local check runs before the guard.
