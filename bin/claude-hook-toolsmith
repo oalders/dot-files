@@ -1,0 +1,31 @@
+#!/bin/bash
+
+# PreToolUse hook: deny Bash calls that run more than five lines of inline
+# python/node/perl/ruby, steering the agent to the toolsmith plugin instead.
+# The toolsmith subagent itself is exempt: writing tools is its job.
+
+set -eu -o pipefail
+
+input=$(cat)
+
+[[ $(jq -r '.tool_name // empty' <<<"$input") == Bash ]] || exit 0
+[[ $(jq -r '.agent_type // empty' <<<"$input") == toolsmith:toolsmith ]] && exit 0
+
+cmd=$(jq -r '.tool_input.command // empty' <<<"$input")
+
+# Inline code: an interpreter fed -c/-e/-E or a heredoc.
+interp='(^|[[:space:];&|(])(python3?|node|perl|ruby)([[:space:]]+-[^[:space:]]*)*'
+inline="${interp}[[:space:]]+(-[ceE]([[:space:]]|$)|-?[[:space:]]*<<)"
+grep -Eq "$inline" <<<"$cmd" || exit 0
+
+# Counts every line of the command, so the first line and a heredoc
+# terminator buy one line of slack each over the five-line rule.
+(($(wc -l <<<"$cmd") > 7)) || exit 0
+
+jq -n '{
+    hookSpecificOutput: {
+        hookEventName: "PreToolUse",
+        permissionDecision: "deny",
+        permissionDecisionReason: "Toolsmith rule: more than five lines of inline code is a tool. Search the catalog (grep -s -i -E <words> ~/.local/share/toolsmith/tools/CATALOG.md) and run a matching tool, or call the Agent tool with subagent_type \"toolsmith:toolsmith\" and a brief. If this code is part of the project deliverable, write it to a file in the project instead."
+    }
+}'

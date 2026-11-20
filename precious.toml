@@ -23,6 +23,7 @@ include = [
     "bash_profile",
     "bashrc-docker",
     "bin/add-worktree",
+    "bin/claude-hook-toolsmith",
     "bin/claude-mcp",
     "bin/dev",
     "bin/dl",
