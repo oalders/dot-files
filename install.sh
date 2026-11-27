@@ -35,6 +35,7 @@ run_mac_installers() {
         ./configure/macos.sh
         ./configure/spotlight.sh
         ./configure/libreoffice.sh
+        ./configure/spotify.sh
         ./installer/spoon-installer.sh
         ./installer/tailscale.sh
     )

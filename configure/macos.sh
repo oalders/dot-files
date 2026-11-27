@@ -39,6 +39,13 @@ defaults write com.apple.finder ShowPathbar -bool true
 # Bouncing apps in the dock are distracting
 defaults write com.apple.dock no-bouncing -bool TRUE
 
+# Don't relaunch every open app at login; it makes boot crawl
+defaults write com.apple.loginwindow TALLogoutSavesState -bool false
+defaults write com.apple.loginwindow LoginwindowLaunchesRelaunchApps -bool false
+
+# Persists even when Epic rewrites its LaunchAgent; harmless if not installed
+launchctl disable "gui/$(id -u)/com.epicgames.launcher"
+
 # Kill affected apps
 for app in "Dock" "Finder"; do
     killall "${app}" >/dev/null 2>&1
