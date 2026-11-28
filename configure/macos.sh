@@ -43,16 +43,16 @@ defaults write com.apple.dock no-bouncing -bool TRUE
 defaults write com.apple.loginwindow TALLogoutSavesState -bool false
 defaults write com.apple.loginwindow LoginwindowLaunchesRelaunchApps -bool false
 
-# Login agents nobody here needs. disable persists even when an app rewrites
-# its LaunchAgent, and is harmless if the app isn't installed.
+# Slow login for no benefit: Epic autostarts, and GPG Suite is unused since
+# commits stopped being signed (`brew cu` in installer/homebrew.sh keeps it
+# patched). disable survives an app rewriting its LaunchAgent and succeeds even
+# if the app isn't installed; undo with `launchctl enable`.
 for agent in \
     com.epicgames.launcher \
     org.gpgtools.Libmacgpg.xpc \
     org.gpgtools.macgpg2.fix \
     org.gpgtools.macgpg2.shutdown-gpg-agent \
-    org.gpgtools.updater \
-    us.zoom.updater \
-    us.zoom.updater.login.check; do
+    org.gpgtools.updater; do
     launchctl disable "gui/$(id -u)/${agent}"
 done
 
