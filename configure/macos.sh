@@ -43,8 +43,18 @@ defaults write com.apple.dock no-bouncing -bool TRUE
 defaults write com.apple.loginwindow TALLogoutSavesState -bool false
 defaults write com.apple.loginwindow LoginwindowLaunchesRelaunchApps -bool false
 
-# Persists even when Epic rewrites its LaunchAgent; harmless if not installed
-launchctl disable "gui/$(id -u)/com.epicgames.launcher"
+# Login agents nobody here needs. disable persists even when an app rewrites
+# its LaunchAgent, and is harmless if the app isn't installed.
+for agent in \
+    com.epicgames.launcher \
+    org.gpgtools.Libmacgpg.xpc \
+    org.gpgtools.macgpg2.fix \
+    org.gpgtools.macgpg2.shutdown-gpg-agent \
+    org.gpgtools.updater \
+    us.zoom.updater \
+    us.zoom.updater.login.check; do
+    launchctl disable "gui/$(id -u)/${agent}"
+done
 
 # Kill affected apps
 for app in "Dock" "Finder"; do
