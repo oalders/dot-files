@@ -257,8 +257,8 @@ mkdir -p .tmp/cache
 # The toolsmith plugin's tools repo; a nono grant can't create its dir.
 mkdir -p "$HOME/.local/share/toolsmith"
 
-# nono drops a missing grant path and ~/go/pkg is read-only in-sandbox, so Go
-# can't create its oalders-go dirs. Outside auto-detect so wrapped repos get them.
+# nono drops grant paths that don't exist and Go can't mkdir under read-only
+# ~/go/pkg in-sandbox. Not in auto-detect: that's skipped once .nono/profile.json exists.
 if [[ -f "$project_root/go.mod" ]]; then
     mkdir -p "$HOME/go/pkg/mod" "$HOME/go/pkg/sumdb"
 fi
