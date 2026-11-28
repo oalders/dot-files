@@ -13,7 +13,6 @@ include = [
     "bash_profile",
     "bashrc-docker",
     "bin/*",
-    "sketchybar/sketchybarrc",
     "ssh/rc",
 ]
 exclude = [ "bin/*.pl", "bin/*.scpt", "bin/gh" ]
@@ -34,7 +33,6 @@ include = [
     "bash_profile",
     "bashrc-docker",
     "bin/*",
-    "sketchybar/sketchybarrc",
     "ssh/rc",
 ]
 exclude = [ "bin/*.pl", "bin/*.scpt", "bin/gh" ]

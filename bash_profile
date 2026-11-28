@@ -37,9 +37,6 @@ if [ -f $gcloud_bash ]; then . $gcloud_bash; fi
 # The next line enables shell command completion for gcloud.
 if [ -f $gcloud_completion ]; then . $gcloud_completion; fi
 
-GPG_TTY=$(tty)
-export GPG_TTY
-
 # Make MacOS less annoying
 # Specifically don't run update_terminal_cwd()
 export BASH_SILENCE_DEPRECATION_WARNING=1

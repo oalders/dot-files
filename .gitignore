@@ -7,7 +7,6 @@ hammerspoon/Spoons/
 nvim/lazy-lock.json
 .pnp.*
 .serena/
-sketchybar/plugins/.laptop
 src/
 .tidyall.d/
 node_modules/
