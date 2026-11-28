@@ -309,6 +309,15 @@ SYMLINKS="$SCRIPT_DIR/installer/symlinks.sh"
     [ "$status" -eq 0 ]
 }
 
+# go mod tidy writes ~/go/pkg/sumdb; ~/go is otherwise read-only (#1143).
+@test "oalders-go.json grants the Go checksum DB state dir" {
+    run jq empty "$NONO_DIR/oalders-go.json"
+    [ "$status" -eq 0 ]
+    run jq -e '.filesystem.allow | index("~/go/pkg/sumdb")' \
+        "$NONO_DIR/oalders-go.json"
+    [ "$status" -eq 0 ]
+}
+
 # Host shells' PATH runs through /run/user/1000/fnm_multishells, so a grant
 # there (or on a parent) would let the sandbox repoint host node/npm (#1062).
 @test "no nono profile grants anything under /run/user" {

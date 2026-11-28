@@ -257,6 +257,12 @@ mkdir -p .tmp/cache
 # The toolsmith plugin's tools repo; a nono grant can't create its dir.
 mkdir -p "$HOME/.local/share/toolsmith"
 
+# Go's checksum DB state: ~/go/pkg is read-only in-sandbox and nono drops a
+# missing grant path. Not in auto-detect, which skips repos with a wrapper.
+if [[ -f "$project_root/go.mod" ]]; then
+    mkdir -p "$HOME/go/pkg/sumdb"
+fi
+
 # Decide which browser MCPs to enable for this session:
 #   - superpowers-chrome: only when --chrome was passed (general-purpose web,
 #     opt-in per-session so idle sandboxes don't spawn Chromium MCPs).
