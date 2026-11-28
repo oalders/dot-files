@@ -311,8 +311,6 @@ SYMLINKS="$SCRIPT_DIR/installer/symlinks.sh"
 
 # go mod tidy writes ~/go/pkg/sumdb; ~/go is otherwise read-only (#1143).
 @test "oalders-go.json grants the Go checksum DB state dir" {
-    run jq empty "$NONO_DIR/oalders-go.json"
-    [ "$status" -eq 0 ]
     run jq -e '.filesystem.allow | index("~/go/pkg/sumdb")' \
         "$NONO_DIR/oalders-go.json"
     [ "$status" -eq 0 ]

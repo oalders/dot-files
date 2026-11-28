@@ -514,14 +514,15 @@ esac'
     grep -Fq '"oalders-perl-net"' .nono/profile.json
 }
 
-@test "bin/nn pre-creates ~/go/pkg/sumdb for a go.mod repo" {
-    # The oalders-go grant can't create it (#1143); an existing wrapper proves
-    # the mkdir isn't tied to first-run auto-detect.
+@test "bin/nn pre-creates ~/go/pkg/mod and ~/go/pkg/sumdb for a go.mod repo" {
+    # The oalders-go grants can't create them (#1143); an existing wrapper
+    # proves the mkdir isn't tied to first-run auto-detect.
     touch go.mod
     mkdir -p .nono
     echo '{"extends": ["oalders", "oalders-go"]}' >.nono/profile.json
     run "$NN"
     [ "$status" -eq 0 ]
+    [ -d "$HOME/go/pkg/mod" ]
     [ -d "$HOME/go/pkg/sumdb" ]
 }
 
