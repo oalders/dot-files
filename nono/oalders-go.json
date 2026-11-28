@@ -18,7 +18,8 @@
     "allow": [
       "~/.cache/go-build",
       "~/.cache/golangci-lint",
-      "~/go/pkg/mod"
+      "~/go/pkg/mod",
+      "~/go/pkg/sumdb"
     ]
   },
   "network": {

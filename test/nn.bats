@@ -514,6 +514,18 @@ esac'
     grep -Fq '"oalders-perl-net"' .nono/profile.json
 }
 
+@test "bin/nn pre-creates ~/go/pkg/mod and ~/go/pkg/sumdb for a go.mod repo" {
+    # The oalders-go grants can't create them (#1143); an existing wrapper
+    # proves the mkdir isn't tied to first-run auto-detect.
+    touch go.mod
+    mkdir -p .nono
+    echo '{"extends": ["oalders", "oalders-go"]}' >.nono/profile.json
+    run "$NN"
+    [ "$status" -eq 0 ]
+    [ -d "$HOME/go/pkg/mod" ]
+    [ -d "$HOME/go/pkg/sumdb" ]
+}
+
 @test "bin/nn --chrome opens the pinned DevTools port and sets CHROME_WS_PORT" {
     # The superpowers-chrome MCP serves DevTools over a localhost TCP port the
     # default chain doesn't open. nn opens one fixed port (--open-port) and
